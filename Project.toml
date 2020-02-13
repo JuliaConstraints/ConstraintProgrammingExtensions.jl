@@ -1,0 +1,17 @@
+name = "ConstraintProgrammingExtensions"
+uuid = "b65d079e-ed98-51d9-b0db-edee61a5c5f8"
+authors = ["Thibaut Cuvelier"]
+version = "0.0.1"
+
+[deps]
+MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
+
+[compat]
+MathOptInterface = "~0.9"
+julia = "^1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
