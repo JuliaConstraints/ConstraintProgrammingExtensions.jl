@@ -1,2 +1,2 @@
 # ConstraintProgrammingExtensions.jl
-Extensions to MathOptInterface to support constraint programming.
+Extensions to [MathOptInterface](https://github.com/JuliaOpt/MathOptInterface.jl) to support constraint programming.
