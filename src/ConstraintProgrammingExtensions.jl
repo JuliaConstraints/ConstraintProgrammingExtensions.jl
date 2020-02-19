@@ -40,7 +40,7 @@ This constraint is sometimes called `in`.
 """
 struct Domain{T <: Number} <: MOI.AbstractScalarSet
     values::Set{T}
-    Domain(itr) = new(Set(itr))
+    Domain(itr) = new{T}(Set(itr))
 end
 
 function Base.copy(set::Domain{T}) where T
@@ -68,7 +68,7 @@ end
     DifferentFrom{T <: Number}(value::T)
 The set exclusing the single point ``x \\in \\mathbb{R}`` where ``x`` is given by `value`.
 """
-struct DifferentFrom{T <: Number} <: AbstractScalarSet
+struct DifferentFrom{T <: Number} <: MOI.AbstractScalarSet
     value::T
 end
 
@@ -121,7 +121,7 @@ For example, while `LessThan(1)` corresponds to the inequality `x <= 1`,
 
     x in Strictly(LessThan(1))
 """
-struct Strictly{S <: Union{LessThan, GreaterThan}} <: MOI.AbstractScalarSet
+struct Strictly{S <: Union{MOI.LessThan, MOI.GreaterThan}} <: MOI.AbstractScalarSet
     set::S
 end
 
