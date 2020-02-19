@@ -65,18 +65,11 @@ struct Membership <: MOI.AbstractVectorSet
 end
 
 """
-    DifferentFrom(dimension)
-
-The first element of a function of dimension `dimension` cannot equal any
-of the following `dimension - 1` elements of the function.
-
-## Example
-
-    [x, y, z] in DifferentFrom(3)
-    # enforces `x != y` AND `x != z`.
+    DifferentFrom{T <: Number}(value::T)
+The set exclusing the single point ``x \\in \\mathbb{R}`` where ``x`` is given by `value`.
 """
-struct DifferentFrom <: MOI.AbstractVectorSet
-    dimension::Int
+struct DifferentFrom{T <: Number} <: AbstractScalarSet
+    value::T
 end
 
 """
@@ -98,13 +91,13 @@ end
 """
     CountDistinct(dimension::Int)
 
-The first variable in the set is forced to be the number of distinct values in 
+The first variable in the set is forced to be the number of distinct values in
 the rest of the expressions.
 
-This is a relaxed version of `AllDifferent`; it encodes an `AllDifferent` 
+This is a relaxed version of `AllDifferent`; it encodes an `AllDifferent`
 constraint when the first variable is the number of variables in the set.
 
-Also called `nvalues`. 
+Also called `nvalues`.
 
 ## Example
 
@@ -120,8 +113,8 @@ dimension(set::CountDistinct) where T = set.dimension + 1
 """
     Strictly{S <: Union{LessThan, GreaterThan}}
 
-Converts an inequality set to a set with the same inequality made strict. 
-For example, while `LessThan(1)` corresponds to the inequality `x <= 1`, 
+Converts an inequality set to a set with the same inequality made strict.
+For example, while `LessThan(1)` corresponds to the inequality `x <= 1`,
 `Strictly(LessThan(1))` corresponds to the inequality `x < 1`.
 
 ## Example
@@ -141,17 +134,17 @@ end
 
 ``\\{(x, i) \\in \\mathbb{R}^d \\times \\mathbb{N}^d | x_j = values[i_j]\\}``
 
-Less formally, the j-th element constrained in this set will take the value of 
+Less formally, the j-th element constrained in this set will take the value of
 `values` at the index given by the `(j + dimension)`-th element.
 
 ## Examples
 
     [x, 3] in Element([4, 5, 6], 2)
     # Enforces that x = 6, because 6 is the 3rd element from the array.
-    
+
     [x, y, 3, j] in Element([4, 5, 6], 4)
     # Enforces that x = 6, because 6 is the 3rd element from the array.
-    # Enforces that y = array[j], depending on the value of j (an integer 
+    # Enforces that y = array[j], depending on the value of j (an integer
     # between 1 and 3).
 """
 struct Element{T <: Real} <: MOI.AbstractVectorSet
@@ -168,7 +161,7 @@ end
 """
     Sort(dimension::Int)
 
-Ensures that the first `dimension` elements is a sorted copy of the next 
+Ensures that the first `dimension` elements is a sorted copy of the next
 `dimension` elements.
 
 ## Example
@@ -189,10 +182,10 @@ dimension(set::Sort) where T = 2 * set.dimension
 """
     SortPermutation(dimension::Int)
 
-Ensures that the first `dimension` elements is a sorted copy of the second 
-`dimension` elements. 
+Ensures that the first `dimension` elements is a sorted copy of the second
+`dimension` elements.
 
-The last `dimension` elements give a permutation to get from the original array 
+The last `dimension` elements give a permutation to get from the original array
 to its sorted version.
 
 ## Example
@@ -213,11 +206,11 @@ dimension(set::SortPermutation) where T = 3 * set.dimension
 """
     BinPacking(n_bins::Int, n_items::Int)
 
-Implements an uncapacitated version of the bin packing. 
+Implements an uncapacitated version of the bin packing.
 
-The first `n_bins` variables give the load in each bin, the next `n_items` give 
-the number of the bin to which the item is assigned to, and the last `n_items` 
-ones give the size of each item. The load of a bin is defined as the sum of the 
+The first `n_bins` variables give the load in each bin, the next `n_items` give
+the number of the bin to which the item is assigned to, and the last `n_items`
+ones give the size of each item. The load of a bin is defined as the sum of the
 sizes of the items put in that bin.
 
 Also called `pack`.
@@ -240,23 +233,23 @@ dimension(set::BinPacking) where T = set.n_bins + 2 * set.n_items
 """
     CapacitatedBinPacking(n_bins::Int, n_items::Int)
 
-Implements an uncapacitated version of the bin packing. 
+Implements an uncapacitated version of the bin packing.
 
-The first `n_bins` variables give the load in each bin, the next `n_bins` are 
-the capacity of each bin, the followin `n_items` give the number of the bin to 
-which the item is assigned to, and the last `n_items` ones give the size of each 
-item. The load of a bin is defined as the sum of the sizes of the items put in 
+The first `n_bins` variables give the load in each bin, the next `n_bins` are
+the capacity of each bin, the followin `n_items` give the number of the bin to
+which the item is assigned to, and the last `n_items` ones give the size of each
+item. The load of a bin is defined as the sum of the sizes of the items put in
 that bin.
 
-This constraint is equivalent to `BinPacking` with inequality constraints on the 
-loads of the bins. However, there are more efficient propagators for the 
+This constraint is equivalent to `BinPacking` with inequality constraints on the
+loads of the bins. However, there are more efficient propagators for the
 combined constraint (bin packing with maximum load).
 
 Also called `bin_packing_capa`.
 
 ## Example
     [a, 2, b, c, d, e] in CapacitatedBinPacking(1, 2)
-    # As there is only one bin, the only solution is to put all the items in 
+    # As there is only one bin, the only solution is to put all the items in
     # that bin if its capacity is large enough.
     # Enforces that:
     # - the bin load is the sum of the objects in that bin: a = d + e
@@ -275,7 +268,7 @@ dimension(set::CapacitatedBinPacking) where T = 2 * set.n_bins + 2 * set.n_items
 
 ``\\{(y, x) \\in \\{0, 1\\} \\times \\mathbb{R}^n | y = 1 \\iff x \\in set, y = 0 otherwise\\}``.
 
-This set serves to find out whether a given constraint is satisfied. 
+This set serves to find out whether a given constraint is satisfied.
 
 The only possible values are 0 and 1.
 """
@@ -293,12 +286,12 @@ end
 # isbits types, nothing to copy
 function Base.copy(
     set::Union{
-        AllDifferent, 
-        DifferentFrom, 
-        CountDistinct, 
+        AllDifferent,
+        DifferentFrom,
+        CountDistinct,
         Element,
-        BinPacking, 
-        CapacitatedBinPacking, 
+        BinPacking,
+        CapacitatedBinPacking,
         DifferentFrom
     }
 )
