@@ -44,9 +44,7 @@ struct Domain{T <: Number} <: MOI.AbstractScalarSet
     Domain(itr) = new{T}(Set(itr))
 end
 
-function Base.copy(set::Domain{T}) where T
-    return Domain(copy(set.values))
-end
+Base.copy(set::Domain{T}) where T = Domain(copy(set.values))
 
 """
     Membership(dimension)
@@ -88,10 +86,7 @@ struct Count{T <: Real} <: MOI.AbstractVectorSet
 end
 
 dimension(set::Count{T}) where T = set.dimension + 1
-
-function Base.copy(set::Count)
-    return Count(copy(set.value), value)
-end
+Base.copy(set::Count{T}) where T = Count(copy(set.value), value)
 
 """
     CountDistinct(dimension::Int)
@@ -130,11 +125,8 @@ struct Strictly{S <: Union{MOI.LessThan, MOI.GreaterThan}} <: MOI.AbstractScalar
     set::S
 end
 
-function Base.copy(set::Strictly{S}) where S
-    return Count(copy(set.set))
-end
-
-MOI.constant(set::Strictly{S}) where {S, T} = constant(set.set)
+Base.copy(set::Strictly{S}) where S = Count(copy(set.set))
+MOI.constant(set::Strictly{S}) where S = constant(set.set)
 MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T} =
     typeof(set)(MOIU.shift_constant(set.set, offset))
 
@@ -162,10 +154,7 @@ struct Element{T <: Real} <: MOI.AbstractVectorSet
 end
 
 dimension(set::Element{T}) where T = set.dimension
-
-function Base.copy(set::Element{T}) where T
-    return Element(copy(set.values), set.dimension)
-end
+Base.copy(set::Element{T}) where T = Element(copy(set.values), set.dimension)
 
 """
     Sort(dimension::Int)
@@ -287,10 +276,8 @@ struct ReificationSet{S <: MOI.AbstractScalarSet} <: MOI.AbstractVectorSet
 end
 
 dimension(set::ReificationSet{T}) where T = set.dimension + 1
-
-function Base.copy(set::ReificationSet{S}) where S
-    return ReificationSet(copy(set.set), set.dimension)
-end
+Base.copy(set::ReificationSet{S}) where S =
+    ReificationSet(copy(set.set), set.dimension)
 
 # isbits types, nothing to copy
 function Base.copy(
