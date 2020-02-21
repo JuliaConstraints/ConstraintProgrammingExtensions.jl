@@ -2,6 +2,7 @@ module ConstraintProgrammingExtensions
 
 import MathOptInterface
 const MOI = MathOptInterface
+const MOIU = MOI.Utilities
 
 """
     AllDifferent(dimension::Int)
@@ -72,6 +73,10 @@ struct DifferentFrom{T <: Number} <: MOI.AbstractScalarSet
     value::T
 end
 
+MOI.constant(set::DifferentFrom{T}) where T = set.value
+MOIU.shift_constant(set::DifferentFrom{T}, offset::T) where T =
+    typeof(set)(MOI.constant(set) + offset)
+
 """
     Count{T <: Real}(value::T, dimension::Int)
 
@@ -128,6 +133,10 @@ end
 function Base.copy(set::Strictly{S}) where S
     return Count(copy(set.set))
 end
+
+MOI.constant(set::Strictly{S}) where {S, T} = constant(set.set)
+MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T} =
+    typeof(set)(MOIU.shift_constant(set.set, offset))
 
 """
     Element{T <: Real}(values::Vector{T})
