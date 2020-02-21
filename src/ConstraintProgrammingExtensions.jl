@@ -126,7 +126,7 @@ struct Strictly{S <: Union{MOI.LessThan, MOI.GreaterThan}} <: MOI.AbstractScalar
 end
 
 Base.copy(set::Strictly{S}) where S = Count(copy(set.set))
-MOI.constant(set::Strictly{S}) where S = constant(set.set)
+MOI.constant(set::Strictly{S}) where S = MOI.constant(set.set)
 MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T} =
     typeof(set)(MOIU.shift_constant(set.set, offset))
 
