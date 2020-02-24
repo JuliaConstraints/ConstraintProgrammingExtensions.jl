@@ -272,12 +272,10 @@ The only possible values are 0 and 1.
 """
 struct ReificationSet{S <: MOI.AbstractScalarSet} <: MOI.AbstractVectorSet
     set::S
-    dimension::Int
 end
 
-dimension(set::ReificationSet{T}) where T = set.dimension + 1
-Base.copy(set::ReificationSet{S}) where S =
-    ReificationSet(copy(set.set), set.dimension)
+dimension(set::ReificationSet{S}) where S = 2
+Base.copy(set::ReificationSet{S}) where S = ReificationSet(copy(set.set))
 
 # isbits types, nothing to copy
 function Base.copy(
