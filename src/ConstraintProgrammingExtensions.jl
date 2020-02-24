@@ -262,7 +262,7 @@ end
 dimension(set::CapacitatedBinPacking) where T = 2 * set.n_bins + 2 * set.n_items
 
 """
-    ReificationSet{S <: MOI.AbstractScalarSet}(set::S)
+    ReificationSet{S <: MOI.AbstractSet}(set::S)
 
 ``\\{(y, x) \\in \\{0, 1\\} \\times \\mathbb{R}^n | y = 1 \\iff x \\in set, y = 0 otherwise\\}``.
 
@@ -270,7 +270,7 @@ This set serves to find out whether a given constraint is satisfied.
 
 The only possible values are 0 and 1.
 """
-struct ReificationSet{S <: MOI.AbstractScalarSet} <: MOI.AbstractVectorSet
+struct ReificationSet{S <: MOI.AbstractSet} <: MOI.AbstractVectorSet
     set::S
 end
 
