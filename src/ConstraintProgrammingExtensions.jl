@@ -274,7 +274,7 @@ struct ReificationSet{S <: MOI.AbstractSet} <: MOI.AbstractVectorSet
     set::S
 end
 
-dimension(set::ReificationSet{S}) where S = 2
+dimension(set::ReificationSet{S}) where S = 1 + dimension(set.set)
 Base.copy(set::ReificationSet{S}) where S = ReificationSet(copy(set.set))
 
 # isbits types, nothing to copy
