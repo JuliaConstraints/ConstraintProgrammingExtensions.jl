@@ -264,7 +264,7 @@ end
 dimension(set::CapacitatedBinPacking) where T = 2 * set.n_bins + 2 * set.n_items
 
 """
-    ReificationSet{S <: MOI.AbstractScalarSet}(set::S)
+    ReificationSet{S <: MOI.AbstractSet}(set::S)
 
 ``\\{(y, x) \\in \\{0, 1\\} \\times \\mathbb{R}^n | y = 1 \\iff x \\in set, y = 0 otherwise\\}``.
 
@@ -272,14 +272,12 @@ This set serves to find out whether a given constraint is satisfied.
 
 The only possible values are 0 and 1.
 """
-struct ReificationSet{S <: MOI.AbstractScalarSet} <: MOI.AbstractVectorSet
+struct ReificationSet{S <: MOI.AbstractSet} <: MOI.AbstractVectorSet
     set::S
-    dimension::Int
 end
 
-dimension(set::ReificationSet{T}) where T = set.dimension + 1
-Base.copy(set::ReificationSet{S}) where S =
-    ReificationSet(copy(set.set), set.dimension)
+dimension(set::ReificationSet{S}) where S = 1 + dimension(set.set)
+Base.copy(set::ReificationSet{S}) where S = ReificationSet(copy(set.set))
 
 # isbits types, nothing to copy
 function Base.copy(
