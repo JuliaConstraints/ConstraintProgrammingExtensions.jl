@@ -41,10 +41,10 @@ This constraint is sometimes called `in`.
 """
 struct Domain{T <: Number} <: MOI.AbstractScalarSet
     values::Set{T}
-    Domain(itr) = new{T}(Set(itr))
 end
 
 Base.copy(set::Domain{T}) where T = Domain(copy(set.values))
+Base.:(==)(x::Domain{T}, y::Domain{T}) where T = x.values == y.values
 
 """
     Membership(dimension)
@@ -65,7 +65,8 @@ end
 
 """
     DifferentFrom{T <: Number}(value::T)
-The set exclusing the single point ``x \\in \\mathbb{R}`` where ``x`` is given by `value`.
+The set exclusing the single point ``x \\in \\mathbb{R}`` where ``x`` is given
+by `value`.
 """
 struct DifferentFrom{T <: Number} <: MOI.AbstractScalarSet
     value::T
@@ -155,6 +156,7 @@ end
 
 dimension(set::Element{T}) where T = set.dimension
 Base.copy(set::Element{T}) where T = Element(copy(set.values), set.dimension)
+Base.:(==)(x::Element{T}, y::Element{T}) where T = x.dimension == x.dimension && x.values == y.values
 
 """
     Sort(dimension::Int)
