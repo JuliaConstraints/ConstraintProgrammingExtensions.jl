@@ -121,7 +121,7 @@ end
 dimension(set::CountDistinct) = set.dimension + 1
 
 """
-    Strictly{S <: Union{LessThan, GreaterThan}}
+    Strictly{S <: Union{LessThan{T}, GreaterThan{T}}}
 
 Converts an inequality set to a set with the same inequality made strict.
 For example, while `LessThan(1)` corresponds to the inequality `x <= 1`,
@@ -131,7 +131,7 @@ For example, while `LessThan(1)` corresponds to the inequality `x <= 1`,
 
     x in Strictly(LessThan(1))
 """
-struct Strictly{S <: Union{MOI.LessThan, MOI.GreaterThan}} <: MOI.AbstractScalarSet
+struct Strictly{T, S <: Union{MOI.LessThan{T}, MOI.GreaterThan{T}}} <: MOI.AbstractScalarSet
     set::S
 end
 
