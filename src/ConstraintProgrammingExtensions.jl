@@ -32,7 +32,7 @@ The set corresponding to an enumeration of constant values.
 The value of a scalar function is enforced to take a value from this set of
 values.
 
-This constraint is sometimes called `in`.
+This constraint is sometimes called `in` or `allowed_assignments`.
 
 ## Example
 
@@ -65,6 +65,7 @@ end
 
 """
     DifferentFrom{T <: Number}(value::T)
+    
 The set exclusing the single point ``x \\in \\mathbb{R}`` where ``x`` is given
 by `value`.
 """
@@ -79,7 +80,15 @@ MOIU.shift_constant(set::DifferentFrom{T}, offset::T) where T =
 """
     Count{T <: Real}(value::T, dimension::Int)
 
-``\\{(y, x) \\in \\mathbb{N} \\times \\mathbb{R}^n : y = |\\{i | x_i = value\\}|\\}``
+``\\{(y, x) \\in \\mathbb{N} \\times \\mathbb{T}^\\mathtt{dimension} : y = |\\{i | x_i = value\\}|\\}``
+
+`dimension` is the number of variables that are checked against the `value`, 
+i.e. the result variable is not included.
+
+## Example
+
+    [w, x, y, z] in Count(2.0, 3)
+    # w == sum([x, y, z] .== 2.0)
 """
 struct Count{T <: Real} <: MOI.AbstractVectorSet
     value::T
