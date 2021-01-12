@@ -65,7 +65,7 @@ end
 
 """
     DifferentFrom{T <: Number}(value::T)
-    
+
 The set exclusing the single point ``x \\in \\mathbb{R}`` where ``x`` is given
 by `value`.
 """
@@ -118,7 +118,7 @@ struct CountDistinct <: MOI.AbstractVectorSet
     dimension::Int
 end
 
-dimension(set::CountDistinct) where T = set.dimension + 1
+dimension(set::CountDistinct) = set.dimension + 1
 
 """
     Strictly{S <: Union{LessThan, GreaterThan}}
