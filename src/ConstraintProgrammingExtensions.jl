@@ -237,7 +237,7 @@ struct BinPacking <: MOI.AbstractVectorSet
     n_items::Int
 end
 
-dimension(set::BinPacking) where T = set.n_bins + 2 * set.n_items
+dimension(set::BinPacking) = set.n_bins + 2 * set.n_items
 
 """
     CapacitatedBinPacking(n_bins::Int, n_items::Int)
@@ -270,7 +270,7 @@ struct CapacitatedBinPacking <: MOI.AbstractVectorSet
     n_items::Int
 end
 
-dimension(set::CapacitatedBinPacking) where T = 2 * set.n_bins + 2 * set.n_items
+dimension(set::CapacitatedBinPacking) = 2 * set.n_bins + 2 * set.n_items
 
 """
     ReificationSet{S <: MOI.AbstractSet}(set::S)
