@@ -262,7 +262,7 @@ make the conversion seamless.
 Also called `bin_packing_capa`.
 
 ## Example
-    [a, b, c, d, e] in CapacitatedBinPacking(1, 2, [4])
+    [a, b, c, d, e] in FixedCapacityBinPacking(1, 2, [4])
     # As there is only one bin, the only solution is to put all the items in
     # that bin if its capacity is large enough.
     # Enforces that:
@@ -300,7 +300,7 @@ maximum load) and for the fixed-capacity version.
 Also called `bin_packing_capa`.
 
 ## Example
-    [a, 2, b, c, d, e] in CapacitatedBinPacking(1, 2)
+    [a, 2, b, c, d, e] in VariableCapacityBinPacking(1, 2)
     # As there is only one bin, the only solution is to put all the items in
     # that bin if its capacity is large enough.
     # Enforces that:
@@ -339,7 +339,8 @@ function Base.copy(
         CountDistinct,
         Element,
         BinPacking,
-        CapacitatedBinPacking,
+        FixedCapacityBinPacking,
+        VariableCapacityBinPacking,
         DifferentFrom
     }
 )
