@@ -211,44 +211,49 @@ end
 dimension(set::SortPermutation) where T = 3 * set.dimension
 
 """
-    BinPacking(n_bins::Int, n_items::Int)
+    BinPacking(n_bins::Int, n_items::Int, weights::Vector{T})
 
 Implements an uncapacitated version of the bin-packing problem.
 
-The first `n_bins` variables give the load in each bin, the next `n_items` give
-the number of the bin to which the item is assigned to, and the last `n_items`
-ones give the size of each item. 
+The first `n_bins` variables give the load in each bin, the last `n_items` give
+the number of the bin to which the item is assigned to. 
 
 The load of a bin is defined as the sum of the sizes of the items put in that 
 bin.
 
-Also called `pack`.
+Also called [`pack`](https://sofdem.github.io/gccat/gccat/Cbin_packing.html).
 
 ## Example
 
-    [a, b, c, d, e] in BinPacking(1, 2)
+    [a, b, c] in BinPacking{Int}(1, 2, [2, 3])
     # As there is only one bin, the only solution is to put all the items in 
     # that bin.
     # Enforces that:
-    # - the bin load is the sum of the objects in that bin: a = d + e
+    # - the bin load is the sum of the weights of the objects in that bin: 
+    #   a = 2 + 3
     # - the bin number of the two items is 1: b = c = 1
 """
-struct BinPacking <: MOI.AbstractVectorSet
+struct BinPacking{T <: Real} <: MOI.AbstractVectorSet
     n_bins::Int
     n_items::Int
+    weights::Vector{T}
+end
+
+function BinPacking(n_bins::Int, n_items::Int, weights::Vector{T}) where T <: Real
+    @assert n_items == length(weights)
+    return BinPacking{T}(n_bins, n_items, weights)
 end
 
 dimension(set::BinPacking) = set.n_bins + 2 * set.n_items
 
 """
-    FixedCapacityBinPacking(n_bins::Int, n_items::Int, capacities::Vector{<:Real})
+    FixedCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}, capacities::Vector{<:Real})
 
 Implements a capacitated version of the bin-packing problem where capacities
 are constant.
 
-The first `n_bins` variables give the load in each bin, the following `n_items` 
-give the number of the bin to which the item is assigned to, and the last 
-`n_items` ones give the size of each item. 
+The first `n_bins` variables give the load in each bin, the last `n_items` 
+give the number of the bin to which the item is assigned to. 
 
 The load of a bin is defined as the sum of the sizes of the items put in that 
 bin.
@@ -259,35 +264,42 @@ more efficient propagators for the combined constraint (bin packing with
 maximum load); if such propagators are not available, bridges are available to
 make the conversion seamless.
 
-Also called `bin_packing_capa`.
+Also called [`bin_packing_capa`](https://sofdem.github.io/gccat/gccat/Cbin_packing_capa.html).
 
 ## Example
-    [a, b, c, d, e] in FixedCapacityBinPacking(1, 2, [4])
+    [a, b, c] in FixedCapacityBinPacking{Int}(1, 2, [2, 3], [4])
     # As there is only one bin, the only solution is to put all the items in
     # that bin if its capacity is large enough.
     # Enforces that:
-    # - the bin load is the sum of the objects in that bin: a = d + e
+    # - the bin load is the sum of the weights of the objects in that bin: 
+    #   a = 2 + 3
     # - the bin load is at most its capacity: a <= 4 (given in the set)
     # - the bin number of the two items is 1: b = c = 1
 """
 struct FixedCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
     n_bins::Int
     n_items::Int
+    weights::Vector{T}
     capacities::Vector{T}
 end
 
-dimension(set::FixedCapacityBinPacking) = set.n_bins + 2 * set.n_items
+function FixedCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}, capacities::Vector{T}) where T <: Real
+    @assert n_items == length(weights)
+    @assert n_bins == length(capacities)
+    return FixedCapacityBinPacking{T}(n_bins, n_items, weights)
+end
+
+dimension(set::FixedCapacityBinPacking) = set.n_bins + set.n_items
 
 """
-    VariableCapacityBinPacking(n_bins::Int, n_items::Int)
+    VariableCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T})
 
 Implements an capacitated version of the bin-packing problem where capacities 
 are optimisation variables.
 
 The first `n_bins` variables give the load in each bin, the next `n_bins` are
-the capacity of each bin, the following `n_items` give the number of the bin to
-which the item is assigned to, and the last `n_items` ones give the size of 
-each item. 
+the capacity of each bin, the last `n_items` give the number of the bin to
+which the item is assigned to.
 
 The load of a bin is defined as the sum of the sizes of the items put in that 
 bin.
@@ -297,23 +309,30 @@ the loads of the bins where the upper bound is any expression. However, there
 are more efficient propagators for the combined constraint (bin packing with 
 maximum load) and for the fixed-capacity version.
 
-Also called `bin_packing_capa`.
+Also called [`bin_packing_capa`](https://sofdem.github.io/gccat/gccat/Cbin_packing_capa.html).
 
 ## Example
-    [a, 2, b, c, d, e] in VariableCapacityBinPacking(1, 2)
+    [a, 2, b, c] in VariableCapacityBinPacking(1, 2, [2, 3])
     # As there is only one bin, the only solution is to put all the items in
     # that bin if its capacity is large enough.
     # Enforces that:
-    # - the bin load is the sum of the objects in that bin: a = d + e
+    # - the bin load is the sum of the weights of the objects in that bin: 
+    #   a = 2 + 3
     # - the bin load is at most its capacity: a <= 2 (given in a variable)
     # - the bin number of the two items is 1: b = c = 1
 """
-struct VariableCapacityBinPacking <: MOI.AbstractVectorSet
+struct VariableCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
     n_bins::Int
     n_items::Int
+    weights::Vector{T}
 end
 
-dimension(set::VariableCapacityBinPacking) = 2 * set.n_bins + 2 * set.n_items
+function VariableCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}) where T <: Real
+    @assert n_items == length(weights)
+    return VariableCapacityBinPacking{T}(n_bins, n_items, weights)
+end
+
+dimension(set::VariableCapacityBinPacking) = 2 * set.n_bins + set.n_items
 
 """
     ReificationSet{S <: MOI.AbstractSet}(set::S)
