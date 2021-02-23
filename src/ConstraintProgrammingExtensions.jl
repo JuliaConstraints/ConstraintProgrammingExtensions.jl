@@ -143,29 +143,27 @@ MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T} =
 """
     Element{T <: Real}(values::Vector{T})
 
-``\\{(x, i) \\in \\mathbb{R}^d \\times \\mathbb{N}^d | x_j = values[i_j]\\}``
+``\\{(x, i) \\in \\mathbb{R}^d \\times \\mathbb{N}^d | x = values[i]\\}``
 
-Less formally, the j-th element constrained in this set will take the value of
-`values` at the index given by the `(j + dimension)`-th element.
+Less formally, the first element constrained in this set will take the value of
+`values` at the index given by the second element.
 
 ## Examples
 
     [x, 3] in Element([4, 5, 6], 2)
     # Enforces that x = 6, because 6 is the 3rd element from the array.
 
-    [x, y, 3, j] in Element([4, 5, 6], 4)
-    # Enforces that x = 6, because 6 is the 3rd element from the array.
+    [y, j] in Element([4, 5, 6], 4)
     # Enforces that y = array[j], depending on the value of j (an integer
     # between 1 and 3).
 """
 struct Element{T <: Real} <: MOI.AbstractVectorSet
     values::Vector{T}
-    dimension::Int
 end
 
-dimension(set::Element{T}) where T = set.dimension
-Base.copy(set::Element{T}) where T = Element(copy(set.values), set.dimension)
-Base.:(==)(x::Element{T}, y::Element{T}) where T = x.dimension == x.dimension && x.values == y.values
+dimension(set::Element{T}) where T = 2
+Base.copy(set::Element{T}) where T = Element(copy(set.values))
+Base.:(==)(x::Element{T}, y::Element{T}) where T = x.values == y.values
 
 """
     Sort(dimension::Int)
