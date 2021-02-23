@@ -213,19 +213,22 @@ dimension(set::SortPermutation) where T = 3 * set.dimension
 """
     BinPacking(n_bins::Int, n_items::Int)
 
-Implements an uncapacitated version of the bin packing.
+Implements an uncapacitated version of the bin-packing problem.
 
 The first `n_bins` variables give the load in each bin, the next `n_items` give
 the number of the bin to which the item is assigned to, and the last `n_items`
-ones give the size of each item. The load of a bin is defined as the sum of the
-sizes of the items put in that bin.
+ones give the size of each item. 
+
+The load of a bin is defined as the sum of the sizes of the items put in that 
+bin.
 
 Also called `pack`.
 
 ## Example
 
     [a, b, c, d, e] in BinPacking(1, 2)
-    # As there is only one bin, the only solution is to put all the items in that bin.
+    # As there is only one bin, the only solution is to put all the items in 
+    # that bin.
     # Enforces that:
     # - the bin load is the sum of the objects in that bin: a = d + e
     # - the bin number of the two items is 1: b = c = 1
@@ -238,19 +241,61 @@ end
 dimension(set::BinPacking) = set.n_bins + 2 * set.n_items
 
 """
-    CapacitatedBinPacking(n_bins::Int, n_items::Int)
+    FixedCapacityBinPacking(n_bins::Int, n_items::Int, capacities::Vector{<:Real})
 
-Implements an uncapacitated version of the bin packing.
+Implements an capacitated version of the bin-packing problem where capacities
+are constant.
+
+The first `n_bins` variables give the load in each bin, the following `n_items` 
+give the number of the bin to which the item is assigned to, and the last 
+`n_items` ones give the size of each item. 
+
+The load of a bin is defined as the sum of the sizes of the items put in that 
+bin.
+
+This constraint is equivalent to `BinPacking` with inequality constraints on 
+the loads of the bins where the upper bound is a constant. However, there are 
+more efficient propagators for the combined constraint (bin packing with 
+maximum load); if such propagators are not available, bridges are available to
+make the conversion seamless.
+
+Also called `bin_packing_capa`.
+
+## Example
+    [a, b, c, d, e] in CapacitatedBinPacking(1, 2, [4])
+    # As there is only one bin, the only solution is to put all the items in
+    # that bin if its capacity is large enough.
+    # Enforces that:
+    # - the bin load is the sum of the objects in that bin: a = d + e
+    # - the bin load is at most its capacity: a <= 4 (given in the set)
+    # - the bin number of the two items is 1: b = c = 1
+"""
+struct FixedCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
+    n_bins::Int
+    n_items::Int
+    capacities::Vector{T}
+end
+
+dimension(set::FixedCapacityBinPacking) = set.n_bins + 2 * set.n_items
+
+"""
+    VariableCapacityBinPacking(n_bins::Int, n_items::Int)
+
+Implements an capacitated version of the bin-packing problem where capacities 
+are optimisation variables.
 
 The first `n_bins` variables give the load in each bin, the next `n_bins` are
-the capacity of each bin, the followin `n_items` give the number of the bin to
-which the item is assigned to, and the last `n_items` ones give the size of each
-item. The load of a bin is defined as the sum of the sizes of the items put in
-that bin.
+the capacity of each bin, the following `n_items` give the number of the bin to
+which the item is assigned to, and the last `n_items` ones give the size of 
+each item. 
 
-This constraint is equivalent to `BinPacking` with inequality constraints on the
-loads of the bins. However, there are more efficient propagators for the
-combined constraint (bin packing with maximum load).
+The load of a bin is defined as the sum of the sizes of the items put in that 
+bin.
+
+This constraint is equivalent to `BinPacking` with inequality constraints on 
+the loads of the bins where the upper bound is any expression. However, there 
+are more efficient propagators for the combined constraint (bin packing with 
+maximum load) and for the fixed-capacity version.
 
 Also called `bin_packing_capa`.
 
@@ -260,15 +305,15 @@ Also called `bin_packing_capa`.
     # that bin if its capacity is large enough.
     # Enforces that:
     # - the bin load is the sum of the objects in that bin: a = d + e
-    # - the bin load is at most its capacity: a <= 2
+    # - the bin load is at most its capacity: a <= 2 (given in a variable)
     # - the bin number of the two items is 1: b = c = 1
 """
-struct CapacitatedBinPacking <: MOI.AbstractVectorSet
+struct VariableCapacityBinPacking <: MOI.AbstractVectorSet
     n_bins::Int
     n_items::Int
 end
 
-dimension(set::CapacitatedBinPacking) = 2 * set.n_bins + 2 * set.n_items
+dimension(set::VariableCapacityBinPacking) = 2 * set.n_bins + 2 * set.n_items
 
 """
     ReificationSet{S <: MOI.AbstractSet}(set::S)
