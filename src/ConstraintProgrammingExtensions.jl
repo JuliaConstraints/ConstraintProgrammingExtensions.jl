@@ -243,7 +243,7 @@ dimension(set::BinPacking) = set.n_bins + 2 * set.n_items
 """
     FixedCapacityBinPacking(n_bins::Int, n_items::Int, capacities::Vector{<:Real})
 
-Implements an capacitated version of the bin-packing problem where capacities
+Implements a capacitated version of the bin-packing problem where capacities
 are constant.
 
 The first `n_bins` variables give the load in each bin, the following `n_items` 
