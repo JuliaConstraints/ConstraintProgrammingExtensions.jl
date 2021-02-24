@@ -240,7 +240,7 @@ struct BinPacking{T <: Real} <: MOI.AbstractVectorSet
 
     function BinPacking(n_bins::Int, n_items::Int, weights::Vector{T}) where T <: Real
         @assert n_items == length(weights)
-        return BinPacking{T}(n_bins, n_items, weights)
+        return new{T}(n_bins, n_items, weights)
     end
 end
 
@@ -285,7 +285,7 @@ struct FixedCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
     function FixedCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}, capacities::Vector{T}) where T <: Real
         @assert n_items == length(weights)
         @assert n_bins == length(capacities)
-        return FixedCapacityBinPacking{T}(n_bins, n_items, weights)
+        return new{T}(n_bins, n_items, weights)
     end
 end
 
@@ -328,7 +328,7 @@ struct VariableCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
 
     function VariableCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}) where T <: Real
         @assert n_items == length(weights)
-        return VariableCapacityBinPacking{T}(n_bins, n_items, weights)
+        return new{T}(n_bins, n_items, weights)
     end
 end
 
