@@ -150,10 +150,10 @@ Less formally, the first element constrained in this set will take the value of
 
 ## Examples
 
-    [x, 3] in Element([4, 5, 6], 2)
+    [x, 3] in Element([4, 5, 6])
     # Enforces that x = 6, because 6 is the 3rd element from the array.
 
-    [y, j] in Element([4, 5, 6], 4)
+    [y, j] in Element([4, 5, 6])
     # Enforces that y = array[j], depending on the value of j (an integer
     # between 1 and 3).
 """
@@ -237,11 +237,11 @@ struct BinPacking{T <: Real} <: MOI.AbstractVectorSet
     n_bins::Int
     n_items::Int
     weights::Vector{T}
-end
 
-function BinPacking(n_bins::Int, n_items::Int, weights::Vector{T}) where T <: Real
-    @assert n_items == length(weights)
-    return BinPacking{T}(n_bins, n_items, weights)
+    function BinPacking(n_bins::Int, n_items::Int, weights::Vector{T}) where T <: Real
+        @assert n_items == length(weights)
+        return BinPacking{T}(n_bins, n_items, weights)
+    end
 end
 
 dimension(set::BinPacking) = set.n_bins + 2 * set.n_items
@@ -281,12 +281,12 @@ struct FixedCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
     n_items::Int
     weights::Vector{T}
     capacities::Vector{T}
-end
 
-function FixedCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}, capacities::Vector{T}) where T <: Real
-    @assert n_items == length(weights)
-    @assert n_bins == length(capacities)
-    return FixedCapacityBinPacking{T}(n_bins, n_items, weights)
+    function FixedCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}, capacities::Vector{T}) where T <: Real
+        @assert n_items == length(weights)
+        @assert n_bins == length(capacities)
+        return FixedCapacityBinPacking{T}(n_bins, n_items, weights)
+    end
 end
 
 dimension(set::FixedCapacityBinPacking) = set.n_bins + set.n_items
@@ -325,11 +325,11 @@ struct VariableCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
     n_bins::Int
     n_items::Int
     weights::Vector{T}
-end
 
-function VariableCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}) where T <: Real
-    @assert n_items == length(weights)
-    return VariableCapacityBinPacking{T}(n_bins, n_items, weights)
+    function VariableCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}) where T <: Real
+        @assert n_items == length(weights)
+        return VariableCapacityBinPacking{T}(n_bins, n_items, weights)
+    end
 end
 
 dimension(set::VariableCapacityBinPacking) = 2 * set.n_bins + set.n_items
