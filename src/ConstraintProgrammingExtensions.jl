@@ -85,6 +85,8 @@ MOIU.shift_constant(set::DifferentFrom{T}, offset::T) where T =
 `dimension` is the number of variables that are checked against the `value`, 
 i.e. the result variable is not included.
 
+Also called `among`.
+
 ## Example
 
     [w, x, y, z] in Count(2.0, 3)
