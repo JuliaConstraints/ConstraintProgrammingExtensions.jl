@@ -343,7 +343,7 @@ dimension(set::VariableCapacityBinPacking) = 2 * set.n_bins + set.n_items
 
 This set serves to find out whether a given constraint is satisfied.
 
-The only possible values are 0 and 1.
+The only possible values are 0 and 1 for the first variable of the set.
 """
 struct ReificationSet{S <: MOI.AbstractSet} <: MOI.AbstractVectorSet
     set::S
@@ -351,6 +351,20 @@ end
 
 dimension(set::ReificationSet{S}) where S = 1 + dimension(set.set)
 Base.copy(set::ReificationSet{S}) where S = ReificationSet(copy(set.set))
+
+"""
+    MinimumDistance{T <: Real}(k::T, dimension::Int)
+
+Ensures that all the `dimension` expressions in this set are at least `k` apart, in absolute value:
+
+``\\{x \\in \\mathbb{S}^{dimension}} | |x_i - x_j| \\geq k, \\forall i \\neq j \\in \\{1, 2\dots dimension\\} \\}``.
+
+Also called [`all_min_dist`](https://sofdem.github.io/gccat/gccat/Call_min_dist.html) or `inter_distance`.
+"""
+struct MinimumDistance{T <: Real} <: MOI.AbstractVectorSet
+    k::T
+    dimension::Int
+end
 
 # isbits types, nothing to copy
 function Base.copy(
@@ -362,7 +376,8 @@ function Base.copy(
         BinPacking,
         FixedCapacityBinPacking,
         VariableCapacityBinPacking,
-        DifferentFrom
+        DifferentFrom,
+        MinimumDistance
     }
 )
     return set
