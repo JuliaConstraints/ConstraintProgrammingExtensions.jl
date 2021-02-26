@@ -357,7 +357,7 @@ Base.copy(set::ReificationSet{S}) where S = ReificationSet(copy(set.set))
 
 Ensures that all the `dimension` expressions in this set are at least `k` apart, in absolute value:
 
-``\\{x \\in \\mathbb{S}^{dimension}} | |x_i - x_j| \\geq k, \\forall i \\neq j \\in \\{1, 2\dots dimension\\} \\}``.
+``\\{x \\in \\mathbb{S}^{dimension}} | |x_i - x_j| \\geq k, \\forall i \\neq j \\in \\{1, 2\\dots dimension\\} \\}``.
 
 Also called [`all_min_dist`](https://sofdem.github.io/gccat/gccat/Call_min_dist.html) or `inter_distance`.
 """
