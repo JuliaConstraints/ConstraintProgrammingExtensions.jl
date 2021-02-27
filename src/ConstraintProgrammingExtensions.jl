@@ -32,7 +32,8 @@ The set corresponding to an enumeration of constant values.
 The value of a scalar function is enforced to take a value from this set of
 values.
 
-This constraint is sometimes called `in` or `allowed_assignments`.
+This constraint is sometimes called `in`, `member` or `allowed_assignments`.
+https://sofdem.github.io/gccat/gccat/Cdomain.html
 
 ## Example
 
@@ -45,6 +46,29 @@ end
 
 Base.copy(set::Domain{T}) where T = Domain(copy(set.values))
 Base.:(==)(x::Domain{T}, y::Domain{T}) where T = x.values == y.values
+
+"""
+    AntiDomain{T <: Number}(values::Set{T})
+
+The set corresponding to an enumeration of constant values that are excluded.
+
+The value of a scalar function is enforced to take a value that is not from 
+this set of values.
+
+This constraint is sometimes called (`not_in`)[https://sofdem.github.io/gccat/gccat/Cnot_in.html#uid28032],
+`not_member`, `rel`, or `forbidden_assignments`.
+
+## Example
+
+    x in AntiDomain(1:3)
+    # enforces `x != 1` AND `x != 2` AND `x != 3`.
+"""
+struct AntiDomain{T <: Number} <: MOI.AbstractScalarSet
+    values::Set{T}
+end
+
+Base.copy(set::AntiDomain{T}) where T = AntiDomain(copy(set.values))
+Base.:(==)(x::AntiDomain{T}, y::AntiDomain{T}) where T = x.values == y.values
 
 """
     Membership(dimension)
