@@ -366,6 +366,26 @@ struct MinimumDistance{T <: Real} <: MOI.AbstractVectorSet
     dimension::Int
 end
 
+"""
+    Inverse(dimension::Int)
+
+Ensures that the two arrays of variables of size `dimension` are the inverse one of the other. 
+
+``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | x_i = j \\iff y_j = i, \forall i, j \\in \\{1, 2 \\dots dimension\\} \\}``.
+
+Also called `channel`, `inverse_channeling`, or `assignment`.
+"""
+struct Inverse <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+# Solvers tend not to agree on the name of this one... "Inverse" is the most common one, though.
+#     https://sofdem.github.io/gccat/gccat/Cinverse.html
+# - inverse: CPLEX, MiniZinc, GCC, CHIP
+# - inverseChanneling: Choco
+# - channel: Gecode
+# - assignment: SICStus
+
 # isbits types, nothing to copy
 function Base.copy(
     set::Union{
