@@ -355,11 +355,13 @@ Base.copy(set::ReificationSet{S}) where S = ReificationSet(copy(set.set))
 """
     MinimumDistance{T <: Real}(k::T, dimension::Int)
 
-Ensures that all the `dimension` expressions in this set are at least `k` apart, in absolute value:
+Ensures that all the `dimension` expressions in this set are at least `k` 
+apart, in absolute value:
 
 ``\\{x \\in \\mathbb{S}^{dimension}} | |x_i - x_j| \\geq k, \\forall i \\neq j \\in \\{1, 2\\dots dimension\\} \\}``.
 
-Also called [`all_min_dist`](https://sofdem.github.io/gccat/gccat/Call_min_dist.html) or `inter_distance`.
+Also called [`all_min_dist`](https://sofdem.github.io/gccat/gccat/Call_min_dist.html) 
+or `inter_distance`.
 """
 struct MinimumDistance{T <: Real} <: MOI.AbstractVectorSet
     k::T
@@ -369,7 +371,8 @@ end
 """
     Inverse(dimension::Int)
 
-Ensures that the two arrays of variables of size `dimension` are the inverse one of the other. 
+Ensures that the two arrays of variables of size `dimension` are the inverse 
+one of the other. 
 
 ``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | x_i = j \\iff y_j = i, \forall i, j \\in \\{1, 2 \\dots dimension\\} \\}``.
 
@@ -385,6 +388,27 @@ end
 # - inverseChanneling: Choco
 # - channel: Gecode
 # - assignment: SICStus
+
+dimension(set::Inverse) = 2 * set.dimension
+
+"""
+    LexicographicallyLessThan(dimension::Int)
+
+Ensures that the first array of variables of size `dimension` is 
+lexicographically less than the second one. 
+
+``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | \exists j \\in \\{1, 2 \\dots dimension\\}: x_j < y_j, \\forall i < j, x_i = y_i \\}``.
+
+Also called [`lex2`](https://sofdem.github.io/gccat/gccat/Clex2.html) or 
+[`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html#uid25647).
+"""
+struct LexicographicallyLessThan <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+# TODO: Implement this like Strictly, based on the existing LessThan/GreaterThan sets?
+
+dimension(set::LexicographicallyLessThan) = 2 * set.dimension
 
 # isbits types, nothing to copy
 function Base.copy(
