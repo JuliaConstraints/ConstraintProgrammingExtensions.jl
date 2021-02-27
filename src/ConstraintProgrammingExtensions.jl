@@ -147,6 +147,44 @@ end
 dimension(set::CountDistinct) = set.dimension + 1
 
 """
+    LexicographicallyLessThan(dimension::Int)
+
+Ensures that the first array of variables of size `dimension` is 
+lexicographically less than the second one. 
+
+``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | \exists j \\in \\{1, 2 \\dots dimension\\}: x_j < y_j, \\forall i < j, x_i = y_i \\}``.
+
+Also called [`lex2`](https://sofdem.github.io/gccat/gccat/Clex2.html) or 
+[`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html#uid25647).
+"""
+struct LexicographicallyLessThan <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+# TODO: Implement this like Strictly, based on the existing LessThan/GreaterThan sets? Major difference: LessThan/Greater than are with respect to a constant, not LexicographicallyLessThan.
+
+dimension(set::LexicographicallyLessThan) = 2 * set.dimension
+
+"""
+    LexicographicallyGreaterThan(dimension::Int)
+
+Ensures that the first array of variables of size `dimension` is 
+lexicographically greater than the second one. 
+
+``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | \exists j \\in \\{1, 2 \\dots dimension\\}: x_j > y_j, \\forall i < j, x_i = y_i \\}``.
+
+Also called [`lex2`](https://sofdem.github.io/gccat/gccat/Clex2.html) or 
+[`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html#uid25647).
+"""
+struct LexicographicallyGreaterThan <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+dimension(set::LexicographicallyGreaterThan) = 2 * set.dimension
+
+# TODO: bridge.
+
+"""
     Strictly{S <: Union{LessThan{T}, GreaterThan{T}}}
 
 Converts an inequality set to a set with the same inequality made strict.
@@ -157,7 +195,7 @@ For example, while `LessThan(1)` corresponds to the inequality `x <= 1`,
 
     x in Strictly(LessThan(1))
 """
-struct Strictly{T, S <: Union{MOI.LessThan{T}, MOI.GreaterThan{T}}} <: MOI.AbstractScalarSet
+struct Strictly{S <: Union{MOI.LessThan{T} where T, MOI.GreaterThan{T} where T, LexicographicallyLessThan, LexicographicallyGreaterThan}, T <: Number} <: MOI.AbstractScalarSet
     set::S
 end
 
@@ -414,25 +452,6 @@ end
 # - assignment: SICStus
 
 dimension(set::Inverse) = 2 * set.dimension
-
-"""
-    LexicographicallyLessThan(dimension::Int)
-
-Ensures that the first array of variables of size `dimension` is 
-lexicographically less than the second one. 
-
-``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | \exists j \\in \\{1, 2 \\dots dimension\\}: x_j < y_j, \\forall i < j, x_i = y_i \\}``.
-
-Also called [`lex2`](https://sofdem.github.io/gccat/gccat/Clex2.html) or 
-[`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html#uid25647).
-"""
-struct LexicographicallyLessThan <: MOI.AbstractVectorSet
-    dimension::Int
-end
-
-# TODO: Implement this like Strictly, based on the existing LessThan/GreaterThan sets?
-
-dimension(set::LexicographicallyLessThan) = 2 * set.dimension
 
 # isbits types, nothing to copy
 function Base.copy(
