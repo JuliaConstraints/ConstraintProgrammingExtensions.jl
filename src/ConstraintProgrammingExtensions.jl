@@ -439,7 +439,9 @@ end
 Ensures that the two arrays of variables of size `dimension` are the inverse 
 one of the other. 
 
-``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | x_i = j \\iff y_j = i, \forall i, j \\in \\{1, 2 \\dots dimension\\} \\}``.
+``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | x_i = j \\iff y_j = i, \\forall i, j \\in \\{1, 2 \\dots dimension\\} \\}``.
+
+Indices start at 1, like Julia.
 
 Also called `channel`, `inverse_channeling`, or `assignment`.
 """
