@@ -182,7 +182,7 @@ end
 
 MOI.dimension(set::LexicographicallyGreaterThan) = 2 * set.dimension
 
-# TODO: bridge.
+# TODO: bridge to LexicographicallyLessThan.
 
 """
     Strictly{S <: Union{LessThan{T}, GreaterThan{T}, LexicographicallyGreaterThan}}
@@ -206,6 +206,8 @@ MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T} =
     typeof(set)(MOIU.shift_constant(set.set, offset))
 
 Strictly(set::LexicographicallyLessThan) = Strictly{LexicographicallyLessThan, Int}(set)
+Strictly(set::MOI.LessThan{T}) where T = Strictly{MOI.LessThan{T}, T}(set)
+Strictly(set::MOI.GreaterThan{T}) where T = Strictly{MOI.GreaterThan{T}, T}(set)
 
 """
     Element{T <: Real}(values::Vector{T})
