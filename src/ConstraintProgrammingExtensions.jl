@@ -121,7 +121,7 @@ struct Count{T <: Real} <: MOI.AbstractVectorSet
     dimension::Int
 end
 
-dimension(set::Count{T}) where T = set.dimension + 1
+MOI.dimension(set::Count{T}) where T = set.dimension + 1
 Base.copy(set::Count{T}) where T = Count(copy(set.value), value)
 
 """
@@ -144,7 +144,7 @@ struct CountDistinct <: MOI.AbstractVectorSet
     dimension::Int
 end
 
-dimension(set::CountDistinct) = set.dimension + 1
+MOI.dimension(set::CountDistinct) = set.dimension + 1
 
 """
     LexicographicallyLessThan(dimension::Int)
@@ -163,7 +163,7 @@ end
 
 # TODO: Implement this like Strictly, based on the existing LessThan/GreaterThan sets? Major difference: LessThan/Greater than are with respect to a constant, not LexicographicallyLessThan.
 
-dimension(set::LexicographicallyLessThan) = 2 * set.dimension
+MOI.dimension(set::LexicographicallyLessThan) = 2 * set.dimension
 
 """
     LexicographicallyGreaterThan(dimension::Int)
@@ -180,12 +180,12 @@ struct LexicographicallyGreaterThan <: MOI.AbstractVectorSet
     dimension::Int
 end
 
-dimension(set::LexicographicallyGreaterThan) = 2 * set.dimension
+MOI.dimension(set::LexicographicallyGreaterThan) = 2 * set.dimension
 
 # TODO: bridge.
 
 """
-    Strictly{S <: Union{LessThan{T}, GreaterThan{T}}}
+    Strictly{S <: Union{LessThan{T}, GreaterThan{T}, LexicographicallyGreaterThan}}
 
 Converts an inequality set to a set with the same inequality made strict.
 For example, while `LessThan(1)` corresponds to the inequality `x <= 1`,
@@ -201,8 +201,11 @@ end
 
 Base.copy(set::Strictly{S}) where S = Count(copy(set.set))
 MOI.constant(set::Strictly{S}) where S = MOI.constant(set.set)
+MOI.dimension(set::Strictly{S}) where S = MOI.dimension(set.set)
 MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T} =
     typeof(set)(MOIU.shift_constant(set.set, offset))
+
+Strictly(set::LexicographicallyLessThan) = Strictly{LexicographicallyLessThan, Int}(set)
 
 """
     Element{T <: Real}(values::Vector{T})
@@ -225,7 +228,7 @@ struct Element{T <: Real} <: MOI.AbstractVectorSet
     values::Vector{T}
 end
 
-dimension(set::Element{T}) where T = 2
+MOI.dimension(set::Element{T}) where T = 2
 Base.copy(set::Element{T}) where T = Element(copy(set.values))
 Base.:(==)(x::Element{T}, y::Element{T}) where T = x.values == y.values
 
@@ -248,7 +251,7 @@ struct Sort <: MOI.AbstractVectorSet
     dimension::Int
 end
 
-dimension(set::Sort) where T = 2 * set.dimension
+MOI.dimension(set::Sort) = 2 * set.dimension
 
 """
     SortPermutation(dimension::Int)
@@ -272,7 +275,7 @@ struct SortPermutation <: MOI.AbstractVectorSet
     dimension::Int
 end
 
-dimension(set::SortPermutation) where T = 3 * set.dimension
+MOI.dimension(set::SortPermutation) where T = 3 * set.dimension
 
 """
     BinPacking(n_bins::Int, n_items::Int, weights::Vector{T})
@@ -308,7 +311,7 @@ struct BinPacking{T <: Real} <: MOI.AbstractVectorSet
     end
 end
 
-dimension(set::BinPacking) = set.n_bins + 2 * set.n_items
+MOI.dimension(set::BinPacking) = set.n_bins + 2 * set.n_items
 
 """
     FixedCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}, capacities::Vector{<:Real})
@@ -353,7 +356,7 @@ struct FixedCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
     end
 end
 
-dimension(set::FixedCapacityBinPacking) = set.n_bins + set.n_items
+MOI.dimension(set::FixedCapacityBinPacking) = set.n_bins + set.n_items
 
 """
     VariableCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T})
@@ -396,7 +399,7 @@ struct VariableCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
     end
 end
 
-dimension(set::VariableCapacityBinPacking) = 2 * set.n_bins + set.n_items
+MOI.dimension(set::VariableCapacityBinPacking) = 2 * set.n_bins + set.n_items
 
 """
     ReificationSet{S <: MOI.AbstractSet}(set::S)
@@ -411,7 +414,7 @@ struct ReificationSet{S <: MOI.AbstractSet} <: MOI.AbstractVectorSet
     set::S
 end
 
-dimension(set::ReificationSet{S}) where S = 1 + dimension(set.set)
+MOI.dimension(set::ReificationSet{S}) where S = 1 + MOI.dimension(set.set)
 Base.copy(set::ReificationSet{S}) where S = ReificationSet(copy(set.set))
 
 """
@@ -451,7 +454,7 @@ end
 # - channel: Gecode
 # - assignment: SICStus
 
-dimension(set::Inverse) = 2 * set.dimension
+MOI.dimension(set::Inverse) = 2 * set.dimension
 
 # isbits types, nothing to copy
 function Base.copy(
