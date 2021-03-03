@@ -15,7 +15,8 @@ MOI.dimension(set::ReificationSet{S}) where S = 1 + MOI.dimension(set.set)
 Base.copy(set::ReificationSet{S}) where S = ReificationSet(copy(set.set))
 
 """
-    EquivalenceSet{S1 <: MOI.AbstractSet, S2 <: MOI.AbstractSet}(set1::S1, set2::S2)
+    EquivalenceSet{S1 <: MOI.AbstractSet, S2 <: MOI.AbstractSet}(set1::S1, 
+                                                                 set2::S2)
 
 ``\\{(x, y) \\in \\mathbb{R}^a \\times \\mathbb{R}^b} \\times \\mathbb{R}^n | x \\in S1 \\iff y \\in S2\\}``.
 
@@ -24,20 +25,26 @@ More explicitly, if the first one is satisfied, then the second one is implied
 to be satisfied too; if the second one is satisfied, then the first one is 
 implied.
 """
-struct EquivalenceSet{S1 <: MOI.AbstractSet, S2 <: MOI.AbstractSet} <: MOI.AbstractVectorSet
+struct EquivalenceSet{S1 <: MOI.AbstractSet, 
+                      S2 <: MOI.AbstractSet} <: MOI.AbstractVectorSet
     set1::S1
     set2::S2
 end
 
-MOI.dimension(set::EquivalenceSet{S, T}) where {S, T} = MOI.dimension(set.set1) + MOI.dimension(set.set2)
-Base.copy(set::EquivalenceSet{S, T}) where {S, T} = EquivalenceSet(copy(set.set), copy(set.set2))
+function MOI.dimension(set::EquivalenceSet{S, T}) where {S, T} 
+    return MOI.dimension(set.set1) + MOI.dimension(set.set2)
+end
+function Base.copy(set::EquivalenceSet{S, T}) where {S, T} 
+    return EquivalenceSet(copy(set.set), copy(set.set2))
+end
 
 """
     IfThenElseSet{
         Condition <: MOI.AbstractSet, 
         TrueConstraint <: MOI.AbstractSet, 
         FalseConstraint <: MOI.AbstractSet
-    }(condition::Condition, true_constraint::TrueConstraint, false_constraint::FalseConstraint)
+    }(condition::Condition, true_constraint::TrueConstraint, 
+      false_constraint::FalseConstraint)
 
 If the `condition` is satisfied, then the first constraint (of type 
 `TrueConstraint`) will be implied. Otherwise, the second constraint
@@ -55,5 +62,12 @@ struct IfThenElseSet{
     false_constraint::FalseConstraint
 end
 
-MOI.dimension(set::IfThenElseSet{S, T, U}) where {S, T, U} = MOI.dimension(set.condition) + MOI.dimension(set.true_constraint) + MOI.dimension(set.false_constraint)
-Base.copy(set::IfThenElseSet{S, T, U}) where {S, T, U} = ReificationSet(copy(set.condition), copy(set.true_constraint), copy(set.false_constraint))
+function MOI.dimension(set::IfThenElseSet{S, T, U}) where {S, T, U} 
+    return MOI.dimension(set.condition) + MOI.dimension(set.true_constraint) + 
+        MOI.dimension(set.false_constraint)
+end
+function Base.copy(set::IfThenElseSet{S, T, U}) where {S, T, U} 
+    return ReificationSet(copy(set.condition), 
+                          copy(set.true_constraint), 
+                          copy(set.false_constraint))
+end
