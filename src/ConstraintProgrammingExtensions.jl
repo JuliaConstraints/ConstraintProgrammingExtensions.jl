@@ -436,6 +436,19 @@ struct MinimumDistance{T <: Real} <: MOI.AbstractVectorSet
 end
 
 """
+    MaximumDistance{T <: Real}(k::T, dimension::Int)
+
+Ensures that all the `dimension` expressions in this set are at most `k` 
+apart, in absolute value:
+
+``\\{x \\in \\mathbb{S}^{dimension}} | |x_i - x_j| \\leq k, \\forall i \\neq j \\in \\{1, 2\\dots dimension\\} \\}``.
+"""
+struct MaximumDistance{T <: Real} <: MOI.AbstractVectorSet
+    k::T
+    dimension::Int
+end
+
+"""
     Inverse(dimension::Int)
 
 Ensures that the two arrays of variables of size `dimension` are the inverse 
