@@ -1,9 +1,11 @@
 # Configuration file for JuliaFormatter.jl
 # For more information, see: https://domluna.github.io/JuliaFormatter.jl/stable/config/
-# Same as for JuMP: https://github.com/jump-dev/JuMP.jl/blob/master/.JuliaFormatter.toml
+# Inspired by JuMP: https://github.com/jump-dev/JuMP.jl/blob/master/.JuliaFormatter.toml
 
 always_for_in = true
 always_use_return = true
 margin = 80
 remove_extra_newlines = true
 short_to_long_function_def = true
+whitespace_typedefs = true
+whitespace_in_kwargs = false

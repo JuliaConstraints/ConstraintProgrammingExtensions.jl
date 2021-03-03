@@ -1,5 +1,4 @@
 
-
 """
     AllDifferent(dimension::Int)
 
@@ -40,8 +39,8 @@ struct Domain{T <: Number} <: MOI.AbstractScalarSet
     values::Set{T}
 end
 
-Base.copy(set::Domain{T}) where T = Domain(copy(set.values))
-Base.:(==)(x::Domain{T}, y::Domain{T}) where T = x.values == y.values
+Base.copy(set::Domain{T}) where {T} = Domain(copy(set.values))
+Base.:(==)(x::Domain{T}, y::Domain{T}) where {T} = x.values == y.values
 
 """
     AntiDomain{T <: Number}(values::Set{T})
@@ -63,8 +62,8 @@ struct AntiDomain{T <: Number} <: MOI.AbstractScalarSet
     values::Set{T}
 end
 
-Base.copy(set::AntiDomain{T}) where T = AntiDomain(copy(set.values))
-Base.:(==)(x::AntiDomain{T}, y::AntiDomain{T}) where T = x.values == y.values
+Base.copy(set::AntiDomain{T}) where {T} = AntiDomain(copy(set.values))
+Base.:(==)(x::AntiDomain{T}, y::AntiDomain{T}) where {T} = x.values == y.values
 
 """
     Membership(dimension)
@@ -93,9 +92,10 @@ struct DifferentFrom{T <: Number} <: MOI.AbstractScalarSet
     value::T
 end
 
-MOI.constant(set::DifferentFrom{T}) where T = set.value
-MOIU.shift_constant(set::DifferentFrom{T}, offset::T) where T =
-    typeof(set)(MOI.constant(set) + offset)
+MOI.constant(set::DifferentFrom{T}) where {T} = set.value
+function MOIU.shift_constant(set::DifferentFrom{T}, offset::T) where {T}
+    return typeof(set)(MOI.constant(set) + offset)
+end
 
 """
     Count{T <: Real}(value::T, dimension::Int)
@@ -117,8 +117,8 @@ struct Count{T <: Real} <: MOI.AbstractVectorSet
     dimension::Int
 end
 
-MOI.dimension(set::Count{T}) where T = set.dimension + 1
-Base.copy(set::Count{T}) where T = Count(copy(set.value), value)
+MOI.dimension(set::Count{T}) where {T} = set.dimension + 1
+Base.copy(set::Count{T}) where {T} = Count(copy(set.value), value)
 
 """
     CountDistinct(dimension::Int)
@@ -191,19 +191,32 @@ For example, while `LessThan(1)` corresponds to the inequality `x <= 1`,
 
     x in Strictly(LessThan(1))
 """
-struct Strictly{S <: Union{MOI.LessThan{T} where T, MOI.GreaterThan{T} where T, LexicographicallyLessThan, LexicographicallyGreaterThan}, T <: Number} <: MOI.AbstractScalarSet
+struct Strictly{
+    S <: Union{
+        MOI.LessThan{T} where T,
+        MOI.GreaterThan{T} where T,
+        LexicographicallyLessThan,
+        LexicographicallyGreaterThan,
+    },
+    T <: Number,
+} <: MOI.AbstractScalarSet
     set::S
 end
 
-Base.copy(set::Strictly{S}) where S = Count(copy(set.set))
-MOI.constant(set::Strictly{S}) where S = MOI.constant(set.set)
-MOI.dimension(set::Strictly{S}) where S = MOI.dimension(set.set)
-MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T} =
-    typeof(set)(MOIU.shift_constant(set.set, offset))
+Base.copy(set::Strictly{S}) where {S} = Count(copy(set.set))
+MOI.constant(set::Strictly{S}) where {S} = MOI.constant(set.set)
+MOI.dimension(set::Strictly{S}) where {S} = MOI.dimension(set.set)
+function MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T}
+    return typeof(set)(MOIU.shift_constant(set.set, offset))
+end
 
-Strictly(set::LexicographicallyLessThan) = Strictly{LexicographicallyLessThan, Int}(set)
-Strictly(set::MOI.LessThan{T}) where T = Strictly{MOI.LessThan{T}, T}(set)
-Strictly(set::MOI.GreaterThan{T}) where T = Strictly{MOI.GreaterThan{T}, T}(set)
+function Strictly(set::LexicographicallyLessThan)
+    return Strictly{LexicographicallyLessThan, Int}(set)
+end
+Strictly(set::MOI.LessThan{T}) where {T} = Strictly{MOI.LessThan{T}, T}(set)
+function Strictly(set::MOI.GreaterThan{T}) where {T}
+    return Strictly{MOI.GreaterThan{T}, T}(set)
+end
 
 """
     Element{T <: Real}(values::Vector{T})
@@ -226,9 +239,9 @@ struct Element{T <: Real} <: MOI.AbstractVectorSet
     values::Vector{T}
 end
 
-MOI.dimension(set::Element{T}) where T = 2
-Base.copy(set::Element{T}) where T = Element(copy(set.values))
-Base.:(==)(x::Element{T}, y::Element{T}) where T = x.values == y.values
+MOI.dimension(set::Element{T}) where {T} = 2
+Base.copy(set::Element{T}) where {T} = Element(copy(set.values))
+Base.:(==)(x::Element{T}, y::Element{T}) where {T} = x.values == y.values
 
 """
     Sort(dimension::Int)
@@ -273,7 +286,7 @@ struct SortPermutation <: MOI.AbstractVectorSet
     dimension::Int
 end
 
-MOI.dimension(set::SortPermutation) where T = 3 * set.dimension
+MOI.dimension(set::SortPermutation) where {T} = 3 * set.dimension
 
 """
     BinPacking(n_bins::Int, n_items::Int, weights::Vector{T})
@@ -303,7 +316,11 @@ struct BinPacking{T <: Real} <: MOI.AbstractVectorSet
     n_items::Int
     weights::Vector{T}
 
-    function BinPacking(n_bins::Int, n_items::Int, weights::Vector{T}) where T <: Real
+    function BinPacking(
+        n_bins::Int,
+        n_items::Int,
+        weights::Vector{T},
+    ) where {T <: Real}
         @assert n_items == length(weights)
         return new{T}(n_bins, n_items, weights)
     end
@@ -347,7 +364,12 @@ struct FixedCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
     weights::Vector{T}
     capacities::Vector{T}
 
-    function FixedCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}, capacities::Vector{T}) where T <: Real
+    function FixedCapacityBinPacking(
+        n_bins::Int,
+        n_items::Int,
+        weights::Vector{T},
+        capacities::Vector{T},
+    ) where {T <: Real}
         @assert n_items == length(weights)
         @assert n_bins == length(capacities)
         return new{T}(n_bins, n_items, weights)
@@ -391,7 +413,11 @@ struct VariableCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
     n_items::Int
     weights::Vector{T}
 
-    function VariableCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}) where T <: Real
+    function VariableCapacityBinPacking(
+        n_bins::Int,
+        n_items::Int,
+        weights::Vector{T},
+    ) where {T <: Real}
         @assert n_items == length(weights)
         return new{T}(n_bins, n_items, weights)
     end
@@ -464,8 +490,8 @@ function Base.copy(
         FixedCapacityBinPacking,
         VariableCapacityBinPacking,
         DifferentFrom,
-        MinimumDistance
-    }
+        MinimumDistance,
+    },
 )
     return set
 end
