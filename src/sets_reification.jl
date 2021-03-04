@@ -42,6 +42,28 @@ function Base.copy(set::EquivalenceSet{S, T}) where {S, T}
 end
 
 """
+EquivalenceNotSet{S1 <: MOI.AbstractSet, S2 <: MOI.AbstractSet}(set1::S1, 
+                                                                set2::S2)
+
+The logical equivalence operator ≡ or ⇔, with the second argument negated.
+
+``\\{(x, y) \\in \\mathbb{R}^{a+b} | x \\in S1 \\iff y \\not\\in S2\\}``.
+"""
+struct EquivalenceNotSet{S1 <: MOI.AbstractSet, S2 <: MOI.AbstractSet} <:
+       MOI.AbstractVectorSet
+    set1::S1
+    set2::S2
+end
+
+function MOI.dimension(set::EquivalenceNotSet{S, T}) where {S, T}
+    return MOI.dimension(set.set1) + MOI.dimension(set.set2)
+end
+
+function Base.copy(set::EquivalenceNotSet{S, T}) where {S, T}
+    return EquivalenceNotSet(copy(set.set), copy(set.set2))
+end
+
+"""
     IfThenElseSet{
         Condition <: MOI.AbstractSet, 
         TrueConstraint <: MOI.AbstractSet, 
