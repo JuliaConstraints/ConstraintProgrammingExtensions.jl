@@ -135,3 +135,29 @@ function Base.copy(set::ImplySet{S, T}) where {S, T}
         copy(set.consequent),
     )
 end
+
+"""
+    TrueSet()
+
+A constraint that is always true. 
+
+It is only useful with reification-like constraints.
+"""
+struct TrueSet <: MOI.AbstractVectorSet
+end
+
+MOI.dimension(set::TrueSet) = 0
+Base.copy(set::TrueSet) = set
+
+"""
+    FalseSet()
+
+A constraint that is always false. 
+
+It is only useful with reification-like constraints.
+"""
+struct FalseSet <: MOI.AbstractVectorSet
+end
+
+MOI.dimension(set::FalseSet) = 0
+Base.copy(set::FalseSet) = set
