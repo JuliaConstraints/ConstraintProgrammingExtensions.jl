@@ -18,7 +18,9 @@ Base.copy(set::ReificationSet{S}) where {S} = ReificationSet(copy(set.set))
     EquivalenceSet{S1 <: MOI.AbstractSet, S2 <: MOI.AbstractSet}(set1::S1, 
                                                                  set2::S2)
 
-``\\{(x, y) \\in \\mathbb{R}^a \\times \\mathbb{R}^b} \\times \\mathbb{R}^n | x \\in S1 \\iff y \\in S2\\}``.
+The logical equivalence operator ≡ or ⇔.
+
+``\\{(x, y) \\in \\mathbb{R}^{a+b} | x \\in S1 \\iff y \\in S2\\}``.
 
 The two constraints must be either satisfied or not satisfied at the same time.
 More explicitly, if the first one is satisfied, then the second one is implied
@@ -34,6 +36,7 @@ end
 function MOI.dimension(set::EquivalenceSet{S, T}) where {S, T}
     return MOI.dimension(set.set1) + MOI.dimension(set.set2)
 end
+
 function Base.copy(set::EquivalenceSet{S, T}) where {S, T}
     return EquivalenceSet(copy(set.set), copy(set.set2))
 end
@@ -46,11 +49,13 @@ end
     }(condition::Condition, true_constraint::TrueConstraint, 
       false_constraint::FalseConstraint)
 
+The ternary operator.
+
 If the `condition` is satisfied, then the first constraint (of type 
 `TrueConstraint`) will be implied. Otherwise, the second constraint
 (of type `FalseConstraint`) will be implied.
 
-``\\{(x, y, z) \\in \\{0, 1\\} \\times \\mathbb{R}^a \\times \\mathbb{R}^b \\times \\mathbb{R}^c | y \\in TrueConstraint \\iff x \\in set, z \\in FalseConstraint otherwise\\}``.
+``\\{(x, y, z) \\in \\mathbb{R}^(a+b+c) | y \\in TrueConstraint \\iff x \\in set, z \\in FalseConstraint otherwise\\}``.
 """
 struct IfThenElseSet{
     Condition <: MOI.AbstractSet,
@@ -67,10 +72,44 @@ function MOI.dimension(set::IfThenElseSet{S, T, U}) where {S, T, U}
            MOI.dimension(set.true_constraint) +
            MOI.dimension(set.false_constraint)
 end
+
 function Base.copy(set::IfThenElseSet{S, T, U}) where {S, T, U}
     return ReificationSet(
         copy(set.condition),
         copy(set.true_constraint),
         copy(set.false_constraint),
+    )
+end
+
+"""
+    ImplySet{
+        Antecedent <: MOI.AbstractSet,
+        Consequent <: MOI.AbstractSet
+    }(antecedent::Antecedent, consequent::Consequent)
+
+The logical implication operator ⇒.
+
+If the `antecedent` is satisfied, then the `consequent` will be implied to be 
+satisfied. Otherwise, nothing is implied on the truth value of `consequent`.
+
+``\\{(x, y) \\in \\mathbb{R}^a \\times \\mathbb{R}^b | y \\in Consequent if x \\in Antecedent\\}``.
+"""
+struct ImplySet{
+    Antecedent <: MOI.AbstractSet,
+    Consequent <: MOI.AbstractSet
+} <: MOI.AbstractVectorSet
+    antecedent::Antecedent
+    consequent::Consequent
+end
+
+function MOI.dimension(set::ImplySet{S, T}) where {S, T}
+    return MOI.dimension(set.antecedent) +
+           MOI.dimension(set.consequent)
+end
+
+function Base.copy(set::ImplySet{S, T}) where {S, T}
+    return ReificationSet(
+        copy(set.antecedent),
+        copy(set.consequent),
     )
 end
