@@ -204,69 +204,6 @@ MOI.dimension(set::LexicographicallyGreaterThan) = 2 * set.dimension
 # TODO: bridge to LexicographicallyLessThan.
 
 """
-    Strictly{S <: Union{LessThan{T}, GreaterThan{T}, LexicographicallyGreaterThan}}
-
-Converts an inequality set to a set with the same inequality made strict.
-For example, while `LessThan(1)` corresponds to the inequality `x <= 1`,
-`Strictly(LessThan(1))` corresponds to the inequality `x < 1`.
-
-## Example
-
-    x in Strictly(LessThan(1))
-"""
-struct Strictly{
-    S <: Union{
-        MOI.LessThan{T} where T,
-        MOI.GreaterThan{T} where T,
-        LexicographicallyLessThan,
-        LexicographicallyGreaterThan,
-    },
-    T <: Number,
-} <: MOI.AbstractScalarSet
-    set::S
-end
-
-Base.copy(set::Strictly{S}) where {S} = Count(copy(set.set))
-MOI.constant(set::Strictly{S}) where {S} = MOI.constant(set.set)
-MOI.dimension(set::Strictly{S}) where {S} = MOI.dimension(set.set)
-function MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T}
-    return typeof(set)(MOIU.shift_constant(set.set, offset))
-end
-
-function Strictly(set::LexicographicallyLessThan)
-    return Strictly{LexicographicallyLessThan, Int}(set)
-end
-Strictly(set::MOI.LessThan{T}) where {T} = Strictly{MOI.LessThan{T}, T}(set)
-function Strictly(set::MOI.GreaterThan{T}) where {T}
-    return Strictly{MOI.GreaterThan{T}, T}(set)
-end
-
-"""
-    Element{T <: Real}(values::Vector{T})
-
-``\\{(x, i) \\in \\mathbb{R}^d \\times \\mathbb{N}^d | x = values[i]\\}``
-
-Less formally, the first element constrained in this set will take the value of
-`values` at the index given by the second element.
-
-## Examples
-
-    [x, 3] in Element([4, 5, 6])
-    # Enforces that x = 6, because 6 is the 3rd element from the array.
-
-    [y, j] in Element([4, 5, 6])
-    # Enforces that y = array[j], depending on the value of j (an integer
-    # between 1 and 3).
-"""
-struct Element{T <: Real} <: MOI.AbstractVectorSet
-    values::Vector{T}
-end
-
-MOI.dimension(set::Element{T}) where {T} = 2
-Base.copy(set::Element{T}) where {T} = Element(copy(set.values))
-Base.:(==)(x::Element{T}, y::Element{T}) where {T} = x.values == y.values
-
-"""
     Sort(dimension::Int)
 
 Ensures that the first `dimension` elements is a sorted copy of the next
@@ -310,6 +247,110 @@ struct SortPermutation <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::SortPermutation) where {T} = 3 * set.dimension
+
+"""
+    Increasing(dimension::Int)
+
+Ensures that the elements of the vector are in increasing order (<= operation).
+
+## Example
+
+    [a, b, c] in Increasing(3)
+    # Enforces that a <= b <= c
+"""
+struct Increasing <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+"""
+    Decreasing(dimension::Int)
+
+Ensures that the elements of the vector are in decreasing order (>= operation).
+
+## Example
+
+    [a, b, c] in Decreasing(3)
+    # Enforces that a >= b >= c
+"""
+struct Decreasing <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+"""
+    Strictly{S <: Union{LessThan{T}, GreaterThan{T}, LexicographicallyGreaterThan}}
+
+Converts an inequality set to a set with the same inequality made strict.
+For example, while `LessThan(1)` corresponds to the inequality `x <= 1`,
+`Strictly(LessThan(1))` corresponds to the inequality `x < 1`.
+
+## Example
+
+    x in Strictly(LessThan(1))
+"""
+struct Strictly{
+    S <: Union{
+        MOI.LessThan{T} where T,
+        MOI.GreaterThan{T} where T,
+        LexicographicallyLessThan,
+        LexicographicallyGreaterThan,
+        Increasing,
+        Decreasing,
+    },
+    T <: Number,
+} <: MOI.AbstractScalarSet
+    set::S
+end
+
+Base.copy(set::Strictly{S}) where {S} = Count(copy(set.set))
+MOI.constant(set::Strictly{S}) where {S} = MOI.constant(set.set)
+MOI.dimension(set::Strictly{S}) where {S} = MOI.dimension(set.set)
+function MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T}
+    return typeof(set)(MOIU.shift_constant(set.set, offset))
+end
+
+function Strictly(set::LexicographicallyLessThan)
+    return Strictly{LexicographicallyLessThan, Int}(set)
+end
+function Strictly(set::LexicographicallyGreaterThan)
+    return Strictly{LexicographicallyGreaterThan, Int}(set)
+end
+function Strictly(set::MOI.LessThan{T}) where {T} 
+    return Strictly{MOI.LessThan{T}, T}(set)
+end
+function Strictly(set::MOI.GreaterThan{T}) where {T}
+    return Strictly{MOI.GreaterThan{T}, T}(set)
+end
+function Strictly(set::Increasing)
+    return Strictly{Increasing, Int}(set)
+end
+function Strictly(set::Decreasing)
+    return Strictly{Decreasing, Int}(set)
+end
+
+"""
+    Element{T <: Real}(values::Vector{T})
+
+``\\{(x, i) \\in \\mathbb{R}^d \\times \\mathbb{N}^d | x = values[i]\\}``
+
+Less formally, the first element constrained in this set will take the value of
+`values` at the index given by the second element.
+
+## Examples
+
+    [x, 3] in Element([4, 5, 6])
+    # Enforces that x = 6, because 6 is the 3rd element from the array.
+
+    [y, j] in Element([4, 5, 6])
+    # Enforces that y = array[j], depending on the value of j (an integer
+    # between 1 and 3).
+"""
+struct Element{T <: Real} <: MOI.AbstractVectorSet
+    values::Vector{T}
+end
+
+MOI.dimension(set::Element{T}) where {T} = 2
+Base.copy(set::Element{T}) where {T} = Element(copy(set.values))
+Base.:(==)(x::Element{T}, y::Element{T}) where {T} = x.values == y.values
 
 """
     BinPacking(n_bins::Int, n_items::Int, weights::Vector{T})
