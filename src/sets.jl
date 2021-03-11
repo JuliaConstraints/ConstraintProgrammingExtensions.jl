@@ -1,4 +1,3 @@
-
 """
     AllDifferent(dimension::Int)
 
@@ -17,6 +16,30 @@ This constraint is sometimes called `distinct`.
 """
 struct AllDifferent <: MOI.AbstractVectorSet
     dimension::Int
+end
+
+# https://sofdem.github.io/gccat/gccat/Calldifferent_cst.html should be modelled
+# with AllDifferent, because it is just shifting all expressions by constants, 
+# i.e. scalar affine expressions.
+
+"""
+    AllDifferentExceptConstant{T <: Number}(dimension::Int, k::Number)
+
+All expressions of a vector-valued function are enforced to take distinct
+values in the solution, but values equal to `k` are not considered: 
+for all pairs of expressions, either their values must differ or at least
+one of the two variables has the value `k`.
+
+This constraint is sometimes called `distinct`.
+
+## Example
+
+    [x, y] in AllDifferent(2, 0)
+    # enforces `x != y` OR `x == 0` OR `y == 0`.
+"""
+struct AllDifferentExceptConstant{T <: Number} <: MOI.AbstractVectorSet
+    dimension::Int
+    k::T
 end
 
 """
