@@ -249,6 +249,76 @@ end
 MOI.dimension(set::SortPermutation) where {T} = 3 * set.dimension
 
 """
+    MinimumAmong(dimension::Int)
+
+Ensures that the first element is the minimum value among the next 
+`dimension` elements.
+
+## Example
+
+    [a, b, c] in MinimumAmong(2)
+    # Enforces that a == min(b, c)
+"""
+struct MinimumAmong <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+MOI.dimension(set::MinimumAmong) = 1 + set.dimension
+
+"""
+    ArgumentMinimumAmong(dimension::Int)
+
+Ensures that the first element is the index of the minimum value among the 
+next `dimension` elements.
+
+## Example
+
+    [a, b, c] in ArgumentMinimumAmong(2)
+    # Enforces that a == argmin(b, c)
+    # I.e., if b < c, a = 1, if b > c, a = 2
+"""
+struct ArgumentMinimumAmong <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+MOI.dimension(set::ArgumentMinimumAmong) = 1 + set.dimension
+
+"""
+    MaximumAmong(dimension::Int)
+
+Ensures that the first element is the maximum value among the next 
+`dimension` elements.
+
+## Example
+
+    [a, b, c] in MaximumAmong(2)
+    # Enforces that a == max(b, c)
+"""
+struct MaximumAmong <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+MOI.dimension(set::MaximumAmong) = 1 + set.dimension
+
+"""
+    ArgumentMaximumAmong(dimension::Int)
+
+Ensures that the first element is the index of the maximum value among the 
+next `dimension` elements.
+
+## Example
+
+    [a, b, c] in ArgumentMaximumAmong(2)
+    # Enforces that a == argmax(b, c)
+    # I.e., if b > c, a = 1, if b < c, a = 2
+"""
+struct ArgumentMaximumAmong <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+MOI.dimension(set::ArgumentMaximumAmong) = 1 + set.dimension
+
+"""
     Increasing(dimension::Int)
 
 Ensures that the elements of the vector are in increasing order (<= operation).
