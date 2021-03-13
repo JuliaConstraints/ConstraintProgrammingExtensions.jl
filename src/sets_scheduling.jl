@@ -29,4 +29,4 @@ struct CumulativeResourceWithDeadline <: MOI.AbstractVectorSet
     n_tasks::Int
 end
 
-MOI.dimension(set::CumulativeResource) = 4 * set.n_tasks + 1
+MOI.dimension(set::CumulativeResourceWithDeadline) = 4 * set.n_tasks + 1
