@@ -115,6 +115,8 @@ If the `antecedent` is satisfied, then the `consequent` will be implied to be
 satisfied. Otherwise, nothing is implied on the truth value of `consequent`.
 
 ``\\{(x, y) \\in \\mathbb{R}^a \\times \\mathbb{R}^b | y \\in Consequent if x \\in Antecedent\\}``.
+
+Also called `if_then`.
 """
 struct Imply{
     Antecedent <: MOI.AbstractSet,
