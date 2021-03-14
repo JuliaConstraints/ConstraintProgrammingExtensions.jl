@@ -12,7 +12,7 @@ All the constraints that are currently defined in [hakank's constraints_utils.jl
 * `is_member_of`: `Domain` and `Membership`
 * `cumulative`: `CumulativeResource` and `CumulativeResourceWithDeadline`
 * `circuit`: `Circuit` and `WeightedCircuit`
-* `circuit_path`: not yet
+* `circuit_path`: `CircuitPath` and `WeightedCircuitPath`
 * `inverse`: `Inverse`
 * `assignment`: `Inverse`
 * `assignment_ctr`: not yet
