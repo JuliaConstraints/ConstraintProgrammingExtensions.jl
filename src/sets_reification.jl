@@ -130,10 +130,54 @@ function MOI.dimension(set::Imply{S, T}) where {S, T}
 end
 
 function Base.copy(set::Imply{S, T}) where {S, T}
-    return Reified(
+    return Imply(
         copy(set.antecedent),
         copy(set.consequent),
     )
+end
+
+"""
+    Conjunction{Ts::Tuple}(constraints::Ts)
+
+The logical conjunction operator ∧ (AND).
+
+``\\{(x, y\\dots) \\in \\mathbb{R}^a \\times \\mathbb{R}^b\\dots | x \\in \mathbb{S_1} \\land y \\in \mathbb{S_2} \\dots \\}``.
+"""
+struct Conjunction{Ts::Tuple} <: MOI.AbstractVectorSet
+    constraints::Ts
+end
+
+# Currently, no varargs for parametric types... For instance, see:
+# https://discourse.julialang.org/t/user-defined-variadic-parametric-types/25487/4
+
+function MOI.dimension(set::Conjunction{Ts}) where {Ts}
+    return sum(MOI.dimension(s) for s in set.constraints)
+end
+
+function Base.copy(set::Conjunction{Ts}) where {Ts}
+    return Conjunction(copy(set.constraints))
+end
+
+"""
+    Disjunction{Ts::Tuple}(constraints::Ts)
+
+The logical disjunction operator ∨ (AND).
+
+``\\{(x, y\\dots) \\in \\mathbb{R}^a \\times \\mathbb{R}^b\\dots | x \\in \mathbb{S_1} \\lor y \\in \mathbb{S_2} \\dots \\}``.
+"""
+struct Disjunction{Ts::Tuple} <: MOI.AbstractVectorSet
+    constraints::Ts
+end
+
+# Currently, no varargs for parametric types... For instance, see:
+# https://discourse.julialang.org/t/user-defined-variadic-parametric-types/25487/4
+
+function MOI.dimension(set::Disjunction{Ts}) where {Ts}
+    return sum(MOI.dimension(s) for s in set.constraints)
+end
+
+function Base.copy(set::Disjunction{Ts}) where {Ts}
+    return Disjunction(copy(set.constraints))
 end
 
 """
