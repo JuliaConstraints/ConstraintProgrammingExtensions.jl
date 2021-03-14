@@ -143,9 +143,9 @@ end
 
 The logical conjunction operator ∧ (AND).
 
-``\\{(x, y\\dots) \\in \\mathbb{R}^a \\times \\mathbb{R}^b\\dots | x \\in \mathbb{S_1} \\land y \\in \mathbb{S_2} \\dots \\}``.
+``\\{(x, y\\dots) \\in \\mathbb{R}^a \\times \\mathbb{R}^b\\dots | x \\in \\mathbb{S_1} \\land y \\in \\mathbb{S_2} \\dots \\}``.
 """
-struct Conjunction{Ts::Tuple} <: MOI.AbstractVectorSet
+struct Conjunction{Ts <: Tuple} <: MOI.AbstractVectorSet
     constraints::Ts
 end
 
@@ -165,9 +165,9 @@ end
 
 The logical disjunction operator ∨ (AND).
 
-``\\{(x, y\\dots) \\in \\mathbb{R}^a \\times \\mathbb{R}^b\\dots | x \\in \mathbb{S_1} \\lor y \\in \mathbb{S_2} \\dots \\}``.
+``\\{(x, y\\dots) \\in \\mathbb{R}^a \\times \\mathbb{R}^b\\dots | x \\in \\mathbb{S_1} \\lor y \\in \\mathbb{S_2} \\dots \\}``.
 """
-struct Disjunction{Ts::Tuple} <: MOI.AbstractVectorSet
+struct Disjunction{Ts <: Tuple} <: MOI.AbstractVectorSet
     constraints::Ts
 end
 
