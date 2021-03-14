@@ -144,6 +144,26 @@ MOI.dimension(set::Count{T}) where {T} = set.dimension + 1
 Base.copy(set::Count{T}) where {T} = Count(copy(set.value), value)
 
 """
+CountCompare(dimension::Int)
+
+``\\{(z, x, y) \\in \\mathbb{N} \\times \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{R}^\\mathtt{dimension} : Z = |\\{i | x_i = y_i\\}|\\}``
+
+The first `dimension` variables are the first array that is compared to the 
+second one, indicated by the next `dimension` variables. The last variable
+is the number of values that are identical in both arrays.
+
+## Example
+
+    [v, w, x, y, z] in Count(2)
+    # w == sum([w, x] .== [y, z])
+"""
+struct CountCompare <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+MOI.dimension(set::CountCompare) = 2 * set.dimension + 1
+
+"""
     CountDistinct(dimension::Int)
 
 The first variable in the set is forced to be the number of distinct values in
