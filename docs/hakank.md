@@ -17,7 +17,7 @@ All the constraints that are currently defined in [hakank's constraints_utils.jl
 * `assignment`: `Inverse`
 * `assignment_ctr`: not yet
 * `matrix_element`: `Element`, but to generalise to more than one dimension
-* `regular`: not yet
+* `regular`: not yet (no representation of finite automata in Julia)
 * `atmost`: `Count` with `LessThan`
 * `atleast`: `Count` with `GreaterThan`
 * `exactly`: `Count`
