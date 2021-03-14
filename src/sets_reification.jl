@@ -181,6 +181,20 @@ function Base.copy(set::Disjunction{Ts}) where {Ts}
 end
 
 """
+    Negation{S <: MOI.AbstractSet}(set::S)
+
+The logical negation operator ¬ (NOT).
+
+``\\{x \\in \\times \\mathbb{R}^n | x \\not\\in set\\}``.
+"""
+struct Negation{S <: MOI.AbstractSet} <: MOI.AbstractVectorSet
+    set::S
+end
+
+MOI.dimension(set::Negation{S}) where {S} = MOI.dimension(set.set)
+Base.copy(set::Negation{S}) where {S} = Negation(copy(set.set))
+
+"""
     True()
 
 A constraint that is always true. 
