@@ -178,3 +178,21 @@ Ensures that the elements of the vector are in decreasing order (>= operation).
 struct Decreasing <: MOI.AbstractVectorSet
     dimension::Int
 end
+
+# isbits types, nothing to copy
+function Base.copy(
+    set::Union{
+        LexicographicallyLessThan, 
+        LexicographicallyGreaterThan, 
+        Sort, 
+        SortPermutation, 
+        MinimumAmong, 
+        ArgumentMinimumAmong, 
+        MaximumAmong, 
+        ArgumentMaximumAmong, 
+        Increasing, 
+        Decreasing,
+    }
+)
+    return set
+end

@@ -30,3 +30,8 @@ struct CumulativeResourceWithDeadline <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::CumulativeResourceWithDeadline) = 4 * set.n_tasks + 1
+
+# isbits types, nothing to copy
+function Base.copy(set::Union{CumulativeResource, CumulativeResourceWithDeadline})
+    return set
+end

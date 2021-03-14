@@ -217,3 +217,8 @@ all the 1s are contiguous. The vector must correspond to the regular expression
 struct Contiguity <: MOI.AbstractVectorSet
     dimension::Int
 end
+
+# isbits types, nothing to copy
+function Base.copy(set::Contiguity)
+    return set
+end

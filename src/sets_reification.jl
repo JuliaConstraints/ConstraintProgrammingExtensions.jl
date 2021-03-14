@@ -221,3 +221,5 @@ end
 
 MOI.dimension(set::False) = 0
 Base.copy(set::False) = set
+
+# No isbits types.

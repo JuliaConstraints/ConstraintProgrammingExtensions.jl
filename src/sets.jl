@@ -268,14 +268,15 @@ MOI.dimension(set::Inverse) = 2 * set.dimension
 function Base.copy(
     set::Union{
         AllDifferent,
+        AllDifferentExceptConstant,
+        Membership,
         DifferentFrom,
+        CountCompare,
         CountDistinct,
         Element,
-        BinPacking,
-        FixedCapacityBinPacking,
-        VariableCapacityBinPacking,
-        DifferentFrom,
         MinimumDistance,
+        MaximumDistance,
+        Inverse,
     },
 )
     return set

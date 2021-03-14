@@ -68,3 +68,8 @@ struct WeightedCircuitPath{T <: Real} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::WeightedCircuitPath{T}) where {T} = 2 * set.n_nodes + 1
+
+# isbits types, nothing to copy
+function Base.copy(set::Union{Circuit, CircuitPath})
+    return set
+end
