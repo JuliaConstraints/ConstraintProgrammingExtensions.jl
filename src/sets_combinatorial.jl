@@ -174,7 +174,7 @@ and a fixed capacity:
 
 ``\\{x \\in \\{0, 1\\}^n | \\sum_{i=1}^n \\mathtt{weights[i]} x_i \\leq \\mathtt{capacity} \\}``.
 
-The last variable, `y`, is the total value of the knapsack
+The last variable, `y`, is the total value of the knapsack:
 
 ``y = \\mathtt{values[i]} x_i``.
 """
@@ -195,7 +195,7 @@ and a capacity given by the next variable, `y`:
 
 ``\\{(x, y) \\in \\{0, 1\\}^n \\times \\mathbb{R} | \\sum_{i=1}^n \\mathtt{weights[i]} x_i \\leq y \\}``.
 
-The last variable, `z`, is the total value of the knapsack
+The last variable, `z`, is the total value of the knapsack:
 
 ``z = \\mathtt{values[i]} x_i``.
 """
@@ -206,3 +206,14 @@ end
 
 MOI.dimension(set::VariableCapacityWeightedKnapsack{T}) where {T} = length(set.weights) + 2
 Base.copy(set::VariableCapacityWeightedKnapsack{T}) where {T} = VariableCapacityWeightedKnapsack(copy(set.weights), copy(set.values))
+
+"""
+    Contiguity(dimension::Int)
+
+Ensures that, in the binary variables `x` constrained to be in this set, 
+all the 1s are contiguous. The vector must correspond to the regular expression
+`0*1*0*`.
+"""
+struct Contiguity <: MOI.AbstractVectorSet
+    dimension::Int
+end

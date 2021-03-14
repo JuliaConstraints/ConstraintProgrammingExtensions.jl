@@ -22,8 +22,8 @@ All the constraints that are currently defined in [hakank's constraints_utils.jl
 * `atleast`: `Count` with `GreaterThan`
 * `exactly`: `Count`
 * `latin_square`: `AllDifferent`
-* `no_overlap`: not yet
-* `global_contiguity_regular`: not yet
+* `no_overlap`: not yet (no representation of intervals)
+* `global_contiguity_regular`: `Contiguity`
 * `lex_less_eq`: `LexicographicallyLessThan`
 * `among`: `Count`
 
