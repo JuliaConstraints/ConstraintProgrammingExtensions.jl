@@ -26,3 +26,4 @@ Numberjack has a very similar goal to this project: a common modelling interface
 * `Numberjack.Mul`: MOI (quadratic expression)
 * `Numberjack.Div`: MOI (quadratic expression)
 * `Numberjack.Mod`: not yet (function)
+* `Numberjack.Table`: `Domain`
