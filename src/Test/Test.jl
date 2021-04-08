@@ -42,5 +42,7 @@ include("count.jl")
 include("countdistinct.jl")
 include("differentfrom.jl")
 include("domain.jl")
+include("element.jl")
+include("strictly.jl")
 
 end
