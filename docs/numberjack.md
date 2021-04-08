@@ -27,3 +27,6 @@ Numberjack has a very similar goal to this project: a common modelling interface
 * `Numberjack.Div`: MOI (quadratic expression)
 * `Numberjack.Mod`: not yet (function)
 * `Numberjack.Table`: `Domain`
+* `Numberjack.Precedence`: not yet (no notion of interval)
+* `Numberjack.NoOverlap`: not yet (no notion of interval)
+* `Numberjack.UnaryResource`: `CumulativeResource`
