@@ -12,4 +12,6 @@ include("sets_scheduling.jl") # Sets related to scheduling.
 include("sets_graph.jl") # Sets that work on graphs.
 include("sets_reification.jl") # Sets that rely on the concept of reification (also called logical constraints).
 
+include("Test/Test.jl")
+
 end

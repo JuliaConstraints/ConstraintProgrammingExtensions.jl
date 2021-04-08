@@ -1,7 +1,7 @@
 module Test
 
-import Test
-import MathOptInterface
+using Test
+using MathOptInterface
 
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
