@@ -37,6 +37,10 @@ end
 
 # Test sets.
 include("alldifferent.jl")
+include("antidomain.jl")
+include("count.jl")
+include("countdistinct.jl")
+include("differentfrom.jl")
 include("domain.jl")
 
 end
