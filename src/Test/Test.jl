@@ -38,11 +38,15 @@ end
 # Test sets.
 include("alldifferent.jl")
 include("antidomain.jl")
+# include("binpacking.jl")
 include("count.jl")
 include("countdistinct.jl")
 include("differentfrom.jl")
 include("domain.jl")
 include("element.jl")
+include("inverse.jl")
+include("lexicographically.jl")
+include("minimumdistance.jl")
 include("strictly.jl")
 
 end
