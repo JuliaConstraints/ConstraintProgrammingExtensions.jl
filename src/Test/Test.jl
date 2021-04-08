@@ -35,4 +35,8 @@ function _vaf(vars::Vector{MOI.VariableIndex})
     )
 end
 
+# Test sets.
+include("alldifferent.jl")
+include("domain.jl")
+
 end
