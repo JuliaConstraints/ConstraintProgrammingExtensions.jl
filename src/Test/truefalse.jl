@@ -55,7 +55,7 @@ function false_test(model::MOI.ModelLike, config::MOIT.TestConfig)
 end
 
 
-const truefalsedicts = Dict(
+const truefalsetests = Dict(
     "true" => true_test,
     "false" => false_test,
 )
