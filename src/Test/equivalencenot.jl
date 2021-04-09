@@ -77,8 +77,8 @@ function equivalencenot_scalaraffinefunction_test(model::MOI.ModelLike, config::
 end
 
 const equivalencenottests = Dict(
-    "equivalencenot_vectorofvariables" => equivalencenot_vectorofvariables_test,
-    "equivalencenot_vectoraffinefunction" => equivalencenot_vectoraffinefunction_test,
+    "equivalencenot_singlevariable" => equivalencenot_singlevariable_test,
+    "equivalencenot_scalaraffinefunction" => equivalencenot_scalaraffinefunction_test,
 )
 
 @MOIT.moitestset equivalencenot

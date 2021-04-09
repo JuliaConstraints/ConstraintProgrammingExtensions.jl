@@ -81,8 +81,8 @@ function ifthenelse_scalaraffinefunction_test(model::MOI.ModelLike, config::MOIT
 end
 
 const ifthenelsetests = Dict(
-    "ifthenelse_vectorofvariables" => ifthenelse_vectorofvariables_test,
-    "ifthenelse_vectoraffinefunction" => ifthenelse_vectoraffinefunction_test,
+    "ifthenelse_singlevariable" => ifthenelse_singlevariable_test,
+    "ifthenelse_scalaraffinefunction" => ifthenelse_scalaraffinefunction_test,
 )
 
 @MOIT.moitestset ifthenelse

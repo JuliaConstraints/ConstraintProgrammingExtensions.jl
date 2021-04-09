@@ -77,8 +77,8 @@ function reified_scalaraffinefunction_test(model::MOI.ModelLike, config::MOIT.Te
 end
 
 const reifiedtests = Dict(
-    "reified_vectorofvariables" => reified_vectorofvariables_test,
-    "reified_vectoraffinefunction" => reified_vectoraffinefunction_test,
+    "reified_singlevariable" => reified_singlevariable_test,
+    "reified_scalaraffinefunction" => reified_scalaraffinefunction_test,
 )
 
 @MOIT.moitestset reified

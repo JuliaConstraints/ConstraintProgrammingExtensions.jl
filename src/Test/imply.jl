@@ -77,8 +77,8 @@ function imply_scalaraffinefunction_test(model::MOI.ModelLike, config::MOIT.Test
 end
 
 const implytests = Dict(
-    "imply_vectorofvariables" => imply_vectorofvariables_test,
-    "imply_vectoraffinefunction" => imply_vectoraffinefunction_test,
+    "imply_singlevariable" => imply_singlevariable_test,
+    "imply_scalaraffinefunction" => imply_scalaraffinefunction_test,
 )
 
 @MOIT.moitestset imply
