@@ -2,10 +2,12 @@ module Test
 
 using Test
 using MathOptInterface
+using ConstraintProgrammingExtensions
 
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
 const MOIT = MOI.Test
+const CP = ConstraintProgrammingExtensions
 
 # A few helpers
 function _vov(vars::Vector{MOI.VariableIndex})
@@ -53,6 +55,6 @@ include("lexicographically.jl")
 include("minimumdistance.jl")
 include("reified.jl")
 include("strictly.jl")
-include("true_false.jl")
+include("truefalse.jl")
 
 end
