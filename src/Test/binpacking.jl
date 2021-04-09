@@ -1,5 +1,4 @@
 function binpacking_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.TestConfig)
-    model = OPTIMIZER
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -44,7 +43,6 @@ function binpacking_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.Te
 end
 
 function binpacking_scalaraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
-    model = OPTIMIZER
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
