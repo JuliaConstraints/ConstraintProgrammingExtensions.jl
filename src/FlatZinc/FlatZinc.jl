@@ -511,6 +511,26 @@ end
 # TODO: float_pow, float_sin, float_sinh, float_sqrt, float_tan, float_tanh, float_times
 # TODO: int2float, not in CP for now.
 
+# - MiniZinc 2.0.0
+# TODO: bool_clause_reif.
+
+# - MiniZinc 2.0.2
+# TODO: array_var_bool_element_nonshifted, array_var_float_element_nonshifted, 
+# array_var_int_element_nonshifted, array_var_set_element_nonshifted
+
+# - MiniZinc 2.1.0
+# Already included above, like in the docs.
+
+# - MiniZinc 2.2.1
+# TODO: int_pow_fixed
+
+# - MiniZinc 2.3.3
+# TODO: float_set_in
+
+# - MiniZinc 2.5.2
+# TODO: array_var_bool_element2d_nonshifted, array_var_float_element2d_nonshifted, 
+# array_var_int_element2d_nonshifted, array_var_set_element2d_nonshifted
+
 # Objective printing.
 
 function write_objective(io::IO, model::Optimizer)
