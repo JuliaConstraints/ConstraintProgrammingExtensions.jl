@@ -20,8 +20,6 @@ const MOIU = MathOptInterface.Utilities
         end
 
         @testset "Strictly{$(Ssub)}" for Ssub in [MOI.LessThan, MOI.GreaterThan]
-            @test isbitstype(CP.Strictly{Ssub{Float64}})
-
             @test CP.Strictly(Ssub(1)) == CP.Strictly(Ssub(1))
             @test CP.Strictly(Ssub(1)) != CP.Strictly(Ssub(2))
             @test CP.Strictly(Ssub(2)) == CP.Strictly(Ssub(2))
