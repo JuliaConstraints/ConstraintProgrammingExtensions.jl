@@ -419,7 +419,97 @@ end
 
 # - Set constraints.
 
+# TODO: no notion of set in MOI! 
+
 # - Float constraints.
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, s::CP.Element{Float64})
+    @assert output_dimension(f) == 2
+    value = f.variables[1]
+    index = f.variables[2]
+    print(io, "array_float_element($(_fzn_f(model, index)), $s.values, $(_fzn_f(model, value)))")
+end
+
+# TODO: no dispatch possible! Already taken by the integer version.
+# function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MaximumAmong)
+#     array = f.variables[2:end]
+#     value = f.variables[1]
+#     print(io, "array_float_maximum($(_fzn_f(model, value)), $(_fzn_f(model, array)))")
+# end
+
+# TODO: no dispatch possible! Already taken by the integer version.
+# function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MinimumAmong)
+#     array = f.variables[2:end]
+#     value = f.variables[1]
+#     print(io, "array_float_minimum($(_fzn_f(model, value)), $(_fzn_f(model, array)))")
+# end
+
+# TODO: array_var_float_element, i.e. CP.Element with a variable array.
+
+# TODO: float_abs, float_acos, float_acosh, float_asin, float_asinh, 
+# float_atan, float_atanh, float_cos, float_cosh, float_div. 
+
+# float_dom: could be useful to merge several MOI.Interval as one constraint, 
+# for now several float_in.
+
+# float_eq, float_eq_reif: meaningless for MOI, no way to represent "x == y"
+# natively (goes through affine expressions).
+
+# TODO: float_exp
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::MOI.Interval{Float64})
+    print(io, "float_in($(_fzn_f(model, f)), [$s.lower, $s.upper])")
+end
+
+# TODO: float_in_reif
+
+# float_le, float_le_reif: meaningless for MOI, no way to represent "x <= y"
+# natively (goes through affine expressions).
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.ScalarAffineFunction, s::MOI.EqualTo{Float64})
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.value - f.constant
+    print(io, "float_lin_eq($(coefficients), [$(_fzn_f(model, variables))], $(value))")
+end
+
+# TODO: float_lin_eq_reif
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.ScalarAffineFunction, s::MOI.LessThan{Float64})
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.value - f.constant
+    print(io, "float_lin_le($(coefficients), [$(_fzn_f(model, variables))], $(value))")
+end
+
+# TODO: float_lin_le_reif
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.ScalarAffineFunction, s::CP.Strictly{MOI.LessThan{Float64}})
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.value - f.constant
+    print(io, "float_lin_lt($(coefficients), [$(_fzn_f(model, variables))], $(value))")
+end
+
+# TODO: float_lin_lt_reif
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.ScalarAffineFunction, s::CP.DifferentFrom{Float64})
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.value - f.constant
+    print(io, "float_lin_ne($(coefficients), [$(_fzn_f(model, variables))], $(value))")
+end
+
+# TODO: float_lin_ne_reif
+# TODO: float_ln, float_log10, float_log2
+
+# float_lt, float_lt_reif: meaningless for MOI, no way to represent "x < y"
+# natively (goes through affine expressions).
+
+# TODO: float_max (CP equivalent!?)
+# TODO: float_min (CP equivalent!?)
+
+# float_net, float_ne_reif: meaningless for MOI, no way to represent "x != y"
+# natively (goes through affine expressions).
+
+# TODO: float_pow, float_sin, float_sinh, float_sqrt, float_tan, float_tanh, float_times
+# TODO: int2float, not in CP for now.
 
 # Objective printing.
 
