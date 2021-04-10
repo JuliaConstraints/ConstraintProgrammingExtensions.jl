@@ -304,7 +304,7 @@ end
 
 function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, s::CP.Element{Int})
     @assert output_dimension(f) == 2
-    value = f.variables[2]
+    value = f.variables[1]
     index = f.variables[2]
     print(io, "array_int_element($(_fzn_f(model, index)), $s.values, $(_fzn_f(model, value)))")
 end
@@ -366,7 +366,7 @@ end
 # TODO: int_min (CP equivalent!?)
 # TODO: int_mod, modulo
 
-# int_ne, int_ne_reif: meaningless for MOI, no way to represent "x == y" 
+# int_ne, int_ne_reif: meaningless for MOI, no way to represent "x == y"
 # natively (goes through affine expressions).
 
 # TODO: int_pow.
@@ -376,15 +376,46 @@ function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::CP
     print(io, "set_in($(_fzn_f(model, f)), $(s.values))")
 end
 
-function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::MOI.GreaterThan{Int})
+function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::MOI.GreaterThan{Int}) # In examples, but not in fzn doc? 
     print(io, "int_ge($(_fzn_f(model, f)), $(s.lower))")
 end
 
-function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::CP.Strictly{MOI.GreaterThan{Int}})
+function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::CP.Strictly{MOI.GreaterThan{Int}}) # In examples, but not in fzn doc? 
     print(io, "int_gt($(_fzn_f(model, f)), $(s.lower))")
 end
 
 # - Boolean constraints.
+
+# TODO: array_bool_and, no conjunction between variables for now in CP.
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, s::CP.Element{Bool})
+    @assert output_dimension(f) == 2
+    value = f.variables[1]
+    index = f.variables[2]
+    print(io, "array_bool_element($(_fzn_f(model, index)), $s.values, $(_fzn_f(model, value)))")
+end
+
+# TODO: array_bool_or, no disjunction between variables for now in CP.
+# TODO: array_bool_xor, no XOR for now in CP.
+# TODO: array_var_bool_element, no CP.Element for array of variables.
+# TODO: bool2int, not in CP for now.
+# TODO: bool_and, like array_bool_and.
+# TODO: bool_clause, not in CP for now.
+
+# bool_eq, bool_eq_reif: meaningless for MOI, no way to represent "x == y"
+# natively (goes through affine expressions).
+# bool_le, bool_le_reif: meaningless for MOI, no way to represent "x <= y"
+# natively (goes through affine expressions).
+
+# TODO: bool_lin_eq, bool_lin_le, no way to dispatch on the type of the variables.
+
+# bool_lt, bool_lt_reif: meaningless for MOI, no way to represent "x < y"
+# natively (goes through affine expressions).
+# bool_ne, bool_ne_reif: meaningless for MOI, no way to represent "x != y"
+# natively (goes through affine expressions).
+
+# TODO: bool_or, no disjunction between variables for now in CP.
+# TODO: bool_xor, no XOR between variables for now in CP.
 
 # - Set constraints.
 
