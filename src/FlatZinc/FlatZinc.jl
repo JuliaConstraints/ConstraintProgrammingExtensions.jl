@@ -300,19 +300,19 @@ end
 # Objective printing.
 
 function write_objective(io::IO, model::Optimizer)
+    print(io, "solve ")
     if model.objective_sense == MOI.FEASIBILITY_SENSE && model.objective_function === nothing
-        print(io, "solve satisfy;")
+        print(io, "satisfy")
     elseif model.objective_sense == MOI.MIN_SENSE && model.objective_function !== nothing
-        print(io, "solve minimize")
+        print(io, "minimize ")
         write_function(io, model, model.objective_function)
-        print(io, ";")
     elseif model.objective_sense == MOI.MAX_SENSE && model.objective_function !== nothing
-        print(io, "solve maximize")
+        print(io, "maximize ")
         write_function(io, model, model.objective_function)
-        print(io, ";")
     else
         error("Assertion failed when printing the objective. Sense: $(model.objective_sense). Function: $(model.objective_function).")
     end
+    print(io, ";")
     println(io)
 end
 
