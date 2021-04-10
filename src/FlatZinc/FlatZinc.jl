@@ -229,6 +229,18 @@ function write_variables(io::IO, model::Model)
     println(io)
 end
 
+function write_constraints(io::IO, model::Model)
+    for cons in model.constraint_info
+        if !cons.output_as_part_of_variable
+            write_constraint(io, cons.f, cons.s)
+            println(io)
+        end
+    end
+    println(io)
+end
+
+# Variable printing.
+
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Float64})
     print(io, "var float: $(name) = $(s.value);")
 end
@@ -271,6 +283,32 @@ end
 
 function write_variable(io::IO, name::String, ::MOI.Integer)
     print(io, "var bool: $(name);")
+end
+
+# Constraint printing.
+
+# Objective printing.
+
+function write_objective(io::IO, model::Model)
+    if model.objective_sense == MOI.FEASIBILITY_SENSE && model.objective_function === nothing
+        print(io, "solve satisfy;")
+    elseif model.objective_sense == MOI.MIN_SENSE && model.objective_function !== nothing
+        print(io, "solve minimize")
+        write_function(io, model, model.objective_function)
+        print(io, ";")
+    elseif model.objective_sense == MOI.MAX_SENSE && model.objective_function !== nothing
+        print(io, "solve maximize")
+        write_function(io, model, model.objective_function)
+        print(io, ";")
+    else
+        error("Assertion failed when printing the objective. Sense: $(model.objective_sense). Function: $(model.objective_function).")
+    end
+    println(io)
+end
+
+# Function printing.
+
+function write_function(io::IO, model::Model, f::MOI.AbstractFunction)
 end
 
 # =============================================================================
