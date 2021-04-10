@@ -8,7 +8,7 @@ const MOIU = MOI.Utilities
 const CleverDicts = MOIU.CleverDicts
 const CP = ConstraintProgrammingExtensions
 
-# Formal grammar: https://www.minizinc.org/doc-2.4.3/en/fzn-spec.html#grammar
+# Formal grammar: https://www.minizinc.org/doc-2.5.5/en/fzn-spec.html#grammar
 
 # =============================================================================
 # =
@@ -145,6 +145,9 @@ function supports_add_constrained_variables(
 end
 
 function add_constrained_variables(model::Optimizer, sets::AbstractVector{<:MOI.AbstractScalarSet})
+    # TODO: memorise that these variables are part of the same call, so that 
+    # the generated FlatZinc is shorter (array of variables)? This would 
+    # require that all sets are identical, though.
     vidx = [_create_variable(model, sets[i]) for i in 1:length(sets)]
     cidx = [_create_constraint(model, MOI.SingleVariable(vidx[i]), sets[i], true) for i in 1:length(sets)]
     return vidx, cidx
@@ -220,7 +223,6 @@ function Base.write(io::IO, model::Optimizer)
 
     write_variables(io, model)
     write_constraints(io, model)
-    write_sense(io, model)
     write_objective(io, model)
 
     return
@@ -228,6 +230,7 @@ end
 
 function write_variables(io::IO, model::Optimizer)
     for var in model.variable_info
+        # Variables either start with "var" or "array of var", let write_variable decide.
         write_variable(io, var.name, var.set)
         println(io)
     end
@@ -293,9 +296,99 @@ function write_variable(io::IO, name::String, ::MOI.Integer)
 end
 
 # Constraint printing.
+# Based on the built-in predicates: https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html
+# In the same order as the documentation.
 
-function write_constraint(io::IO, f, s)
+# - Integer constraints.
+    # TODO: only for integer variables, not enforced for now.
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, s::CP.Element{Int})
+    @assert output_dimension(f) == 2
+    value = f.variables[2]
+    index = f.variables[2]
+    print(io, "array_int_element($(_fzn_f(model, index)), $s.values, $(_fzn_f(model, value)))")
 end
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MaximumAmong)
+    array = f.variables[2:end]
+    value = f.variables[1]
+    print(io, "array_int_maximum($(_fzn_f(model, value)), $(_fzn_f(model, array)))")
+end
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MinimumAmong)
+    array = f.variables[2:end]
+    value = f.variables[1]
+    print(io, "array_int_minimum($(_fzn_f(model, value)), $(_fzn_f(model, array)))")
+end
+
+# TODO: absolute value. int_abs.
+# TODO: integer division. int_div
+
+# int_eq, int_eq_reif: meaningless for MOI, no way to represent "x == y" 
+# natively (goes through affine expressions).
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::MOI.LessThan{Int})
+    print(io, "int_le($(_fzn_f(model, f)), $(s.upper))")
+end
+
+# TODO: int_le_reif
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.ScalarAffineFunction, s::MOI.EqualTo{Int})
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.value - f.constant
+    print(io, "int_lin_eq($(coefficients), [$(_fzn_f(model, variables))], $(value))")
+end
+
+# TODO: int_lin_eq_reif
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.ScalarAffineFunction, s::MOI.LessThan{Int})
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.value - f.constant
+    print(io, "int_lin_le($(coefficients), [$(_fzn_f(model, variables))], $(value))")
+end
+
+# TODO: int_lin_le_reif
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.ScalarAffineFunction, s::CP.DifferentFrom{Int})
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.value - f.constant
+    print(io, "int_lin_ne($(coefficients), [$(_fzn_f(model, variables))], $(value))")
+end
+
+# TODO: int_lin_ne_reif
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::CP.Strictly{MOI.LessThan{Int}})
+    print(io, "int_lt($(_fzn_f(model, f)), $(s.upper))")
+end
+
+# TODO: int_lt_reif
+# TODO: int_max (CP equivalent!?)
+# TODO: int_min (CP equivalent!?)
+# TODO: int_mod, modulo
+
+# int_ne, int_ne_reif: meaningless for MOI, no way to represent "x == y" 
+# natively (goes through affine expressions).
+
+# TODO: int_pow.
+# TODO: int_times.
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::CP.Domain{Int})
+    print(io, "set_in($(_fzn_f(model, f)), $(s.values))")
+end
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::MOI.GreaterThan{Int})
+    print(io, "int_ge($(_fzn_f(model, f)), $(s.lower))")
+end
+
+function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::CP.Strictly{MOI.GreaterThan{Int}})
+    print(io, "int_gt($(_fzn_f(model, f)), $(s.lower))")
+end
+
+# - Boolean constraints.
+
+# - Set constraints.
+
+# - Float constraints.
 
 # Objective printing.
 
@@ -304,11 +397,10 @@ function write_objective(io::IO, model::Optimizer)
     if model.objective_sense == MOI.FEASIBILITY_SENSE && model.objective_function === nothing
         print(io, "satisfy")
     elseif model.objective_sense == MOI.MIN_SENSE && model.objective_function !== nothing
-        print(io, "minimize ")
+        print(io, "minimize $(_fzn_f(model, model.objective_function))")
         write_function(io, model, model.objective_function)
     elseif model.objective_sense == MOI.MAX_SENSE && model.objective_function !== nothing
-        print(io, "maximize ")
-        write_function(io, model, model.objective_function)
+        print(io, "maximize $(_fzn_f(model, model.objective_function))")
     else
         error("Assertion failed when printing the objective. Sense: $(model.objective_sense). Function: $(model.objective_function).")
     end
@@ -318,8 +410,18 @@ end
 
 # Function printing.
 
-function write_function(io::IO, model::Optimizer, f::MOI.SingleVariable)
-    print(io, model.variable_info[f.variable].name)
+_fzn_f(model::Optimizer, f::MOI.SingleVariable) = _fzn_f(model, f.variable)
+_fzn_f(model::Optimizer, f::MOI.VariableIndex) = model.variable_info[f].name
+_fzn_f(model::Optimizer, fs::Vector{MOI.VariableIndex}) = join([_fzn_f(model, f) for f in fs], ", ")
+
+# Destructuring.
+
+function _saf_to_coef_vars(f::MOI.ScalarAffineFunction)
+    MOIU.canonicalize!(f)
+    variables = MOI.VariableIndex[t.variable_index for t in f.terms]
+    coefficients = Int[t.coefficient for t in f.terms]
+
+    return variables, coefficients
 end
 
 # =============================================================================
