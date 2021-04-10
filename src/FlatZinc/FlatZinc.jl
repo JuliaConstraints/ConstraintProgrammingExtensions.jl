@@ -227,15 +227,15 @@ function write_variables(io::IO, model::Model)
 end
 
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Float64})
-    print(io, "var float: $(name) = $(s.constant);")
+    print(io, "var float: $(name) = $(s.value);")
 end
 
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Int})
-    print(io, "var int: $(name) = $(s.constant);")
+    print(io, "var int: $(name) = $(s.value);")
 end
 
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Bool})
-    print(io, "var bool: $(name) = $(s.constant);")
+    print(io, "var bool: $(name) = $(s.value);")
 end
 
 function write_variable(io::IO, name::String, s::MOI.LessThan{Float64})
