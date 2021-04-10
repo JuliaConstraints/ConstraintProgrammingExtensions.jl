@@ -1,5 +1,206 @@
 module FlatZinc
 
-# Export to the FlatZinc format.
+# Formal grammar: https://www.minizinc.org/doc-2.4.3/en/fzn-spec.html#grammar
+
+# =============================================================================
+# =
+# = FlatZinc model.
+# =
+# =============================================================================
+
+mutable struct VariableInfo 
+    index::MOI.VariableIndex
+    name::String
+    set::AbstractVector{MOI.AbstractSet}
+end
+
+mutable struct ConstraintInfo 
+    index::MOI.ConstraintIndex
+    # FlatZinc does not allow constraint names.
+    f::MOI.AbstractFunction
+    s::AbstractVector{MOI.AbstractSet}
+    output_as_part_of_variable::Bool
+end
+
+mutable struct Optimizer <: MOI.AbstractOptimizer
+    # A mapping from the MOI.VariableIndex to the variable object.
+    # VariableInfo also stores some additional fields like the type of variable.
+    variable_info::CleverDicts.CleverDict{MOI.VariableIndex, VariableInfo}
+
+    # A mapping from the MOI.ConstraintIndex to the variable object.
+    # VariableInfo also stores some additional fields like the type of variable.
+    constraint_info::Dict{MOI.ConstraintIndex, ConstraintInfo}
+
+    # Memorise the objective sense and the function separately, as the Concert
+    # API forces to give both at the same time.
+    objective_sense::MOI.OptimizationSense
+    objective_function::Union{Nothing, MOI.AbstractScalarFunction}
+
+    """
+        Optimizer()
+
+    Create a new Optimizer object.
+    """
+    function Optimizer()
+        model.variable_info =
+            CleverDicts.CleverDict{MOI.VariableIndex, VariableInfo}()
+        model.constraint_info = Dict{MOI.ConstraintIndex, ConstraintInfo}()
+
+        model.objective_sense = MOI.FEASIBILITY_SENSE
+        model.objective_function = nothing
+
+        MOI.empty!(model)
+        return model
+    end
+end
+
+function Base.show(io::IO, ::Model)
+    print(io, "A FlatZinc (fzn) model")
+    return
+end
+
+function MOI.empty!(model::Optimizer)
+    empty!(model.variable_info)
+    empty!(model.constraint_info)
+
+    model.objective_sense = MOI.FEASIBILITY_SENSE
+    model.objective_function = nothing
+    
+    return
+end
+
+function MOI.is_empty(model::Optimizer)
+    !isempty(model.variable_info) && return false
+    !isempty(model.constraint_info) && return false
+    model.objective_sense != MOI.FEASIBILITY_SENSE && return false
+    model.objective_function !== nothing && return false
+    return true
+end
+
+function _create_variable(model::Optimizer, set::AbstractScalarSet)
+    index = CleverDicts.add_item(
+        model.variable_info,
+        VariableInfo(MOI.VariableIndex(0), "", set),
+    )
+    model.variable_info[index].index = index
+    return index
+end
+
+function _create_constraint(model::Optimizer, f::MOI.SingleVariable, 
+                            set::AbstractScalarSet, as_part_of_variable::Bool)
+    index = CleverDicts.add_item(
+        model.constraint_info,
+        ConstraintInfo(MOI.ConstraintIndex(0), f, set, as_part_of_variable),
+    )
+    model.constraint_info[index].index = index
+    return index
+end
+
+# Names. 
+# No support for constraint names in fzn, hence no ConstraintName.
+
+function MOI.get(model::Optimizer, ::MOI.VariableName, v::MOI.VariableIndex)
+    return model.variable_info[v].name
+end
+
+function MOI.set(
+    model::Optimizer,
+    ::MOI.VariableName,
+    v::MOI.VariableIndex,
+    name::String,
+)
+    model.variable_info[v].name = name
+    return
+end
+
+# Variables.
+
+function supports_add_constrained_variables(
+    ::Optimizer,
+    ::Type{F},
+) where {
+    F <: Union{
+        MOI.EqualTo{Float64},
+        MOI.LessThan{Float64},
+        MOI.GreaterThan{Float64},
+        MOI.Interval{Float64},
+        MOI.EqualTo{Int},
+        MOI.LessThan{Int},
+        MOI.GreaterThan{Int},
+        MOI.Interval{Int},
+        MOI.ZeroOne,
+        MOI.Integer,
+    },
+}
+    return true
+end
+
+function add_constrained_variables(model::Optimizer, sets::AbstractVector{<:AbstractScalarSet})
+    vidx = [_create_variable(model, sets[i]) for i in 1:length(sets)]
+    cidx = [_create_constraint(model, MOI.SingleVariable(vidx[i]), sets[i], true) for i in 1:length(sets)]
+    return vidx, cidx
+end
+
+function add_constrained_variable(model::Optimizer, set::AbstractScalarSet)
+    vidx = _create_variable(model, set)
+    cidx = _create_constraint(model, MOI.SingleVariable(vidx), set, true)
+    return vidx, cidx
+end
+
+# Constraints.
+
+function MOI.is_valid(
+    model::Optimizer,
+    c::MOI.ConstraintIndex{F, S},
+) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
+    info = get(model.constraint_info, c, nothing)
+    return info !== nothing && typeof(info.s) == S
+end
+
+function MOI.add_constraint(
+    model::Optimizer,
+    f::F,
+    s::S,
+) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
+    index = MOI.ConstraintIndex{F, S}(length(model.constraint_info) + 1)
+    model.constraint_info[index] = ConstraintInfo(index, f, s, true)
+    return index
+end
+
+# =============================================================================
+# =
+# = Export to the FlatZinc format.
+# =
+# =============================================================================
+
+"""
+    Base.write(io::IO, model::FlatZinc.Model)
+
+Write `model` to `io` in the FlatZinc (fzn) file format.
+"""
+function Base.write(io::IO, model::Model)
+    MOI.FileFormats.create_unique_names(model)
+    variable_names = Dict{MOI.VariableIndex,String}(
+        index => MOI.get(model, MOI.VariableName(), index) for
+        index in MOI.get(model, MOI.ListOfVariableIndices())
+    )
+
+    write_variables(io, model, variable_names)
+    write_constraints(io, model, variable_names)
+    write_sense(io, model)
+    write_objective(io, model, variable_names)
+
+    return
+end
+
+# =============================================================================
+# =
+# = Import from the FlatZinc format.
+# =
+# =============================================================================
+
+function Base.read!(::IO, ::Model)
+    return error("read! is not implemented for FlatZinc (fzn) files.")
+end
 
 end
