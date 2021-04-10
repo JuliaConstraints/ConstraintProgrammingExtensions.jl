@@ -1,5 +1,8 @@
 module FlatZinc
 
+import MathOptInterface
+const MOI = MathOptInterface
+
 # Formal grammar: https://www.minizinc.org/doc-2.4.3/en/fzn-spec.html#grammar
 
 # =============================================================================
