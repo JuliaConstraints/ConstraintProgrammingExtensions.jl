@@ -1,7 +1,12 @@
 module FlatZinc
 
 import MathOptInterface
+import ConstraintProgrammingExtensions
+
 const MOI = MathOptInterface
+const MOIU = MOI.Utilities
+const CleverDicts = MOIU.CleverDicts
+const CP = ConstraintProgrammingExtensions
 
 # Formal grammar: https://www.minizinc.org/doc-2.4.3/en/fzn-spec.html#grammar
 
@@ -34,10 +39,10 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
     # VariableInfo also stores some additional fields like the type of variable.
     constraint_info::Dict{MOI.ConstraintIndex, ConstraintInfo}
 
-    # Memorise the objective sense and the function separately, as the Concert
-    # API forces to give both at the same time.
+    # Memorise the objective sense and the function separately.
+    # The function can only be a single variable, as per FlatZinc limitations.
     objective_sense::MOI.OptimizationSense
-    objective_function::Union{Nothing, MOI.AbstractScalarFunction}
+    objective_function::Union{Nothing, MOI.SingleVariable}
 
     """
         Optimizer()
@@ -57,7 +62,7 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
     end
 end
 
-function Base.show(io::IO, ::Model)
+function Base.show(io::IO, ::Optimizer)
     print(io, "A FlatZinc (fzn) model")
     return
 end
@@ -80,7 +85,7 @@ function MOI.is_empty(model::Optimizer)
     return true
 end
 
-function _create_variable(model::Optimizer, set::AbstractScalarSet)
+function _create_variable(model::Optimizer, set::MOI.AbstractScalarSet)
     index = CleverDicts.add_item(
         model.variable_info,
         VariableInfo(MOI.VariableIndex(0), "", set),
@@ -90,7 +95,7 @@ function _create_variable(model::Optimizer, set::AbstractScalarSet)
 end
 
 function _create_constraint(model::Optimizer, f::MOI.SingleVariable, 
-                            set::AbstractScalarSet, as_part_of_variable::Bool)
+                            set::MOI.AbstractScalarSet, as_part_of_variable::Bool)
     index = CleverDicts.add_item(
         model.constraint_info,
         ConstraintInfo(MOI.ConstraintIndex(0), f, set, as_part_of_variable),
@@ -139,13 +144,13 @@ function supports_add_constrained_variables(
     return true
 end
 
-function add_constrained_variables(model::Optimizer, sets::AbstractVector{<:AbstractScalarSet})
+function add_constrained_variables(model::Optimizer, sets::AbstractVector{<:MOI.AbstractScalarSet})
     vidx = [_create_variable(model, sets[i]) for i in 1:length(sets)]
     cidx = [_create_constraint(model, MOI.SingleVariable(vidx[i]), sets[i], true) for i in 1:length(sets)]
     return vidx, cidx
 end
 
-function add_constrained_variable(model::Optimizer, set::AbstractScalarSet)
+function add_constrained_variable(model::Optimizer, set::MOI.AbstractScalarSet)
     vidx = _create_variable(model, set)
     cidx = _create_constraint(model, MOI.SingleVariable(vidx), set, true)
     return vidx, cidx
@@ -206,11 +211,11 @@ end
 # =============================================================================
 
 """
-    Base.write(io::IO, model::FlatZinc.Model)
+    Base.write(io::IO, model::FlatZinc.Optimizer)
 
 Write `model` to `io` in the FlatZinc (fzn) file format.
 """
-function Base.write(io::IO, model::Model)
+function Base.write(io::IO, model::Optimizer)
     MOI.FileFormats.create_unique_names(model)
 
     write_variables(io, model)
@@ -221,7 +226,7 @@ function Base.write(io::IO, model::Model)
     return
 end
 
-function write_variables(io::IO, model::Model)
+function write_variables(io::IO, model::Optimizer)
     for var in model.variable_info
         write_variable(io, var.name, var.set)
         println(io)
@@ -229,10 +234,12 @@ function write_variables(io::IO, model::Model)
     println(io)
 end
 
-function write_constraints(io::IO, model::Model)
+function write_constraints(io::IO, model::Optimizer)
     for cons in model.constraint_info
         if !cons.output_as_part_of_variable
+            print(io, "constraint ")
             write_constraint(io, cons.f, cons.s)
+            print(";")
             println(io)
         end
     end
@@ -287,9 +294,12 @@ end
 
 # Constraint printing.
 
+function write_constraint(io::IO, f, s)
+end
+
 # Objective printing.
 
-function write_objective(io::IO, model::Model)
+function write_objective(io::IO, model::Optimizer)
     if model.objective_sense == MOI.FEASIBILITY_SENSE && model.objective_function === nothing
         print(io, "solve satisfy;")
     elseif model.objective_sense == MOI.MIN_SENSE && model.objective_function !== nothing
@@ -308,7 +318,8 @@ end
 
 # Function printing.
 
-function write_function(io::IO, model::Model, f::MOI.AbstractFunction)
+function write_function(io::IO, model::Optimizer, f::MOI.SingleVariable)
+    print(io, model.variable_info[f.variable].name)
 end
 
 # =============================================================================
@@ -317,7 +328,7 @@ end
 # =
 # =============================================================================
 
-function Base.read!(::IO, ::Model)
+function Base.read!(::IO, ::Optimizer)
     return error("read! is not implemented for FlatZinc (fzn) files.")
 end
 
