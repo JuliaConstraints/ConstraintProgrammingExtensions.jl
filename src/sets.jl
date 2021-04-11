@@ -211,7 +211,7 @@ Base.copy(set::Element{T}) where {T} = Element(copy(set.values))
 Base.:(==)(x::Element{T}, y::Element{T}) where {T} = x.values == y.values
 
 """
-    MinimumDistance{T <: Real}(k::T, dimension::Int)
+    MinimumDistance{T <: Real}(dimension::Int, k::T)
 
 Ensures that all the `dimension` expressions in this set are at least `k` 
 apart, in absolute value:
@@ -222,12 +222,12 @@ Also called [`all_min_dist`](https://sofdem.github.io/gccat/gccat/Call_min_dist.
 or `inter_distance`.
 """
 struct MinimumDistance{T <: Real} <: MOI.AbstractVectorSet
-    k::T
     dimension::Int
+    k::T
 end
 
 """
-    MaximumDistance{T <: Real}(k::T, dimension::Int)
+    MaximumDistance{T <: Real}(dimension::Int, k::T)
 
 Ensures that all the `dimension` expressions in this set are at most `k` 
 apart, in absolute value:
@@ -235,8 +235,8 @@ apart, in absolute value:
 ``\\{x \\in \\mathbb{S}^{dimension}} | |x_i - x_j| \\leq k, \\forall i \\neq j \\in \\{1, 2\\dots dimension\\} \\}``.
 """
 struct MaximumDistance{T <: Real} <: MOI.AbstractVectorSet
-    k::T
     dimension::Int
+    k::T
 end
 
 """

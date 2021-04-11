@@ -4,8 +4,8 @@ Release Notes
 Version 0.2.0
 -------------
 
-Interface change: `Count` becomes consistent with 
-`AllDifferentExceptConstant`, with the dimension before the value.
+Interface change: `Count`, `MaximumDistance`, and `MinimumDistance` become 
+consistent with `AllDifferentExceptConstant`, with the dimension before the value.
 
 Improved the internal test suite. 
 
