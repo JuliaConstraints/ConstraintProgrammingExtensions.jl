@@ -1,6 +1,6 @@
 @testset "Sets" begin
     # Just a dimension.
-    @testset "$(S)" for S in [CP.AllDifferent, CP.Membership, CP.CountDistinct, CP.Inverse, CP.Contiguity]
+    @testset "$(S)" for S in [CP.AllDifferent, CP.Membership, CP.CountDistinct, CP.Inverse, CP.Contiguity, CP.Circuit, CP.CircuitPath]
         @test isbitstype(S)
 
         @test S(2) == S(2)
@@ -11,13 +11,13 @@
         @test typeof(copy(s)) <: S
         @test copy(s) == s
 
-        if S in [CP.AllDifferent, CP.Membership, CP.Contiguity]
+        if S in [CP.AllDifferent, CP.Membership, CP.Contiguity, CP.Circuit]
             @test MOI.dimension(S(2)) == 2
             @test MOI.dimension(S(3)) == 3
         elseif S == CP.CountDistinct
             @test MOI.dimension(S(2)) == 2 + 1
             @test MOI.dimension(S(3)) == 3 + 1
-        elseif S == CP.Inverse
+        elseif S in [CP.Inverse, CP.CircuitPath]
             @test MOI.dimension(S(2)) == 2 * 2
             @test MOI.dimension(S(3)) == 3 * 2
         else 
@@ -192,5 +192,23 @@
         @test copy(s) == s
 
         @test MOI.dimension(CP.VariableCapacityKnapsack([1, 2, 3])) == 3 + 1
+    end
+
+    @testset "$(S)" for S in [CP.WeightedCircuit, CP.WeightedCircuitPath]
+        @test S(3, [1 2 3; 4 5 6; 7 8 9]) == S(3, [1 2 3; 4 5 6; 7 8 9])
+        @test S(3, [1 2 3; 4 5 6; 7 8 9]) != S(2, [1 2; 3 4])
+        @test S(2, [1 2; 3 4]) != S(3, [1 2 3; 4 5 6; 7 8 9])
+        
+        s = S(3, [1 2 3; 4 5 6; 7 8 9])
+        @test typeof(copy(s)) <: S
+        @test copy(s) == s
+
+        if S == CP.WeightedCircuit
+            @test MOI.dimension(S(3, [1 2 3; 4 5 6; 7 8 9])) == 3 + 1
+        elseif S == CP.WeightedCircuitPath
+            @test MOI.dimension(S(3, [1 2 3; 4 5 6; 7 8 9])) == 3 * 2 + 1
+        else 
+            error("$(S) not implemented")
+        end
     end
 end
