@@ -56,6 +56,20 @@
         @test MOI.dimension(CP.CountCompare(3)) == 3 * 2 + 1
     end
     
+    @testset "Element" begin
+        set1 = [1, 2, 3]
+        set2 = [1, 2, 3, 4]
+        @test CP.Element(set1) == CP.Element(set1)
+        @test CP.Element(set1) != CP.Element(set2)
+        @test CP.Element(set2) != CP.Element(set1)
+        
+        s = CP.Element(set1)
+        @test copy(s) == s
+
+        @test MOI.dimension(CP.Element(set1)) == 2
+        @test MOI.dimension(CP.Element(set2)) == 2
+    end
+    
     @testset "$(S)" for S in [CP.Domain, CP.AntiDomain]
         set1 = Set([1, 2, 3])
         set2 = Set([1, 2, 3, 4])
