@@ -20,7 +20,7 @@
         end
     end
     
-    @testset "$(S)" for S in [CP.AllDifferentExceptConstant, CP.Count]
+    @testset "$(S)" for S in [CP.AllDifferentExceptConstant, CP.Count, CP.MinimumDistance, CP.MaximumDistance]
         @test isbitstype(S{Int})
 
         @test S(2, 0) == S(2, 0)
@@ -31,7 +31,7 @@
         s = S(2, 0)
         @test copy(s) == s
 
-        if S == CP.AllDifferentExceptConstant
+        if S in [CP.AllDifferentExceptConstant, CP.MaximumDistance, CP.MinimumDistance]
             @test MOI.dimension(S(2, 0)) == 2
             @test MOI.dimension(S(3, 4)) == 3
         elseif S == CP.Count
