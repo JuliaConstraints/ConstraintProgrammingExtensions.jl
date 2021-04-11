@@ -1,12 +1,15 @@
 @testset "Sets" begin
-    # isbits.
     @testset "AllDifferent" begin
         @test isbitstype(CP.AllDifferent)
 
         @test CP.AllDifferent(2) == CP.AllDifferent(2)
         @test CP.AllDifferent(2) != CP.AllDifferent(3)
         @test CP.AllDifferent(3) != CP.AllDifferent(2)
+        
+        s = CP.AllDifferent(2)
+        @test copy(s) == s
 
+        @test MOI.dimension(CP.AllDifferent(2)) == 2
         @test MOI.dimension(CP.AllDifferent(3)) == 3
     end
 
@@ -15,9 +18,13 @@
         @test CP.Strictly(Ssub(1)) != CP.Strictly(Ssub(2))
         @test CP.Strictly(Ssub(2)) == CP.Strictly(Ssub(2))
         @test CP.Strictly(Ssub(2)) != CP.Strictly(Ssub(1))
+        
+        s = CP.Strictly(Ssub(1))
+        @test copy(s) == s
 
         @test MOI.constant(CP.Strictly(Ssub(3))) == 3
         @test MOI.dimension(CP.Strictly(Ssub(3))) == 1
+        @test MOI.dimension(CP.Strictly(Ssub(3))) == MOI.dimension(Ssub(3))
         @test MOIU.shift_constant(CP.Strictly(Ssub(3)), 1) == CP.Strictly(Ssub(4))
     end
 
@@ -28,6 +35,9 @@
         @test CP.DifferentFrom(1) != CP.DifferentFrom(2)
         @test CP.DifferentFrom(2) == CP.DifferentFrom(2)
         @test CP.DifferentFrom(2) != CP.DifferentFrom(1)
+        
+        s = CP.DifferentFrom(1)
+        @test copy(s) == s
 
         @test MOI.constant(CP.DifferentFrom(3)) == 3
         @test MOI.dimension(CP.DifferentFrom(3)) == 1
