@@ -141,7 +141,7 @@ struct Count{T <: Real} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::Count{T}) where {T} = set.dimension + 1
-Base.copy(set::Count{T}) where {T} = Count(copy(set.value), value)
+Base.copy(set::Count{T}) where {T} = Count(set.dimension, copy(set.value))
 
 """
 CountCompare(dimension::Int)
