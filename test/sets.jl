@@ -1,5 +1,6 @@
 @testset "Sets" begin
-    @testset "$(S)" for S in [CP.AllDifferent, CP.Membership, CP.CountDistinct, CP.Inverse]
+    # Just a dimension.
+    @testset "$(S)" for S in [CP.AllDifferent, CP.Membership, CP.CountDistinct, CP.Inverse, CP.Contiguity]
         @test isbitstype(S)
 
         @test S(2) == S(2)
@@ -10,7 +11,7 @@
         @test typeof(copy(s)) <: S
         @test copy(s) == s
 
-        if S in [CP.AllDifferent, CP.Membership]
+        if S in [CP.AllDifferent, CP.Membership, CP.Contiguity]
             @test MOI.dimension(S(2)) == 2
             @test MOI.dimension(S(3)) == 3
         elseif S == CP.CountDistinct
@@ -24,6 +25,7 @@
         end
     end
     
+    # Two arguments: first a dimension, then a templated constant.
     @testset "$(S)" for S in [CP.AllDifferentExceptConstant, CP.Count, CP.MinimumDistance, CP.MaximumDistance]
         @test isbitstype(S{Int})
 
@@ -124,5 +126,35 @@
         @test MOI.constant(CP.DifferentFrom(3)) == 3
         @test MOI.dimension(CP.DifferentFrom(3)) == 1
         @test MOIU.shift_constant(CP.DifferentFrom(3), 1) == CP.DifferentFrom(4)
+    end
+
+    @testset "BinPacking" begin
+        @test_throws AssertionError CP.BinPacking(1, 2, [1, 2, 3])
+
+        @test CP.BinPacking(1, 2, [1, 2]) == CP.BinPacking(1, 2, [1, 2])
+        @test CP.BinPacking(2, 2, [1, 2]) != CP.BinPacking(1, 2, [1, 2])
+        @test CP.BinPacking(1, 3, [1, 2, 3]) != CP.BinPacking(1, 2, [1, 2])
+        
+        s = CP.BinPacking(1, 2, [1, 2])
+        @test typeof(copy(s)) <: CP.BinPacking
+        @test copy(s) == s
+
+        @test MOI.dimension(CP.BinPacking(1, 2, [1, 2])) == 3
+    end
+
+    @testset "FixedCapacityBinPacking" begin
+        @test_throws AssertionError CP.FixedCapacityBinPacking(1, 2, [1, 2, 3], [4])
+        @test_throws AssertionError CP.FixedCapacityBinPacking(1, 2, [1, 2], [3, 4])
+        @test_throws AssertionError CP.FixedCapacityBinPacking(1, 2, [1, 2, 3], [4, 5])
+
+        @test CP.FixedCapacityBinPacking(1, 2, [1, 2], [4]) == CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
+        @test CP.FixedCapacityBinPacking(2, 2, [1, 2], [4, 5]) != CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
+        @test CP.FixedCapacityBinPacking(1, 3, [1, 2, 3], [4]) != CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
+        
+        s = CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
+        @test typeof(copy(s)) <: CP.FixedCapacityBinPacking
+        @test copy(s) == s
+
+        @test MOI.dimension(CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])) == 3
     end
 end

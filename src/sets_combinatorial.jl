@@ -36,7 +36,9 @@ struct BinPacking{T <: Real} <: MOI.AbstractVectorSet
     end
 end
 
-MOI.dimension(set::BinPacking) = set.n_bins + 2 * set.n_items
+MOI.dimension(set::BinPacking) = set.n_bins + set.n_items
+Base.copy(set::BinPacking{T}) where {T} = BinPacking(set.n_bins, set.n_items, copy(set.weights))
+Base.:(==)(x::BinPacking{T}, y::BinPacking{T}) where {T} = x.n_bins == y.n_bins && x.n_items == y.n_items && x.weights == y.weights
 
 """
     FixedCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}, capacities::Vector{<:Real})
@@ -82,11 +84,13 @@ struct FixedCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
     ) where {T <: Real}
         @assert n_items == length(weights)
         @assert n_bins == length(capacities)
-        return new{T}(n_bins, n_items, weights)
+        return new{T}(n_bins, n_items, weights, capacities)
     end
 end
 
 MOI.dimension(set::FixedCapacityBinPacking) = set.n_bins + set.n_items
+Base.copy(set::FixedCapacityBinPacking{T}) where {T} = FixedCapacityBinPacking(set.n_bins, set.n_items, copy(set.weights), copy(set.capacities))
+Base.:(==)(x::FixedCapacityBinPacking{T}, y::FixedCapacityBinPacking{T}) where {T} = x.n_bins == y.n_bins && x.n_items == y.n_items && x.weights == y.weights && x.capacities == y.capacities
 
 """
     VariableCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T})
