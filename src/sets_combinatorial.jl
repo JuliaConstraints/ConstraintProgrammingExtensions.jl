@@ -138,6 +138,8 @@ struct VariableCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::VariableCapacityBinPacking) = 2 * set.n_bins + set.n_items
+Base.copy(set::VariableCapacityBinPacking{T}) where {T} = VariableCapacityBinPacking(set.n_bins, set.n_items, copy(set.weights))
+Base.:(==)(x::VariableCapacityBinPacking{T}, y::VariableCapacityBinPacking{T}) where {T} = x.n_bins == y.n_bins && x.n_items == y.n_items && x.weights == y.weights
 
 """
     Knapsack{T <: Real}(weights::T, capacity::Vector{T})
@@ -153,7 +155,8 @@ struct Knapsack{T <: Real} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::Knapsack{T}) where {T} = length(set.weights)
-Base.copy(set::Knapsack{T}) where {T} = Knapsack(copy(set.weights), set.capacity)
+Base.copy(set::Knapsack{T}) where {T} = Knapsack(copy(set.weights), copy(set.capacity))
+Base.:(==)(x::Knapsack{T}, y::Knapsack{T}) where {T} = x.weights == y.weights && x.capacity == y.capacity
 
 """
     VariableCapacityKnapsack{T <: Real}(weights::Vector{T})
@@ -169,47 +172,7 @@ end
 
 MOI.dimension(set::VariableCapacityKnapsack{T}) where {T} = length(set.weights) + 1
 Base.copy(set::VariableCapacityKnapsack{T}) where {T} = VariableCapacityKnapsack(copy(set.weights))
-
-"""
-    WeightedKnapsack{T <: Real}(weights::Vector{T}, capacity::T, values::Vector{U})
-
-Ensures that the `n` first variables, `x`, respect a knapsack constraint with fixed weights
-and a fixed capacity: 
-
-``\\{x \\in \\{0, 1\\}^n | \\sum_{i=1}^n \\mathtt{weights[i]} x_i \\leq \\mathtt{capacity} \\}``.
-
-The last variable, `y`, is the total value of the knapsack:
-
-``y = \\mathtt{values[i]} x_i``.
-"""
-struct WeightedKnapsack{T <: Real, U <: Real} <: MOI.AbstractVectorSet
-    weights::Vector{T}
-    capacity::T
-    values::Vector{U}
-end
-
-MOI.dimension(set::WeightedKnapsack{T, U}) where {T, U} = length(set.weights) + 1
-Base.copy(set::WeightedKnapsack{T, U}) where {T, U} = Knapsack(copy(set.weights), set.capacity, copy(set.values))
-
-"""
-    VariableCapacityWeightedKnapsack{T <: Real, U <: Real}(weights::Vector{T}, values::Vector{U})
-
-Ensures that the first `n` variables, `x`, respect a knapsack constraint with fixed weights
-and a capacity given by the next variable, `y`: 
-
-``\\{(x, y) \\in \\{0, 1\\}^n \\times \\mathbb{R} | \\sum_{i=1}^n \\mathtt{weights[i]} x_i \\leq y \\}``.
-
-The last variable, `z`, is the total value of the knapsack:
-
-``z = \\mathtt{values[i]} x_i``.
-"""
-struct VariableCapacityWeightedKnapsack{T <: Real, U <: Real} <: MOI.AbstractVectorSet
-    weights::Vector{T}
-    values::Vector{U}
-end
-
-MOI.dimension(set::VariableCapacityWeightedKnapsack{T}) where {T} = length(set.weights) + 2
-Base.copy(set::VariableCapacityWeightedKnapsack{T}) where {T} = VariableCapacityWeightedKnapsack(copy(set.weights), copy(set.values))
+Base.:(==)(x::VariableCapacityKnapsack{T}, y::VariableCapacityKnapsack{T}) where {T} = x.weights == y.weights
 
 """
     Contiguity(dimension::Int)
