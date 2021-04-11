@@ -226,6 +226,9 @@ struct MinimumDistance{T <: Real} <: MOI.AbstractVectorSet
     k::T
 end
 
+Base.copy(set::MinimumDistance{T}) where {T} = MinimumDistance(set.dimension, copy(set.k))
+Base.:(==)(x::MinimumDistance{T}, y::MinimumDistance{T}) where {T} = x.dimension == y.dimension && x.k == y.k
+
 """
     MaximumDistance{T <: Real}(dimension::Int, k::T)
 
@@ -238,6 +241,9 @@ struct MaximumDistance{T <: Real} <: MOI.AbstractVectorSet
     dimension::Int
     k::T
 end
+
+Base.copy(set::MaximumDistance{T}) where {T} = MaximumDistance(set.dimension, copy(set.k))
+Base.:(==)(x::MaximumDistance{T}, y::MaximumDistance{T}) where {T} = x.dimension == y.dimension && x.k == y.k
 
 """
     Inverse(dimension::Int)
@@ -273,9 +279,6 @@ function Base.copy(
         DifferentFrom,
         CountCompare,
         CountDistinct,
-        Element,
-        MinimumDistance,
-        MaximumDistance,
         Inverse,
     },
 )

@@ -1,5 +1,5 @@
 @testset "Sets" begin
-    @testset "$(S)" for S in [CP.AllDifferent, CP.Membership, CP.CountDistinct]
+    @testset "$(S)" for S in [CP.AllDifferent, CP.Membership, CP.CountDistinct, CP.Inverse]
         @test isbitstype(S)
 
         @test S(2) == S(2)
@@ -7,6 +7,7 @@
         @test S(3) != S(2)
         
         s = S(2)
+        @test typeof(copy(s)) <: S
         @test copy(s) == s
 
         if S in [CP.AllDifferent, CP.Membership]
@@ -15,6 +16,9 @@
         elseif S == CP.CountDistinct
             @test MOI.dimension(S(2)) == 2 + 1
             @test MOI.dimension(S(3)) == 3 + 1
+        elseif S == CP.Inverse
+            @test MOI.dimension(S(2)) == 2 * 2
+            @test MOI.dimension(S(3)) == 3 * 2
         else 
             error("$(S) not implemented")
         end
@@ -29,6 +33,7 @@
         @test S(3, 0) != S(2, 0)
         
         s = S(2, 0)
+        @test typeof(copy(s)) <: S
         @test copy(s) == s
 
         if S in [CP.AllDifferentExceptConstant, CP.MaximumDistance, CP.MinimumDistance]
@@ -50,6 +55,7 @@
         @test CP.CountCompare(3) != CP.CountCompare(2)
         
         s = CP.CountCompare(2)
+        @test typeof(copy(s)) <: CP.CountCompare
         @test copy(s) == s
 
         @test MOI.dimension(CP.CountCompare(2)) == 2 * 2 + 1
@@ -64,6 +70,7 @@
         @test CP.Element(set2) != CP.Element(set1)
         
         s = CP.Element(set1)
+        @test typeof(copy(s)) <: CP.Element
         @test copy(s) == s
 
         @test MOI.dimension(CP.Element(set1)) == 2
@@ -78,6 +85,7 @@
         @test S(set2) != S(set1)
         
         s = S(set1)
+        @test typeof(copy(s)) <: S
         @test copy(s) == s
 
         @test MOI.dimension(S(set1)) == 1
@@ -91,6 +99,7 @@
         @test CP.Strictly(Ssub(2)) != CP.Strictly(Ssub(1))
         
         s = CP.Strictly(Ssub(1))
+        @test typeof(copy(s)) <: CP.Strictly{Ssub{Int}}
         @test copy(s) == s
 
         @test MOI.constant(CP.Strictly(Ssub(3))) == 3
@@ -109,6 +118,7 @@
         @test CP.DifferentFrom(2) != CP.DifferentFrom(1)
         
         s = CP.DifferentFrom(1)
+        @test typeof(copy(s)) <: CP.DifferentFrom
         @test copy(s) == s
 
         @test MOI.constant(CP.DifferentFrom(3)) == 3
