@@ -121,7 +121,7 @@ function MOIU.shift_constant(set::DifferentFrom{T}, offset::T) where {T}
 end
 
 """
-    Count{T <: Real}(value::T, dimension::Int)
+    Count{T <: Real}(dimension::Int, value::T)
 
 ``\\{(y, x) \\in \\mathbb{N} \\times \\mathbb{T}^\\mathtt{dimension} : y = |\\{i | x_i = value\\}|\\}``
 
@@ -136,8 +136,8 @@ Also called `among`.
     # w == sum([x, y, z] .== 2.0)
 """
 struct Count{T <: Real} <: MOI.AbstractVectorSet
-    value::T
     dimension::Int
+    value::T
 end
 
 MOI.dimension(set::Count{T}) where {T} = set.dimension + 1
