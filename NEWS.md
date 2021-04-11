@@ -4,6 +4,8 @@ Release Notes
 Version 0.2.0
 -------------
 
+Models can be exported as FlatZinc (submodule FlatZinc), a subset of MiniZinc.
+
 Interface change: `Count`, `MaximumDistance`, and `MinimumDistance` become 
 consistent with `AllDifferentExceptConstant`, with the dimension before the value.
 

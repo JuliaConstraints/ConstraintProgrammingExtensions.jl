@@ -42,6 +42,9 @@ struct AllDifferentExceptConstant{T <: Number} <: MOI.AbstractVectorSet
     k::T
 end
 
+Base.copy(set::AllDifferentExceptConstant{T}) where {T} = AllDifferentExceptConstant(set.dimension, copy(set.k))
+Base.:(==)(x::AllDifferentExceptConstant{T}, y::AllDifferentExceptConstant{T}) where {T} = x.dimension == y.dimension && x.k == y.k
+
 """
     Domain{T <: Number}(values::Set{T})
 
@@ -116,6 +119,7 @@ struct DifferentFrom{T <: Number} <: MOI.AbstractScalarSet
 end
 
 MOI.constant(set::DifferentFrom{T}) where {T} = set.value
+Base.copy(set::DifferentFrom{T}) where {T} = DifferentFrom(copy(set.value))
 function MOIU.shift_constant(set::DifferentFrom{T}, offset::T) where {T}
     return typeof(set)(MOI.constant(set) + offset)
 end
@@ -142,6 +146,7 @@ end
 
 MOI.dimension(set::Count{T}) where {T} = set.dimension + 1
 Base.copy(set::Count{T}) where {T} = Count(set.dimension, copy(set.value))
+Base.:(==)(x::Count{T}, y::Count{T}) where {T} = x.dimension == y.dimension && x.value == y.value
 
 """
 CountCompare(dimension::Int)
@@ -274,9 +279,7 @@ MOI.dimension(set::Inverse) = 2 * set.dimension
 function Base.copy(
     set::Union{
         AllDifferent,
-        AllDifferentExceptConstant,
         Membership,
-        DifferentFrom,
         CountCompare,
         CountDistinct,
         Inverse,
