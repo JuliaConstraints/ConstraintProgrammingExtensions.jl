@@ -113,11 +113,38 @@
         @test typeof(copy(s)) <: CP.Strictly{Ssub{Int}}
         @test copy(s) == s
 
-        @test MOI.constant(CP.Strictly(Ssub(3))) == 3
         @test MOI.dimension(CP.Strictly(Ssub(3))) == 1
         @test MOI.dimension(CP.Strictly(Ssub(1))) == 1
         @test MOI.dimension(CP.Strictly(Ssub(3))) == MOI.dimension(Ssub(3))
+
+        @test MOI.constant(CP.Strictly(Ssub(3))) == 3
         @test MOIU.shift_constant(CP.Strictly(Ssub(3)), 1) == CP.Strictly(Ssub(4))
+    end
+
+    @testset "Strictly{$(Ssub)}" for Ssub in [CP.LexicographicallyLessThan, CP.LexicographicallyGreaterThan, CP.Increasing, CP.Decreasing]
+        @test CP.Strictly(Ssub(1)) == CP.Strictly(Ssub(1))
+        @test CP.Strictly(Ssub(1)) != CP.Strictly(Ssub(2))
+        @test CP.Strictly(Ssub(2)) == CP.Strictly(Ssub(2))
+        @test CP.Strictly(Ssub(2)) != CP.Strictly(Ssub(1))
+        
+        s = CP.Strictly(Ssub(1))
+        @test typeof(copy(s)) <: CP.Strictly{Ssub}
+        @test copy(s) == s
+
+        if Ssub in [CP.LexicographicallyLessThan, CP.LexicographicallyGreaterThan]
+            @test MOI.dimension(CP.Strictly(Ssub(3))) == 3 * 2
+            @test MOI.dimension(CP.Strictly(Ssub(1))) == 1 * 2
+        elseif Ssub in [CP.Increasing, CP.Decreasing]
+            @test MOI.dimension(CP.Strictly(Ssub(3))) == 3
+            @test MOI.dimension(CP.Strictly(Ssub(1))) == 1
+        else 
+            error("$(S) not implemented")
+        end
+
+        if Ssub in [MOI.LessThan, MOI.GreaterThan]
+            @test MOI.constant(CP.Strictly(Ssub(3))) == 3
+            @test MOIU.shift_constant(CP.Strictly(Ssub(3)), 1) == CP.Strictly(Ssub(4))
+        end
     end
 
     @testset "DifferentFrom" begin
