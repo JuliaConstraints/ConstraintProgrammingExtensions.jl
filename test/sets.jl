@@ -1,6 +1,6 @@
 @testset "Sets" begin
     # Just a dimension.
-    @testset "$(S)" for S in [CP.AllDifferent, CP.Membership, CP.CountDistinct, CP.Inverse, CP.Contiguity, CP.Circuit, CP.CircuitPath]
+    @testset "$(S)" for S in [CP.AllDifferent, CP.Membership, CP.CountDistinct, CP.Inverse, CP.Contiguity, CP.Circuit, CP.CircuitPath, CP.CumulativeResource, CP.CumulativeResourceWithDeadline, CP.LexicographicallyLessThan, CP.LexicographicallyGreaterThan, CP.Sort, CP.SortPermutation, CP.MinimumAmong, CP.MaximumAmong, CP.ArgumentMinimumAmong, CP.ArgumentMaximumAmong, CP.Increasing, CP.Decreasing]
         @test isbitstype(S)
 
         @test S(2) == S(2)
@@ -11,15 +11,24 @@
         @test typeof(copy(s)) <: S
         @test copy(s) == s
 
-        if S in [CP.AllDifferent, CP.Membership, CP.Contiguity, CP.Circuit]
+        if S in [CP.AllDifferent, CP.Membership, CP.Contiguity, CP.Circuit, CP.Increasing, CP.Decreasing]
             @test MOI.dimension(S(2)) == 2
             @test MOI.dimension(S(3)) == 3
-        elseif S == CP.CountDistinct
+        elseif S in [CP.CountDistinct, CP.MinimumAmong, CP.MaximumAmong, CP.ArgumentMinimumAmong, CP.ArgumentMaximumAmong]
             @test MOI.dimension(S(2)) == 2 + 1
             @test MOI.dimension(S(3)) == 3 + 1
-        elseif S in [CP.Inverse, CP.CircuitPath]
+        elseif S in [CP.Inverse, CP.CircuitPath, CP.LexicographicallyLessThan, CP.LexicographicallyGreaterThan, CP.Sort]
             @test MOI.dimension(S(2)) == 2 * 2
             @test MOI.dimension(S(3)) == 3 * 2
+        elseif S == CP.SortPermutation
+            @test MOI.dimension(S(2)) == 2 * 3
+            @test MOI.dimension(S(3)) == 3 * 3
+        elseif S == CP.CumulativeResource
+            @test MOI.dimension(S(2)) == 2 * 3 + 1
+            @test MOI.dimension(S(3)) == 3 * 3 + 1
+        elseif S == CP.CumulativeResourceWithDeadline
+            @test MOI.dimension(S(2)) == 2 * 4 + 1
+            @test MOI.dimension(S(3)) == 3 * 4 + 1
         else 
             error("$(S) not implemented")
         end

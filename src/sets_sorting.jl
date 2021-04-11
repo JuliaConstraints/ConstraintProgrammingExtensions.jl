@@ -79,7 +79,7 @@ struct SortPermutation <: MOI.AbstractVectorSet
     dimension::Int
 end
 
-MOI.dimension(set::SortPermutation) where {T} = 3 * set.dimension
+MOI.dimension(set::SortPermutation) = 3 * set.dimension
 
 """
     MinimumAmong(dimension::Int)
