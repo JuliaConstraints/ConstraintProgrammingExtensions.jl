@@ -162,7 +162,7 @@ function MOI.dimension(set::Conjunction{Ts}) where {Ts}
 end
 
 function Base.copy(set::Conjunction{Ts}) where {Ts}
-    return Conjunction(copy(set.constraints))
+    return Conjunction(deepcopy(set.constraints))
 end
 
 """
@@ -184,7 +184,7 @@ function MOI.dimension(set::Disjunction{Ts}) where {Ts}
 end
 
 function Base.copy(set::Disjunction{Ts}) where {Ts}
-    return Disjunction(copy(set.constraints))
+    return Disjunction(deepcopy(set.constraints))
 end
 
 """
