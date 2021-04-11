@@ -13,10 +13,11 @@ end
 
 MOI.dimension(set::Reified{S}) where {S} = 1 + MOI.dimension(set.set)
 Base.copy(set::Reified{S}) where {S} = Reified(copy(set.set))
+Base.:(==)(x::Reified{S}, y::Reified{S}) where {S} = x.set == y.set
 
 """
     Equivalence{S1 <: MOI.AbstractSet, S2 <: MOI.AbstractSet}(set1::S1, 
-                                                                 set2::S2)
+                                                              set2::S2)
 
 The logical equivalence operator ≡ or ⇔.
 
@@ -38,7 +39,11 @@ function MOI.dimension(set::Equivalence{S, T}) where {S, T}
 end
 
 function Base.copy(set::Equivalence{S, T}) where {S, T}
-    return Equivalence(copy(set.set), copy(set.set2))
+    return Equivalence(copy(set.set1), copy(set.set2))
+end
+
+function Base.:(==)(x::Equivalence{S, T}, y::Equivalence{S, T}) where {S, T}
+    return x.set1 == y.set1 && x.set2 == y.set2
 end
 
 """
@@ -60,7 +65,7 @@ function MOI.dimension(set::EquivalenceNot{S, T}) where {S, T}
 end
 
 function Base.copy(set::EquivalenceNot{S, T}) where {S, T}
-    return EquivalenceNot(copy(set.set), copy(set.set2))
+    return EquivalenceNot(copy(set.set1), copy(set.set2))
 end
 
 """
@@ -96,7 +101,7 @@ function MOI.dimension(set::IfThenElse{S, T, U}) where {S, T, U}
 end
 
 function Base.copy(set::IfThenElse{S, T, U}) where {S, T, U}
-    return Reified(
+    return IfThenElse(
         copy(set.condition),
         copy(set.true_constraint),
         copy(set.false_constraint),
@@ -195,6 +200,7 @@ end
 
 MOI.dimension(set::Negation{S}) where {S} = MOI.dimension(set.set)
 Base.copy(set::Negation{S}) where {S} = Negation(copy(set.set))
+Base.:(==)(x::Negation{S}, y::Negation{S}) where {S} = x.set == y.set
 
 """
     True()
@@ -207,7 +213,6 @@ struct True <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::True) = 0
-Base.copy(set::True) = set
 
 """
     False()
@@ -220,6 +225,13 @@ struct False <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::False) = 0
-Base.copy(set::False) = set
 
-# No isbits types.
+# isbits types, nothing to copy
+function Base.copy(
+    set::Union{
+        True,
+        False,
+    },
+)
+    return set
+end
