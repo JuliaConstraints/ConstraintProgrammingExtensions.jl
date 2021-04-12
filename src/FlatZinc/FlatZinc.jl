@@ -349,7 +349,7 @@ function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, s:
     @assert MOI.output_dimension(f) == 2
     value = f.variables[1]
     index = f.variables[2]
-    print(io, "array_int_element($(_fzn_f(model, index)), $s.values, $(_fzn_f(model, value)))")
+    print(io, "array_int_element($(_fzn_f(model, index)), $(s.values), $(_fzn_f(model, value)))")
 end
 
 function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MaximumAmong)
@@ -386,7 +386,7 @@ end
 
 function write_constraint(io::IO, model::Optimizer, f::MOI.ScalarAffineFunction, s::MOI.LessThan{Int})
     variables, coefficients = _saf_to_coef_vars(f)
-    value = s.value - f.constant
+    value = s.upper - f.constant
     print(io, "int_lin_le($(coefficients), [$(_fzn_f(model, variables))], $(value))")
 end
 
@@ -401,7 +401,7 @@ end
 # TODO: int_lin_ne_reif
 
 function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::CP.Strictly{MOI.LessThan{Int}})
-    print(io, "int_lt($(_fzn_f(model, f)), $(s.upper))")
+    print(io, "int_lt($(_fzn_f(model, f)), $(s.set.upper))")
 end
 
 # TODO: int_lt_reif
@@ -419,14 +419,6 @@ function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::CP
     print(io, "set_in($(_fzn_f(model, f)), $(s.values))")
 end
 
-function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::MOI.GreaterThan{Int}) # In examples, but not in fzn doc? 
-    print(io, "int_ge($(_fzn_f(model, f)), $(s.lower))")
-end
-
-function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::CP.Strictly{MOI.GreaterThan{Int}}) # In examples, but not in fzn doc? 
-    print(io, "int_gt($(_fzn_f(model, f)), $(s.lower))")
-end
-
 # - Boolean constraints.
 
 # TODO: array_bool_and, no conjunction between variables for now in CP.
@@ -435,7 +427,11 @@ function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, s:
     @assert MOI.output_dimension(f) == 2
     value = f.variables[1]
     index = f.variables[2]
-    print(io, "array_bool_element($(_fzn_f(model, index)), $s.values, $(_fzn_f(model, value)))")
+
+    # Standard interpolation of a vector of boolean will show the type, which is not wanted.
+    values = join([ifelse(v, "1", "0") for v in s.values], ", ")
+
+    print(io, "array_bool_element($(_fzn_f(model, index)), [$(values)], $(_fzn_f(model, value)))")
 end
 
 # TODO: array_bool_or, no disjunction between variables for now in CP.
@@ -470,7 +466,7 @@ function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, s:
     @assert MOI.output_dimension(f) == 2
     value = f.variables[1]
     index = f.variables[2]
-    print(io, "array_float_element($(_fzn_f(model, index)), $s.values, $(_fzn_f(model, value)))")
+    print(io, "array_float_element($(_fzn_f(model, index)), $(s.values), $(_fzn_f(model, value)))")
 end
 
 # TODO: no dispatch possible! Already taken by the integer version.
@@ -501,7 +497,7 @@ end
 # TODO: float_exp
 
 function write_constraint(io::IO, model::Optimizer, f::MOI.SingleVariable, s::MOI.Interval{Float64})
-    print(io, "float_in($(_fzn_f(model, f)), [$s.lower, $s.upper])")
+    print(io, "float_in($(_fzn_f(model, f)), $(s.lower), $(s.upper))")
 end
 
 # TODO: float_in_reif
@@ -519,7 +515,7 @@ end
 
 function write_constraint(io::IO, model::Optimizer, f::MOI.ScalarAffineFunction, s::MOI.LessThan{Float64})
     variables, coefficients = _saf_to_coef_vars(f)
-    value = s.value - f.constant
+    value = s.upper - f.constant
     print(io, "float_lin_le($(coefficients), [$(_fzn_f(model, variables))], $(value))")
 end
 
@@ -527,7 +523,7 @@ end
 
 function write_constraint(io::IO, model::Optimizer, f::MOI.ScalarAffineFunction, s::CP.Strictly{MOI.LessThan{Float64}})
     variables, coefficients = _saf_to_coef_vars(f)
-    value = s.value - f.constant
+    value = s.set.upper - f.constant
     print(io, "float_lin_lt($(coefficients), [$(_fzn_f(model, variables))], $(value))")
 end
 
