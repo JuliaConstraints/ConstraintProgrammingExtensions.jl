@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.2.1
+-------------
+
+Hotfix: the test sets for solvers were not fully updated to the latest API 
+changes.
+
+
 Version 0.2.0
 -------------
 
