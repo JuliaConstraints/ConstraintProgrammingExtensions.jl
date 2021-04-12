@@ -4,6 +4,25 @@
         @test sprint(show, m) == "A FlatZinc (fzn) model"
         @test MOI.is_empty(m)
 
+        # Check that the types of constraints of this test are supported.
+        @test MOI.supports_constraint(m, MOI.SingleVariable, MOI.LessThan{Int})
+        @test MOI.supports_constraint(m, MOI.SingleVariable, MOI.LessThan{Float64})
+        @test MOI.supports_constraint(m, MOI.SingleVariable, CP.Strictly{MOI.LessThan{Float64}})
+        @test MOI.supports_constraint(m, MOI.SingleVariable, CP.Domain{Int})
+        @test MOI.supports_constraint(m, MOI.SingleVariable, MOI.Interval{Float64})
+        @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.Element{Int})
+        @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.Element{Bool})
+        @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.Element{Float64})
+        @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.MaximumAmong)
+        @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.MinimumAmong)
+        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Int}, MOI.EqualTo{Int})
+        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Int}, MOI.LessThan{Int})
+        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Int}, CP.DifferentFrom{Int})
+        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Float64}, MOI.EqualTo{Float64})
+        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Float64}, MOI.LessThan{Float64})
+        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Float64}, CP.Strictly{MOI.LessThan{Float64}})
+        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Float64}, CP.DifferentFrom{Float64})
+
         # Validity of constrained variables.
         for S in [
             MOI.EqualTo{Float64},

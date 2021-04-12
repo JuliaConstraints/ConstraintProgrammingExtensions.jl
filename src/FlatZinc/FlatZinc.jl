@@ -219,17 +219,23 @@ function MOI.get(
     return model.constraint_info[c.value].s
 end
 
-function MOI.supports_constraint(
-    ::Optimizer,
-    ::Type{F},
-    ::Type{S},
-) where {
-    T <: Real,
-    F <: Union{MOI.SingleVariable, MOI.ScalarAffineFunction{T}},  # TODO: support MOI.ScalarQuadraticFunction{T}
-    S <: Union{MOI.GreaterThan{T}, MOI.LessThan{T}, MOI.EqualTo{T}, CP.DifferentFrom{T}},
-}
-    return true
-end
+MOI.supports_constraint(::Optimizer, ::Type{MOI.SingleVariable}, ::Type{MOI.LessThan{Int}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.SingleVariable}, ::Type{MOI.LessThan{Float64}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.SingleVariable}, ::Type{CP.Strictly{MOI.LessThan{Float64}}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.SingleVariable}, ::Type{CP.Domain{Int}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.SingleVariable}, ::Type{MOI.Interval{Float64}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.VectorOfVariables}, ::Type{CP.Element{Int}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.VectorOfVariables}, ::Type{CP.Element{Bool}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.VectorOfVariables}, ::Type{CP.Element{Float64}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.VectorOfVariables}, ::Type{CP.MaximumAmong}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.VectorOfVariables}, ::Type{CP.MinimumAmong}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.ScalarAffineFunction{Int}}, ::Type{MOI.EqualTo{Int}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.ScalarAffineFunction{Int}}, ::Type{MOI.LessThan{Int}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.ScalarAffineFunction{Int}}, ::Type{CP.DifferentFrom{Int}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.ScalarAffineFunction{Float64}}, ::Type{MOI.EqualTo{Float64}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.ScalarAffineFunction{Float64}}, ::Type{MOI.LessThan{Float64}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.ScalarAffineFunction{Float64}}, ::Type{CP.Strictly{MOI.LessThan{Float64}}}) = true
+MOI.supports_constraint(::Optimizer, ::Type{MOI.ScalarAffineFunction{Float64}}, ::Type{CP.DifferentFrom{Float64}}) = true
 
 function MOI.get(model::Optimizer, ::MOI.ListOfConstraintIndices{F, S}) where {F, S}
     return [c.index for c in model.constraint_info if typeof(c.f) == F && typeof(c.s) == S]
