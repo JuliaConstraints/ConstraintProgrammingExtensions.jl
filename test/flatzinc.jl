@@ -1,6 +1,7 @@
 @testset "FlatZinc" begin
     m = CP.FlatZinc.Optimizer()
     @test sprint(show, m) == "A FlatZinc (fzn) model"
+    @test MOI.is_empty(m)
 
     # Validity of constrained variables.
     for S in [
@@ -33,6 +34,7 @@
     h, h_eq0b = MOI.add_constrained_variable(m, MOI.EqualTo(false))
     i = MOI.add_variable(m)
 
+    @test ! MOI.is_empty(m)
     @test MOI.is_valid(m, x)
     @test MOI.is_valid(m, x_int)
     for i in 1:5
