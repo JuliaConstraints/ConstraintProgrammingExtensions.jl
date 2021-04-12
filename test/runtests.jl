@@ -7,6 +7,6 @@ const MOI = MathOptInterface
 const MOIU = MathOptInterface.Utilities
 
 @testset "ConstraintProgrammingExtensions" begin
-    # include("sets.jl")
+    include("sets.jl")
     include("flatzinc.jl")
 end
