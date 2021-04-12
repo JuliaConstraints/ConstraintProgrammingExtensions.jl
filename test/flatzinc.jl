@@ -107,6 +107,12 @@
         @test MOI.is_valid(m, c14)
         @test MOI.is_valid(m, c15)
 
+        # Test some attributes for these constraints.
+        @test MOI.get(m, MOI.ConstraintFunction(), c1) == MOI.VectorOfVariables([e, f])
+        @test MOI.get(m, MOI.ConstraintSet(), c1) == CP.Element([6, 5, 4])
+        @test MOI.get(m, MOI.ListOfConstraintIndices{MOI.VectorOfVariables, CP.Element{Int}}()) == [c1]
+        @test length(MOI.get(m, MOI.ListOfConstraints())) == 24
+
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
         write(io, m)

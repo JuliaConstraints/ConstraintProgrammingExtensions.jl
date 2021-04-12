@@ -216,7 +216,7 @@ function MOI.get(
     ::MOI.ConstraintSet,
     c::MOI.ConstraintIndex{F, S},
 ) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
-    return model.constraint_info[c.value].set
+    return model.constraint_info[c.value].s
 end
 
 function MOI.supports_constraint(
@@ -231,8 +231,8 @@ function MOI.supports_constraint(
     return true
 end
 
-function MOI.get(model::Optimizer, ::MOI.ListOfConstraintIndices)
-    return [c.index for c in model.constraint_info]
+function MOI.get(model::Optimizer, ::MOI.ListOfConstraintIndices{F, S}) where {F, S}
+    return [c.index for c in model.constraint_info if typeof(c.f) == F && typeof(c.s) == S]
 end
 
 function MOI.get(model::Optimizer, ::MOI.ListOfConstraints)
