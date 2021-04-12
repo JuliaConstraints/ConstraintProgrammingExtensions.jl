@@ -241,13 +241,23 @@ end
 # =
 # =============================================================================
 
+const START_REG = r"^[^a-zA-Z]"
+const NAME_REG = r"[^A-Za-z0-9_]"
+
 """
     Base.write(io::IO, model::FlatZinc.Optimizer)
 
 Write `model` to `io` in the FlatZinc (fzn) file format.
 """
 function Base.write(io::IO, model::Optimizer)
-    MOI.FileFormats.create_unique_variable_names(model, false, Function[])
+    MOI.FileFormats.create_unique_variable_names(
+        model, 
+        false,
+        [
+            s -> match(START_REG, s) !== nothing ? "x" * s : s,
+            s -> replace(s, NAME_REG => "_"),
+        ],
+    )
 
     write_variables(io, model)
     write_constraints(io, model)

@@ -61,12 +61,12 @@
 
     # Set names. Don't set them for all variables, to check whether names are 
     # made unique before generating the model.
-    MOI.set(m, MOI.VariableName(), x, "x")
+    MOI.set(m, MOI.VariableName(), x, "_x") # Not valid in FlatZinc.
     for i in 1:5
         MOI.set(m, MOI.VariableName(), y[i], "y_$(i)")
     end
 
-    @test MOI.get(m, MOI.VariableName(), x) == "x"
+    @test MOI.get(m, MOI.VariableName(), x) == "_x"
     for i in 1:5
         @test MOI.get(m, MOI.VariableName(), y[i]) == "y_$(i)"
     end
@@ -85,4 +85,15 @@
     io = IOBuffer(truncate=true)
     write(io, m)
     println(String(take!(io)))
+
+    # Test that the names have been correctly transformed. (Redundant with the 
+    # previous test, but will help with debugging.)
+    @test MOI.get(m, MOI.VariableName(), x) == "x_x"
+    for i in 1:5
+        @test MOI.get(m, MOI.VariableName(), y[i]) == "y_$(i)"
+    end
+    for v in [a, b, c, d, e, f, g, h, i]
+        vn = MOI.get(m, MOI.VariableName(), v)
+        @test match(r"^x\d+$", vn) !== nothing
+    end
 end
