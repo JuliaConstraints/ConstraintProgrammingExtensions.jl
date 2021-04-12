@@ -9,7 +9,8 @@ Models can be exported as FlatZinc (submodule FlatZinc), a subset of MiniZinc.
 Interface change: `Count`, `MaximumDistance`, and `MinimumDistance` become 
 consistent with `AllDifferentExceptConstant`, with the dimension before the value.
 
-Improved the internal test suite. 
+Revamped the internal test suite. Many bugs have been discovered and fixed: 
+typos, missing `copy` functions or equality comparisons, mostly.
 
 
 Version 0.1.2
