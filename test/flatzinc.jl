@@ -31,6 +31,7 @@
     f, f_lt0i = MOI.add_constrained_variable(m, MOI.LessThan(0))
     g, g_eq0i = MOI.add_constrained_variable(m, MOI.EqualTo(0))
     h, h_eq0b = MOI.add_constrained_variable(m, MOI.EqualTo(false))
+    i = MOI.add_variable(m)
 
     @test MOI.is_valid(m, x)
     @test MOI.is_valid(m, x_int)
@@ -54,6 +55,7 @@
     @test MOI.is_valid(m, g_eq0i)
     @test MOI.is_valid(m, h)
     @test MOI.is_valid(m, h_eq0b)
+    @test MOI.is_valid(m, i)
 
     # Set names. Don't set them for all variables, to check whether names are 
     # made unique before generating the model.

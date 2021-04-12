@@ -36,8 +36,11 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
     variable_info::CleverDicts.CleverDict{MOI.VariableIndex, VariableInfo}
 
     # A mapping from the MOI.ConstraintIndex to the variable object.
-    # VariableInfo also stores some additional fields like the type of variable.
-    constraint_info::Dict{MOI.ConstraintIndex, ConstraintInfo}
+    # ConstraintInfo also stores some additional fields like the type of 
+    # constraint. Deletion of constraints is not supported (having a vector 
+    # ensures that the order in which constraints are added is respected when 
+    # outputting the model, which makes testing easier).
+    constraint_info::Vector{ConstraintInfo}
 
     # Memorise the objective sense and the function separately.
     # The function can only be a single variable, as per FlatZinc limitations.
@@ -53,7 +56,7 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
         model = new()
         model.variable_info =
             CleverDicts.CleverDict{MOI.VariableIndex, VariableInfo}()
-        model.constraint_info = Dict{MOI.ConstraintIndex, ConstraintInfo}()
+        model.constraint_info = ConstraintInfo[]
 
         model.objective_sense = MOI.FEASIBILITY_SENSE
         model.objective_function = nothing
@@ -86,7 +89,7 @@ function MOI.is_empty(model::Optimizer)
     return true
 end
 
-function _create_variable(model::Optimizer, set::MOI.AbstractScalarSet)
+function _create_variable(model::Optimizer, set::Union{MOI.AbstractScalarSet, MOI.Reals})
     index = CleverDicts.add_item(
         model.variable_info,
         VariableInfo(MOI.VariableIndex(0), "", set),
@@ -97,8 +100,8 @@ end
 
 function _create_constraint(model::Optimizer, f::F, 
                             set::S, as_part_of_variable::Bool) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
-    index = MOI.ConstraintIndex{F, S}(length(model.constraint_info))
-    model.constraint_info[index] = ConstraintInfo(index, f, set, as_part_of_variable)
+    index = MOI.ConstraintIndex{F, S}(length(model.constraint_info) + 1)
+    push!(model.constraint_info, ConstraintInfo(index, f, set, as_part_of_variable))
     return index
 end
 
@@ -142,6 +145,10 @@ function MOI.supports_add_constrained_variables(
     return true
 end
 
+function MOI.add_variable(model::Optimizer)
+    return _create_variable(model, MOI.Reals(1))
+end
+
 function MOI.add_constrained_variables(model::Optimizer, sets::AbstractVector{<:MOI.AbstractScalarSet})
     # TODO: memorise that these variables are part of the same call, so that 
     # the generated FlatZinc is shorter (array of variables)? This would 
@@ -174,7 +181,7 @@ function MOI.is_valid(
     model::Optimizer,
     c::MOI.ConstraintIndex{F, S},
 ) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
-    info = get(model.constraint_info, c, nothing)
+    info = get(model.constraint_info, c.value, nothing)
     return info !== nothing && typeof(info.s) == S
 end
 
@@ -184,7 +191,7 @@ function MOI.add_constraint(
     s::S,
 ) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
     index = MOI.ConstraintIndex{F, S}(length(model.constraint_info) + 1)
-    model.constraint_info[index] = ConstraintInfo(index, f, s, false)
+    push!(model.constraint_info, ConstraintInfo(index, f, s, false))
     return index
 end
 
@@ -193,7 +200,7 @@ function MOI.get(
     ::MOI.ConstraintFunction,
     c::MOI.ConstraintIndex{F, S},
 ) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
-    return model.constraint_info[c].f
+    return model.constraint_info[c.value].f
 end
 
 function MOI.get(
@@ -201,7 +208,7 @@ function MOI.get(
     ::MOI.ConstraintSet,
     c::MOI.ConstraintIndex{F, S},
 ) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
-    return model.constraint_info[c].set
+    return model.constraint_info[c.value].set
 end
 
 function MOI.supports_constraint(
@@ -217,12 +224,12 @@ function MOI.supports_constraint(
 end
 
 function MOI.get(model::Optimizer, ::MOI.ListOfConstraintIndices)
-    return collect(keys(model.constraint_info))
+    return [c.index for c in model.constraint_info]
 end
 
 function MOI.get(model::Optimizer, ::MOI.ListOfConstraints)
     types = Set{Tuple{Any, Any}}()
-    for info in values(model.constraint_info)
+    for info in model.constraint_info
         push!(types, (typeof(info.f), typeof(info.s)))
     end
     return collect(types)
@@ -260,7 +267,7 @@ function write_variables(io::IO, model::Optimizer)
 end
 
 function write_constraints(io::IO, model::Optimizer)
-    for cons in values(model.constraint_info)
+    for cons in model.constraint_info
         if !cons.output_as_part_of_variable
             print(io, "constraint ")
             write_constraint(io, model, cons.f, cons.s)
@@ -307,6 +314,10 @@ end
 
 function write_variable(io::IO, name::String, s::MOI.Interval{T}) where T <: Union{Int, Float64}
     print(io, "var $(s.lower)..$(s.upper): $(name);")
+end
+
+function write_variable(io::IO, name::String, ::MOI.Reals)
+    print(io, "var float: $(name);")
 end
 
 function write_variable(io::IO, name::String, ::MOI.ZeroOne)
