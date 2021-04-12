@@ -19,14 +19,14 @@ const CP = ConstraintProgrammingExtensions
 mutable struct VariableInfo 
     index::MOI.VariableIndex
     name::String
-    set::AbstractVector{MOI.AbstractSet}
+    set::MOI.AbstractSet
 end
 
 mutable struct ConstraintInfo 
     index::MOI.ConstraintIndex
     # FlatZinc does not allow constraint names.
     f::MOI.AbstractFunction
-    s::AbstractVector{MOI.AbstractSet}
+    s::MOI.AbstractSet
     output_as_part_of_variable::Bool
 end
 
@@ -50,6 +50,7 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
     Create a new Optimizer object.
     """
     function Optimizer()
+        model = new()
         model.variable_info =
             CleverDicts.CleverDict{MOI.VariableIndex, VariableInfo}()
         model.constraint_info = Dict{MOI.ConstraintIndex, ConstraintInfo}()
@@ -94,13 +95,10 @@ function _create_variable(model::Optimizer, set::MOI.AbstractScalarSet)
     return index
 end
 
-function _create_constraint(model::Optimizer, f::MOI.SingleVariable, 
-                            set::MOI.AbstractScalarSet, as_part_of_variable::Bool)
-    index = CleverDicts.add_item(
-        model.constraint_info,
-        ConstraintInfo(MOI.ConstraintIndex(0), f, set, as_part_of_variable),
-    )
-    model.constraint_info[index].index = index
+function _create_constraint(model::Optimizer, f::F, 
+                            set::S, as_part_of_variable::Bool) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
+    index = MOI.ConstraintIndex{F, S}(length(model.constraint_info))
+    model.constraint_info[index] = ConstraintInfo(index, f, set, as_part_of_variable)
     return index
 end
 
@@ -123,7 +121,7 @@ end
 
 # Variables.
 
-function supports_add_constrained_variables(
+function MOI.supports_add_constrained_variables(
     ::Optimizer,
     ::Type{F},
 ) where {
@@ -144,7 +142,7 @@ function supports_add_constrained_variables(
     return true
 end
 
-function add_constrained_variables(model::Optimizer, sets::AbstractVector{<:MOI.AbstractScalarSet})
+function MOI.add_constrained_variables(model::Optimizer, sets::AbstractVector{<:MOI.AbstractScalarSet})
     # TODO: memorise that these variables are part of the same call, so that 
     # the generated FlatZinc is shorter (array of variables)? This would 
     # require that all sets are identical, though.
@@ -153,10 +151,21 @@ function add_constrained_variables(model::Optimizer, sets::AbstractVector{<:MOI.
     return vidx, cidx
 end
 
-function add_constrained_variable(model::Optimizer, set::MOI.AbstractScalarSet)
+function MOI.add_constrained_variable(model::Optimizer, set::MOI.AbstractScalarSet)
     vidx = _create_variable(model, set)
     cidx = _create_constraint(model, MOI.SingleVariable(vidx), set, true)
     return vidx, cidx
+end
+
+function MOI.is_valid(
+    model::Optimizer,
+    v::MOI.VariableIndex,
+)
+    return haskey(model.variable_info, v)
+end
+
+function MOI.get(model::Optimizer, ::MOI.ListOfVariableIndices)
+    return collect(keys(model.variable_info))
 end
 
 # Constraints.
@@ -175,7 +184,7 @@ function MOI.add_constraint(
     s::S,
 ) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
     index = MOI.ConstraintIndex{F, S}(length(model.constraint_info) + 1)
-    model.constraint_info[index] = ConstraintInfo(index, f, s, true)
+    model.constraint_info[index] = ConstraintInfo(index, f, s, false)
     return index
 end
 
@@ -201,10 +210,22 @@ function MOI.supports_constraint(
     ::Type{S},
 ) where {
     T <: Real,
-    F <: Union{MOI.SingleVariable, MOI.ScalarAffineFunction{T}, MOI.ScalarQuadraticFunction{T}},
-    S <: Union{MOI.GreaterThan{T}, MOI.LessThan{T}, MOI.EqualTo{T}},
+    F <: Union{MOI.SingleVariable, MOI.ScalarAffineFunction{T}},  # TODO: support MOI.ScalarQuadraticFunction{T}
+    S <: Union{MOI.GreaterThan{T}, MOI.LessThan{T}, MOI.EqualTo{T}, CP.DifferentFrom{T}},
 }
     return true
+end
+
+function MOI.get(model::Optimizer, ::MOI.ListOfConstraintIndices)
+    return collect(keys(model.constraint_info))
+end
+
+function MOI.get(model::Optimizer, ::MOI.ListOfConstraints)
+    types = Set{Tuple{Any, Any}}()
+    for info in values(model.constraint_info)
+        push!(types, (typeof(info.f), typeof(info.s)))
+    end
+    return collect(types)
 end
 
 # =============================================================================
@@ -219,7 +240,7 @@ end
 Write `model` to `io` in the FlatZinc (fzn) file format.
 """
 function Base.write(io::IO, model::Optimizer)
-    MOI.FileFormats.create_unique_names(model)
+    MOI.FileFormats.create_unique_variable_names(model, false, Function[])
 
     write_variables(io, model)
     write_constraints(io, model)
@@ -229,8 +250,9 @@ function Base.write(io::IO, model::Optimizer)
 end
 
 function write_variables(io::IO, model::Optimizer)
-    for var in model.variable_info
-        # Variables either start with "var" or "array of var", let write_variable decide.
+    for var in values(model.variable_info)
+        # Variables either start with "var" or "array of var", let 
+        # write_variable decide.
         write_variable(io, var.name, var.set)
         println(io)
     end
@@ -238,11 +260,11 @@ function write_variables(io::IO, model::Optimizer)
 end
 
 function write_constraints(io::IO, model::Optimizer)
-    for cons in model.constraint_info
+    for cons in values(model.constraint_info)
         if !cons.output_as_part_of_variable
             print(io, "constraint ")
-            write_constraint(io, cons.f, cons.s)
-            print(";")
+            write_constraint(io, model, cons.f, cons.s)
+            print(io, ";")
             println(io)
         end
     end
@@ -303,7 +325,7 @@ end
     # TODO: only for integer variables, not enforced for now.
 
 function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, s::CP.Element{Int})
-    @assert output_dimension(f) == 2
+    @assert MOI.output_dimension(f) == 2
     value = f.variables[1]
     index = f.variables[2]
     print(io, "array_int_element($(_fzn_f(model, index)), $s.values, $(_fzn_f(model, value)))")
@@ -389,7 +411,7 @@ end
 # TODO: array_bool_and, no conjunction between variables for now in CP.
 
 function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, s::CP.Element{Bool})
-    @assert output_dimension(f) == 2
+    @assert MOI.output_dimension(f) == 2
     value = f.variables[1]
     index = f.variables[2]
     print(io, "array_bool_element($(_fzn_f(model, index)), $s.values, $(_fzn_f(model, value)))")
@@ -424,7 +446,7 @@ end
 # - Float constraints.
 
 function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, s::CP.Element{Float64})
-    @assert output_dimension(f) == 2
+    @assert MOI.output_dimension(f) == 2
     value = f.variables[1]
     index = f.variables[2]
     print(io, "array_float_element($(_fzn_f(model, index)), $s.values, $(_fzn_f(model, value)))")
