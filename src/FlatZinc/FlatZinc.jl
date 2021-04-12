@@ -89,6 +89,14 @@ function MOI.is_empty(model::Optimizer)
     return true
 end
 
+function MOI.set(model::Optimizer, ::MOI.ObjectiveFunction{MOI.SingleVariable}, f::MOI.SingleVariable)
+    model.objective_function = f
+end
+
+function MOI.set(model::Optimizer, ::MOI.ObjectiveSense, s::MOI.OptimizationSense)
+    model.objective_sense = s
+end
+
 function _create_variable(model::Optimizer, set::Union{MOI.AbstractScalarSet, MOI.Reals})
     index = CleverDicts.add_item(
         model.variable_info,
@@ -578,7 +586,6 @@ function write_objective(io::IO, model::Optimizer)
         print(io, "satisfy")
     elseif model.objective_sense == MOI.MIN_SENSE && model.objective_function !== nothing
         print(io, "minimize $(_fzn_f(model, model.objective_function))")
-        write_function(io, model, model.objective_function)
     elseif model.objective_sense == MOI.MAX_SENSE && model.objective_function !== nothing
         print(io, "maximize $(_fzn_f(model, model.objective_function))")
     else
