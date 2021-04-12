@@ -16,7 +16,7 @@ function minimumdistance_vectorofvariables_test(model::MOI.ModelLike, config::MO
     c1 = MOI.add_constraint(model, x1, MOI.EqualTo(1))
     c2 = MOI.add_constraint(model, x2, MOI.Interval(1, 2))
 
-    c3 = MOI.add_constraint(model, _vaf([x1, x2]), CP.MinimumDistance(1, 2))
+    c3 = MOI.add_constraint(model, _vaf([x1, x2]), CP.MinimumDistance(2, 1))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)
@@ -57,7 +57,7 @@ function minimumdistance_vectoraffinefunction_test(model::MOI.ModelLike, config:
     c1 = MOI.add_constraint(model, x1, MOI.EqualTo(1))
     c2 = MOI.add_constraint(model, x2, MOI.Interval(1, 2))
 
-    c3 = MOI.add_constraint(model, _vaf([x1, x2]), CP.MinimumDistance(1, 2))
+    c3 = MOI.add_constraint(model, _vaf([x1, x2]), CP.MinimumDistance(2, 1))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)
