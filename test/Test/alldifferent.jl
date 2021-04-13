@@ -1,7 +1,7 @@
 @testset "AllDifferent" begin
-    mock = MOIU.MockOptimizer(MOIU.Model{Float64}())
+    mock = MOIU.MockOptimizer(COIU.Model{Int}())
     config = MOIT.TestConfig()
-    
+
     MOIU.set_mock_optimize!(
         mock,
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [1, 2])),
