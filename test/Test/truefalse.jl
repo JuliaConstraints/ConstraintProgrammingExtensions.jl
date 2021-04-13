@@ -1,3 +1,16 @@
+@testset "True and False" begin
+    mock = MOIU.MockOptimizer(MOIU.UniversalFallback(MOIU.Model{Int}()))
+    config = MOIT.TestConfig()
+
+    MOIU.set_mock_optimize!(
+        mock,
+        (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [1])),
+        (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [0])),
+    )
+    COIT.truefalsetest(mock, config)
+end
+
+
 function true_test(model::MOI.ModelLike, config::MOIT.TestConfig)
     MOI.empty!(model)
 

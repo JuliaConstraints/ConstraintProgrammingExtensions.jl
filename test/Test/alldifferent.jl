@@ -1,5 +1,5 @@
 @testset "AllDifferent" begin
-    mock = MOIU.MockOptimizer(COIU.Model{Int}())
+    mock = MOIU.MockOptimizer(MOIU.UniversalFallback(MOIU.Model{Int}()))
     config = MOIT.TestConfig()
 
     MOIU.set_mock_optimize!(

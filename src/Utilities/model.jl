@@ -1,4 +1,4 @@
-@MOIU.model(
+println(macroexpand(Utilities, @MOIU.model(
     Model,
     (MOI.ZeroOne, MOI.Integer),
     (
@@ -32,6 +32,13 @@
         MOI.LogDetConeTriangle,
         MOI.LogDetConeSquare,
         CP.AllDifferent,
+        CP.AllDifferentExceptConstant,
+        CP.AntiDomain,
+        CP.BinPacking,
+        CP.Count,
+        CP.CountDistinct,
+        CP.DifferentFrom,
+        CP.Domain,
     ),
     (
         MOI.PowerCone,
@@ -40,14 +47,16 @@
         MOI.SOS2,
     ),
     (),
-    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.ScalarAffineFunction,),
     (MOI.VectorOfVariables,),
-    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
-)
+    (MOI.VectorAffineFunction,)
+)))
 
 @doc raw"""
+
 An implementation of `ModelLike` that supports all functions and sets defined
-in MOI. It is parameterized by the coefficient type.
+in COI. It is parameterized by the coefficient type.
+
 # Examples
 ```jl
 model = Model{Float64}()

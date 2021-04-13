@@ -1,5 +1,5 @@
 @testset "Test" begin
-    include("alldifferent.jl")#=
+    include("alldifferent.jl")
     include("antidomain.jl")
     include("binpacking.jl")
     include("count.jl")
@@ -16,5 +16,5 @@
     include("minimumdistance.jl")
     include("reified.jl")
     include("strictly.jl")
-    include("truefalse.jl")=#
+    include("truefalse.jl")
 end
