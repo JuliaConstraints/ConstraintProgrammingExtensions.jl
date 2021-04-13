@@ -55,6 +55,7 @@ include("lexicographically.jl")
 include("minimumdistance.jl")
 include("reified.jl")
 include("strictly.jl")
+include("strictly_lexicographically.jl")
 include("truefalse.jl")
 
 end
