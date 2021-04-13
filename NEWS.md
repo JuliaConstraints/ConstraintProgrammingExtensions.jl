@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.2.2
+-------------
+
+Test suite for the `Test` submodule. The test for `Strictly` has been split
+into two parts.
+
+
 Version 0.2.1
 -------------
 
