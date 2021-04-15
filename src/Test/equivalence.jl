@@ -1,4 +1,7 @@
-function equivalence_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function equivalence_singlevariable_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -35,7 +38,10 @@ function equivalence_singlevariable_test(model::MOI.ModelLike, config::MOIT.Test
     end
 end
 
-function equivalence_scalaraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function equivalence_scalaraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -78,7 +84,8 @@ end
 
 const equivalencetests = Dict(
     "equivalence_singlevariable" => equivalence_singlevariable_test,
-    "equivalence_scalaraffinefunction" => equivalence_scalaraffinefunction_test,
+    "equivalence_scalaraffinefunction" =>
+        equivalence_scalaraffinefunction_test,
 )
 
-@MOIT.moitestset equivalence
+MOIT.@moitestset equivalence

@@ -1,4 +1,7 @@
-function element_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function element_singlevariable_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -28,7 +31,10 @@ function element_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestConf
     end
 end
 
-function element_scalaraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function element_scalaraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -71,4 +77,4 @@ const elementtests = Dict(
     "element_scalaraffinefunction" => element_scalaraffinefunction_test,
 )
 
-@MOIT.moitestset element
+MOIT.@moitestset element

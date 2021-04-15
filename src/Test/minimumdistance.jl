@@ -1,4 +1,7 @@
-function minimumdistance_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function minimumdistance_vectorofvariables_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -35,7 +38,10 @@ function minimumdistance_vectorofvariables_test(model::MOI.ModelLike, config::MO
     end
 end
 
-function minimumdistance_vectoraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function minimumdistance_vectoraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -77,8 +83,10 @@ function minimumdistance_vectoraffinefunction_test(model::MOI.ModelLike, config:
 end
 
 const minimumdistancetests = Dict(
-    "minimumdistance_vectorofvariables" => minimumdistance_vectorofvariables_test,
-    "minimumdistance_vectoraffinefunction" => minimumdistance_vectoraffinefunction_test,
+    "minimumdistance_vectorofvariables" =>
+        minimumdistance_vectorofvariables_test,
+    "minimumdistance_vectoraffinefunction" =>
+        minimumdistance_vectoraffinefunction_test,
 )
 
-@MOIT.moitestset minimumdistance
+MOIT.@moitestset minimumdistance

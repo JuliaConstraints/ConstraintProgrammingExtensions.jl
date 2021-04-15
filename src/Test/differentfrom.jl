@@ -1,4 +1,7 @@
-function differentfrom_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function differentfrom_singlevariable_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -30,7 +33,10 @@ function differentfrom_singlevariable_test(model::MOI.ModelLike, config::MOIT.Te
     end
 end
 
-function differentfrom_scalaraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function differentfrom_scalaraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -75,7 +81,8 @@ end
 
 const differentfromtests = Dict(
     "differentfrom_singlevariable" => differentfrom_singlevariable_test,
-    "differentfrom_scalaraffinefunction" => differentfrom_scalaraffinefunction_test,
+    "differentfrom_scalaraffinefunction" =>
+        differentfrom_scalaraffinefunction_test,
 )
 
-@MOIT.moitestset differentfrom
+MOIT.@moitestset differentfrom

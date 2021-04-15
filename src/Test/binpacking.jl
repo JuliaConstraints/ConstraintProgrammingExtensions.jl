@@ -1,4 +1,7 @@
-function binpacking_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function binpacking_vectorofvariables_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -42,7 +45,10 @@ function binpacking_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.Te
     end
 end
 
-function binpacking_scalaraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function binpacking_scalaraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -114,7 +120,8 @@ end
 
 const binpackingtests = Dict(
     "binpacking_vectorofvariables" => binpacking_vectorofvariables_test,
-    "binpacking_scalaraffinefunction" => binpacking_scalaraffinefunction_test,
+    "binpacking_scalaraffinefunction" =>
+        binpacking_scalaraffinefunction_test,
 )
 
-@MOIT.moitestset binpacking
+MOIT.@moitestset binpacking

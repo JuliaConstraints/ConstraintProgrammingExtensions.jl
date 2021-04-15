@@ -36,7 +36,7 @@ end
 function Strictly(set::LexicographicallyGreaterThan)
     return Strictly{LexicographicallyGreaterThan, Int}(set)
 end
-function Strictly(set::MOI.LessThan{T}) where {T} 
+function Strictly(set::MOI.LessThan{T}) where {T}
     return Strictly{MOI.LessThan{T}, T}(set)
 end
 function Strictly(set::MOI.GreaterThan{T}) where {T}

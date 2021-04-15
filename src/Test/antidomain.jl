@@ -1,4 +1,7 @@
-function antidomain_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function antidomain_singlevariable_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -35,7 +38,10 @@ function antidomain_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestC
     end
 end
 
-function antidomain_scalaraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function antidomain_scalaraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -90,7 +96,8 @@ end
 
 const antidomaintests = Dict(
     "antidomain_singlevariable" => antidomain_singlevariable_test,
-    "antidomain_scalaraffinefunction" => antidomain_scalaraffinefunction_test,
+    "antidomain_scalaraffinefunction" =>
+        antidomain_scalaraffinefunction_test,
 )
 
-@MOIT.moitestset antidomain
+MOIT.@moitestset antidomain

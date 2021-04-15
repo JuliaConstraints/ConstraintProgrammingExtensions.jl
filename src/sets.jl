@@ -42,8 +42,15 @@ struct AllDifferentExceptConstant{T <: Number} <: MOI.AbstractVectorSet
     k::T
 end
 
-Base.copy(set::AllDifferentExceptConstant{T}) where {T} = AllDifferentExceptConstant(set.dimension, copy(set.k))
-Base.:(==)(x::AllDifferentExceptConstant{T}, y::AllDifferentExceptConstant{T}) where {T} = x.dimension == y.dimension && x.k == y.k
+function Base.copy(set::AllDifferentExceptConstant{T}) where {T}
+    return AllDifferentExceptConstant(set.dimension, copy(set.k))
+end
+function Base.:(==)(
+    x::AllDifferentExceptConstant{T},
+    y::AllDifferentExceptConstant{T},
+) where {T}
+    return x.dimension == y.dimension && x.k == y.k
+end
 
 """
     Domain{T <: Number}(values::Set{T})
@@ -146,7 +153,9 @@ end
 
 MOI.dimension(set::Count{T}) where {T} = set.dimension + 1
 Base.copy(set::Count{T}) where {T} = Count(set.dimension, copy(set.value))
-Base.:(==)(x::Count{T}, y::Count{T}) where {T} = x.dimension == y.dimension && x.value == y.value
+function Base.:(==)(x::Count{T}, y::Count{T}) where {T}
+    return x.dimension == y.dimension && x.value == y.value
+end
 
 """
 CountCompare(dimension::Int)
@@ -231,8 +240,12 @@ struct MinimumDistance{T <: Real} <: MOI.AbstractVectorSet
     k::T
 end
 
-Base.copy(set::MinimumDistance{T}) where {T} = MinimumDistance(set.dimension, copy(set.k))
-Base.:(==)(x::MinimumDistance{T}, y::MinimumDistance{T}) where {T} = x.dimension == y.dimension && x.k == y.k
+function Base.copy(set::MinimumDistance{T}) where {T}
+    return MinimumDistance(set.dimension, copy(set.k))
+end
+function Base.:(==)(x::MinimumDistance{T}, y::MinimumDistance{T}) where {T}
+    return x.dimension == y.dimension && x.k == y.k
+end
 
 """
     MaximumDistance{T <: Real}(dimension::Int, k::T)
@@ -247,8 +260,12 @@ struct MaximumDistance{T <: Real} <: MOI.AbstractVectorSet
     k::T
 end
 
-Base.copy(set::MaximumDistance{T}) where {T} = MaximumDistance(set.dimension, copy(set.k))
-Base.:(==)(x::MaximumDistance{T}, y::MaximumDistance{T}) where {T} = x.dimension == y.dimension && x.k == y.k
+function Base.copy(set::MaximumDistance{T}) where {T}
+    return MaximumDistance(set.dimension, copy(set.k))
+end
+function Base.:(==)(x::MaximumDistance{T}, y::MaximumDistance{T}) where {T}
+    return x.dimension == y.dimension && x.k == y.k
+end
 
 """
     Inverse(dimension::Int)
@@ -277,13 +294,7 @@ MOI.dimension(set::Inverse) = 2 * set.dimension
 
 # isbits types, nothing to copy
 function Base.copy(
-    set::Union{
-        AllDifferent,
-        Membership,
-        CountCompare,
-        CountDistinct,
-        Inverse,
-    },
+    set::Union{AllDifferent, Membership, CountCompare, CountDistinct, Inverse},
 )
     return set
 end

@@ -48,8 +48,12 @@ struct WeightedCircuit{T <: Real} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::WeightedCircuit{T}) where {T} = set.n_nodes + 1
-Base.copy(set::WeightedCircuit{T}) where {T} = WeightedCircuit(set.n_nodes, copy(set.cost_matrix))
-Base.:(==)(x::WeightedCircuit{T}, y::WeightedCircuit{T}) where {T} = x.n_nodes == y.n_nodes && x.cost_matrix == y.cost_matrix
+function Base.copy(set::WeightedCircuit{T}) where {T}
+    return WeightedCircuit(set.n_nodes, copy(set.cost_matrix))
+end
+function Base.:(==)(x::WeightedCircuit{T}, y::WeightedCircuit{T}) where {T}
+    return x.n_nodes == y.n_nodes && x.cost_matrix == y.cost_matrix
+end
 
 """
     WeightedCircuitPath(n_nodes::Int, cost_matrix::AbstractMatrix{T})
@@ -70,8 +74,15 @@ struct WeightedCircuitPath{T <: Real} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::WeightedCircuitPath{T}) where {T} = 2 * set.n_nodes + 1
-Base.copy(set::WeightedCircuitPath{T}) where {T} = WeightedCircuitPath(set.n_nodes, copy(set.cost_matrix))
-Base.:(==)(x::WeightedCircuitPath{T}, y::WeightedCircuitPath{T}) where {T} = x.n_nodes == y.n_nodes && x.cost_matrix == y.cost_matrix
+function Base.copy(set::WeightedCircuitPath{T}) where {T}
+    return WeightedCircuitPath(set.n_nodes, copy(set.cost_matrix))
+end
+function Base.:(==)(
+    x::WeightedCircuitPath{T},
+    y::WeightedCircuitPath{T},
+) where {T}
+    return x.n_nodes == y.n_nodes && x.cost_matrix == y.cost_matrix
+end
 
 # isbits types, nothing to copy
 function Base.copy(set::Union{Circuit, CircuitPath})

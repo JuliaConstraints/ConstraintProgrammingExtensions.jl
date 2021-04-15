@@ -123,24 +123,18 @@ satisfied. Otherwise, nothing is implied on the truth value of `consequent`.
 
 Also called `if_then`.
 """
-struct Imply{
-    Antecedent <: MOI.AbstractSet,
-    Consequent <: MOI.AbstractSet
-} <: MOI.AbstractVectorSet
+struct Imply{Antecedent <: MOI.AbstractSet, Consequent <: MOI.AbstractSet} <:
+       MOI.AbstractVectorSet
     antecedent::Antecedent
     consequent::Consequent
 end
 
 function MOI.dimension(set::Imply{S, T}) where {S, T}
-    return MOI.dimension(set.antecedent) +
-           MOI.dimension(set.consequent)
+    return MOI.dimension(set.antecedent) + MOI.dimension(set.consequent)
 end
 
 function Base.copy(set::Imply{S, T}) where {S, T}
-    return Imply(
-        copy(set.antecedent),
-        copy(set.consequent),
-    )
+    return Imply(copy(set.antecedent), copy(set.consequent))
 end
 
 """
@@ -209,8 +203,7 @@ A constraint that is always true.
 
 It is only useful with reification-like constraints.
 """
-struct True <: MOI.AbstractVectorSet
-end
+struct True <: MOI.AbstractVectorSet end
 
 MOI.dimension(set::True) = 0
 
@@ -221,17 +214,11 @@ A constraint that is always false.
 
 It is only useful with reification-like constraints.
 """
-struct False <: MOI.AbstractVectorSet
-end
+struct False <: MOI.AbstractVectorSet end
 
 MOI.dimension(set::False) = 0
 
 # isbits types, nothing to copy
-function Base.copy(
-    set::Union{
-        True,
-        False,
-    },
-)
+function Base.copy(set::Union{True, False})
     return set
 end

@@ -1,4 +1,7 @@
-function ifthenelse_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function ifthenelse_singlevariable_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -37,7 +40,10 @@ function ifthenelse_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestC
     end
 end
 
-function ifthenelse_scalaraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function ifthenelse_scalaraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -82,7 +88,8 @@ end
 
 const ifthenelsetests = Dict(
     "ifthenelse_singlevariable" => ifthenelse_singlevariable_test,
-    "ifthenelse_scalaraffinefunction" => ifthenelse_scalaraffinefunction_test,
+    "ifthenelse_scalaraffinefunction" =>
+        ifthenelse_scalaraffinefunction_test,
 )
 
-@MOIT.moitestset ifthenelse
+MOIT.@moitestset ifthenelse

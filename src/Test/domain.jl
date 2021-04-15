@@ -1,4 +1,7 @@
-function domain_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function domain_singlevariable_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -33,7 +36,10 @@ function domain_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestConfi
     end
 end
 
-function domain_scalaraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function domain_scalaraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -107,4 +113,4 @@ const domaintests = Dict(
     "domain_scalaraffinefunction" => domain_scalaraffinefunction_test,
 )
 
-@MOIT.moitestset domain
+MOIT.@moitestset domain

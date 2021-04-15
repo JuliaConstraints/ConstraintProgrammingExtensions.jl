@@ -1,4 +1,7 @@
-function strictly_lessthan_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function strictly_lessthan_singlevariable_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -37,7 +40,10 @@ function strictly_lessthan_singlevariable_test(model::MOI.ModelLike, config::MOI
     end
 end
 
-function strictly_greaterthan_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function strictly_greaterthan_singlevariable_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -76,7 +82,10 @@ function strictly_greaterthan_singlevariable_test(model::MOI.ModelLike, config::
     end
 end
 
-function strictly_lexicographicallylessthan_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function strictly_lexicographicallylessthan_vectorofvariables_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -126,7 +135,10 @@ function strictly_lexicographicallylessthan_vectorofvariables_test(model::MOI.Mo
     end
 end
 
-function strictly_lexicographicallylessthan_vectoraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function strictly_lexicographicallylessthan_vectoraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -177,8 +189,10 @@ function strictly_lexicographicallylessthan_vectoraffinefunction_test(model::MOI
 end
 
 const strictlytests = Dict(
-    "strictly_lessthan_singlevariable" => strictly_lessthan_singlevariable_test,
-    "strictly_greaterthan_singlevariable" => strictly_greaterthan_singlevariable_test,
+    "strictly_lessthan_singlevariable" =>
+        strictly_lessthan_singlevariable_test,
+    "strictly_greaterthan_singlevariable" =>
+        strictly_greaterthan_singlevariable_test,
 )
 
-@MOIT.moitestset strictly
+MOIT.@moitestset strictly

@@ -1,4 +1,7 @@
-function strictly_lexicographicallylessthan_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function strictly_lexicographicallylessthan_vectorofvariables_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -48,7 +51,10 @@ function strictly_lexicographicallylessthan_vectorofvariables_test(model::MOI.Mo
     end
 end
 
-function strictly_lexicographicallylessthan_vectoraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function strictly_lexicographicallylessthan_vectoraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -99,8 +105,10 @@ function strictly_lexicographicallylessthan_vectoraffinefunction_test(model::MOI
 end
 
 const strictlylexicographicallytests = Dict(
-    "strictly_lexicographicallylessthan_vectorofvariables" => strictly_lexicographicallylessthan_vectorofvariables_test,
-    "strictly_lexicographicallylessthan_vectoraffinefunction" => strictly_lexicographicallylessthan_vectoraffinefunction_test,
+    "strictly_lexicographicallylessthan_vectorofvariables" =>
+        strictly_lexicographicallylessthan_vectorofvariables_test,
+    "strictly_lexicographicallylessthan_vectoraffinefunction" =>
+        strictly_lexicographicallylessthan_vectoraffinefunction_test,
 )
 
-@MOIT.moitestset strictlylexicographically
+MOIT.@moitestset strictlylexicographically

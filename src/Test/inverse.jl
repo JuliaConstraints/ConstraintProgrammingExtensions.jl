@@ -1,4 +1,7 @@
-function inverse_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function inverse_vectorofvariables_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -36,7 +39,10 @@ function inverse_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.TestC
     end
 end
 
-function inverse_vectoraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function inverse_vectoraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -83,4 +89,4 @@ const inversetests = Dict(
     "inverse_vectoraffinefunction" => inverse_vectoraffinefunction_test,
 )
 
-@MOIT.moitestset inverse
+MOIT.@moitestset inverse

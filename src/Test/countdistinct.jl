@@ -1,4 +1,7 @@
-function countdistinct_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function countdistinct_vectorofvariables_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -42,7 +45,10 @@ function countdistinct_vectorofvariables_test(model::MOI.ModelLike, config::MOIT
     end
 end
 
-function countdistinct_vectoraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function countdistinct_vectoraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -91,8 +97,10 @@ function countdistinct_vectoraffinefunction_test(model::MOI.ModelLike, config::M
 end
 
 const countdistincttests = Dict(
-    "countdistinct_vectorofvariables" => countdistinct_vectorofvariables_test,
-    "countdistinct_vectoraffinefunction" => countdistinct_vectoraffinefunction_test,
+    "countdistinct_vectorofvariables" =>
+        countdistinct_vectorofvariables_test,
+    "countdistinct_vectoraffinefunction" =>
+        countdistinct_vectoraffinefunction_test,
 )
 
-@MOIT.moitestset countdistinct
+MOIT.@moitestset countdistinct

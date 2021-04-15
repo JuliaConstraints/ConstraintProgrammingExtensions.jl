@@ -1,4 +1,7 @@
-function count_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function count_vectorofvariables_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -38,7 +41,10 @@ function count_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.TestCon
     end
 end
 
-function count_vectoraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function count_vectoraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -91,4 +97,4 @@ const counttests = Dict(
     "count_vectoraffinefunction" => count_vectoraffinefunction_test,
 )
 
-@MOIT.moitestset count
+MOIT.@moitestset count

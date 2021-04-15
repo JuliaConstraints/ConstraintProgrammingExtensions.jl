@@ -6,22 +6,70 @@
 
         # Check that the types of constraints of this test are supported.
         @test MOI.supports_constraint(m, MOI.SingleVariable, MOI.LessThan{Int})
-        @test MOI.supports_constraint(m, MOI.SingleVariable, MOI.LessThan{Float64})
-        @test MOI.supports_constraint(m, MOI.SingleVariable, CP.Strictly{MOI.LessThan{Float64}})
+        @test MOI.supports_constraint(
+            m,
+            MOI.SingleVariable,
+            MOI.LessThan{Float64},
+        )
+        @test MOI.supports_constraint(
+            m,
+            MOI.SingleVariable,
+            CP.Strictly{MOI.LessThan{Float64}},
+        )
         @test MOI.supports_constraint(m, MOI.SingleVariable, CP.Domain{Int})
-        @test MOI.supports_constraint(m, MOI.SingleVariable, MOI.Interval{Float64})
+        @test MOI.supports_constraint(
+            m,
+            MOI.SingleVariable,
+            MOI.Interval{Float64},
+        )
         @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.Element{Int})
-        @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.Element{Bool})
-        @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.Element{Float64})
+        @test MOI.supports_constraint(
+            m,
+            MOI.VectorOfVariables,
+            CP.Element{Bool},
+        )
+        @test MOI.supports_constraint(
+            m,
+            MOI.VectorOfVariables,
+            CP.Element{Float64},
+        )
         @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.MaximumAmong)
         @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.MinimumAmong)
-        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Int}, MOI.EqualTo{Int})
-        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Int}, MOI.LessThan{Int})
-        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Int}, CP.DifferentFrom{Int})
-        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Float64}, MOI.EqualTo{Float64})
-        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Float64}, MOI.LessThan{Float64})
-        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Float64}, CP.Strictly{MOI.LessThan{Float64}})
-        @test MOI.supports_constraint(m, MOI.ScalarAffineFunction{Float64}, CP.DifferentFrom{Float64})
+        @test MOI.supports_constraint(
+            m,
+            MOI.ScalarAffineFunction{Int},
+            MOI.EqualTo{Int},
+        )
+        @test MOI.supports_constraint(
+            m,
+            MOI.ScalarAffineFunction{Int},
+            MOI.LessThan{Int},
+        )
+        @test MOI.supports_constraint(
+            m,
+            MOI.ScalarAffineFunction{Int},
+            CP.DifferentFrom{Int},
+        )
+        @test MOI.supports_constraint(
+            m,
+            MOI.ScalarAffineFunction{Float64},
+            MOI.EqualTo{Float64},
+        )
+        @test MOI.supports_constraint(
+            m,
+            MOI.ScalarAffineFunction{Float64},
+            MOI.LessThan{Float64},
+        )
+        @test MOI.supports_constraint(
+            m,
+            MOI.ScalarAffineFunction{Float64},
+            CP.Strictly{MOI.LessThan{Float64}},
+        )
+        @test MOI.supports_constraint(
+            m,
+            MOI.ScalarAffineFunction{Float64},
+            CP.DifferentFrom{Float64},
+        )
 
         # Validity of constrained variables.
         for S in [
@@ -42,8 +90,9 @@
 
         # Create variables.
         x, x_int = MOI.add_constrained_variable(m, MOI.Integer())
-        y, y_bool = MOI.add_constrained_variables(m, [MOI.ZeroOne() for _ in 1:5])
-        
+        y, y_bool =
+            MOI.add_constrained_variables(m, [MOI.ZeroOne() for _ in 1:5])
+
         a, a_gt0f = MOI.add_constrained_variable(m, MOI.GreaterThan(0.0))
         b, b_lt0f = MOI.add_constrained_variable(m, MOI.LessThan(0.0))
         c, c_eq0f = MOI.add_constrained_variable(m, MOI.EqualTo(0.0))
@@ -54,7 +103,7 @@
         h, h_eq0b = MOI.add_constrained_variable(m, MOI.EqualTo(false))
         i = MOI.add_variable(m)
 
-        @test ! MOI.is_empty(m)
+        @test !MOI.is_empty(m)
         @test MOI.is_valid(m, x)
         @test MOI.is_valid(m, x_int)
         for i in 1:5
@@ -93,23 +142,83 @@
 
         # Add constraints. The actual model does not make any sense, and is 
         # infeasible. This one is just for the sake of testing the output.
-        c1 = MOI.add_constraint(m, MOI.VectorOfVariables([e, f]), CP.Element([6, 5, 4]))
-        c2 = MOI.add_constraint(m, MOI.VectorOfVariables([e, f, g]), CP.MaximumAmong(2))
-        c3 = MOI.add_constraint(m, MOI.VectorOfVariables([e, f, g]), CP.MinimumAmong(2))
+        c1 = MOI.add_constraint(
+            m,
+            MOI.VectorOfVariables([e, f]),
+            CP.Element([6, 5, 4]),
+        )
+        c2 = MOI.add_constraint(
+            m,
+            MOI.VectorOfVariables([e, f, g]),
+            CP.MaximumAmong(2),
+        )
+        c3 = MOI.add_constraint(
+            m,
+            MOI.VectorOfVariables([e, f, g]),
+            CP.MinimumAmong(2),
+        )
         c4 = MOI.add_constraint(m, e, MOI.LessThan(2))
-        c5 = MOI.add_constraint(m, MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], [f, g]), 0), MOI.EqualTo(2))
-        c6 = MOI.add_constraint(m, MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], [f, g]), 0), MOI.LessThan(2))
-        c7 = MOI.add_constraint(m, MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], [f, g]), 0), CP.DifferentFrom(2))
+        c5 = MOI.add_constraint(
+            m,
+            MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], [f, g]), 0),
+            MOI.EqualTo(2),
+        )
+        c6 = MOI.add_constraint(
+            m,
+            MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], [f, g]), 0),
+            MOI.LessThan(2),
+        )
+        c7 = MOI.add_constraint(
+            m,
+            MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], [f, g]), 0),
+            CP.DifferentFrom(2),
+        )
         c8 = MOI.add_constraint(m, e, CP.Strictly(MOI.LessThan(2)))
         c9 = MOI.add_constraint(m, e, CP.Domain(Set([0, 1, 2])))
-        c10 = MOI.add_constraint(m, MOI.VectorOfVariables([y[1], y[2]]), CP.Element([true, false]))
-        c11 = MOI.add_constraint(m, MOI.VectorOfVariables([a, h]), CP.Element([1.0, 2.0]))
+        c10 = MOI.add_constraint(
+            m,
+            MOI.VectorOfVariables([y[1], y[2]]),
+            CP.Element([true, false]),
+        )
+        c11 = MOI.add_constraint(
+            m,
+            MOI.VectorOfVariables([a, h]),
+            CP.Element([1.0, 2.0]),
+        )
         c12 = MOI.add_constraint(m, a, MOI.Interval(1.0, 2.0))
-        c13 = MOI.add_constraint(m, MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1.0, 2.0], [a, b]), 0.0), MOI.EqualTo(2.0))
-        c14 = MOI.add_constraint(m, MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1.0, 2.0], [c, d]), 0.0), MOI.LessThan(2.0))
-        c15 = MOI.add_constraint(m, MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1.0, 2.0], [e, f]), 0.0), CP.Strictly(MOI.LessThan(2.0)))
-        c15 = MOI.add_constraint(m, MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1.0, 2.0], [g, h]), 0.0), CP.DifferentFrom(2.0))
-        
+        c13 = MOI.add_constraint(
+            m,
+            MOI.ScalarAffineFunction(
+                MOI.ScalarAffineTerm.([1.0, 2.0], [a, b]),
+                0.0,
+            ),
+            MOI.EqualTo(2.0),
+        )
+        c14 = MOI.add_constraint(
+            m,
+            MOI.ScalarAffineFunction(
+                MOI.ScalarAffineTerm.([1.0, 2.0], [c, d]),
+                0.0,
+            ),
+            MOI.LessThan(2.0),
+        )
+        c15 = MOI.add_constraint(
+            m,
+            MOI.ScalarAffineFunction(
+                MOI.ScalarAffineTerm.([1.0, 2.0], [e, f]),
+                0.0,
+            ),
+            CP.Strictly(MOI.LessThan(2.0)),
+        )
+        c15 = MOI.add_constraint(
+            m,
+            MOI.ScalarAffineFunction(
+                MOI.ScalarAffineTerm.([1.0, 2.0], [g, h]),
+                0.0,
+            ),
+            CP.DifferentFrom(2.0),
+        )
+
         @test MOI.is_valid(m, c1)
         @test MOI.is_valid(m, c2)
         @test MOI.is_valid(m, c3)
@@ -127,9 +236,16 @@
         @test MOI.is_valid(m, c15)
 
         # Test some attributes for these constraints.
-        @test MOI.get(m, MOI.ConstraintFunction(), c1) == MOI.VectorOfVariables([e, f])
+        @test MOI.get(m, MOI.ConstraintFunction(), c1) ==
+              MOI.VectorOfVariables([e, f])
         @test MOI.get(m, MOI.ConstraintSet(), c1) == CP.Element([6, 5, 4])
-        @test MOI.get(m, MOI.ListOfConstraintIndices{MOI.VectorOfVariables, CP.Element{Int}}()) == [c1]
+        @test MOI.get(
+            m,
+            MOI.ListOfConstraintIndices{
+                MOI.VectorOfVariables,
+                CP.Element{Int},
+            }(),
+        ) == [c1]
         @test length(MOI.get(m, MOI.ListOfConstraints())) == 24
 
         # Generate the FZN file.
@@ -190,12 +306,16 @@
         @test MOI.is_empty(m)
 
         x, x_int = MOI.add_constrained_variable(m, MOI.Integer())
-        
-        @test ! MOI.is_empty(m)
+
+        @test !MOI.is_empty(m)
         @test MOI.is_valid(m, x)
         @test MOI.is_valid(m, x_int)
-        
-        MOI.set(m, MOI.ObjectiveFunction{MOI.SingleVariable}(), MOI.SingleVariable(x))
+
+        MOI.set(
+            m,
+            MOI.ObjectiveFunction{MOI.SingleVariable}(),
+            MOI.SingleVariable(x),
+        )
 
         # Minimise.
         MOI.set(m, MOI.ObjectiveSense(), MOI.MIN_SENSE)
@@ -203,7 +323,7 @@
         io = IOBuffer(truncate=true)
         write(io, m)
         fzn = String(take!(io))
-        
+
         @test fzn == """var bool: x1;
 
 
@@ -216,7 +336,7 @@
         io = IOBuffer(truncate=true)
         write(io, m)
         fzn = String(take!(io))
-        
+
         @test fzn == """var bool: x1;
 
 
@@ -227,7 +347,7 @@
     @testset "Reading" begin
         m = CP.FlatZinc.Optimizer()
         @test MOI.is_empty(m)
-        
+
         @test_throws ErrorException read!(IOBuffer("42"), m)
     end
 end

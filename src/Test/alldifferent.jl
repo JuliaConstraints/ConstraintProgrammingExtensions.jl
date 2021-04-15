@@ -1,4 +1,7 @@
-function alldifferent_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function alldifferent_vectorofvariables_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -31,7 +34,10 @@ function alldifferent_vectorofvariables_test(model::MOI.ModelLike, config::MOIT.
     end
 end
 
-function alldifferent_vectoraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function alldifferent_vectoraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -76,7 +82,8 @@ end
 
 const alldifferenttests = Dict(
     "alldifferent_vectorofvariables" => alldifferent_vectorofvariables_test,
-    "alldifferent_vectoraffinefunction" => alldifferent_vectoraffinefunction_test,
+    "alldifferent_vectoraffinefunction" =>
+        alldifferent_vectoraffinefunction_test,
 )
 
-@MOIT.moitestset alldifferent
+MOIT.@moitestset alldifferent

@@ -1,4 +1,7 @@
-function imply_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function imply_singlevariable_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -35,7 +38,10 @@ function imply_singlevariable_test(model::MOI.ModelLike, config::MOIT.TestConfig
     end
 end
 
-function imply_scalaraffinefunction_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function imply_scalaraffinefunction_test(
+    model::MOI.ModelLike,
+    config::MOIT.TestConfig,
+)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -81,4 +87,4 @@ const implytests = Dict(
     "imply_scalaraffinefunction" => imply_scalaraffinefunction_test,
 )
 
-@MOIT.moitestset imply
+MOIT.@moitestset imply
