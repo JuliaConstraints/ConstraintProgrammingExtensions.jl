@@ -99,8 +99,9 @@ function write_variable(io::IO, name::String, s::MOI.EqualTo{Bool})
 end
 
 function write_variable(io::IO, name::String, s::MOI.LessThan{Float64})
-    # typemin(Float64) is -Inf, which is "-Inf" as a string. Take the next 
-    # smallest value as a proxy, because it has a standard scientific notation.
+    # typemin(Float64) is -Inf, which is "-Inf" as a string (which is not 
+    # allowed by FlatZinc). Take the next smallest value as a proxy, because 
+    # it has a standard scientific notation (and this is allowed in FlatZinc).
     print(io, "var $(nextfloat(typemin(Float64)))..$(s.upper): $(name);")
     return nothing
 end
@@ -111,8 +112,9 @@ function write_variable(io::IO, name::String, s::MOI.LessThan{Int})
 end
 
 function write_variable(io::IO, name::String, s::MOI.GreaterThan{Float64})
-    # typemax(Float64) is Inf, which is "Inf" as a string. Take the next 
-    # largest value as a proxy, because it has a standard scientific notation.
+    # typemax(Float64) is Inf, which is "Inf" as a string (which is not 
+    # allowed by FlatZinc). Take the next largest value as a proxy, because 
+    # it has a standard scientific notation (and this is allowed in FlatZinc).
     print(io, "var $(s.lower)..$(prevfloat(typemax(Float64))): $(name);")
     return nothing
 end
