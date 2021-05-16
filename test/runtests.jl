@@ -11,6 +11,7 @@ const MOIT = MOI.Test
 
 @testset "ConstraintProgrammingExtensions" begin
     include("sets.jl")
+    include("moi_traits.jl")
     include("FlatZinc/FlatZinc.jl")
     include("Test/Test.jl")
 end

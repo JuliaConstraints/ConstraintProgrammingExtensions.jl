@@ -1,10 +1,12 @@
 @testset "FlatZinc" begin
-    @testset "Writing constraints" begin
+    @testset "Optimiser attributes" begin
         m = CP.FlatZinc.Optimizer()
         @test sprint(show, m) == "A FlatZinc (fzn) model"
-        @test MOI.is_empty(m)
+    end
 
-        # Check that the types of constraints of this test are supported.
+    @testset "Supported constraints" begin
+        m = CP.FlatZinc.Optimizer()
+        
         @test MOI.supports_constraint(m, MOI.SingleVariable, MOI.LessThan{Int})
         @test MOI.supports_constraint(
             m,
@@ -70,8 +72,9 @@
             MOI.ScalarAffineFunction{Float64},
             CP.DifferentFrom{Float64},
         )
+    end
 
-        # Validity of constrained variables.
+    @testset "Supported constrained variables" begin
         for S in [
             MOI.EqualTo{Float64},
             MOI.LessThan{Float64},
@@ -87,6 +90,11 @@
         ]
             @test MOI.supports_add_constrained_variables(m, S)
         end
+    end
+
+    @testset "Writing constraints" begin
+        m = CP.FlatZinc.Optimizer()
+        @test MOI.is_empty(m)
 
         # Create variables.
         x, x_int = MOI.add_constrained_variable(m, MOI.Integer())
