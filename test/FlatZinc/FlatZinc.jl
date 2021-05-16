@@ -97,6 +97,9 @@
         b, b_lt0f = MOI.add_constrained_variable(m, MOI.LessThan(0.0))
         c, c_eq0f = MOI.add_constrained_variable(m, MOI.EqualTo(0.0))
         d, d_intf = MOI.add_constrained_variable(m, MOI.Interval(0.0, 1.0))
+        e, e_int = MOI.add_constrained_variable(m, MOI.Integer())
+        f, f_int = MOI.add_constrained_variable(m, MOI.Integer())
+        g, g_int = MOI.add_constrained_variable(m, MOI.Integer())
         h, h_eq0b = MOI.add_constrained_variable(m, MOI.EqualTo(false))
         i = MOI.add_variable(m)
 
@@ -115,6 +118,12 @@
         @test MOI.is_valid(m, c_eq0f)
         @test MOI.is_valid(m, d)
         @test MOI.is_valid(m, d_intf)
+        @test MOI.is_valid(m, e)
+        @test MOI.is_valid(m, e_int)
+        @test MOI.is_valid(m, f)
+        @test MOI.is_valid(m, f_int)
+        @test MOI.is_valid(m, g)
+        @test MOI.is_valid(m, g_int)
         @test MOI.is_valid(m, h)
         @test MOI.is_valid(m, h_eq0b)
         @test MOI.is_valid(m, i)
@@ -237,14 +246,14 @@
                 CP.Element{Int},
             }(),
         ) == [c1]
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 24
+        @test length(MOI.get(m, MOI.ListOfConstraints())) == 22
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
         write(io, m)
         fzn = String(take!(io))
 
-        @test fzn == """var bool: x_x;
+        @test fzn == """var int: x_x;
             var bool: y_1;
             var bool: y_2;
             var bool: y_3;
@@ -254,9 +263,9 @@
             var -1.7976931348623157e308..0.0: x8;
             var float: x9 = 0.0;
             var 0.0..1.0: x10;
-            var 0..9223372036854775807: x11;
-            var -9223372036854775808..0: x12;
-            var int: x13 = 0;
+            var int: x11;
+            var int: x12;
+            var int: x13;
             var bool: x14 = false;
             var float: x15;
             
@@ -268,7 +277,7 @@
             constraint int_lin_le([1, 1], [x12, x13], 2);
             constraint int_lin_ne([1, 1], [x12, x13], 2);
             constraint int_lt(x11, 2);
-            constraint set_in(x11, Set([0, 2, 1]));
+            constraint set_in(x11, [0, 2, 1]);
             constraint array_bool_element(y_2, [1, 0], y_1);
             constraint array_float_element(x14, [1.0, 2.0], x7);
             constraint float_in(x7, 1.0, 2.0);
@@ -315,7 +324,7 @@
         write(io, m)
         fzn = String(take!(io))
 
-        @test fzn == """var bool: x1;
+        @test fzn == """var int: x1;
 
 
         solve minimize x1;
@@ -328,7 +337,7 @@
         write(io, m)
         fzn = String(take!(io))
 
-        @test fzn == """var bool: x1;
+        @test fzn == """var int: x1;
 
 
         solve maximize x1;

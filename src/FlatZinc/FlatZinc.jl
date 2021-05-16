@@ -215,7 +215,6 @@ function MOI.is_valid(
     c::MOI.ConstraintIndex{F, S},
 ) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
     info = get(model.constraint_info, c.value, nothing)
-    @show info
     return info !== nothing && typeof(info.s) == S
 end
 
@@ -417,11 +416,12 @@ end
 function write_variables(io::IO, model::Optimizer)
     for var in values(model.variable_info)
         # Variables either start with "var" or "array of var", let 
-        # write_variable decide.
+        # write_variable decide (even though only "var" s implemented for now).
         write_variable(io, var.name, var.set)
         println(io)
     end
-    return println(io)
+    println(io)
+    return nothing
 end
 
 function write_constraints(io::IO, model::Optimizer)
@@ -433,41 +433,49 @@ function write_constraints(io::IO, model::Optimizer)
             println(io)
         end
     end
-    return println(io)
+    println(io)
+    return nothing
 end
 
 # Variable printing.
 
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Float64})
-    return print(io, "var float: $(name) = $(s.value);")
+    print(io, "var float: $(name) = $(s.value);")
+    return nothing
 end
 
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Int})
-    return print(io, "var int: $(name) = $(s.value);")
+    print(io, "var int: $(name) = $(s.value);")
+    return nothing
 end
 
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Bool})
-    return print(io, "var bool: $(name) = $(s.value);")
+    print(io, "var bool: $(name) = $(s.value);")
+    return nothing
 end
 
 function write_variable(io::IO, name::String, s::MOI.LessThan{Float64})
     # typemin(Float64) is -Inf, which is "-Inf" as a string. Take the next 
     # smallest value as a proxy, because it has a standard scientific notation.
-    return print(io, "var $(nextfloat(typemin(Float64)))..$(s.upper): $(name);")
+    print(io, "var $(nextfloat(typemin(Float64)))..$(s.upper): $(name);")
+    return nothing
 end
 
 function write_variable(io::IO, name::String, s::MOI.LessThan{Int})
-    return print(io, "var $(typemin(Int))..$(s.upper): $(name);")
+    print(io, "var $(typemin(Int))..$(s.upper): $(name);")
+    return nothing
 end
 
 function write_variable(io::IO, name::String, s::MOI.GreaterThan{Float64})
     # typemax(Float64) is Inf, which is "Inf" as a string. Take the next 
     # largest value as a proxy, because it has a standard scientific notation.
-    return print(io, "var $(s.lower)..$(prevfloat(typemax(Float64))): $(name);")
+    print(io, "var $(s.lower)..$(prevfloat(typemax(Float64))): $(name);")
+    return nothing
 end
 
 function write_variable(io::IO, name::String, s::MOI.GreaterThan{Int})
-    return print(io, "var $(s.lower)..$(typemax(Int)): $(name);")
+    print(io, "var $(s.lower)..$(typemax(Int)): $(name);")
+    return nothing
 end
 
 function write_variable(
@@ -475,19 +483,23 @@ function write_variable(
     name::String,
     s::MOI.Interval{T},
 ) where {T <: Union{Int, Float64}}
-    return print(io, "var $(s.lower)..$(s.upper): $(name);")
+    print(io, "var $(s.lower)..$(s.upper): $(name);")
+    return nothing
 end
 
 function write_variable(io::IO, name::String, ::MOI.Reals)
-    return print(io, "var float: $(name);")
+    print(io, "var float: $(name);")
+    return nothing
 end
 
 function write_variable(io::IO, name::String, ::MOI.ZeroOne)
-    return print(io, "var bool: $(name);")
+    print(io, "var bool: $(name);")
+    return nothing
 end
 
 function write_variable(io::IO, name::String, ::MOI.Integer)
-    return print(io, "var bool: $(name);")
+    print(io, "var int: $(name);")
+    return nothing
 end
 
 # Constraint printing.
@@ -508,10 +520,11 @@ function write_constraint(
 
     value = f.variables[1]
     index = f.variables[2]
-    return print(
+    print(
         io,
         "array_int_element($(_fzn_f(model, index)), $(s.values), $(_fzn_f(model, value)))",
     )
+    return nothing
 end
 
 function write_constraint(
@@ -526,10 +539,11 @@ function write_constraint(
 
     array = f.variables[2:end]
     value = f.variables[1]
-    return print(
+    print(
         io,
         "array_int_maximum($(_fzn_f(model, value)), $(_fzn_f(model, array)))",
     )
+    return nothing
 end
 
 function write_constraint(
@@ -544,10 +558,11 @@ function write_constraint(
 
     array = f.variables[2:end]
     value = f.variables[1]
-    return print(
+    print(
         io,
         "array_int_minimum($(_fzn_f(model, value)), $(_fzn_f(model, array)))",
     )
+    return nothing
 end
 
 # TODO: absolute value. int_abs.
@@ -563,7 +578,8 @@ function write_constraint(
     s::MOI.LessThan{Int},
 )
     @assert CP.is_integer(model, f)
-    return print(io, "int_le($(_fzn_f(model, f)), $(s.upper))")
+    print(io, "int_le($(_fzn_f(model, f)), $(s.upper))")
+    return nothing
 end
 
 # TODO: int_le_reif
@@ -576,10 +592,11 @@ function write_constraint(
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.value - f.constant
-    return print(
+    print(
         io,
         "int_lin_eq($(coefficients), [$(_fzn_f(model, variables))], $(value))",
     )
+    return nothing
 end
 
 # TODO: int_lin_eq_reif
@@ -592,10 +609,11 @@ function write_constraint(
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.upper - f.constant
-    return print(
+    print(
         io,
         "int_lin_le($(coefficients), [$(_fzn_f(model, variables))], $(value))",
     )
+    return nothing
 end
 
 # TODO: int_lin_le_reif
@@ -608,10 +626,11 @@ function write_constraint(
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.value - f.constant
-    return print(
+    print(
         io,
         "int_lin_ne($(coefficients), [$(_fzn_f(model, variables))], $(value))",
     )
+    return nothing
 end
 
 # TODO: int_lin_ne_reif
@@ -623,7 +642,8 @@ function write_constraint(
     s::CP.Strictly{MOI.LessThan{Int}},
 )
     @assert CP.is_integer(model, f)
-    return print(io, "int_lt($(_fzn_f(model, f)), $(s.set.upper))")
+    print(io, "int_lt($(_fzn_f(model, f)), $(s.set.upper))")
+    return nothing
 end
 
 # TODO: int_lt_reif
@@ -644,7 +664,8 @@ function write_constraint(
     s::CP.Domain{Int},
 )
     @assert CP.is_integer(model, f)
-    return print(io, "set_in($(_fzn_f(model, f)), $(s.values))")
+    print(io, "set_in($(_fzn_f(model, f)), $(collect(s.values)))")
+    return nothing
 end
 
 # - Boolean constraints.
@@ -667,10 +688,11 @@ function write_constraint(
     # Standard interpolation of a vector of boolean will show the type, which is not wanted.
     values = join([ifelse(v, "1", "0") for v in s.values], ", ")
 
-    return print(
+    print(
         io,
         "array_bool_element($(_fzn_f(model, index)), [$(values)], $(_fzn_f(model, value)))",
     )
+    return nothing
 end
 
 # TODO: array_bool_or, no disjunction between variables for now in CP.
@@ -710,10 +732,11 @@ function write_constraint(
     @assert MOI.output_dimension(f) == 2
     value = f.variables[1]
     index = f.variables[2]
-    return print(
+    print(
         io,
         "array_float_element($(_fzn_f(model, index)), $(s.values), $(_fzn_f(model, value)))",
     )
+    return nothing
 end
 
 # TODO: no dispatch possible! Already taken by the integer version.
@@ -749,7 +772,8 @@ function write_constraint(
     f::MOI.SingleVariable,
     s::MOI.Interval{Float64},
 )
-    return print(io, "float_in($(_fzn_f(model, f)), $(s.lower), $(s.upper))")
+    print(io, "float_in($(_fzn_f(model, f)), $(s.lower), $(s.upper))")
+    return nothing
 end
 
 # TODO: float_in_reif
@@ -765,10 +789,11 @@ function write_constraint(
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.value - f.constant
-    return print(
+    print(
         io,
         "float_lin_eq($(coefficients), [$(_fzn_f(model, variables))], $(value))",
     )
+    return nothing
 end
 
 # TODO: float_lin_eq_reif
@@ -781,10 +806,11 @@ function write_constraint(
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.upper - f.constant
-    return print(
+    print(
         io,
         "float_lin_le($(coefficients), [$(_fzn_f(model, variables))], $(value))",
     )
+    return nothing
 end
 
 # TODO: float_lin_le_reif
@@ -797,10 +823,11 @@ function write_constraint(
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.set.upper - f.constant
-    return print(
+    print(
         io,
         "float_lin_lt($(coefficients), [$(_fzn_f(model, variables))], $(value))",
     )
+    return nothing
 end
 
 # TODO: float_lin_lt_reif
@@ -813,10 +840,11 @@ function write_constraint(
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.value - f.constant
-    return print(
+    print(
         io,
         "float_lin_ne($(coefficients), [$(_fzn_f(model, variables))], $(value))",
     )
+    return nothing
 end
 
 # TODO: float_lin_ne_reif
@@ -873,7 +901,8 @@ function write_objective(io::IO, model::Optimizer)
         )
     end
     print(io, ";")
-    return println(io)
+    println(io)
+    return nothing
 end
 
 # Function printing.
@@ -901,7 +930,8 @@ end
 # =============================================================================
 
 function Base.read!(::IO, ::Optimizer)
-    return error("read! is not implemented for FlatZinc (fzn) files.")
+    error("read! is not implemented for FlatZinc (fzn) files.")
+    return nothing
 end
 
 end
