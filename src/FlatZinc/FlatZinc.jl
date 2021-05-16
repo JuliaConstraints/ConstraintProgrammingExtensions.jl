@@ -500,8 +500,8 @@ function write_constraint(
     s::CP.Element{Int},
 )
     @assert MOI.output_dimension(f) == 2
-    @assert is_integer(model, f.variables[1])
-    @assert is_integer(model, f.variables[2])
+    @assert CP.is_integer(model, f.variables[1])
+    @assert CP.is_integer(model, f.variables[2])
 
     value = f.variables[1]
     index = f.variables[2]
@@ -518,7 +518,7 @@ function write_constraint(
     ::CP.MaximumAmong,
 )
     for i in 1:MOI.output_dimension(f)
-        @assert is_integer(model, f.variables[i])
+        @assert CP.is_integer(model, f.variables[i])
     end
 
     array = f.variables[2:end]
@@ -536,7 +536,7 @@ function write_constraint(
     ::CP.MinimumAmong,
 )
     for i in 1:MOI.output_dimension(f)
-        @assert is_integer(model, f.variables[i])
+        @assert CP.is_integer(model, f.variables[i])
     end
 
     array = f.variables[2:end]
@@ -559,7 +559,7 @@ function write_constraint(
     f::MOI.SingleVariable,
     s::MOI.LessThan{Int},
 )
-    @assert is_integer(model, f)
+    @assert CP.is_integer(model, f)
     return print(io, "int_le($(_fzn_f(model, f)), $(s.upper))")
 end
 
@@ -619,7 +619,7 @@ function write_constraint(
     f::MOI.SingleVariable,
     s::CP.Strictly{MOI.LessThan{Int}},
 )
-    @assert is_integer(model, f)
+    @assert CP.is_integer(model, f)
     return print(io, "int_lt($(_fzn_f(model, f)), $(s.set.upper))")
 end
 
@@ -640,7 +640,7 @@ function write_constraint(
     f::MOI.SingleVariable,
     s::CP.Domain{Int},
 )
-    @assert is_integer(model, f)
+    @assert CP.is_integer(model, f)
     return print(io, "set_in($(_fzn_f(model, f)), $(s.values))")
 end
 
@@ -655,8 +655,8 @@ function write_constraint(
     s::CP.Element{Bool},
 )
     @assert MOI.output_dimension(f) == 2
-    @assert is_binary(model, f.variables[1])
-    @assert is_binary(model, f.variables[2])
+    @assert CP.is_binary(model, f.variables[1])
+    @assert CP.is_binary(model, f.variables[2])
 
     value = f.variables[1]
     index = f.variables[2]
