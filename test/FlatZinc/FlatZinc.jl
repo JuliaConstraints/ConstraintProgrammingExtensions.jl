@@ -95,35 +95,61 @@
 
     @testset "Writing" begin
         @testset "Variables" begin
-            ;
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
     
-            a, a_gt0f = MOI.add_constrained_variable(m, MOI.GreaterThan(0.0))
-            b, b_lt0f = MOI.add_constrained_variable(m, MOI.LessThan(0.0))
-            c, c_eq0f = MOI.add_constrained_variable(m, MOI.EqualTo(0.0))
-            d, d_intf = MOI.add_constrained_variable(m, MOI.Interval(0.0, 1.0))
-            e, e_int = MOI.add_constrained_variable(m, MOI.Integer())
-            f, f_int = MOI.add_constrained_variable(m, MOI.Integer())
-            g, g_int = MOI.add_constrained_variable(m, MOI.Integer())
-            h, h_eq0b = MOI.add_constrained_variable(m, MOI.EqualTo(false))
-            i = MOI.add_variable(m)
+            a, a_c = MOI.add_constrained_variable(m, MOI.GreaterThan(0.0))
+            b, b_c = MOI.add_constrained_variable(m, MOI.LessThan(0.0))
+            c, c_c = MOI.add_constrained_variable(m, MOI.EqualTo(0.0))
+            d, d_c = MOI.add_constrained_variable(m, MOI.Interval(0.0, 1.0))
+            e, e_c = MOI.add_constrained_variable(m, MOI.GreaterThan(0))
+            f, f_c = MOI.add_constrained_variable(m, MOI.LessThan(0))
+            g, g_c = MOI.add_constrained_variable(m, MOI.EqualTo(0))
+            h, h_c = MOI.add_constrained_variable(m, MOI.Interval(0, 1))
+            i, i_c = MOI.add_constrained_variable(m, MOI.EqualTo(false))
+            j = MOI.add_variable(m)
 
             @test MOI.is_valid(m, a)
-            @test MOI.is_valid(m, a_gt0f)
+            @test MOI.is_valid(m, a_c)
             @test MOI.is_valid(m, b)
-            @test MOI.is_valid(m, b_lt0f)
+            @test MOI.is_valid(m, b_c)
             @test MOI.is_valid(m, c)
-            @test MOI.is_valid(m, c_eq0f)
+            @test MOI.is_valid(m, c_c)
             @test MOI.is_valid(m, d)
-            @test MOI.is_valid(m, d_intf)
+            @test MOI.is_valid(m, d_c)
             @test MOI.is_valid(m, e)
-            @test MOI.is_valid(m, e_int)
+            @test MOI.is_valid(m, e_c)
             @test MOI.is_valid(m, f)
-            @test MOI.is_valid(m, f_int)
+            @test MOI.is_valid(m, f_c)
             @test MOI.is_valid(m, g)
-            @test MOI.is_valid(m, g_int)
+            @test MOI.is_valid(m, g_c)
             @test MOI.is_valid(m, h)
-            @test MOI.is_valid(m, h_eq0b)
+            @test MOI.is_valid(m, h_c)
             @test MOI.is_valid(m, i)
+            @test MOI.is_valid(m, i_c)
+            @test MOI.is_valid(m, j)
+    
+            # Generate the FZN file.
+            io = IOBuffer(truncate=true)
+            write(io, m)
+            fzn = String(take!(io))
+
+            @test fzn == """var 0.0..1.7976931348623157e308: x1;
+                var -1.7976931348623157e308..0.0: x2;
+                var float: x3 = 0.0;
+                var 0.0..1.0: x4;
+                var 0..9223372036854775807: x5;
+                var -9223372036854775808..0: x6;
+                var int: x7 = 0;
+                var 0..1: x8;
+                var bool: x9 = false;
+                var float: x10;
+                
+                
+                
+                
+                solve satisfy;
+                """
         end
 
         @testset "Constraints: CP.MinimumAmong / CP.MaximumAmong" begin
