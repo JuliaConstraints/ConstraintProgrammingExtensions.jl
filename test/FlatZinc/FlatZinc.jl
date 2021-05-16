@@ -75,6 +75,7 @@
     end
 
     @testset "Supported constrained variables" begin
+        m = CP.FlatZinc.Optimizer()
         for S in [
             MOI.EqualTo{Float64},
             MOI.LessThan{Float64},
