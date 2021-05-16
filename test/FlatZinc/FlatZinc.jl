@@ -1,82 +1,81 @@
 @testset "FlatZinc" begin
-    @testset "Optimiser attributes" begin
-        m = CP.FlatZinc.Optimizer()
-        @test sprint(show, m) == "A FlatZinc (fzn) model"
-    end
+    @testset "Model" begin
+        @testset "Optimiser attributes" begin
+            m = CP.FlatZinc.Optimizer()
+            @test sprint(show, m) == "A FlatZinc (fzn) model"
+        end
 
-    @testset "Supported constraints" begin
-        m = CP.FlatZinc.Optimizer()
-        
-        @test MOI.supports_constraint(m, MOI.SingleVariable, MOI.LessThan{Int})
-        @test MOI.supports_constraint(
-            m,
-            MOI.SingleVariable,
-            MOI.LessThan{Float64},
-        )
-        @test MOI.supports_constraint(
-            m,
-            MOI.SingleVariable,
-            CP.Strictly{MOI.LessThan{Float64}},
-        )
-        @test MOI.supports_constraint(m, MOI.SingleVariable, CP.Domain{Int})
-        @test MOI.supports_constraint(
-            m,
-            MOI.SingleVariable,
-            MOI.Interval{Float64},
-        )
-        @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.Element{Int})
-        @test MOI.supports_constraint(
-            m,
-            MOI.VectorOfVariables,
-            CP.Element{Bool},
-        )
-        @test MOI.supports_constraint(
-            m,
-            MOI.VectorOfVariables,
-            CP.Element{Float64},
-        )
-        @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.MaximumAmong)
-        @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.MinimumAmong)
-        @test MOI.supports_constraint(
-            m,
-            MOI.ScalarAffineFunction{Int},
-            MOI.EqualTo{Int},
-        )
-        @test MOI.supports_constraint(
-            m,
-            MOI.ScalarAffineFunction{Int},
-            MOI.LessThan{Int},
-        )
-        @test MOI.supports_constraint(
-            m,
-            MOI.ScalarAffineFunction{Int},
-            CP.DifferentFrom{Int},
-        )
-        @test MOI.supports_constraint(
-            m,
-            MOI.ScalarAffineFunction{Float64},
-            MOI.EqualTo{Float64},
-        )
-        @test MOI.supports_constraint(
-            m,
-            MOI.ScalarAffineFunction{Float64},
-            MOI.LessThan{Float64},
-        )
-        @test MOI.supports_constraint(
-            m,
-            MOI.ScalarAffineFunction{Float64},
-            CP.Strictly{MOI.LessThan{Float64}},
-        )
-        @test MOI.supports_constraint(
-            m,
-            MOI.ScalarAffineFunction{Float64},
-            CP.DifferentFrom{Float64},
-        )
-    end
+        @testset "Supported constraints" begin
+            m = CP.FlatZinc.Optimizer()
+            
+            @test MOI.supports_constraint(m, MOI.SingleVariable, MOI.LessThan{Int})
+            @test MOI.supports_constraint(
+                m,
+                MOI.SingleVariable,
+                MOI.LessThan{Float64},
+            )
+            @test MOI.supports_constraint(
+                m,
+                MOI.SingleVariable,
+                CP.Strictly{MOI.LessThan{Float64}},
+            )
+            @test MOI.supports_constraint(m, MOI.SingleVariable, CP.Domain{Int})
+            @test MOI.supports_constraint(
+                m,
+                MOI.SingleVariable,
+                MOI.Interval{Float64},
+            )
+            @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.Element{Int})
+            @test MOI.supports_constraint(
+                m,
+                MOI.VectorOfVariables,
+                CP.Element{Bool},
+            )
+            @test MOI.supports_constraint(
+                m,
+                MOI.VectorOfVariables,
+                CP.Element{Float64},
+            )
+            @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.MaximumAmong)
+            @test MOI.supports_constraint(m, MOI.VectorOfVariables, CP.MinimumAmong)
+            @test MOI.supports_constraint(
+                m,
+                MOI.ScalarAffineFunction{Int},
+                MOI.EqualTo{Int},
+            )
+            @test MOI.supports_constraint(
+                m,
+                MOI.ScalarAffineFunction{Int},
+                MOI.LessThan{Int},
+            )
+            @test MOI.supports_constraint(
+                m,
+                MOI.ScalarAffineFunction{Int},
+                CP.DifferentFrom{Int},
+            )
+            @test MOI.supports_constraint(
+                m,
+                MOI.ScalarAffineFunction{Float64},
+                MOI.EqualTo{Float64},
+            )
+            @test MOI.supports_constraint(
+                m,
+                MOI.ScalarAffineFunction{Float64},
+                MOI.LessThan{Float64},
+            )
+            @test MOI.supports_constraint(
+                m,
+                MOI.ScalarAffineFunction{Float64},
+                CP.Strictly{MOI.LessThan{Float64}},
+            )
+            @test MOI.supports_constraint(
+                m,
+                MOI.ScalarAffineFunction{Float64},
+                CP.DifferentFrom{Float64},
+            )
+        end
 
-    @testset "Supported constrained variables" begin
-        m = CP.FlatZinc.Optimizer()
-        for S in [
+        @testset "Supported constrained variable with $(S)" for S in [
             MOI.EqualTo{Float64},
             MOI.LessThan{Float64},
             MOI.GreaterThan{Float64},
@@ -89,6 +88,7 @@
             MOI.ZeroOne,
             MOI.Integer,
         ]
+            m = CP.FlatZinc.Optimizer()
             @test MOI.supports_add_constrained_variables(m, S)
         end
     end
@@ -138,17 +138,8 @@
             @test MOI.is_valid(m, h_eq0b)
             @test MOI.is_valid(m, i)
     
-            # Set names. Don't set them for all variables, to check whether names are 
-            # made unique before generating the model.
-            MOI.set(m, MOI.VariableName(), x, "_x") # Not valid in FlatZinc.
-            for i in 1:5
-                MOI.set(m, MOI.VariableName(), y[i], "y_$(i)")
-            end
-    
-            @test MOI.get(m, MOI.VariableName(), x) == "_x"
-            for i in 1:5
-                @test MOI.get(m, MOI.VariableName(), y[i]) == "y_$(i)"
-            end
+            # Don't set names to check whether they are made unique before 
+            # generating the model.
     
             # Add constraints. The actual model does not make any sense, and is 
             # infeasible. This one is just for the sake of testing the output.
@@ -304,16 +295,56 @@
                 
                 solve satisfy;
                 """
+
+            # Test that the names have been correctly transformed.
+            for v in [x, y..., a, b, c, d, e, f, g, h, i]
+                vn = MOI.get(m, MOI.VariableName(), v)
+                @test match(r"^x\d+$", vn) !== nothing
+            end
+        end
+
+        @testset "Name rewriting" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
     
-            # Test that the names have been correctly transformed. (Redundant with the 
-            # previous test, but will help with debugging.)
-            @test MOI.get(m, MOI.VariableName(), x) == "x_x"
+            # Create variables.
+            x, x_int = MOI.add_constrained_variable(m, MOI.Integer())
+            y, y_bool =
+                MOI.add_constrained_variables(m, [MOI.ZeroOne() for _ in 1:5])
+                
+            # Set names.
+            MOI.set(m, MOI.VariableName(), x, "_x") # Not valid in FlatZinc.
+            for i in 1:5
+                MOI.set(m, MOI.VariableName(), y[i], "y_$(i)")
+            end
+    
+            @test MOI.get(m, MOI.VariableName(), x) == "_x"
             for i in 1:5
                 @test MOI.get(m, MOI.VariableName(), y[i]) == "y_$(i)"
             end
-            for v in [a, b, c, d, e, f, g, h, i]
-                vn = MOI.get(m, MOI.VariableName(), v)
-                @test match(r"^x\d+$", vn) !== nothing
+    
+            # Generate the FZN file.
+            io = IOBuffer(truncate=true)
+            write(io, m)
+            fzn = String(take!(io))
+
+            @test fzn == """var int: x_x;
+                var bool: y_1;
+                var bool: y_2;
+                var bool: y_3;
+                var bool: y_4;
+                var bool: y_5;
+                
+                
+                
+                
+                solve satisfy;
+                """
+    
+            # Test that the names have been correctly transformed.
+            @test MOI.get(m, MOI.VariableName(), x) == "x_x"
+            for i in 1:5
+                @test MOI.get(m, MOI.VariableName(), y[i]) == "y_$(i)"
             end
         end
         
