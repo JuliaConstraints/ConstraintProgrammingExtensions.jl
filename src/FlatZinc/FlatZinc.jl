@@ -527,11 +527,25 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
-    f::MOI.ScalarAffineFunction,
-    s::MOI.EqualTo,
-)
+    f::MOI.ScalarAffineFunction{T},
+    s::Union{MOI.EqualTo{U}, MOI.LessThan{U}},
+) where {T, U}
+    # *_lin_eq, *_lin_le
     variables, _ = _saf_to_coef_vars(f)
     write_constraint(io, model, f, s, Val(_promote_type(model, variables)))
+    return nothing
+end
+
+# *_lin_lt: not needed, only float_lin_lt available in FlatZinc.
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    f::MOI.VectorOfVariables, 
+    s::Union{CP.MaximumAmong, CP.MinimumAmong},
+)
+    # array_*_maximum, array_*_minimum
+    write_constraint(io, model, f, s, Val(_promote_type(model, f.variables)))
     return nothing
 end
 
@@ -561,11 +575,8 @@ function write_constraint(
     model::Optimizer,
     f::MOI.VectorOfVariables,
     ::CP.MaximumAmong,
+    ::Val{:int},
 )
-    for i in 1:MOI.output_dimension(f)
-        @assert CP.is_integer(model, f.variables[i])
-    end
-
     array = f.variables[2:end]
     value = f.variables[1]
     print(
@@ -580,11 +591,8 @@ function write_constraint(
     model::Optimizer,
     f::MOI.VectorOfVariables,
     ::CP.MinimumAmong,
+    ::Val{:int},
 )
-    for i in 1:MOI.output_dimension(f)
-        @assert CP.is_integer(model, f.variables[i])
-    end
-
     array = f.variables[2:end]
     value = f.variables[1]
     print(
@@ -636,6 +644,7 @@ function write_constraint(
     model::Optimizer,
     f::MOI.ScalarAffineFunction,
     s::MOI.LessThan{Int},
+    ::Val{:int}
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.upper - f.constant
@@ -737,7 +746,37 @@ end
 # bool_le, bool_le_reif: meaningless for MOI, no way to represent "x <= y"
 # natively (goes through affine expressions).
 
-# TODO: bool_lin_eq, bool_lin_le, no way to dispatch on the type of the variables.
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    f::MOI.ScalarAffineFunction,
+    s::MOI.EqualTo{Int},
+    ::Val{:bool}
+)
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.value - f.constant
+    print(
+        io,
+        "bool_lin_eq($(coefficients), [$(_fzn_f(model, variables))], $(value))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    f::MOI.ScalarAffineFunction,
+    s::MOI.LessThan{Int},
+    ::Val{:bool}
+)
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.value - f.constant
+    print(
+        io,
+        "bool_lin_le($(coefficients), [$(_fzn_f(model, variables))], $(value))",
+    )
+    return nothing
+end
 
 # bool_lt, bool_lt_reif: meaningless for MOI, no way to represent "x < y"
 # natively (goes through affine expressions).
@@ -769,19 +808,17 @@ function write_constraint(
     return nothing
 end
 
-# TODO: no dispatch possible! Already taken by the integer version.
-# function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MaximumAmong)
-#     array = f.variables[2:end]
-#     value = f.variables[1]
-#     print(io, "array_float_maximum($(_fzn_f(model, value)), $(_fzn_f(model, array)))")
-# end
+function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MaximumAmong, ::Val{:float})
+    array = f.variables[2:end]
+    value = f.variables[1]
+    print(io, "array_float_maximum($(_fzn_f(model, value)), $(_fzn_f(model, array)))")
+end
 
-# TODO: no dispatch possible! Already taken by the integer version.
-# function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MinimumAmong)
-#     array = f.variables[2:end]
-#     value = f.variables[1]
-#     print(io, "array_float_minimum($(_fzn_f(model, value)), $(_fzn_f(model, array)))")
-# end
+function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MinimumAmong, ::Val{:float})
+    array = f.variables[2:end]
+    value = f.variables[1]
+    print(io, "array_float_minimum($(_fzn_f(model, value)), $(_fzn_f(model, array)))")
+end
 
 # TODO: array_var_float_element, i.e. CP.Element with a variable array.
 
@@ -816,6 +853,7 @@ function write_constraint(
     model::Optimizer,
     f::MOI.ScalarAffineFunction,
     s::MOI.EqualTo{Float64},
+    ::Val{:float}
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.value - f.constant
