@@ -42,6 +42,11 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
     # outputting the model, which makes testing easier).
     constraint_info::Vector{ConstraintInfo}
 
+    # For FlatZinc-level sets, map the constraints that are defined on sets
+    # to the assigned name of the set. This structure is built when outputting 
+    # the FZN file.
+    sets_id::Dict{MOI.ConstraintIndex, String}
+
     # Memorise the objective sense and the function separately.
     # The function can only be a single variable, as per FlatZinc limitations.
     objective_sense::MOI.OptimizationSense
@@ -61,6 +66,8 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
         model.objective_sense = MOI.FEASIBILITY_SENSE
         model.objective_function = nothing
 
+        model.sets_id = Dict{MOI.ConstraintIndex, String}()
+
         MOI.empty!(model)
         return model
     end
@@ -77,6 +84,8 @@ function MOI.empty!(model::Optimizer)
 
     model.objective_sense = MOI.FEASIBILITY_SENSE
     model.objective_function = nothing
+
+    model.sets_id = Dict{MOI.ConstraintIndex, String}()
 
     return
 end
@@ -397,6 +406,8 @@ const NAME_REG = r"[^A-Za-z0-9_]"
 Write `model` to `io` in the FlatZinc (fzn) file format.
 """
 function Base.write(io::IO, model::Optimizer)
+    empty!(model.sets_id)
+    
     MOI.FileFormats.create_unique_variable_names(
         model,
         false,
@@ -407,6 +418,7 @@ function Base.write(io::IO, model::Optimizer)
     )
 
     write_variables(io, model)
+    write_sets(io, model)
     write_constraints(io, model)
     write_objective(io, model)
 
@@ -424,11 +436,21 @@ function write_variables(io::IO, model::Optimizer)
     return nothing
 end
 
+function write_sets(io::IO, model::Optimizer)
+    for cons in model.constraint_info
+        if !cons.output_as_part_of_variable
+            write_set(io, model, cons, cons.s)
+        end
+    end
+    println(io)
+    return nothing
+end
+
 function write_constraints(io::IO, model::Optimizer)
     for cons in model.constraint_info
         if !cons.output_as_part_of_variable
             print(io, "constraint ")
-            write_constraint(io, model, cons.f, cons.s)
+            write_constraint(io, model, cons.index, cons.f, cons.s)
             print(io, ";")
             println(io)
         end
@@ -502,6 +524,23 @@ function write_variable(io::IO, name::String, ::MOI.Integer)
     return nothing
 end
 
+# Set printing. 
+
+function write_set(::IO, ::Optimizer, ::ConstraintInfo, ::MOI.AbstractSet)
+    # In general, nothing to do. 
+    return nothing
+end
+
+function write_set(io::IO, model::Optimizer, con::ConstraintInfo, s::CP.Domain{Int})
+    set_name = "SET" * string(length(model.sets_id))
+    model.sets_id[con.index] = set_name
+    set_value = join(collect(s.values), ", ")
+    
+    print(io, "set of int: $(set_name) = {$(set_value)};")
+    println(io)
+    return nothing
+end
+
 # Constraint printing.
 # Based on the built-in predicates: https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html
 # In the same order as the documentation.
@@ -527,12 +566,13 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    index::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction{T},
     s::Union{MOI.EqualTo{U}, MOI.LessThan{U}},
 ) where {T, U}
     # *_lin_eq, *_lin_le
     variables, _ = _saf_to_coef_vars(f)
-    write_constraint(io, model, f, s, Val(_promote_type(model, variables)))
+    write_constraint(io, model, index, f, s, Val(_promote_type(model, variables)))
     return nothing
 end
 
@@ -541,11 +581,12 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    index::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables, 
     s::Union{CP.MaximumAmong, CP.MinimumAmong},
 )
     # array_*_maximum, array_*_minimum
-    write_constraint(io, model, f, s, Val(_promote_type(model, f.variables)))
+    write_constraint(io, model, index, f, s, Val(_promote_type(model, f.variables)))
     return nothing
 end
 
@@ -554,6 +595,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Element{Int},
 )
@@ -573,6 +615,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     ::CP.MaximumAmong,
     ::Val{:int},
@@ -589,6 +632,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     ::CP.MinimumAmong,
     ::Val{:int},
@@ -611,6 +655,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
     s::MOI.LessThan{Int},
 )
@@ -624,6 +669,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::MOI.EqualTo{Int},
     ::Val{:int}
@@ -642,6 +688,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::MOI.LessThan{Int},
     ::Val{:int}
@@ -660,6 +707,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::CP.DifferentFrom{Int},
 )
@@ -677,6 +725,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
     s::CP.Strictly{MOI.LessThan{Int}},
 )
@@ -699,11 +748,11 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    index::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
-    s::CP.Domain{Int},
+    ::CP.Domain{Int},
 )
-    @assert CP.is_integer(model, f)
-    print(io, "set_in($(_fzn_f(model, f)), $(collect(s.values)))")
+    print(io, "set_in($(_fzn_f(model, f)), $(model.sets_id[index]))")
     return nothing
 end
 
@@ -714,6 +763,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Element{Bool},
 )
@@ -749,6 +799,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::MOI.EqualTo{Int},
     ::Val{:bool}
@@ -765,6 +816,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::MOI.LessThan{Int},
     ::Val{:bool}
@@ -795,6 +847,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Element{Float64},
 )
@@ -808,13 +861,13 @@ function write_constraint(
     return nothing
 end
 
-function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MaximumAmong, ::Val{:float})
+function write_constraint(io::IO, model::Optimizer, ::MOI.ConstraintIndex, f::MOI.VectorOfVariables, ::CP.MaximumAmong, ::Val{:float})
     array = f.variables[2:end]
     value = f.variables[1]
     print(io, "array_float_maximum($(_fzn_f(model, value)), [$(_fzn_f(model, array))])")
 end
 
-function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MinimumAmong, ::Val{:float})
+function write_constraint(io::IO, model::Optimizer, ::MOI.ConstraintIndex, f::MOI.VectorOfVariables, ::CP.MinimumAmong, ::Val{:float})
     array = f.variables[2:end]
     value = f.variables[1]
     print(io, "array_float_minimum($(_fzn_f(model, value)), [$(_fzn_f(model, array))])")
@@ -836,6 +889,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
     s::MOI.Interval{Float64},
 )
@@ -851,6 +905,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::MOI.EqualTo{Float64},
     ::Val{:float}
@@ -869,6 +924,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::MOI.LessThan{Float64},
 )
@@ -886,6 +942,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::CP.Strictly{MOI.LessThan{Float64}},
 )
@@ -903,6 +960,7 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::CP.DifferentFrom{Float64},
 )

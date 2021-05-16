@@ -268,6 +268,8 @@
             var int: x13;
             var bool: x14 = false;
             var float: x15;
+
+            set of int: SET0 = {0, 2, 1};
             
             constraint array_int_element(x12, [6, 5, 4], x11);
             constraint array_int_maximum(x11, [x12, x13]);
@@ -277,7 +279,7 @@
             constraint int_lin_le([1, 1], [x12, x13], 2);
             constraint int_lin_ne([1, 1], [x12, x13], 2);
             constraint int_lt(x11, 2);
-            constraint set_in(x11, [0, 2, 1]);
+            constraint set_in(x11, SET0);
             constraint array_bool_element(y_2, [1, 0], y_1);
             constraint array_float_element(x14, [1.0, 2.0], x7);
             constraint float_in(x7, 1.0, 2.0);
@@ -327,6 +329,7 @@
         @test fzn == """var int: x1;
 
 
+
         solve minimize x1;
         """
 
@@ -338,6 +341,7 @@
         fzn = String(take!(io))
 
         @test fzn == """var int: x1;
+
 
 
         solve maximize x1;
