@@ -154,11 +154,6 @@
                 MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], [f, g]), 0),
                 MOI.LessThan(2),
             )
-            c7 = MOI.add_constraint(
-                m,
-                MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], [f, g]), 0),
-                CP.DifferentFrom(2),
-            )
             c8 = MOI.add_constraint(m, e, CP.Strictly(MOI.LessThan(2)))
             c9 = MOI.add_constraint(m, e, CP.Domain(Set([0, 1, 2])))
             c12 = MOI.add_constraint(m, a, MOI.Interval(1.0, 2.0))
@@ -186,25 +181,15 @@
                 ),
                 CP.Strictly(MOI.LessThan(2.0)),
             )
-            c15 = MOI.add_constraint(
-                m,
-                MOI.ScalarAffineFunction(
-                    MOI.ScalarAffineTerm.([1.0, 2.0], [g, h]),
-                    0.0,
-                ),
-                CP.DifferentFrom(2.0),
-            )
     
             @test MOI.is_valid(m, c4)
             @test MOI.is_valid(m, c5)
             @test MOI.is_valid(m, c6)
-            @test MOI.is_valid(m, c7)
             @test MOI.is_valid(m, c8)
             @test MOI.is_valid(m, c9)
             @test MOI.is_valid(m, c12)
             @test MOI.is_valid(m, c13)
             @test MOI.is_valid(m, c14)
-            @test MOI.is_valid(m, c15)
     
             # Test some attributes for these constraints.
             @test MOI.get(m, MOI.ConstraintFunction(), c1) ==
@@ -246,15 +231,12 @@
                 array [1..2] of bool: ARRAY1 = [true, false];
                 array [1..2] of float: ARRAY2 = [1.0, 2.0];
     
-                constraint array_int_element(x12, ARRAY0, x11);
                 constraint int_le(x11, 2);
                 constraint int_lin_eq([1, 1], [x12, x13], 2);
                 constraint int_lin_le([1, 1], [x12, x13], 2);
                 constraint int_lin_ne([1, 1], [x12, x13], 2);
                 constraint int_lt(x11, 2);
                 constraint set_in(x11, SET0);
-                constraint array_bool_element(y_2, ARRAY1, y_1);
-                constraint array_float_element(x14, ARRAY2, x7);
                 constraint float_in(x7, 1.0, 2.0);
                 constraint float_lin_eq([1, 2], [x7, x8], 2.0);
                 constraint float_lin_le([1, 2], [x9, x10], 2.0);
@@ -271,7 +253,7 @@
             end
         end
 
-        @testset "Constraints: MinimumAmong / MaximumAmong" begin
+        @testset "Constraints: CP.MinimumAmong / CP.MaximumAmong" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
     
@@ -336,6 +318,12 @@
                 
                 solve satisfy;
                 """
+
+            # Test that the names have been correctly transformed.
+            for v in x
+                vn = MOI.get(m, MOI.VariableName(), v)
+                @test match(r"^x\d+$", vn) !== nothing
+            end
         end
 
         @testset "Constraints: CP.Element" begin
@@ -412,6 +400,72 @@
                 
                 solve satisfy;
                 """
+
+            # Test that the names have been correctly transformed.
+            for v in [x..., y..., z...]
+                vn = MOI.get(m, MOI.VariableName(), v)
+                @test match(r"^x\d+$", vn) !== nothing
+            end
+        end
+
+        @testset "Constraints: CP.DifferentFrom" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
+    
+            # Create variables.
+            x, x_int = MOI.add_constrained_variables(m, [MOI.Integer() for _ in 1:2])
+            y = MOI.add_variables(m, 2)
+            
+            for i in 1:2
+                @test MOI.is_valid(m, x[i])
+                @test MOI.is_valid(m, x_int[i])
+                @test MOI.is_valid(m, y[i])
+            end
+            
+            # Add constraints.
+            c1 = MOI.add_constraint(
+                m,
+                MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], x), 0),
+                CP.DifferentFrom(2),
+            )
+            c2 = MOI.add_constraint(
+                m,
+                MOI.ScalarAffineFunction(
+                    MOI.ScalarAffineTerm.([1.0, 2.0], y),
+                    0.0,
+                ),
+                CP.DifferentFrom(2.0),
+            )
+
+            @test MOI.is_valid(m, c1)
+            @test MOI.is_valid(m, c2)
+    
+            # Test some attributes for these constraints.
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 3
+    
+            # Generate the FZN file.
+            io = IOBuffer(truncate=true)
+            write(io, m)
+            fzn = String(take!(io))
+
+            @test fzn == """var int: x1;
+                var int: x2;
+                var float: x3;
+                var float: x4;
+                
+                
+                
+                constraint int_lin_ne([1, 1], [x1, x2], 2);
+                constraint float_lin_ne([1, 2], [x3, x4], 2.0);
+                
+                solve satisfy;
+                """
+
+            # Test that the names have been correctly transformed.
+            for v in [x..., y...]
+                vn = MOI.get(m, MOI.VariableName(), v)
+                @test match(r"^x\d+$", vn) !== nothing
+            end
         end
 
         @testset "Name rewriting" begin
