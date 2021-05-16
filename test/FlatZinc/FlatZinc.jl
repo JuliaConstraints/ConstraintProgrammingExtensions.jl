@@ -143,11 +143,6 @@
     
             # Add constraints. The actual model does not make any sense, and is 
             # infeasible. This one is just for the sake of testing the output.
-            c1 = MOI.add_constraint(
-                m,
-                MOI.VectorOfVariables([e, f]),
-                CP.Element([6, 5, 4]),
-            )
             c4 = MOI.add_constraint(m, e, MOI.LessThan(2))
             c5 = MOI.add_constraint(
                 m,
@@ -166,16 +161,6 @@
             )
             c8 = MOI.add_constraint(m, e, CP.Strictly(MOI.LessThan(2)))
             c9 = MOI.add_constraint(m, e, CP.Domain(Set([0, 1, 2])))
-            c10 = MOI.add_constraint(
-                m,
-                MOI.VectorOfVariables([y[1], y[2]]),
-                CP.Element([true, false]),
-            )
-            c11 = MOI.add_constraint(
-                m,
-                MOI.VectorOfVariables([a, h]),
-                CP.Element([1.0, 2.0]),
-            )
             c12 = MOI.add_constraint(m, a, MOI.Interval(1.0, 2.0))
             c13 = MOI.add_constraint(
                 m,
@@ -210,15 +195,12 @@
                 CP.DifferentFrom(2.0),
             )
     
-            @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c4)
             @test MOI.is_valid(m, c5)
             @test MOI.is_valid(m, c6)
             @test MOI.is_valid(m, c7)
             @test MOI.is_valid(m, c8)
             @test MOI.is_valid(m, c9)
-            @test MOI.is_valid(m, c10)
-            @test MOI.is_valid(m, c11)
             @test MOI.is_valid(m, c12)
             @test MOI.is_valid(m, c13)
             @test MOI.is_valid(m, c14)
@@ -351,6 +333,82 @@
                 
                 constraint array_int_maximum(x1, [x2, x3]);
                 constraint array_int_minimum(x1, [x2, x3, x4, x5]);
+                
+                solve satisfy;
+                """
+        end
+
+        @testset "Constraints: CP.Element" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
+    
+            # Create variables.
+            x, x_int = MOI.add_constrained_variables(m, [MOI.Integer() for _ in 1:2])
+            y, y_bool = MOI.add_constrained_variables(m, [MOI.ZeroOne() for _ in 1:2])
+            z = MOI.add_variables(m, 2)
+            
+            for i in 1:2
+                @test MOI.is_valid(m, x[i])
+                @test MOI.is_valid(m, x_int[i])
+                @test MOI.is_valid(m, y[i])
+                @test MOI.is_valid(m, y_bool[i])
+                @test MOI.is_valid(m, z[i])
+            end
+            
+            # Add constraints.
+            c1 = MOI.add_constraint(
+                m,
+                MOI.VectorOfVariables(x),
+                CP.Element([6, 5, 4]),
+            )
+            c2 = MOI.add_constraint(
+                m,
+                MOI.VectorOfVariables(y),
+                CP.Element([true, false]),
+            )
+            c3 = MOI.add_constraint(
+                m,
+                MOI.VectorOfVariables(z),
+                CP.Element([1.0, 2.0]),
+            )
+            
+            @test MOI.is_valid(m, c1)
+            @test MOI.is_valid(m, c2)
+            @test MOI.is_valid(m, c3)
+    
+            # Test some attributes for these constraints.
+            @test MOI.get(m, MOI.ConstraintFunction(), c1) ==
+                  MOI.VectorOfVariables(x)
+            @test MOI.get(m, MOI.ConstraintSet(), c1) == CP.Element([6, 5, 4])
+            @test MOI.get(
+                m,
+                MOI.ListOfConstraintIndices{
+                    MOI.VectorOfVariables,
+                    CP.Element{Int},
+                }(),
+            ) == [c1]
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 5
+    
+            # Generate the FZN file.
+            io = IOBuffer(truncate=true)
+            write(io, m)
+            fzn = String(take!(io))
+
+            @test fzn == """var int: x1;
+                var int: x2;
+                var bool: x3;
+                var bool: x4;
+                var float: x5;
+                var float: x6;
+                
+                
+                array [1..3] of int: ARRAY0 = [6, 5, 4];
+                array [1..2] of bool: ARRAY1 = [true, false];
+                array [1..2] of float: ARRAY2 = [1.0, 2.0];
+                
+                constraint array_int_element(x2, ARRAY0, x1);
+                constraint array_bool_element(x4, ARRAY1, x3);
+                constraint array_float_element(x6, ARRAY2, x5);
                 
                 solve satisfy;
                 """
