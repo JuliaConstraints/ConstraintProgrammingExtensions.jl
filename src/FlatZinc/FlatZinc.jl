@@ -42,10 +42,11 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
     # outputting the model, which makes testing easier).
     constraint_info::Vector{ConstraintInfo}
 
-    # For FlatZinc-level sets, map the constraints that are defined on sets
-    # to the assigned name of the set. This structure is built when outputting 
-    # the FZN file.
+    # For FlatZinc-level sets/arrays, map the constraints that are defined on 
+    # sets/arrays to the assigned name of the set/array. This structure is 
+    # built when outputting the FZN file.
     sets_id::Dict{MOI.ConstraintIndex, String}
+    arrs_id::Dict{MOI.ConstraintIndex, String}
 
     # Memorise the objective sense and the function separately.
     # The function can only be a single variable, as per FlatZinc limitations.
@@ -67,6 +68,7 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
         model.objective_function = nothing
 
         model.sets_id = Dict{MOI.ConstraintIndex, String}()
+        model.arrs_id = Dict{MOI.ConstraintIndex, String}()
 
         MOI.empty!(model)
         return model
@@ -86,6 +88,7 @@ function MOI.empty!(model::Optimizer)
     model.objective_function = nothing
 
     model.sets_id = Dict{MOI.ConstraintIndex, String}()
+    model.arrs_id = Dict{MOI.ConstraintIndex, String}()
 
     return
 end
@@ -407,6 +410,7 @@ Write `model` to `io` in the FlatZinc (fzn) file format.
 """
 function Base.write(io::IO, model::Optimizer)
     empty!(model.sets_id)
+    empty!(model.arrs_id)
     
     MOI.FileFormats.create_unique_variable_names(
         model,
@@ -419,6 +423,7 @@ function Base.write(io::IO, model::Optimizer)
 
     write_variables(io, model)
     write_sets(io, model)
+    write_arrays(io, model)
     write_constraints(io, model)
     write_objective(io, model)
 
@@ -440,6 +445,16 @@ function write_sets(io::IO, model::Optimizer)
     for cons in model.constraint_info
         if !cons.output_as_part_of_variable
             write_set(io, model, cons, cons.s)
+        end
+    end
+    println(io)
+    return nothing
+end
+
+function write_arrays(io::IO, model::Optimizer)
+    for cons in model.constraint_info
+        if !cons.output_as_part_of_variable
+            write_array(io, model, cons, cons.s)
         end
     end
     println(io)
@@ -541,6 +556,48 @@ function write_set(io::IO, model::Optimizer, con::ConstraintInfo, s::CP.Domain{I
     return nothing
 end
 
+# Array printing. 
+
+function write_array(::IO, ::Optimizer, ::ConstraintInfo, ::MOI.AbstractSet)
+    # In general, nothing to do. 
+    return nothing
+end
+
+function write_array(io::IO, model::Optimizer, con::ConstraintInfo, s::CP.Element{Bool})
+    array_name = "ARRAY" * string(length(model.arrs_id))
+    model.arrs_id[con.index] = array_name
+    array_value = join(collect(s.values), ", ")
+    array_length = length(s.values)
+
+    values = join([ifelse(v, "1", "0") for v in s.values], ", ")
+    
+    print(io, "array [1..$(array_length)] of bool: $(array_name) = [$(array_value)];")
+    println(io)
+    return nothing
+end
+
+function write_array(io::IO, model::Optimizer, con::ConstraintInfo, s::CP.Element{Int})
+    array_name = "ARRAY" * string(length(model.arrs_id))
+    model.arrs_id[con.index] = array_name
+    array_value = join(collect(s.values), ", ")
+    array_length = length(s.values)
+    
+    print(io, "array [1..$(array_length)] of int: $(array_name) = [$(array_value)];")
+    println(io)
+    return nothing
+end
+
+function write_array(io::IO, model::Optimizer, con::ConstraintInfo, s::CP.Element{Float64})
+    array_name = "ARRAY" * string(length(model.arrs_id))
+    model.arrs_id[con.index] = array_name
+    array_value = join(collect(s.values), ", ")
+    array_length = length(s.values)
+    
+    print(io, "array [1..$(array_length)] of float: $(array_name) = [$(array_value)];")
+    println(io)
+    return nothing
+end
+
 # Constraint printing.
 # Based on the built-in predicates: https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html
 # In the same order as the documentation.
@@ -595,19 +652,20 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
-    ::MOI.ConstraintIndex,
+    index::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::CP.Element{Int},
+    ::CP.Element{Int},
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_integer(model, f.variables[1])
     @assert CP.is_integer(model, f.variables[2])
 
+    array_name = model.arrs_id[index]
     value = f.variables[1]
     index = f.variables[2]
     print(
         io,
-        "array_int_element($(_fzn_f(model, index)), $(s.values), $(_fzn_f(model, value)))",
+        "array_int_element($(_fzn_f(model, index)), $(array_name), $(_fzn_f(model, value)))",
     )
     return nothing
 end
@@ -763,23 +821,21 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
-    ::MOI.ConstraintIndex,
+    index::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::CP.Element{Bool},
+    ::CP.Element{Bool},
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
     @assert CP.is_binary(model, f.variables[2])
 
+    array_name = model.arrs_id[index]
     value = f.variables[1]
     index = f.variables[2]
 
-    # Standard interpolation of a vector of boolean will show the type, which is not wanted.
-    values = join([ifelse(v, "1", "0") for v in s.values], ", ")
-
     print(
         io,
-        "array_bool_element($(_fzn_f(model, index)), [$(values)], $(_fzn_f(model, value)))",
+        "array_bool_element($(_fzn_f(model, index)), $(array_name), $(_fzn_f(model, value)))",
     )
     return nothing
 end
@@ -847,16 +903,19 @@ end
 function write_constraint(
     io::IO,
     model::Optimizer,
-    ::MOI.ConstraintIndex,
+    index::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::CP.Element{Float64},
+    ::CP.Element{Float64},
 )
     @assert MOI.output_dimension(f) == 2
+
+    array_name = model.arrs_id[index]
     value = f.variables[1]
     index = f.variables[2]
+
     print(
         io,
-        "array_float_element($(_fzn_f(model, index)), $(s.values), $(_fzn_f(model, value)))",
+        "array_float_element($(_fzn_f(model, index)), $(array_name), $(_fzn_f(model, value)))",
     )
     return nothing
 end
