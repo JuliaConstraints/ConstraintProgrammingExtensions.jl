@@ -506,6 +506,35 @@ end
 # Based on the built-in predicates: https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html
 # In the same order as the documentation.
 
+# - Dispatch on variable types, if needed. 
+
+function _promote_type(model::MOI.ModelLike, vars::Vector{MOI.VariableIndex})
+    smallest = :bool
+
+    for var in vars
+        if smallest == :bool && !CP.is_binary(model, var)
+            smallest = :int
+        end
+        if smallest == :int && !CP.is_integer(model, var)
+            smallest = :float
+            break
+        end
+    end
+
+    return smallest
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    f::MOI.ScalarAffineFunction,
+    s::MOI.EqualTo,
+)
+    variables, _ = _saf_to_coef_vars(f)
+    write_constraint(io, model, f, s, Val(_promote_type(model, variables)))
+    return nothing
+end
+
 # - Integer constraints.
 
 function write_constraint(
@@ -589,6 +618,7 @@ function write_constraint(
     model::Optimizer,
     f::MOI.ScalarAffineFunction,
     s::MOI.EqualTo{Int},
+    ::Val{:int}
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.value - f.constant
