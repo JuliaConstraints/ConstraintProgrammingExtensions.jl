@@ -148,16 +148,6 @@
                 MOI.VectorOfVariables([e, f]),
                 CP.Element([6, 5, 4]),
             )
-            c2 = MOI.add_constraint(
-                m,
-                MOI.VectorOfVariables([e, f, g]),
-                CP.MaximumAmong(2),
-            )
-            c3 = MOI.add_constraint(
-                m,
-                MOI.VectorOfVariables([e, f, g]),
-                CP.MinimumAmong(2),
-            )
             c4 = MOI.add_constraint(m, e, MOI.LessThan(2))
             c5 = MOI.add_constraint(
                 m,
@@ -221,8 +211,6 @@
             )
     
             @test MOI.is_valid(m, c1)
-            @test MOI.is_valid(m, c2)
-            @test MOI.is_valid(m, c3)
             @test MOI.is_valid(m, c4)
             @test MOI.is_valid(m, c5)
             @test MOI.is_valid(m, c6)
@@ -247,7 +235,7 @@
                     CP.Element{Int},
                 }(),
             ) == [c1]
-            @test length(MOI.get(m, MOI.ListOfConstraints())) == 22
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 20
     
             # Generate the FZN file.
             io = IOBuffer(truncate=true)
@@ -277,8 +265,6 @@
                 array [1..2] of float: ARRAY2 = [1.0, 2.0];
     
                 constraint array_int_element(x12, ARRAY0, x11);
-                constraint array_int_maximum(x11, [x12, x13]);
-                constraint array_int_minimum(x11, [x12, x13]);
                 constraint int_le(x11, 2);
                 constraint int_lin_eq([1, 1], [x12, x13], 2);
                 constraint int_lin_le([1, 1], [x12, x13], 2);
@@ -301,6 +287,73 @@
                 vn = MOI.get(m, MOI.VariableName(), v)
                 @test match(r"^x\d+$", vn) !== nothing
             end
+        end
+
+        @testset "Constraints: MinimumAmong / MaximumAmong" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
+    
+            # Create variables.
+            x, x_int = MOI.add_constrained_variables(m, [MOI.Integer() for _ in 1:5])
+            
+            for i in 1:5
+                @test MOI.is_valid(m, x[i])
+                @test MOI.is_valid(m, x_int[i])
+            end
+            
+            # Add constraints.
+            c1 = MOI.add_constraint(
+                m,
+                MOI.VectorOfVariables([x[1], x[2], x[3]]),
+                CP.MaximumAmong(2),
+            )
+            c2 = MOI.add_constraint(
+                m,
+                MOI.VectorOfVariables(x),
+                CP.MinimumAmong(4),
+            )
+    
+            @test MOI.is_valid(m, c1)
+            @test MOI.is_valid(m, c2)
+    
+            # Test some attributes for these constraints.
+            @test MOI.get(m, MOI.ConstraintFunction(), c1) ==
+                  MOI.VectorOfVariables([x[1], x[2], x[3]])
+            @test MOI.get(m, MOI.ConstraintSet(), c1) == CP.MaximumAmong(2)
+            @test MOI.get(
+                m,
+                MOI.ListOfConstraintIndices{
+                    MOI.VectorOfVariables,
+                    CP.Element{Int},
+                }(),
+            ) == MOI.ConstraintIndex[]
+            @test MOI.get(
+                m,
+                MOI.ListOfConstraintIndices{
+                    MOI.VectorOfVariables,
+                    CP.MaximumAmong,
+                }(),
+            ) == [c1]
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 3
+    
+            # Generate the FZN file.
+            io = IOBuffer(truncate=true)
+            write(io, m)
+            fzn = String(take!(io))
+
+            @test fzn == """var int: x1;
+                var int: x2;
+                var int: x3;
+                var int: x4;
+                var int: x5;
+                
+                
+                
+                constraint array_int_maximum(x1, [x2, x3]);
+                constraint array_int_minimum(x1, [x2, x3, x4, x5]);
+                
+                solve satisfy;
+                """
         end
 
         @testset "Name rewriting" begin
