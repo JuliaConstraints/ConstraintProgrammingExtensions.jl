@@ -4,6 +4,8 @@ import MathOptInterface
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
 
+include("moi_traits.jl")
+
 include("sets.jl") # Most sets.
 include("sets_combinatorial.jl") # Sets related to typical combinatorial problems.
 include("sets_sorting.jl") # Sets related to sorting values.
