@@ -242,6 +242,18 @@ function write_constraint(
     return nothing
 end
 
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    index::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::Union{MOI.EqualTo{T}, MOI.LessThan{T}},
+) where {T}
+    # *_lin_eq, *_lin_le
+    write_constraint(io, model, index, f, s, Val(_promote_type(model, [f.variable])))
+    return nothing
+end
+
 # *_lin_lt: not needed, only float_lin_lt available in FlatZinc.
 
 function write_constraint(
@@ -332,6 +344,22 @@ function write_constraint(
 end
 
 # TODO: int_le_reif
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::MOI.EqualTo{Int},
+    ::Val{:int}
+)
+    # Hypothesis: !cons.output_as_part_of_variable.
+    print(
+        io,
+        "int_lin_eq([1], [$(_fzn_f(model, f))], $(s.value))",
+    )
+    return nothing
+end
 
 function write_constraint(
     io::IO,
@@ -465,6 +493,22 @@ function write_constraint(
     io::IO,
     model::Optimizer,
     ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::MOI.EqualTo{Int},
+    ::Val{:bool}
+)
+    # Hypothesis: !cons.output_as_part_of_variable.
+    print(
+        io,
+        "bool_lin_eq([1], [$(_fzn_f(model, f))], $(s.value))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::MOI.EqualTo{Int},
     ::Val{:bool}
@@ -474,6 +518,72 @@ function write_constraint(
     print(
         io,
         "bool_lin_eq($(coefficients), [$(_fzn_f(model, variables))], $(value))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::MOI.EqualTo{Int},
+    ::Val{:bool}
+)
+    # Hypothesis: !cons.output_as_part_of_variable.
+    print(
+        io,
+        "int_lin_eq([1], [$(_fzn_f(model, f))], $(s.value))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::MOI.EqualTo{Bool},
+    ::Val{:bool}
+)
+    # Hypothesis: !cons.output_as_part_of_variable.
+    print(
+        io,
+        "int_lin_eq([1], [$(_fzn_f(model, f))], $(s.value))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.ScalarAffineFunction,
+    s::MOI.EqualTo{Int},
+    ::Val{:bool}
+)
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.value - f.constant
+    print(
+        io,
+        "int_lin_eq($(coefficients), [$(_fzn_f(model, variables))], $(value))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.ScalarAffineFunction,
+    s::MOI.EqualTo{Bool},
+    ::Val{:bool}
+)
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.value - f.constant
+    print(
+        io,
+        "int_lin_eq($(coefficients), [$(_fzn_f(model, variables))], $(value))",
     )
     return nothing
 end
@@ -583,6 +693,22 @@ function write_constraint(
     print(
         io,
         "float_lin_eq($(coefficients), [$(_fzn_f(model, variables))], $(value))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::MOI.EqualTo{Float64},
+    ::Val{:float}
+)
+    # Hypothesis: !cons.output_as_part_of_variable.
+    print(
+        io,
+        "float_lin_eq([1], [$(_fzn_f(model, f))], $(s.value))",
     )
     return nothing
 end

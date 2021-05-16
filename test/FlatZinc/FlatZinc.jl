@@ -548,16 +548,21 @@
             end
         end
         
-        @testset "Constraints: MOI.SingleVariable in MOI.LessThan / CP.Strictly{MOI.LessThan}" begin
+        @testset "Constraints: MOI.SingleVariable in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan}" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
     
             # Create variable.
             x, x_int = MOI.add_constrained_variable(m, MOI.Integer())
+            y, y_bool = MOI.add_constrained_variable(m, MOI.ZeroOne())
+            z = MOI.add_variable(m)
     
             @test !MOI.is_empty(m)
             @test MOI.is_valid(m, x)
             @test MOI.is_valid(m, x_int)
+            @test MOI.is_valid(m, y)
+            @test MOI.is_valid(m, y_bool)
+            @test MOI.is_valid(m, z)
     
             # Don't set names to check whether they are made unique before 
             # generating the model.
@@ -565,23 +570,44 @@
             # Add constraints. 
             c1 = MOI.add_constraint(m, x, MOI.LessThan(2))
             c2 = MOI.add_constraint(m, x, CP.Strictly(MOI.LessThan(2)))
+            c3 = MOI.add_constraint(m, x, MOI.EqualTo(4))
+            c4 = MOI.add_constraint(m, y, MOI.EqualTo(false))
+            c5 = MOI.add_constraint(m, z, MOI.EqualTo(5.0))
     
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
+            @test MOI.is_valid(m, c3)
+            @test MOI.is_valid(m, c4)
+            @test MOI.is_valid(m, c5)
     
             # Test some attributes for these constraints.
-            @test length(MOI.get(m, MOI.ListOfConstraints())) == 3
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 7
     
             # Generate the FZN file.
             io = IOBuffer(truncate=true)
             write(io, m)
             fzn = String(take!(io))
     
-            @test fzn == "var int: x1;\n\n\n\nconstraint int_le(x1, 2);\nconstraint int_lt(x1, 2);\n\nsolve satisfy;\n"
+            @test fzn == """var int: x1;
+                var bool: x2;
+                var float: x3;
+                
+                
+                
+                constraint int_le(x1, 2);
+                constraint int_lt(x1, 2);
+                constraint int_lin_eq([1], [x1], 4);
+                constraint int_lin_eq([1], [x2], false);
+                constraint float_lin_eq([1], [x3], 5.0);
+                
+                solve satisfy;
+                """
 
-            # Test that the name has been correctly transformed.
-            xn = MOI.get(m, MOI.VariableName(), x)
-            @test match(r"^x\d+$", xn) !== nothing
+            # Test that the names have been correctly transformed.
+            for v in [x, y, z]
+                vn = MOI.get(m, MOI.VariableName(), v)
+                @test match(r"^x\d+$", vn) !== nothing
+            end
         end
         
         @testset "Name rewriting" begin
