@@ -13,9 +13,11 @@ const NAME_REG = r"[^A-Za-z0-9_]"
 Write `model` to `io` in the FlatZinc (fzn) file format.
 """
 function Base.write(io::IO, model::Optimizer)
+    # Reset the data structures holding set and array names.
     empty!(model.sets_id)
     empty!(model.arrs_id)
     
+    # Ensure variable names are unique.
     MOI.FileFormats.create_unique_variable_names(
         model,
         false,
@@ -25,6 +27,7 @@ function Base.write(io::IO, model::Optimizer)
         ],
     )
 
+    # Actually write the contents.
     write_variables(io, model)
     write_sets(io, model)
     write_arrays(io, model)
