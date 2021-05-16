@@ -581,7 +581,7 @@ function write_constraint(
     value = f.variables[1]
     print(
         io,
-        "array_int_maximum($(_fzn_f(model, value)), $(_fzn_f(model, array)))",
+        "array_int_maximum($(_fzn_f(model, value)), [$(_fzn_f(model, array))])",
     )
     return nothing
 end
@@ -597,7 +597,7 @@ function write_constraint(
     value = f.variables[1]
     print(
         io,
-        "array_int_minimum($(_fzn_f(model, value)), $(_fzn_f(model, array)))",
+        "array_int_minimum($(_fzn_f(model, value)), [$(_fzn_f(model, array))])",
     )
     return nothing
 end
@@ -811,13 +811,13 @@ end
 function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MaximumAmong, ::Val{:float})
     array = f.variables[2:end]
     value = f.variables[1]
-    print(io, "array_float_maximum($(_fzn_f(model, value)), $(_fzn_f(model, array)))")
+    print(io, "array_float_maximum($(_fzn_f(model, value)), [$(_fzn_f(model, array))])")
 end
 
 function write_constraint(io::IO, model::Optimizer, f::MOI.VectorOfVariables, ::CP.MinimumAmong, ::Val{:float})
     array = f.variables[2:end]
     value = f.variables[1]
-    print(io, "array_float_minimum($(_fzn_f(model, value)), $(_fzn_f(model, array)))")
+    print(io, "array_float_minimum($(_fzn_f(model, value)), [$(_fzn_f(model, array))])")
 end
 
 # TODO: array_var_float_element, i.e. CP.Element with a variable array.

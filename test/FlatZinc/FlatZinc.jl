@@ -270,8 +270,8 @@
             var float: x15;
             
             constraint array_int_element(x12, [6, 5, 4], x11);
-            constraint array_int_maximum(x11, x12, x13);
-            constraint array_int_minimum(x11, x12, x13);
+            constraint array_int_maximum(x11, [x12, x13]);
+            constraint array_int_minimum(x11, [x12, x13]);
             constraint int_le(x11, 2);
             constraint int_lin_eq([1, 1], [x12, x13], 2);
             constraint int_lin_le([1, 1], [x12, x13], 2);
