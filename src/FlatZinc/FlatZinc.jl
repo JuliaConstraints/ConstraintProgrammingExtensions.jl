@@ -193,6 +193,8 @@ function MOI.add_constrained_variable(
     model::Optimizer,
     set::MOI.AbstractScalarSet,
 )
+    # Unlike FZN, MOI does not assume that a variable >= 0.0 is any different 
+    # from a >= 0 (int).
     vidx = _create_variable(model, set)
     cidx = _create_constraint(model, MOI.SingleVariable(vidx), set, true)
     return vidx, cidx
@@ -213,6 +215,7 @@ function MOI.is_valid(
     c::MOI.ConstraintIndex{F, S},
 ) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
     info = get(model.constraint_info, c.value, nothing)
+    @show info
     return info !== nothing && typeof(info.s) == S
 end
 
