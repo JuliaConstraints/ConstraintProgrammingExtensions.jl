@@ -94,14 +94,8 @@
     end
 
     @testset "Writing" begin
-        @testset "Large feasibility model with name rewriting" begin
-            m = CP.FlatZinc.Optimizer()
-            @test MOI.is_empty(m)
-    
-            # Create variables.
-            x, x_int = MOI.add_constrained_variable(m, MOI.Integer())
-            y, y_bool =
-                MOI.add_constrained_variables(m, [MOI.ZeroOne() for _ in 1:5])
+        @testset "Variables" begin
+            ;
     
             a, a_gt0f = MOI.add_constrained_variable(m, MOI.GreaterThan(0.0))
             b, b_lt0f = MOI.add_constrained_variable(m, MOI.LessThan(0.0))
@@ -112,14 +106,7 @@
             g, g_int = MOI.add_constrained_variable(m, MOI.Integer())
             h, h_eq0b = MOI.add_constrained_variable(m, MOI.EqualTo(false))
             i = MOI.add_variable(m)
-    
-            @test !MOI.is_empty(m)
-            @test MOI.is_valid(m, x)
-            @test MOI.is_valid(m, x_int)
-            for i in 1:5
-                @test MOI.is_valid(m, y[i])
-                @test MOI.is_valid(m, y_bool[i])
-            end
+
             @test MOI.is_valid(m, a)
             @test MOI.is_valid(m, a_gt0f)
             @test MOI.is_valid(m, b)
@@ -137,115 +124,6 @@
             @test MOI.is_valid(m, h)
             @test MOI.is_valid(m, h_eq0b)
             @test MOI.is_valid(m, i)
-    
-            # Don't set names to check whether they are made unique before 
-            # generating the model.
-    
-            # Add constraints. The actual model does not make any sense, and is 
-            # infeasible. This one is just for the sake of testing the output.
-            c4 = MOI.add_constraint(m, e, MOI.LessThan(2))
-            c5 = MOI.add_constraint(
-                m,
-                MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], [f, g]), 0),
-                MOI.EqualTo(2),
-            )
-            c6 = MOI.add_constraint(
-                m,
-                MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], [f, g]), 0),
-                MOI.LessThan(2),
-            )
-            c8 = MOI.add_constraint(m, e, CP.Strictly(MOI.LessThan(2)))
-            c13 = MOI.add_constraint(
-                m,
-                MOI.ScalarAffineFunction(
-                    MOI.ScalarAffineTerm.([1.0, 2.0], [a, b]),
-                    0.0,
-                ),
-                MOI.EqualTo(2.0),
-            )
-            c14 = MOI.add_constraint(
-                m,
-                MOI.ScalarAffineFunction(
-                    MOI.ScalarAffineTerm.([1.0, 2.0], [c, d]),
-                    0.0,
-                ),
-                MOI.LessThan(2.0),
-            )
-            c15 = MOI.add_constraint(
-                m,
-                MOI.ScalarAffineFunction(
-                    MOI.ScalarAffineTerm.([1.0, 2.0], [e, f]),
-                    0.0,
-                ),
-                CP.Strictly(MOI.LessThan(2.0)),
-            )
-    
-            @test MOI.is_valid(m, c4)
-            @test MOI.is_valid(m, c5)
-            @test MOI.is_valid(m, c6)
-            @test MOI.is_valid(m, c8)
-            @test MOI.is_valid(m, c13)
-            @test MOI.is_valid(m, c14)
-    
-            # Test some attributes for these constraints.
-            @test MOI.get(m, MOI.ConstraintFunction(), c1) ==
-                  MOI.VectorOfVariables([e, f])
-            @test MOI.get(m, MOI.ConstraintSet(), c1) == CP.Element([6, 5, 4])
-            @test MOI.get(
-                m,
-                MOI.ListOfConstraintIndices{
-                    MOI.VectorOfVariables,
-                    CP.Element{Int},
-                }(),
-            ) == [c1]
-            @test length(MOI.get(m, MOI.ListOfConstraints())) == 20
-    
-            # Generate the FZN file.
-            io = IOBuffer(truncate=true)
-            write(io, m)
-            fzn = String(take!(io))
-    
-            @test fzn == """var int: x_x;
-                var bool: y_1;
-                var bool: y_2;
-                var bool: y_3;
-                var bool: y_4;
-                var bool: y_5;
-                var 0.0..1.7976931348623157e308: x7;
-                var -1.7976931348623157e308..0.0: x8;
-                var float: x9 = 0.0;
-                var 0.0..1.0: x10;
-                var int: x11;
-                var int: x12;
-                var int: x13;
-                var bool: x14 = false;
-                var float: x15;
-    
-                set of int: SET0 = {0, 2, 1};
-    
-                array [1..3] of int: ARRAY0 = [6, 5, 4];
-                array [1..2] of bool: ARRAY1 = [true, false];
-                array [1..2] of float: ARRAY2 = [1.0, 2.0];
-    
-                constraint int_le(x11, 2);
-                constraint int_lin_eq([1, 1], [x12, x13], 2);
-                constraint int_lin_le([1, 1], [x12, x13], 2);
-                constraint int_lin_ne([1, 1], [x12, x13], 2);
-                constraint int_lt(x11, 2);
-                constraint float_in(x7, 1.0, 2.0);
-                constraint float_lin_eq([1, 2], [x7, x8], 2.0);
-                constraint float_lin_le([1, 2], [x9, x10], 2.0);
-                constraint float_lin_lt([1, 2], [x11, x12], 2.0);
-                constraint float_lin_ne([1, 2], [x13, x14], 2.0);
-                
-                solve satisfy;
-                """
-
-            # Test that the names have been correctly transformed.
-            for v in [x, y..., a, b, c, d, e, f, g, h, i]
-                vn = MOI.get(m, MOI.VariableName(), v)
-                @test match(r"^x\d+$", vn) !== nothing
-            end
         end
 
         @testset "Constraints: CP.MinimumAmong / CP.MaximumAmong" begin
@@ -642,6 +520,42 @@
                 vn = MOI.get(m, MOI.VariableName(), v)
                 @test match(r"^x\d+$", vn) !== nothing
             end
+        end
+        
+        @testset "Constraints: MOI.SingleVariable in MOI.LessThan / CP.Strictly{MOI.LessThan}" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
+    
+            # Create variable.
+            x, x_int = MOI.add_constrained_variable(m, MOI.Integer())
+    
+            @test !MOI.is_empty(m)
+            @test MOI.is_valid(m, x)
+            @test MOI.is_valid(m, x_int)
+    
+            # Don't set names to check whether they are made unique before 
+            # generating the model.
+    
+            # Add constraints. 
+            c1 = MOI.add_constraint(m, x, MOI.LessThan(2))
+            c2 = MOI.add_constraint(m, x, CP.Strictly(MOI.LessThan(2)))
+    
+            @test MOI.is_valid(m, c1)
+            @test MOI.is_valid(m, c2)
+    
+            # Test some attributes for these constraints.
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 3
+    
+            # Generate the FZN file.
+            io = IOBuffer(truncate=true)
+            write(io, m)
+            fzn = String(take!(io))
+    
+            @test fzn == "var int: x1;\n\n\n\nconstraint int_le(x1, 2);\nconstraint int_lt(x1, 2);\n\nsolve satisfy;\n"
+
+            # Test that the name has been correctly transformed.
+            xn = MOI.get(m, MOI.VariableName(), x)
+            @test match(r"^x\d+$", xn) !== nothing
         end
         
         @testset "Name rewriting" begin
