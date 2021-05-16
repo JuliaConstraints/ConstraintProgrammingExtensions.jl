@@ -155,7 +155,6 @@
                 MOI.LessThan(2),
             )
             c8 = MOI.add_constraint(m, e, CP.Strictly(MOI.LessThan(2)))
-            c9 = MOI.add_constraint(m, e, CP.Domain(Set([0, 1, 2])))
             c12 = MOI.add_constraint(m, a, MOI.Interval(1.0, 2.0))
             c13 = MOI.add_constraint(
                 m,
@@ -186,7 +185,6 @@
             @test MOI.is_valid(m, c5)
             @test MOI.is_valid(m, c6)
             @test MOI.is_valid(m, c8)
-            @test MOI.is_valid(m, c9)
             @test MOI.is_valid(m, c12)
             @test MOI.is_valid(m, c13)
             @test MOI.is_valid(m, c14)
@@ -454,7 +452,7 @@
                 var float: x4;
                 
                 
-                
+
                 constraint int_lin_ne([1, 1], [x1, x2], 2);
                 constraint float_lin_ne([1, 2], [x3, x4], 2.0);
                 
@@ -468,6 +466,38 @@
             end
         end
 
+        @testset "Constraints: CP.Domain" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
+    
+            # Create variable.
+            x, x_int = MOI.add_constrained_variable(m, MOI.Integer())
+            @test MOI.is_valid(m, x)
+            @test MOI.is_valid(m, x_int)
+            
+            # Create constraint.
+            c = MOI.add_constraint(m, x, CP.Domain(Set([0, 1, 2])))
+            @test MOI.is_valid(m, c)
+            
+            # Test some attributes for this constraint.
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 2
+    
+            # Generate the FZN file.
+            io = IOBuffer(truncate=true)
+            write(io, m)
+            fzn = String(take!(io))
+
+            @test fzn == """var int: x1;
+                
+                set of int: SET0 = {0, 2, 1};
+                
+                
+                constraint set_in(x1, SET0);
+                
+                solve satisfy;
+                """
+        end
+
         @testset "Name rewriting" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
@@ -477,8 +507,9 @@
             y, y_bool =
                 MOI.add_constrained_variables(m, [MOI.ZeroOne() for _ in 1:5])
                 
-            # Set names.
-            MOI.set(m, MOI.VariableName(), x, "_x") # Not valid in FlatZinc.
+            # Set names. The name for x in invalid for FlatZinc, but not 
+            # the ones for y.
+            MOI.set(m, MOI.VariableName(), x, "_x")
             for i in 1:5
                 MOI.set(m, MOI.VariableName(), y[i], "y_$(i)")
             end
