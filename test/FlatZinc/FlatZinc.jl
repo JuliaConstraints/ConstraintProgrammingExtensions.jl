@@ -463,13 +463,16 @@
     
             # Create variables.
             x, x_int = MOI.add_constrained_variables(m, [MOI.Integer() for _ in 1:2])
-            y = MOI.add_variables(m, 2)
+            y, y_bool = MOI.add_constrained_variables(m, [MOI.ZeroOne() for _ in 1:2])
+            z = MOI.add_variables(m, 2)
     
             @test !MOI.is_empty(m)
             for i in 1:2
                 @test MOI.is_valid(m, x[i])
                 @test MOI.is_valid(m, x_int[i])
                 @test MOI.is_valid(m, y[i])
+                @test MOI.is_valid(m, y_bool[i])
+                @test MOI.is_valid(m, z[i])
             end
     
             # Don't set names to check whether they are made unique before 
@@ -488,24 +491,34 @@
             )
             c3 = MOI.add_constraint(
                 m,
-                MOI.ScalarAffineFunction(
-                    MOI.ScalarAffineTerm.([1.0, 2.0], y),
-                    0.0,
-                ),
-                MOI.EqualTo(2.0),
+                MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], y), 0),
+                MOI.EqualTo(true),
             )
             c4 = MOI.add_constraint(
                 m,
-                MOI.ScalarAffineFunction(
-                    MOI.ScalarAffineTerm.([1.0, 2.0], y),
-                    0.0,
-                ),
-                MOI.LessThan(2.0),
+                MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], y), 0),
+                MOI.EqualTo(0),
             )
             c5 = MOI.add_constraint(
                 m,
                 MOI.ScalarAffineFunction(
-                    MOI.ScalarAffineTerm.([1.0, 2.0], y),
+                    MOI.ScalarAffineTerm.([1.0, 2.0], z),
+                    0.0,
+                ),
+                MOI.EqualTo(2.0),
+            )
+            c6 = MOI.add_constraint(
+                m,
+                MOI.ScalarAffineFunction(
+                    MOI.ScalarAffineTerm.([1.0, 2.0], z),
+                    0.0,
+                ),
+                MOI.LessThan(2.0),
+            )
+            c7 = MOI.add_constraint(
+                m,
+                MOI.ScalarAffineFunction(
+                    MOI.ScalarAffineTerm.([1.0, 2.0], z),
                     0.0,
                 ),
                 CP.Strictly(MOI.LessThan(2.0)),
@@ -516,9 +529,11 @@
             @test MOI.is_valid(m, c3)
             @test MOI.is_valid(m, c4)
             @test MOI.is_valid(m, c5)
+            @test MOI.is_valid(m, c6)
+            @test MOI.is_valid(m, c7)
     
             # Test some attributes for these constraints.
-            @test length(MOI.get(m, MOI.ListOfConstraints())) == 6
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 8
     
             # Generate the FZN file.
             io = IOBuffer(truncate=true)
@@ -527,22 +542,26 @@
     
             @test fzn == """var int: x1;
                 var int: x2;
-                var float: x3;
-                var float: x4;
+                var bool: x3;
+                var bool: x4;
+                var float: x5;
+                var float: x6;
                 
                 
                 
                 constraint int_lin_eq([1, 1], [x1, x2], 2);
                 constraint int_lin_le([1, 1], [x1, x2], 2);
-                constraint float_lin_eq([1, 2], [x3, x4], 2.0);
-                constraint float_lin_le([1, 2], [x3, x4], 2.0);
-                constraint float_lin_lt([1, 2], [x3, x4], 2.0);
+                constraint int_lin_eq([1, 1], [x3, x4], 1);
+                constraint int_lin_eq([1, 1], [x3, x4], 0);
+                constraint float_lin_eq([1, 2], [x5, x6], 2.0);
+                constraint float_lin_le([1, 2], [x5, x6], 2.0);
+                constraint float_lin_lt([1, 2], [x5, x6], 2.0);
                 
                 solve satisfy;
                 """
 
             # Test that the names have been correctly transformed.
-            for v in [x..., y...]
+            for v in [x..., y..., z...]
                 vn = MOI.get(m, MOI.VariableName(), v)
                 @test match(r"^x\d+$", vn) !== nothing
             end
@@ -572,13 +591,15 @@
             c2 = MOI.add_constraint(m, x, CP.Strictly(MOI.LessThan(2)))
             c3 = MOI.add_constraint(m, x, MOI.EqualTo(4))
             c4 = MOI.add_constraint(m, y, MOI.EqualTo(false))
-            c5 = MOI.add_constraint(m, z, MOI.EqualTo(5.0))
+            c5 = MOI.add_constraint(m, y, MOI.EqualTo(1))
+            c6 = MOI.add_constraint(m, z, MOI.EqualTo(5.0))
     
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
             @test MOI.is_valid(m, c3)
             @test MOI.is_valid(m, c4)
             @test MOI.is_valid(m, c5)
+            @test MOI.is_valid(m, c6)
     
             # Test some attributes for these constraints.
             @test length(MOI.get(m, MOI.ListOfConstraints())) == 7
@@ -598,6 +619,7 @@
                 constraint int_lt(x1, 2);
                 constraint int_lin_eq([1], [x1], 4);
                 constraint int_lin_eq([1], [x2], false);
+                constraint int_lin_eq([1], [x2], 1);
                 constraint float_lin_eq([1], [x3], 5.0);
                 
                 solve satisfy;
