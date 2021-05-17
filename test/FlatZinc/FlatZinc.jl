@@ -652,6 +652,53 @@
                 @test match(r"^x\d+$", vn) !== nothing
             end
         end
+
+        @testset "Constraints: CP.Reified{MOI.SingleVariable in MOI.EqualTo}" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
+    
+            # Create variable.
+            x, x_bool = MOI.add_constrained_variable(m, MOI.ZeroOne())
+            y, y_int = MOI.add_constrained_variable(m, MOI.Integer())
+    
+            @test !MOI.is_empty(m)
+            @test MOI.is_valid(m, x)
+            @test MOI.is_valid(m, x_bool)
+            @test MOI.is_valid(m, y)
+            @test MOI.is_valid(m, y_int)
+    
+            # Don't set names to check whether they are made unique before 
+            # generating the model.
+    
+            # Add constraints. 
+            c1 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.LessThan(2)))
+    
+            @test MOI.is_valid(m, c1)
+    
+            # Test some attributes for these constraints.
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 3
+    
+            # Generate the FZN file.
+            io = IOBuffer(truncate=true)
+            write(io, m)
+            fzn = String(take!(io))
+    
+            @test fzn == """var bool: x1;
+                var int: x2;
+                
+                
+                
+                constraint int_le_reif(x1, 2, x1);
+                
+                solve satisfy;
+                """
+
+            # Test that the names have been correctly transformed.
+            for v in [x, y]
+                vn = MOI.get(m, MOI.VariableName(), v)
+                @test match(r"^x\d+$", vn) !== nothing
+            end
+        end
         
         @testset "Name rewriting" begin
             m = CP.FlatZinc.Optimizer()

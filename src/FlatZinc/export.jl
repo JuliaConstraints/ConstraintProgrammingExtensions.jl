@@ -343,7 +343,20 @@ function write_constraint(
     return nothing
 end
 
-# TODO: int_le_reif
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorOfVariables,
+    s::CP.Reified{MOI.LessThan{Int}},
+)
+    @assert MOI.output_dimension(f) == 2
+    @assert CP.is_binary(model, f.variables[1])
+    @assert CP.is_integer(model, f.variables[2])
+    
+    print(io, "int_le_reif($(_fzn_f(model, f.variables[1])), $(s.set.upper), $(_fzn_f(model, f.variables[1])))")
+    return nothing
+end
 
 function write_constraint(
     io::IO,
