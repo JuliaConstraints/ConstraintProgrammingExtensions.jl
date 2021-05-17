@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.2.3
+-------------
+
+Various fixes for the FlatZinc output, which is now tested more thoroughly.
+Reified constraints are also supported.
+
+
 Version 0.2.2
 -------------
 
