@@ -551,8 +551,8 @@
                 
                 constraint int_lin_eq([1, 1], [x1, x2], 2);
                 constraint int_lin_le([1, 1], [x1, x2], 2);
-                constraint int_lin_eq([1, 1], [x3, x4], 1);
-                constraint int_lin_eq([1, 1], [x3, x4], 0);
+                constraint bool_lin_eq([1, 1], [x3, x4], 1);
+                constraint bool_lin_eq([1, 1], [x3, x4], 0);
                 constraint float_lin_eq([1, 2], [x5, x6], 2.0);
                 constraint float_lin_le([1, 2], [x5, x6], 2.0);
                 constraint float_lin_lt([1, 2], [x5, x6], 2.0);
@@ -618,8 +618,8 @@
                 constraint int_le(x1, 2);
                 constraint int_lt(x1, 2);
                 constraint int_lin_eq([1], [x1], 4);
-                constraint int_lin_eq([1], [x2], false);
-                constraint int_lin_eq([1], [x2], 1);
+                constraint bool_lin_eq([1], [x2], false);
+                constraint bool_lin_eq([1], [x2], 1);
                 constraint float_lin_eq([1], [x3], 5.0);
                 
                 solve satisfy;

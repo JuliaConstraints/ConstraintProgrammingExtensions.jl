@@ -494,9 +494,9 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
-    s::MOI.EqualTo{Int},
+    s::MOI.EqualTo{T},
     ::Val{:bool}
-)
+) where {T <: Union{Int, Bool}}
     # Hypothesis: !cons.output_as_part_of_variable.
     print(
         io,
@@ -510,47 +510,14 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
-    s::MOI.EqualTo{Int},
+    s::MOI.EqualTo{T},
     ::Val{:bool}
-)
+) where {T <: Union{Int, Bool}}
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.value - f.constant
     print(
         io,
         "bool_lin_eq($(coefficients), [$(_fzn_f(model, variables))], $(value))",
-    )
-    return nothing
-end
-
-function write_constraint(
-    io::IO,
-    model::Optimizer,
-    ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
-    s::MOI.EqualTo{Bool},
-    ::Val{:bool}
-)
-    # Hypothesis: !cons.output_as_part_of_variable.
-    print(
-        io,
-        "int_lin_eq([1], [$(_fzn_f(model, f))], $(s.value))",
-    )
-    return nothing
-end
-
-function write_constraint(
-    io::IO,
-    model::Optimizer,
-    ::MOI.ConstraintIndex,
-    f::MOI.ScalarAffineFunction,
-    s::MOI.EqualTo{Bool},
-    ::Val{:bool}
-)
-    variables, coefficients = _saf_to_coef_vars(f)
-    value = s.value - f.constant
-    print(
-        io,
-        "int_lin_eq($(coefficients), [$(_fzn_f(model, variables))], $(value))",
     )
     return nothing
 end
