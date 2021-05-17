@@ -233,6 +233,18 @@ function write_constraint(
     io::IO,
     model::Optimizer,
     index::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::Union{MOI.EqualTo{T}, MOI.LessThan{T}},
+) where {T}
+    # *_lin_eq, *_lin_le
+    write_constraint(io, model, index, f, s, Val(_promote_type(model, [f.variable])))
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    index::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction{T},
     s::Union{MOI.EqualTo{U}, MOI.LessThan{U}},
 ) where {T, U}
@@ -246,11 +258,24 @@ function write_constraint(
     io::IO,
     model::Optimizer,
     index::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
-    s::Union{MOI.EqualTo{T}, MOI.LessThan{T}},
+    f::MOI.VectorOfVariables,
+    s::Union{CP.Reified{MOI.EqualTo{T}}, CP.Reified{MOI.LessThan{T}}},
 ) where {T}
-    # *_lin_eq, *_lin_le
-    write_constraint(io, model, index, f, s, Val(_promote_type(model, [f.variable])))
+    # *_lin_eq_le_reif, *_lin_le_reif
+    write_constraint(io, model, index, f, s, Val(_promote_type(model, f.variables)))
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    index::MOI.ConstraintIndex,
+    f::MOI.VectorAffineFunction{T},
+    s::Union{CP.Reified{MOI.EqualTo{U}}, CP.Reified{MOI.LessThan{U}}},
+) where {T, U}
+    # *_lin_eq_reif, *_lin_le_reif
+    variables, _ = _saf_to_coef_vars(f)
+    write_constraint(io, model, index, f, s, Val(_promote_type(model, variables)))
     return nothing
 end
 
@@ -391,7 +416,44 @@ function write_constraint(
     return nothing
 end
 
-# TODO: int_lin_eq_reif
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorOfVariables,
+    s::CP.Reified{MOI.EqualTo{Int}},
+    ::Val{:int}
+)
+    @assert MOI.output_dimension(f) == 2
+    print(
+        io,
+        "int_lin_eq_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.value), $(_fzn_f(model, f.variables[1])))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorAffineFunction,
+    s::CP.Reified{MOI.EqualTo{Int}},
+    ::Val{:int}
+)
+    @assert MOI.output_dimension(f) == 2
+
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.value - f.constant
+
+    @assert coefficients[1] == 1
+    @assert is_binary(variables[1])
+
+    print(
+        io,
+        "int_lin_eq_reif($(coefficients[2:end]), [$(_fzn_f(model, variables[2:end]))], $(value), $(_fzn_f(model, variables[1])))",
+    )
+    return nothing
+end
 
 function write_constraint(
     io::IO,
@@ -410,7 +472,24 @@ function write_constraint(
     return nothing
 end
 
-# TODO: int_lin_le_reif
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorAffineFunction,
+    s::MOI.LessThan{Int},
+    ::Val{:int}
+)
+    @assert MOI.output_dimension(f) == 2
+
+    variables, coefficients = _saf_to_coef_vars(f)
+    value = s.upper - f.constant
+    print(
+        io,
+        "int_lin_le_reif($(coefficients[2:end]), [$(_fzn_f(model, variables[2:end]))], $(value), $(_fzn_f(model, variables[1])))",
+    )
+    return nothing
+end
 
 function write_constraint(
     io::IO,
@@ -442,7 +521,21 @@ function write_constraint(
     return nothing
 end
 
-# TODO: int_lt_reif
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorOfVariables,
+    s::CP.Reified{CP.Strictly{MOI.LessThan{Int}, Int}},
+)
+    @assert MOI.output_dimension(f) == 2
+    @assert CP.is_binary(model, f.variables[1])
+    @assert CP.is_integer(model, f.variables[2])
+
+    print(io, "int_lt_reif($(_fzn_f(model, f.variables[2])), $(s.set.set.upper), $(_fzn_f(model, f.variables[1])))")
+    return nothing
+end
+
 # TODO: int_max (CP equivalent!?)
 # TODO: int_min (CP equivalent!?)
 # TODO: int_mod, modulo
