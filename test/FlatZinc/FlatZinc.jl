@@ -158,11 +158,13 @@
     
             # Create variables.
             x, x_int = MOI.add_constrained_variables(m, [MOI.Integer() for _ in 1:5])
+            y = MOI.add_variables(m, 5)
             
             @test !MOI.is_empty(m)
             for i in 1:5
                 @test MOI.is_valid(m, x[i])
                 @test MOI.is_valid(m, x_int[i])
+                @test MOI.is_valid(m, y[i])
             end
     
             # Don't set names to check whether they are made unique before 
@@ -179,9 +181,21 @@
                 MOI.VectorOfVariables(x),
                 CP.MinimumAmong(4),
             )
+            c3 = MOI.add_constraint(
+                m,
+                MOI.VectorOfVariables([y[1], y[2], y[3]]),
+                CP.MaximumAmong(2),
+            )
+            c4 = MOI.add_constraint(
+                m,
+                MOI.VectorOfVariables(y),
+                CP.MinimumAmong(4),
+            )
     
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
+            @test MOI.is_valid(m, c3)
+            @test MOI.is_valid(m, c4)
     
             # Test some attributes for these constraints.
             @test MOI.get(m, MOI.ConstraintFunction(), c1) ==
@@ -200,7 +214,7 @@
                     MOI.VectorOfVariables,
                     CP.MaximumAmong,
                 }(),
-            ) == [c1]
+            ) == [c1, c3]
             @test length(MOI.get(m, MOI.ListOfConstraints())) == 3
     
             # Generate the FZN file.
@@ -213,11 +227,18 @@
                 var int: x3;
                 var int: x4;
                 var int: x5;
+                var float: x6;
+                var float: x7;
+                var float: x8;
+                var float: x9;
+                var float: x10;
                 
                 
                 
                 constraint array_int_maximum(x1, [x2, x3]);
                 constraint array_int_minimum(x1, [x2, x3, x4, x5]);
+                constraint array_float_maximum(x6, [x7, x8]);
+                constraint array_float_minimum(x6, [x7, x8, x9, x10]);
                 
                 solve satisfy;
                 """
