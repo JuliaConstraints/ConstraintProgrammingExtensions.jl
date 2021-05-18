@@ -234,9 +234,9 @@ function write_constraint(
     model::Optimizer,
     index::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
-    s::Union{MOI.EqualTo{T}, MOI.LessThan{T}},
+    s::Union{MOI.EqualTo{T}, MOI.LessThan{T}, CP.Strictly{MOI.LessThan{T}}, CP.DifferentFrom{T}},
 ) where {T}
-    # *_lin_eq, *_lin_le
+    # *_eq, *_le, *_lt, *_ne
     write_constraint(io, model, index, f, s, Val(_promote_type(model, [f.variable])))
     return nothing
 end
@@ -360,6 +360,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
     s::MOI.LessThan{Int},
+    ::Val{:int}
 )
     @assert CP.is_integer(model, f)
     print(io, "int_le($(_fzn_f(model, f)), $(s.upper))")
@@ -939,6 +940,30 @@ function write_constraint(
         io,
         "float_eq($(_fzn_f(model, f)), $(s.value))",
     )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::MOI.LessThan{Float64},
+    ::Val{:float}
+)
+    print(io, "float_le($(_fzn_f(model, f)), $(s.upper))")
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::CP.Strictly{MOI.LessThan{Float64}, Float64},
+    ::Val{:float}
+)
+    print(io, "float_lt($(_fzn_f(model, f)), $(s.set.upper))")
     return nothing
 end
 

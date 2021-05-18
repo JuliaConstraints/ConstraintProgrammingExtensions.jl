@@ -689,13 +689,17 @@
     
             # Add constraints. 
             c1 = MOI.add_constraint(m, x, MOI.EqualTo(5.0))
-            c2 = MOI.add_constraint(m, x, CP.DifferentFrom(2.0))
+            c2 = MOI.add_constraint(m, x, MOI.LessThan(5.0))
+            c3 = MOI.add_constraint(m, x, CP.Strictly(MOI.LessThan(5.0)))
+            c4 = MOI.add_constraint(m, x, CP.DifferentFrom(5.0))
     
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
+            @test MOI.is_valid(m, c3)
+            @test MOI.is_valid(m, c4)
     
             # Test some attributes for these constraints.
-            @test length(MOI.get(m, MOI.ListOfConstraints())) == 2
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 4
     
             # Generate the FZN file.
             io = IOBuffer(truncate=true)
@@ -707,7 +711,9 @@
                 
                 
                 constraint float_eq(x1, 5.0);
-                constraint float_ne(x1, 2.0);
+                constraint float_le(x1, 5.0);
+                constraint float_lt(x1, 5.0);
+                constraint float_ne(x1, 5.0);
                 
                 solve satisfy;
                 """
