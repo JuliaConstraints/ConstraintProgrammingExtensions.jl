@@ -674,13 +674,15 @@
             c1 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.EqualTo(2)))
             c2 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.LessThan(2)))
             c3 = MOI.add_constraint(m, [x, y], CP.Reified(CP.Strictly(MOI.LessThan(2))))
+            c4 = MOI.add_constraint(m, [x, y], CP.Reified(CP.DifferentFrom(2)))
     
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
             @test MOI.is_valid(m, c3)
+            @test MOI.is_valid(m, c4)
     
             # Test some attributes for these constraints.
-            @test length(MOI.get(m, MOI.ListOfConstraints())) == 5
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 6
     
             # Generate the FZN file.
             io = IOBuffer(truncate=true)
@@ -695,6 +697,7 @@
                 constraint int_lin_eq_reif([1], [x2], 2, x1);
                 constraint int_le_reif(x1, 2, x1);
                 constraint int_lt_reif(x2, 2, x1);
+                constraint int_ne_reif(x2, 2, x1);
                 
                 solve satisfy;
                 """
@@ -726,13 +729,15 @@
             c1 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.EqualTo(2.0)))
             c2 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.LessThan(2.0)))
             c3 = MOI.add_constraint(m, [x, y], CP.Reified(CP.Strictly(MOI.LessThan(2.0))))
+            c4 = MOI.add_constraint(m, [x, y], CP.Reified(CP.DifferentFrom(2.0)))
     
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
             @test MOI.is_valid(m, c3)
+            @test MOI.is_valid(m, c4)
     
             # Test some attributes for these constraints.
-            @test length(MOI.get(m, MOI.ListOfConstraints())) == 4
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 5
     
             # Generate the FZN file.
             io = IOBuffer(truncate=true)
@@ -747,6 +752,7 @@
                 constraint float_lin_eq_reif([1], [x2], 2.0, x1);
                 constraint float_lin_le_reif([1], [x2], 2.0, x1);
                 constraint float_lin_lt_reif([1], [x2], 2.0, x1);
+                constraint float_lin_ne_reif([1], [x2], 2.0, x1);
                 
                 solve satisfy;
                 """

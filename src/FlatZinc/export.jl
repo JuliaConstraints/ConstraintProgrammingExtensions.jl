@@ -425,6 +425,8 @@ function write_constraint(
     ::Val{:int}
 )
     @assert MOI.output_dimension(f) == 2
+    @assert CP.is_binary(model, f.variables[1])
+
     print(
         io,
         "int_lin_eq_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.value), $(_fzn_f(model, f.variables[1])))",
@@ -441,12 +443,12 @@ function write_constraint(
     ::Val{:int}
 )
     @assert MOI.output_dimension(f) == 2
+    @assert CP.is_binary(model, f.variables[1])
+    @assert CP.is_integer(model, f.variables[2])
+    @assert coefficients[1] == 1
 
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.value - f.constant
-
-    @assert coefficients[1] == 1
-    @assert is_binary(variables[1])
 
     print(
         io,
@@ -507,7 +509,23 @@ function write_constraint(
     return nothing
 end
 
-# TODO: int_lin_ne_reif
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorOfVariables,
+    s::CP.Reified{CP.DifferentFrom{Int}},
+)
+    @assert MOI.output_dimension(f) == 2
+    @assert CP.is_binary(model, f.variables[1])
+    @assert CP.is_integer(model, f.variables[2])
+
+    print(
+        io,
+        "int_ne_reif($(_fzn_f(model, f.variables[2])), $(s.set.value), $(_fzn_f(model, f.variables[1])))",
+    )
+    return nothing
+end
 
 function write_constraint(
     io::IO,
@@ -761,7 +779,9 @@ function write_constraint(
     s::CP.Reified{MOI.EqualTo{Float64}},
     ::Val{:float}
 )
+    @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
+
     print(
         io,
         "float_lin_eq_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.value), $(_fzn_f(model, f.variables[1])))",
@@ -793,7 +813,9 @@ function write_constraint(
     s::CP.Reified{MOI.LessThan{Float64}},
     ::Val{:float}
 )
+    @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
+
     print(
         io,
         "float_lin_le_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.upper), $(_fzn_f(model, f.variables[1])))",
@@ -824,7 +846,9 @@ function write_constraint(
     f::MOI.VectorOfVariables,
     s::CP.Reified{CP.Strictly{MOI.LessThan{Float64}, Float64}},
 )
+    @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
+
     print(
         io,
         "float_lin_lt_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.set.upper), $(_fzn_f(model, f.variables[1])))",
@@ -848,7 +872,23 @@ function write_constraint(
     return nothing
 end
 
-# TODO: float_lin_ne_reif
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorOfVariables,
+    s::CP.Reified{CP.DifferentFrom{Float64}},
+)
+    @assert MOI.output_dimension(f) == 2
+    @assert CP.is_binary(model, f.variables[1])
+
+    print(
+        io,
+        "float_lin_ne_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.value), $(_fzn_f(model, f.variables[1])))",
+    )
+    return nothing
+end
+
 # TODO: float_ln, float_log10, float_log2
 
 # float_lt, float_lt_reif: meaningless for MOI, no way to represent "x < y"
