@@ -1138,6 +1138,36 @@
             @test var_annotations == ""
             @test var_value == ""
 
+            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var bool: 5454;") # Invalid variable name.
+            @test var_type == "bool"
+            @test var_name == "5454"
+            @test var_annotations == ""
+            @test var_value == ""
+
+            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var 4..8: x1;")
+            @test var_type == "4..8"
+            @test var_name == "x1"
+            @test var_annotations == ""
+            @test var_value == ""
+
+            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var 4.5..8.4: x1;")
+            @test var_type == "4.5..8.4"
+            @test var_name == "x1"
+            @test var_annotations == ""
+            @test var_value == ""
+
+            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var set of 4.5..8.4: x1;") 
+            @test var_type == "set of 4.5..8.4"
+            @test var_name == "x1"
+            @test var_annotations == ""
+            @test var_value == ""
+
+            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var set of {4.5..8.4}: x1;") 
+            @test var_type == "set of {4.5..8.4}"
+            @test var_name == "x1"
+            @test var_annotations == ""
+            @test var_value == ""
+
             var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 :: some_annotation;")
             @test var_type == "int"
             @test var_name == "x1"
