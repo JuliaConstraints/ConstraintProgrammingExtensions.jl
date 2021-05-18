@@ -1213,6 +1213,22 @@
             @test var_value == ""
         end
 
+        @testset "parse_array_type" begin
+            @test_throws AssertionError CP.FlatZinc.parse_array_type("5")
+            @test_throws AssertionError CP.FlatZinc.parse_array_type("2..5")
+            @test_throws AssertionError CP.FlatZinc.parse_array_type("[2..5]")
+            @test_throws AssertionError CP.FlatZinc.parse_array_type("[2..5] ")
+            @test_throws AssertionError CP.FlatZinc.parse_array_type(" [2..5]")
+            @test_throws AssertionError CP.FlatZinc.parse_array_type(" [2..5] ")
+
+            @test CP.FlatZinc.parse_array_type("") === nothing
+            @test CP.FlatZinc.parse_array_type("[1..5]") == 5
+            @test CP.FlatZinc.parse_array_type("[  1  ..  5  ]") == 5
+            @test CP.FlatZinc.parse_array_type("[1..9846515]") == 9846515
+            @test CP.FlatZinc.parse_array_type("[          1.. 9846515 ]") == 9846515
+            @test CP.FlatZinc.parse_array_type("[1  ..9846515]") == 9846515
+        end
+
         # m = CP.FlatZinc.Optimizer()
         # @test MOI.is_empty(m)
 

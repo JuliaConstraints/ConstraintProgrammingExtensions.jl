@@ -79,7 +79,7 @@ function Base.read!(io::IO, model::Optimizer)
 end
 
 # -----------------------------------------------------------------------------
-# - High-level parsing functions.
+# - High-level parsing functions (FlatZinc items).
 # -----------------------------------------------------------------------------
 
 function parse_predicate!(item::String, model::Optimizer)
@@ -93,7 +93,11 @@ function parse_parameter!(item::String, model::Optimizer)
 end
 
 function parse_variable!(item::String, model::Optimizer)
-    var_type, var_name, var_annotations, var_value = split_variable(item)
+    # Typical input: "var int: x1;"
+    # Complex input: "array [1..5] of var int: x1;"
+    # Complex input: "var int: x1 :: some_annotation = some_value;"
+
+    var_array, var_type, var_name, var_annotations, var_value = split_variable(item)
     return nothing
 end
 
@@ -105,6 +109,36 @@ end
 function parse_solve!(item::String, model::Optimizer)
     error("Solves are not supported.")
     return nothing
+end
+
+# -----------------------------------------------------------------------------
+# - Low-level parsing functions (other grammar rules).
+# -----------------------------------------------------------------------------
+
+function parse_array_type(var_array::String)::Union{Nothing, Int}
+    # Typical input: "[1..5]"
+    # The "1.." part is enforced by the grammar (with the exception of spaces).
+
+    if length(var_array) == 0
+        return nothing
+    end
+
+    # Get rid of the square brackets.
+    @assert var_array[1] == '['
+    @assert var_array[end] == ']'
+    var_array = string(strip(var_array[2:end-1]))
+
+    # Get rid of the leading "1".
+    @assert var_array[1] == '1'
+    var_array = string(strip(var_array[2:end]))
+
+    # Get rid of the leading "..".
+    @assert var_array[1] == '.'
+    @assert var_array[2] == '.'
+    var_array = string(strip(var_array[3:end]))
+
+    # What remains should be an integer.
+    return parse(Int, var_array)
 end
 
 # -----------------------------------------------------------------------------
