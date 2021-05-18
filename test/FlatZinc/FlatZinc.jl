@@ -1132,54 +1132,63 @@
             @test_throws AssertionError CP.FlatZinc.split_variable("")
             @test_throws AssertionError CP.FlatZinc.split_variable("solve satisfy;")
 
+            # Vanilla declaration.
             var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1;")
             @test var_type == "int"
             @test var_name == "x1"
             @test var_annotations == ""
             @test var_value == ""
 
-            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var bool: 5454;") # Invalid variable name.
+            # With another type (still a string) and an *invalid* variable name.
+            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var bool: 5454;")
             @test var_type == "bool"
             @test var_name == "5454"
             @test var_annotations == ""
             @test var_value == ""
 
+            # With another type (range of integers).
             var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var 4..8: x1;")
             @test var_type == "4..8"
             @test var_name == "x1"
             @test var_annotations == ""
             @test var_value == ""
 
+            # With another type (range of floats).
             var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var 4.5..8.4: x1;")
             @test var_type == "4.5..8.4"
             @test var_name == "x1"
             @test var_annotations == ""
             @test var_value == ""
 
+            # With another type (set of floats, intension).
             var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var set of 4.5..8.4: x1;") 
             @test var_type == "set of 4.5..8.4"
             @test var_name == "x1"
             @test var_annotations == ""
             @test var_value == ""
 
-            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var set of {4.5..8.4}: x1;") 
-            @test var_type == "set of {4.5..8.4}"
+            # With another type (set of floats, extension).
+            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var set of {4.5, 8.4}: x1;") 
+            @test var_type == "set of {4.5, 8.4}"
             @test var_name == "x1"
             @test var_annotations == ""
             @test var_value == ""
 
+            # With annotations.
             var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 :: some_annotation;")
             @test var_type == "int"
             @test var_name == "x1"
             @test var_annotations == "some_annotation"
             @test var_value == ""
 
+            # With value.
             var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 = some_value;")
             @test var_type == "int"
             @test var_name == "x1"
             @test var_annotations == ""
             @test var_value == "some_value"
 
+            # With annotations and value.
             var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 :: some_annotation = some_value;")
             @test var_type == "int"
             @test var_name == "x1"
