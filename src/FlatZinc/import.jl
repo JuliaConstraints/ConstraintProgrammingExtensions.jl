@@ -93,7 +93,7 @@ function parse_parameter!(item::String, model::Optimizer)
 end
 
 function parse_variable!(item::String, model::Optimizer)
-    error("Variables are not supported.")
+    var_type, var_name, var_annotations, var_value = split_variable(item)
     return nothing
 end
 
@@ -108,7 +108,7 @@ function parse_solve!(item::String, model::Optimizer)
 end
 
 # -----------------------------------------------------------------------------
-# - Low-level parsing functions.
+# - String-level parsing functions.
 # -----------------------------------------------------------------------------
 
 function get_fzn_item(io::IO)
@@ -140,4 +140,55 @@ function get_fzn_item(io::IO)
         end
     end
     return string(strip(item))
+end
+
+function split_variable(item::String)
+    @assert length(item) > 4
+
+    # Get rid of the "var" keyword at the beginning. 
+    @assert item[1:3] == "var"
+    item = lstrip(item[4:end])
+
+    # Split on the colon (:): the type of the variable is before.
+    var_type, item = split(item, ':', limit=2)
+    var_type = strip(var_type)
+    item = lstrip(item)
+
+    # Potentially split on the double colon (::) to detect annotations, then
+    # on the equal (=) to detect literal values.
+    if occursin("::", item)
+        var_name, item = split(item, "::", limit=2)
+        var_name = strip(var_name)
+        item = lstrip(item)
+
+        if occursin('=', item)
+            var_annotations, item = split(item, '=', limit=2)
+            var_annotations = strip(var_annotations)
+            item = lstrip(item)
+
+            var_value, item = split(item, ';', limit=2)
+            var_value = strip(var_value)
+        else
+            var_annotations, item = split(item, ';', limit=2)
+            var_annotations = strip(var_annotations)
+            var_value = ""
+        end
+    else
+        var_annotations = ""
+
+        if occursin('=', item)
+            var_name, item = split(item, '=', limit=2)
+            var_name = strip(var_name)
+            item = lstrip(item)
+
+            var_value, item = split(item, ';', limit=2)
+            var_value = strip(var_value)
+        else
+            var_name, item = split(item, ';', limit=2)
+            var_name = strip(var_name)
+            var_value = ""
+        end
+    end
+    
+    return (var_type, var_name, var_annotations, var_value)
 end

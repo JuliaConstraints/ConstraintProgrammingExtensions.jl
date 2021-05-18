@@ -1128,6 +1128,35 @@
             @test CP.FlatZinc.get_fzn_item(io) == ""
         end
 
+        @testset "Variable splitting" begin
+            @test_throws AssertionError CP.FlatZinc.split_variable("")
+            @test_throws AssertionError CP.FlatZinc.split_variable("solve satisfy;")
+
+            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1;")
+            @test var_type == "int"
+            @test var_name == "x1"
+            @test var_annotations == ""
+            @test var_value == ""
+
+            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 :: some_annotation;")
+            @test var_type == "int"
+            @test var_name == "x1"
+            @test var_annotations == "some_annotation"
+            @test var_value == ""
+
+            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 = some_value;")
+            @test var_type == "int"
+            @test var_name == "x1"
+            @test var_annotations == ""
+            @test var_value == "some_value"
+
+            var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 :: some_annotation = some_value;")
+            @test var_type == "int"
+            @test var_name == "x1"
+            @test var_annotations == "some_annotation"
+            @test var_value == "some_value"
+        end
+
         # m = CP.FlatZinc.Optimizer()
         # @test MOI.is_empty(m)
 
