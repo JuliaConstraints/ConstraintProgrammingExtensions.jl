@@ -82,31 +82,40 @@ end
 # - High-level parsing functions (FlatZinc items).
 # -----------------------------------------------------------------------------
 
-function parse_predicate!(item::String, model::Optimizer)
+function parse_predicate!(item::AbstractString, model::Optimizer)
     error("Predicates are not supported.")
     return nothing
 end
 
-function parse_parameter!(item::String, model::Optimizer)
+function parse_parameter!(item::AbstractString, model::Optimizer)
     error("Parameters are not supported.")
     return nothing
 end
 
-function parse_variable!(item::String, model::Optimizer)
+function parse_variable!(item::AbstractString, model::Optimizer)
     # Typical input: "var int: x1;"
     # Complex input: "array [1..5] of var int: x1;"
     # Complex input: "var int: x1 :: some_annotation = some_value;"
 
     var_array, var_type, var_name, var_annotations, var_value = split_variable(item)
+
+    if var_array === nothing
+        var_array = 1
+    else
+        var_array = parse_array_type(var_array)
+    end
+
+    var_type = parse_variable_type(var_type)
+
     return nothing
 end
 
-function parse_constraint!(item::String, model::Optimizer)
+function parse_constraint!(item::AbstractString, model::Optimizer)
     error("Constraints are not supported.")
     return nothing
 end
 
-function parse_solve!(item::String, model::Optimizer)
+function parse_solve!(item::AbstractString, model::Optimizer)
     error("Solves are not supported.")
     return nothing
 end
@@ -115,7 +124,7 @@ end
 # - Low-level parsing functions (other grammar rules), independent of MOI.
 # -----------------------------------------------------------------------------
 
-function parse_array_type(var_array::String)::Union{Nothing, Int}
+function parse_array_type(var_array::AbstractString)::Union{Nothing, Int}
     # Typical input: "[1..5]"
     # The "1.." part is enforced by the grammar (with the exception of spaces).
 
@@ -141,7 +150,7 @@ function parse_array_type(var_array::String)::Union{Nothing, Int}
     return parse(Int, var_array)
 end
 
-function parse_range(range::String)
+function parse_range(range::AbstractString)
     # Typical inputs: "1..5", "1.5..2.4"
     @assert length(range) > 2
 
@@ -168,7 +177,7 @@ function parse_range(range::String)
     end
 end
 
-function parse_set(set::String)
+function parse_set(set::AbstractString)
     # Typical inputs: "{}", "{1, 2, 3}"
     # Typical inputs: "{}", "{1.0, 2.1, 3.2}"
     @assert length(set) >= 2
@@ -191,7 +200,7 @@ function parse_set(set::String)
     end
 end
 
-function parse_set_int(set::String)
+function parse_set_int(set::AbstractString)
     # Typical inputs: "", "1, 2, 3"
 
     values = Int[]
@@ -208,7 +217,7 @@ function parse_set_int(set::String)
     return values
 end
 
-function parse_set_float(set::String)
+function parse_set_float(set::AbstractString)
     # Typical inputs: "", "1.0, 2.1, 3.2"
 
     values = Float64[]
@@ -225,37 +234,61 @@ function parse_set_float(set::String)
     return values
 end
 
-function parse_variable_type(var_type::String)
+function parse_variable_type(var_type::AbstractString)
     # Typical inputs: "bool", "int", "set of int", "float"
-    # Complex inputs: "1..5", "{1, 2, 3}", "1.5..1.7"
+    # Complex inputs: "1..5", "{1, 2, 3}", "1.5..1.7", "set of {1, 2, 3}", "set of 1..2"
 
     # Return tuple: 
     # - variable type: String ("bool", "int", "float")
     # - variable type: String ("scalar", "set")
     # - range minimum: Union{Nothing, Int, Float64}
     # - range maximum: Union{Nothing, Int, Float64}
-
-    var_type = strip(var_type)
+    # - allowed values: Union{Nothing, Vector{Int}, Vector{Float64}}
 
     # Basic variable type.
     if var_type == "bool"
-        return ("bool", "scalar", nothing, nothing)
+        return ("bool", "scalar", nothing, nothing, nothing)
     elseif var_type == "int"
-        return ("int", "scalar", nothing, nothing)
+        return ("int", "scalar", nothing, nothing, nothing)
     elseif var_type == "float"
-        return ("float", "scalar", nothing, nothing)
+        return ("float", "scalar", nothing, nothing, nothing)
     elseif var_type == "set of int"
-        return ("int", "set", nothing, nothing)
+        return ("int", "set", nothing, nothing, nothing)
+    end
+
+    # Sets, both ranges and sets in extension.
+    if startswith(var_type, "set")
+        @assert length(var_type) >= 4
+        var_type = strip(var_type[4:end])
+        @assert startswith(var_type, "of")
+        @assert length(var_type) >= 3
+        var_type = strip(var_type[3:end])
+
+        if startswith(var_type, '{') && endswith(var_type, '}')
+            var_type, var_values = parse_set(var_type)
+            return (var_type, "set", nothing, nothing, var_values)
+        end
+
+        if !startswith(var_type, '{') && !endswith(var_type, '}') && occursin("..", var_type)
+            var_type, var_min, var_max = parse_range(var_type)
+            return (var_type, "set", var_min, var_max, nothing)
+        end
+
+        @assert false
     end
 
     # Ranges, of both integers and floats. Check this as a last step, because 
     # this might conflict with other cases ("set of 1..4", for instance).
     if occursin("..", var_type)
         var_type, var_min, var_max = parse_range(var_type)
-        return (var_type, "scalar", var_min, var_max)
+        return (var_type, "scalar", var_min, var_max, nothing)
     end
 
     # Scalar variables, with sets given in extension.
+    if startswith(var_type, '{') && endswith(var_type, '}')
+        var_type, var_values = parse_set(var_type)
+        return (var_type, "scalar", nothing, nothing, var_values)
+    end
 
     # If no return previously, this could not be parsed.
     @assert false
@@ -296,7 +329,7 @@ function get_fzn_item(io::IO)
     return string(strip(item))
 end
 
-function split_variable(item::String)
+function split_variable(item::AbstractString)
     # Typical input: "var int: x1;" -> scalar
     # Complex input: "array [1..5] of var int: x1;" -> array
     # Complex input: "var int: x1 :: some_annotation = some_value;" -> scalar
@@ -312,7 +345,7 @@ function split_variable(item::String)
     end
 end
 
-function split_variable_scalar(item::String)
+function split_variable_scalar(item::AbstractString)
     # Get rid of the "var" keyword at the beginning. 
     @assert item[1:3] == "var"
     item = lstrip(item[4:end])
@@ -361,7 +394,7 @@ function split_variable_scalar(item::String)
     return ("", var_type, var_name, var_annotations, var_value)
 end
 
-function split_variable_array(item::String)
+function split_variable_array(item::AbstractString)
     # Get rid of the "array" keyword at the beginning. 
     @assert item[1:5] == "array"
     item = lstrip(item[6:end])
