@@ -394,7 +394,7 @@ function write_constraint(
     # Hypothesis: !cons.output_as_part_of_variable.
     print(
         io,
-        "int_lin_eq([1], [$(_fzn_f(model, f))], $(s.value))",
+        "int_eq($(_fzn_f(model, f)), $(s.value))",
     )
     return nothing
 end
@@ -429,7 +429,7 @@ function write_constraint(
 
     print(
         io,
-        "int_lin_eq_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.value), $(_fzn_f(model, f.variables[1])))",
+        "int_eq_reif($(_fzn_f(model, f.variables[2])), $(s.set.value), $(_fzn_f(model, f.variables[1])))",
     )
     return nothing
 end
@@ -624,7 +624,7 @@ function write_constraint(
     # Hypothesis: !cons.output_as_part_of_variable.
     print(
         io,
-        "bool_lin_eq([1], [$(_fzn_f(model, f))], $(s.value))",
+        "bool_eq($(_fzn_f(model, f)), $(s.value))",
     )
     return nothing
 end
@@ -717,8 +717,38 @@ end
 # float_dom: could be useful to merge several MOI.Interval as one constraint, 
 # for now several float_in.
 
-# float_eq, float_eq_reif: meaningless for MOI, no way to represent "x == y"
-# natively (goes through affine expressions).
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::MOI.EqualTo{Float64},
+    ::Val{:float}
+)
+    print(
+        io,
+        "float_eq($(_fzn_f(model, f.variable)), $(s.set.value))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorOfVariables,
+    s::CP.Reified{MOI.EqualTo{Float64}},
+    ::Val{:float}
+)
+    @assert MOI.output_dimension(f) == 2
+    @assert CP.is_binary(model, f.variables[1])
+
+    print(
+        io,
+        "float_eq_reif($(_fzn_f(model, f.variables[2])), $(s.set.value), $(_fzn_f(model, f.variables[1])))",
+    )
+    return nothing
+end
 
 # TODO: float_exp
 
@@ -766,25 +796,7 @@ function write_constraint(
     # Hypothesis: !cons.output_as_part_of_variable.
     print(
         io,
-        "float_lin_eq([1], [$(_fzn_f(model, f))], $(s.value))",
-    )
-    return nothing
-end
-
-function write_constraint(
-    io::IO,
-    model::Optimizer,
-    ::MOI.ConstraintIndex,
-    f::MOI.VectorOfVariables,
-    s::CP.Reified{MOI.EqualTo{Float64}},
-    ::Val{:float}
-)
-    @assert MOI.output_dimension(f) == 2
-    @assert CP.is_binary(model, f.variables[1])
-
-    print(
-        io,
-        "float_lin_eq_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.value), $(_fzn_f(model, f.variables[1])))",
+        "float_eq($(_fzn_f(model, f)), $(s.value))",
     )
     return nothing
 end
@@ -818,7 +830,7 @@ function write_constraint(
 
     print(
         io,
-        "float_lin_le_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.upper), $(_fzn_f(model, f.variables[1])))",
+        "float_le_reif($(_fzn_f(model, f.variables[2])), $(s.set.upper), $(_fzn_f(model, f.variables[1])))",
     )
     return nothing
 end
@@ -851,7 +863,7 @@ function write_constraint(
 
     print(
         io,
-        "float_lin_lt_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.set.upper), $(_fzn_f(model, f.variables[1])))",
+        "float_lt_reif($(_fzn_f(model, f.variables[2])), $(s.set.set.upper), $(_fzn_f(model, f.variables[1])))",
     )
     return nothing
 end
@@ -884,7 +896,7 @@ function write_constraint(
 
     print(
         io,
-        "float_lin_ne_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.value), $(_fzn_f(model, f.variables[1])))",
+        "float_ne_reif($(_fzn_f(model, f.variables[2])), $(s.set.value), $(_fzn_f(model, f.variables[1])))",
     )
     return nothing
 end
