@@ -627,13 +627,15 @@
             # generating the model.
     
             # Add constraints. 
-            c1 = MOI.add_constraint(m, x, MOI.LessThan(2))
-            c2 = MOI.add_constraint(m, x, CP.Strictly(MOI.LessThan(2)))
-            c3 = MOI.add_constraint(m, x, MOI.EqualTo(4))
-            c4 = MOI.add_constraint(m, y, MOI.EqualTo(false))
-            c5 = MOI.add_constraint(m, y, MOI.EqualTo(1)) # 1 will be cast to true.
-            c6 = MOI.add_constraint(m, x, CP.DifferentFrom(2))
-            c7 = MOI.add_constraint(m, y, CP.DifferentFrom(false))
+            c1 = MOI.add_constraint(m, x, MOI.EqualTo(4))
+            c2 = MOI.add_constraint(m, y, MOI.EqualTo(false))
+            c3 = MOI.add_constraint(m, y, MOI.EqualTo(1)) # 1 will be cast to true.
+            c4 = MOI.add_constraint(m, x, MOI.LessThan(2))
+            c5 = MOI.add_constraint(m, y, MOI.LessThan(true))
+            c6 = MOI.add_constraint(m, x, CP.Strictly(MOI.LessThan(2)))
+            c7 = MOI.add_constraint(m, y, CP.Strictly(MOI.LessThan(true)))
+            c8 = MOI.add_constraint(m, x, CP.DifferentFrom(2))
+            c9 = MOI.add_constraint(m, y, CP.DifferentFrom(false))
     
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
@@ -642,9 +644,11 @@
             @test MOI.is_valid(m, c5)
             @test MOI.is_valid(m, c6)
             @test MOI.is_valid(m, c7)
+            @test MOI.is_valid(m, c8)
+            @test MOI.is_valid(m, c9)
     
             # Test some attributes for these constraints.
-            @test length(MOI.get(m, MOI.ListOfConstraints())) == 8
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 10
     
             # Generate the FZN file.
             io = IOBuffer(truncate=true)
@@ -656,11 +660,13 @@
                 
                 
                 
-                constraint int_le(x1, 2);
-                constraint int_lt(x1, 2);
                 constraint int_eq(x1, 4);
                 constraint bool_eq(x2, false);
                 constraint bool_eq(x2, true);
+                constraint int_le(x1, 2);
+                constraint bool_le(x2, true);
+                constraint int_lt(x1, 2);
+                constraint bool_lt(x2, true);
                 constraint int_ne(x1, 2);
                 constraint int_ne(x2, false);
                 

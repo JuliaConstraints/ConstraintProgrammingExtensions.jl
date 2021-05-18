@@ -351,9 +351,6 @@ end
 # TODO: absolute value. int_abs.
 # TODO: integer division. int_div
 
-# int_eq, int_eq_reif: meaningless for MOI, no way to represent "x == y" 
-# natively (goes through affine expressions).
-
 function write_constraint(
     io::IO,
     model::Optimizer,
@@ -362,8 +359,21 @@ function write_constraint(
     s::MOI.LessThan{Int},
     ::Val{:int}
 )
-    @assert CP.is_integer(model, f)
+    @assert CP.is_integer(model, f) || CP.is_binary(model, f)
     print(io, "int_le($(_fzn_f(model, f)), $(s.upper))")
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::MOI.LessThan{Bool},
+    ::Val{:bool}
+)
+    @assert CP.is_binary(model, f)
+    print(io, "bool_le($(_fzn_f(model, f)), $(Bool(s.upper)))")
     return nothing
 end
 
@@ -377,7 +387,7 @@ function write_constraint(
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
-    @assert CP.is_integer(model, f.variables[2])
+    @assert CP.is_integer(model, f.variables[2]) || CP.is_binary(model, f.variables[2])
     
     print(io, "int_le_reif($(_fzn_f(model, f.variables[1])), $(s.set.upper), $(_fzn_f(model, f.variables[1])))")
     return nothing
@@ -622,8 +632,20 @@ function write_constraint(
     f::MOI.SingleVariable,
     s::CP.Strictly{MOI.LessThan{Int}},
 )
-    @assert CP.is_integer(model, f)
+    @assert CP.is_integer(model, f) || CP.is_binary(model, f)
     print(io, "int_lt($(_fzn_f(model, f)), $(s.set.upper))")
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::CP.Strictly{MOI.LessThan{Bool}},
+)
+    @assert CP.is_binary(model, f)
+    print(io, "bool_lt($(_fzn_f(model, f)), $(s.set.upper))")
     return nothing
 end
 
