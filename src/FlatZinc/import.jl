@@ -145,6 +145,16 @@ end
 function split_variable(item::String)
     @assert length(item) > 4
 
+    if startswith(item, "var")
+        return split_variable_scalar(item)
+    elseif startswith(item, "array") && occursin("var", item)
+        return split_variable_array(item)
+    else
+        @assert false
+    end
+end
+
+function split_variable_scalar(item::String)
     # Get rid of the "var" keyword at the beginning. 
     @assert item[1:3] == "var"
     item = lstrip(item[4:end])
@@ -190,5 +200,22 @@ function split_variable(item::String)
         end
     end
     
-    return (var_type, var_name, var_annotations, var_value)
+    return ("", var_type, var_name, var_annotations, var_value)
+end
+
+function split_variable_array(item::String)
+    # Get rid of the "array" keyword at the beginning. 
+    @assert item[1:5] == "array"
+    item = lstrip(item[6:end])
+
+    # Split on the "of" keyword: the array definition is before, the rest is a 
+    # normal variable definition.
+    var_array, item = split(item, "of", limit=2)
+    var_array = strip(var_array)
+    item = string(lstrip(item))
+
+    # Parse the rest of the line.
+    _, var_type, var_name, var_annotations, var_value = split_variable_scalar(item)
+    
+    return (var_array, var_type, var_name, var_annotations, var_value)
 end
