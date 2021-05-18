@@ -653,21 +653,19 @@
             end
         end
 
-        @testset "Constraints: CP.Reified{MOI.VectorOfVariables in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan}}" begin
+        @testset "Constraints: CP.Reified{MOI.VectorOfVariables of integers in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan}}" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
     
             # Create variable.
             x, x_bool = MOI.add_constrained_variable(m, MOI.ZeroOne())
             y, y_int = MOI.add_constrained_variable(m, MOI.Integer())
-            z = MOI.add_variable(m)
     
             @test !MOI.is_empty(m)
             @test MOI.is_valid(m, x)
             @test MOI.is_valid(m, x_bool)
             @test MOI.is_valid(m, y)
             @test MOI.is_valid(m, y_int)
-            @test MOI.is_valid(m, z)
     
             # Don't set names to check whether they are made unique before 
             # generating the model.
@@ -678,6 +676,7 @@
             c3 = MOI.add_constraint(m, [x, y], CP.Reified(CP.Strictly(MOI.LessThan(2))))
     
             @test MOI.is_valid(m, c1)
+            @test MOI.is_valid(m, c2)
             @test MOI.is_valid(m, c3)
     
             # Test some attributes for these constraints.
@@ -690,7 +689,6 @@
     
             @test fzn == """var bool: x1;
                 var int: x2;
-                var float: x3;
                 
                 
                 
@@ -707,6 +705,113 @@
                 @test match(r"^x\d+$", vn) !== nothing
             end
         end
+
+        @testset "Constraints: CP.Reified{MOI.VectorOfVariables of floats in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan}}" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
+    
+            # Create variable.
+            x, x_bool = MOI.add_constrained_variable(m, MOI.ZeroOne())
+            y = MOI.add_variable(m)
+    
+            @test !MOI.is_empty(m)
+            @test MOI.is_valid(m, x)
+            @test MOI.is_valid(m, x_bool)
+            @test MOI.is_valid(m, y)
+    
+            # Don't set names to check whether they are made unique before 
+            # generating the model.
+    
+            # Add constraints. 
+            c1 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.EqualTo(2.0)))
+            c2 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.LessThan(2.0)))
+            c3 = MOI.add_constraint(m, [x, y], CP.Reified(CP.Strictly(MOI.LessThan(2.0))))
+    
+            @test MOI.is_valid(m, c1)
+            @test MOI.is_valid(m, c2)
+            @test MOI.is_valid(m, c3)
+    
+            # Test some attributes for these constraints.
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 4
+    
+            # Generate the FZN file.
+            io = IOBuffer(truncate=true)
+            write(io, m)
+            fzn = String(take!(io))
+    
+            @test fzn == """var bool: x1;
+                var float: x2;
+                
+                
+                
+                constraint float_lin_eq_reif([1], [x2], 2.0, x1);
+                constraint float_lin_le_reif([1], [x2], 2.0, x1);
+                constraint float_lin_lt_reif([1], [x2], 2.0, x1);
+                
+                solve satisfy;
+                """
+
+            # Test that the names have been correctly transformed.
+            for v in [x, y]
+                vn = MOI.get(m, MOI.VariableName(), v)
+                @test match(r"^x\d+$", vn) !== nothing
+            end
+        end
+
+        # @testset "Constraints: CP.Reified{MOI.VectorAffineFunction in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan}}" begin
+        #     m = CP.FlatZinc.Optimizer()
+        #     @test MOI.is_empty(m)
+    
+        #     # Create variable.
+        #     x, x_bool = MOI.add_constrained_variable(m, MOI.ZeroOne())
+        #     y, y_int = MOI.add_constrained_variable(m, MOI.Integer())
+        #     z = MOI.add_variable(m)
+    
+        #     @test !MOI.is_empty(m)
+        #     @test MOI.is_valid(m, x)
+        #     @test MOI.is_valid(m, x_bool)
+        #     @test MOI.is_valid(m, y)
+        #     @test MOI.is_valid(m, y_int)
+        #     @test MOI.is_valid(m, z)
+    
+        #     # Don't set names to check whether they are made unique before 
+        #     # generating the model.
+    
+        #     # Add constraints. 
+        #     c1 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.EqualTo(2)))
+        #     c2 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.LessThan(2)))
+        #     c3 = MOI.add_constraint(m, [x, y], CP.Reified(CP.Strictly(MOI.LessThan(2))))
+    
+        #     @test MOI.is_valid(m, c1)
+        #     @test MOI.is_valid(m, c3)
+    
+        #     # Test some attributes for these constraints.
+        #     @test length(MOI.get(m, MOI.ListOfConstraints())) == 5
+    
+        #     # Generate the FZN file.
+        #     io = IOBuffer(truncate=true)
+        #     write(io, m)
+        #     fzn = String(take!(io))
+    
+        #     @test fzn == """var bool: x1;
+        #         var int: x2;
+        #         var float: x3;
+                
+                
+                
+        #         constraint int_lin_eq_reif([1], [x2], 2, x1);
+        #         constraint int_le_reif(x1, 2, x1);
+        #         constraint int_lt_reif(x2, 2, x1);
+                
+        #         solve satisfy;
+        #         """
+
+        #     # Test that the names have been correctly transformed.
+        #     for v in [x, y]
+        #         vn = MOI.get(m, MOI.VariableName(), v)
+        #         @test match(r"^x\d+$", vn) !== nothing
+        #     end
+        # end
         
         @testset "Name rewriting" begin
             m = CP.FlatZinc.Optimizer()

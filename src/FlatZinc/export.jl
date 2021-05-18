@@ -753,7 +753,21 @@ function write_constraint(
     return nothing
 end
 
-# TODO: float_lin_eq_reif
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorOfVariables,
+    s::CP.Reified{MOI.EqualTo{Float64}},
+    ::Val{:float}
+)
+    @assert CP.is_binary(model, f.variables[1])
+    print(
+        io,
+        "float_lin_eq_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.value), $(_fzn_f(model, f.variables[1])))",
+    )
+    return nothing
+end
 
 function write_constraint(
     io::IO,
@@ -771,7 +785,21 @@ function write_constraint(
     return nothing
 end
 
-# TODO: float_lin_le_reif
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorOfVariables,
+    s::CP.Reified{MOI.LessThan{Float64}},
+    ::Val{:float}
+)
+    @assert CP.is_binary(model, f.variables[1])
+    print(
+        io,
+        "float_lin_le_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.upper), $(_fzn_f(model, f.variables[1])))",
+    )
+    return nothing
+end
 
 function write_constraint(
     io::IO,
@@ -789,7 +817,20 @@ function write_constraint(
     return nothing
 end
 
-# TODO: float_lin_lt_reif
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorOfVariables,
+    s::CP.Reified{CP.Strictly{MOI.LessThan{Float64}, Float64}},
+)
+    @assert CP.is_binary(model, f.variables[1])
+    print(
+        io,
+        "float_lin_lt_reif([1], [$(_fzn_f(model, f.variables[2]))], $(s.set.set.upper), $(_fzn_f(model, f.variables[1])))",
+    )
+    return nothing
+end
 
 function write_constraint(
     io::IO,
