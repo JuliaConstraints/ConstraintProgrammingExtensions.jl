@@ -848,7 +848,7 @@ function write_constraint(
     # Hypothesis: !cons.output_as_part_of_variable.
     print(
         io,
-        "float_eq($(_fzn_f(model, f.variable)), $(s.set.value))",
+        "float_eq($(_fzn_f(model, f.variable)), $(s.value))",
     )
     return nothing
 end
