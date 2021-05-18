@@ -103,7 +103,7 @@ function parse_variable!(item::AbstractString, model::Optimizer)
     var_array, var_type, var_name, var_annotations, var_value = split_variable(item)
 
     # Parse the parts if need be.
-    if var_array === nothing
+    if var_array == ""
         var_array_length = 1
     else
         var_array_length = parse_array_type(var_array)
@@ -115,15 +115,34 @@ function parse_variable!(item::AbstractString, model::Optimizer)
         @warn "Annotations are not supported and are currently ignored."
     end
 
-    @show var_array_length
-    @show var_type
-
     # Map to MOI constructs and add into the model.
     if var_multiplicity != FznScalar
         error("Set variables are not supported.")
     end
 
+    if var_array_length != 1
+        error("TODO")
+        # Encode the position in the array using 
+    end
 
+    # - Create the MOI variable.
+    moi_set = map_to_moi(var_type)
+    if moi_set === nothing
+        moi_var = MOI.add_variable(model)
+    else
+        moi_var, _ = MOI.add_constrained_variable(model, moi_set)
+
+    # - Ease the retrieval of the variable by name for further use.
+        MOI.add_constraint(model, moi_var, MOI.Interval(var_min, var_max))
+    end
+
+    # - Add a value constraint.
+    if var_allowed_values !== nothing
+        MOI.add_constraint(model, moi_var, CP.Domain(Set(var_allowed_values)))
+    end
+
+    # - Fix the value.
+    # TODO: play with var_value.
 
     return nothing
 end

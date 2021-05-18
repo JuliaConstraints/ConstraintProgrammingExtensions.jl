@@ -41,6 +41,9 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
     objective_sense::MOI.OptimizationSense
     objective_function::Union{Nothing, MOI.SingleVariable}
 
+    # Map names to MOI variable indices.
+    name_to_var::Dict{String, MOI.VariableIndex}
+
     """
         Optimizer()
 
