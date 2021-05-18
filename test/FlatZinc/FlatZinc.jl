@@ -1128,7 +1128,7 @@
             @test CP.FlatZinc.get_fzn_item(io) == ""
         end
 
-        @testset "Variable splitting" begin
+        @testset "split_variable" begin
             @test_throws AssertionError CP.FlatZinc.split_variable("")
             @test_throws AssertionError CP.FlatZinc.split_variable("solve satisfy;")
 
@@ -1227,6 +1227,25 @@
             @test CP.FlatZinc.parse_array_type("[1..9846515]") == 9846515
             @test CP.FlatZinc.parse_array_type("[          1.. 9846515 ]") == 9846515
             @test CP.FlatZinc.parse_array_type("[1  ..9846515]") == 9846515
+        end
+
+        @testset "parse_range" begin
+            @test_throws AssertionError CP.FlatZinc.parse_range("")
+            @test_throws AssertionError CP.FlatZinc.parse_range("5")
+            @test_throws ErrorException CP.FlatZinc.parse_range("[2..5]")
+            @test_throws ErrorException CP.FlatZinc.parse_range("[2..5] ")
+            @test_throws ErrorException CP.FlatZinc.parse_range(" [2..5]")
+            @test_throws ErrorException CP.FlatZinc.parse_range(" [2..5] ")
+
+            @test CP.FlatZinc.parse_range("1..5") == ("int", 1, 5)
+            @test CP.FlatZinc.parse_range("1  ..  5") == ("int", 1, 5)
+            @test CP.FlatZinc.parse_range("1..9846515") == ("int", 1, 9846515)
+            @test CP.FlatZinc.parse_range("1.. 9846515") == ("int", 1, 9846515)
+
+            @test CP.FlatZinc.parse_range("1..1.5") == ("float", 1, 1.5)
+            @test CP.FlatZinc.parse_range("1  ..  1.5") == ("float", 1, 1.5)
+            @test CP.FlatZinc.parse_range("1..9.846515") == ("float", 1, 9.846515)
+            @test CP.FlatZinc.parse_range("1.. 9.846515") == ("float", 1, 9.846515)
         end
 
         # m = CP.FlatZinc.Optimizer()

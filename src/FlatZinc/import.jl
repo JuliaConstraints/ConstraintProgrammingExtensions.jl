@@ -112,7 +112,7 @@ function parse_solve!(item::String, model::Optimizer)
 end
 
 # -----------------------------------------------------------------------------
-# - Low-level parsing functions (other grammar rules).
+# - Low-level parsing functions (other grammar rules), independent of MOI.
 # -----------------------------------------------------------------------------
 
 function parse_array_type(var_array::String)::Union{Nothing, Int}
@@ -139,6 +139,80 @@ function parse_array_type(var_array::String)::Union{Nothing, Int}
 
     # What remains should be an integer.
     return parse(Int, var_array)
+end
+
+function parse_range(range::String)
+    # Typical inputs: "1..5", "1.5..2.4"
+    @assert length(range) > 2
+
+    low, hi = split(range, "..")
+    low = strip(low)
+    hi = strip(hi)
+
+    # First, try to parse as integers: this is more restrictive than floats.
+    try
+        low_int = parse(Int, low)
+        hi_int = parse(Int, hi)
+
+        return ("int", low_int, hi_int)
+    catch
+        try
+            low = parse(Float64, low)
+            hi = parse(Float64, hi)
+
+            return ("float", low, hi)
+        catch
+            error("Ill-formed input: $low, $hi.")
+            return nothing
+        end
+    end
+end
+
+function parse_set(set::String)
+    # Typical inputs: "{}", "{1, 2, 3}"
+
+    # Get rid of the curly braces
+    @assert set[1] == '{'
+    @assert set[end] == '}'
+    set = set[2:end-1]
+
+
+end
+
+function parse_variable_type(var_type::String)
+    # Typical inputs: "bool", "int", "set of int", "float"
+    # Complex inputs: "1..5", "{1, 2, 3}", "1.5..1.7"
+
+    # Return tuple: 
+    # - variable type: String ("bool", "int", "float")
+    # - variable type: String ("scalar", "set")
+    # - range minimum: Union{Nothing, Int, Float64}
+    # - range maximum: Union{Nothing, Int, Float64}
+
+    var_type = strip(var_type)
+
+    # Basic variable type.
+    if var_type == "bool"
+        return ("bool", "scalar", nothing, nothing)
+    elseif var_type == "int"
+        return ("int", "scalar", nothing, nothing)
+    elseif var_type == "float"
+        return ("float", "scalar", nothing, nothing)
+    elseif var_type == "set of int"
+        return ("int", "set", nothing, nothing)
+    end
+
+    # Ranges, of both integers and floats. Check this as a last step, because 
+    # this might conflict with other cases ("set of 1..4", for instance).
+    if occursin("..", var_type)
+        var_type, var_min, var_max = parse_range(var_type)
+        return (var_type, "scalar", var_min, var_max)
+    end
+
+    # Scalar variables, with sets given in extension.
+
+    # If no return previously, this could not be parsed.
+    @assert false
 end
 
 # -----------------------------------------------------------------------------
@@ -177,6 +251,10 @@ function get_fzn_item(io::IO)
 end
 
 function split_variable(item::String)
+    # Typical input: "var int: x1;" -> scalar
+    # Complex input: "array [1..5] of var int: x1;" -> array
+    # Complex input: "var int: x1 :: some_annotation = some_value;" -> scalar
+
     @assert length(item) > 4
 
     if startswith(item, "var")
