@@ -61,6 +61,8 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
         model.sets_id = Dict{MOI.ConstraintIndex, String}()
         model.arrs_id = Dict{MOI.ConstraintIndex, String}()
 
+        model.name_to_var = Dict{String, MOI.VariableIndex}()
+
         MOI.empty!(model)
         return model
     end
@@ -81,6 +83,8 @@ function MOI.empty!(model::Optimizer)
     model.sets_id = Dict{MOI.ConstraintIndex, String}()
     model.arrs_id = Dict{MOI.ConstraintIndex, String}()
 
+    model.name_to_var = Dict{String, MOI.VariableIndex}()
+
     return
 end
 
@@ -92,12 +96,15 @@ function MOI.is_empty(model::Optimizer)
     return true
 end
 
+# Set the objective.
+
 function MOI.set(
     model::Optimizer,
     ::MOI.ObjectiveFunction{MOI.SingleVariable},
     f::MOI.SingleVariable,
 )
-    return model.objective_function = f
+    model.objective_function = f
+    return nothing
 end
 
 function MOI.set(
@@ -105,8 +112,11 @@ function MOI.set(
     ::MOI.ObjectiveSense,
     s::MOI.OptimizationSense,
 )
-    return model.objective_sense = s
+    model.objective_sense = s
+    return nothing
 end
+
+# Helpers.
 
 function _create_variable(
     model::Optimizer,
@@ -205,6 +215,10 @@ end
 
 function MOI.is_valid(model::Optimizer, v::MOI.VariableIndex)
     return haskey(model.variable_info, v)
+end
+
+function MOI.get(model::Optimizer, ::MOI.NumberOfVariables)
+    return length(model.variable_info)
 end
 
 function MOI.get(model::Optimizer, ::MOI.ListOfVariableIndices)
@@ -375,6 +389,10 @@ function MOI.get(
         c.index for
         c in model.constraint_info if typeof(c.f) == F && typeof(c.s) == S
     ]
+end
+
+function MOI.get(model::Optimizer, ::MOI.NumberOfConstraints{F, S}) where {F, S}
+    return length(model.constraint_info)
 end
 
 function MOI.get(model::Optimizer, ::MOI.ListOfConstraints)

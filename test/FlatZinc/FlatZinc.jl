@@ -1128,180 +1128,192 @@
             @test CP.FlatZinc.get_fzn_item(io) == ""
         end
 
-        @testset "split_variable" begin
-            @test_throws AssertionError CP.FlatZinc.split_variable("")
-            @test_throws AssertionError CP.FlatZinc.split_variable("solve satisfy;")
+        @testset "Parsing helpers" begin
+            @testset "parse_array_type" begin
+                @test_throws AssertionError CP.FlatZinc.parse_array_type("5")
+                @test_throws AssertionError CP.FlatZinc.parse_array_type("2..5")
+                @test_throws AssertionError CP.FlatZinc.parse_array_type("[2..5]")
+                @test_throws AssertionError CP.FlatZinc.parse_array_type("[2..5] ")
+                @test_throws AssertionError CP.FlatZinc.parse_array_type(" [2..5]")
+                @test_throws AssertionError CP.FlatZinc.parse_array_type(" [2..5] ")
 
-            # Vanilla declaration.
-            var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1;")
-            @test var_array == ""
-            @test var_type == "int"
-            @test var_name == "x1"
-            @test var_annotations == ""
-            @test var_value == ""
+                @test CP.FlatZinc.parse_array_type("") === nothing
+                @test CP.FlatZinc.parse_array_type("[1..5]") == 5
+                @test CP.FlatZinc.parse_array_type("[  1  ..  5  ]") == 5
+                @test CP.FlatZinc.parse_array_type("[1..9846515]") == 9846515
+                @test CP.FlatZinc.parse_array_type("[          1.. 9846515 ]") == 9846515
+                @test CP.FlatZinc.parse_array_type("[1  ..9846515]") == 9846515
+            end
 
-            # With another type (still a string) and an *invalid* variable name.
-            var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var bool: 5454;")
-            @test var_array == ""
-            @test var_type == "bool"
-            @test var_name == "5454"
-            @test var_annotations == ""
-            @test var_value == ""
+            @testset "parse_range" begin
+                @test_throws AssertionError CP.FlatZinc.parse_range("")
+                @test_throws AssertionError CP.FlatZinc.parse_range("5")
+                @test_throws ErrorException CP.FlatZinc.parse_range("[2..5]")
+                @test_throws ErrorException CP.FlatZinc.parse_range("[2..5] ")
+                @test_throws ErrorException CP.FlatZinc.parse_range(" [2..5]")
+                @test_throws ErrorException CP.FlatZinc.parse_range(" [2..5] ")
 
-            # With another type (range of integers).
-            var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var 4..8: x1;")
-            @test var_array == ""
-            @test var_type == "4..8"
-            @test var_name == "x1"
-            @test var_annotations == ""
-            @test var_value == ""
+                @test CP.FlatZinc.parse_range("1..5") == (CP.FlatZinc.FznInt, 1, 5)
+                @test CP.FlatZinc.parse_range("1  ..  5") == (CP.FlatZinc.FznInt, 1, 5)
+                @test CP.FlatZinc.parse_range("1..9846515") == (CP.FlatZinc.FznInt, 1, 9846515)
+                @test CP.FlatZinc.parse_range("1.. 9846515") == (CP.FlatZinc.FznInt, 1, 9846515)
 
-            # With another type (range of floats).
-            var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var 4.5..8.4: x1;")
-            @test var_array == ""
-            @test var_type == "4.5..8.4"
-            @test var_name == "x1"
-            @test var_annotations == ""
-            @test var_value == ""
+                @test CP.FlatZinc.parse_range("1..1.5") == (CP.FlatZinc.FznFloat, 1, 1.5)
+                @test CP.FlatZinc.parse_range("1  ..  1.5") == (CP.FlatZinc.FznFloat, 1, 1.5)
+                @test CP.FlatZinc.parse_range("1..9.846515") == (CP.FlatZinc.FznFloat, 1, 9.846515)
+                @test CP.FlatZinc.parse_range("1.. 9.846515") == (CP.FlatZinc.FznFloat, 1, 9.846515)
+            end
 
-            # With another type (set of floats, intension).
-            var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var set of 4.5..8.4: x1;")
-            @test var_array == ""
-            @test var_type == "set of 4.5..8.4"
-            @test var_name == "x1"
-            @test var_annotations == ""
-            @test var_value == ""
+            @testset "parse_set" begin
+                @test_throws AssertionError CP.FlatZinc.parse_set("")
+                @test_throws AssertionError CP.FlatZinc.parse_set("5")
+                @test_throws AssertionError CP.FlatZinc.parse_set("[2..5]")
+                @test_throws AssertionError CP.FlatZinc.parse_set("{2, 5} ")
+                @test_throws AssertionError CP.FlatZinc.parse_set(" {2, 5}")
+                @test_throws AssertionError CP.FlatZinc.parse_set(" {2, 5} ")
 
-            # With another type (set of floats, extension).
-            var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var set of {4.5, 8.4}: x1;") 
-            @test var_array == ""
-            @test var_type == "set of {4.5, 8.4}"
-            @test var_name == "x1"
-            @test var_annotations == ""
-            @test var_value == ""
+                @test CP.FlatZinc.parse_set("{}") == (CP.FlatZinc.FznInt, Int[])
+                @test CP.FlatZinc.parse_set("{2}") == (CP.FlatZinc.FznInt, [2])
+                @test CP.FlatZinc.parse_set("{2, 5}") == (CP.FlatZinc.FznInt, [2, 5])
+                @test CP.FlatZinc.parse_set("{ 2 , 5 }") == (CP.FlatZinc.FznInt, [2, 5])
+                @test CP.FlatZinc.parse_set("{1, 9846515}") == (CP.FlatZinc.FznInt, [1, 9846515])
 
-            # With annotations.
-            var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 :: some_annotation;")
-            @test var_array == ""
-            @test var_type == "int"
-            @test var_name == "x1"
-            @test var_annotations == "some_annotation"
-            @test var_value == ""
+                # No empty float set, impossible to distinguish from integers.
+                @test CP.FlatZinc.parse_set("{2.0}") == (CP.FlatZinc.FznFloat, [2.0])
+                @test CP.FlatZinc.parse_set("{2.0, 5.1}") == (CP.FlatZinc.FznFloat, [2.0, 5.1])
+                @test CP.FlatZinc.parse_set("{ 2.0 , 5.1 }") == (CP.FlatZinc.FznFloat, [2.0, 5.1])
+                @test CP.FlatZinc.parse_set("{1.0, 9.846515}") == (CP.FlatZinc.FznFloat, [1.0, 9.846515])
+            end
 
-            # With value.
-            var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 = some_value;")
-            @test var_array == ""
-            @test var_type == "int"
-            @test var_name == "x1"
-            @test var_annotations == ""
-            @test var_value == "some_value"
+            @testset "parse_variable_type" begin
+                @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of")
+                @test_throws ErrorException CP.FlatZinc.parse_variable_type("set of [2..5]")
+                @test_throws ErrorException CP.FlatZinc.parse_variable_type("set of [2..5")
+                @test_throws ErrorException CP.FlatZinc.parse_variable_type("set of 2..5]")
+                @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of {2, 5")
+                @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of 2, 5}")
+                @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of {2..5")
+                @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of 2..5}")
 
-            # With annotations and value.
-            var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 :: some_annotation = some_value;")
-            @test var_array == ""
-            @test var_type == "int"
-            @test var_name == "x1"
-            @test var_annotations == "some_annotation"
-            @test var_value == "some_value"
+                @test CP.FlatZinc.parse_variable_type("bool") == (CP.FlatZinc.FznBool, CP.FlatZinc.FznScalar, nothing, nothing, nothing)
+                @test CP.FlatZinc.parse_variable_type("int") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznScalar, nothing, nothing, nothing)
+                @test CP.FlatZinc.parse_variable_type("float") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznScalar, nothing, nothing, nothing)
+                @test CP.FlatZinc.parse_variable_type("set of int") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, nothing)
 
-            # Array declaration.
-            var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("array [1..5] of var int: x1;")
-            @test var_array == "[1..5]"
-            @test var_type == "int"
-            @test var_name == "x1"
-            @test var_annotations == ""
-            @test var_value == ""
+                @test CP.FlatZinc.parse_variable_type("set of {}") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, Int[])
+                @test CP.FlatZinc.parse_variable_type("set of {2}") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, [2])
+                @test CP.FlatZinc.parse_variable_type("set of {2, 5}") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, [2, 5])
+                @test CP.FlatZinc.parse_variable_type("set of { 2 , 5 }") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, [2, 5])
+                @test CP.FlatZinc.parse_variable_type("set of {1, 9846515}") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, [1, 9846515])
+
+                # No empty float set, impossible to distinguish from integers.
+                @test CP.FlatZinc.parse_variable_type("set of {2.0}") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznSet, nothing, nothing, [2.0])
+                @test CP.FlatZinc.parse_variable_type("set of {2.0, 5.1}") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznSet, nothing, nothing, [2.0, 5.1])
+                @test CP.FlatZinc.parse_variable_type("set of { 2.0 , 5.1 }") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznSet, nothing, nothing, [2.0, 5.1])
+                @test CP.FlatZinc.parse_variable_type("set of {1.0, 9.846515}") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznSet, nothing, nothing, [1.0, 9.846515])
+
+                @test CP.FlatZinc.parse_variable_type("set of 2..5") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, 2, 5, nothing)
+            end
         end
 
-        @testset "parse_array_type" begin
-            @test_throws AssertionError CP.FlatZinc.parse_array_type("5")
-            @test_throws AssertionError CP.FlatZinc.parse_array_type("2..5")
-            @test_throws AssertionError CP.FlatZinc.parse_array_type("[2..5]")
-            @test_throws AssertionError CP.FlatZinc.parse_array_type("[2..5] ")
-            @test_throws AssertionError CP.FlatZinc.parse_array_type(" [2..5]")
-            @test_throws AssertionError CP.FlatZinc.parse_array_type(" [2..5] ")
+        @testset "Variable section" begin
+            @testset "Split a variable entry" begin
+                @test_throws AssertionError CP.FlatZinc.split_variable("")
+                @test_throws AssertionError CP.FlatZinc.split_variable("solve satisfy;")
 
-            @test CP.FlatZinc.parse_array_type("") === nothing
-            @test CP.FlatZinc.parse_array_type("[1..5]") == 5
-            @test CP.FlatZinc.parse_array_type("[  1  ..  5  ]") == 5
-            @test CP.FlatZinc.parse_array_type("[1..9846515]") == 9846515
-            @test CP.FlatZinc.parse_array_type("[          1.. 9846515 ]") == 9846515
-            @test CP.FlatZinc.parse_array_type("[1  ..9846515]") == 9846515
+                # Vanilla declaration.
+                var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1;")
+                @test var_array == ""
+                @test var_type == "int"
+                @test var_name == "x1"
+                @test var_annotations == ""
+                @test var_value == ""
+
+                # With another type (still a string) and an *invalid* variable name.
+                var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var bool: 5454;")
+                @test var_array == ""
+                @test var_type == "bool"
+                @test var_name == "5454"
+                @test var_annotations == ""
+                @test var_value == ""
+
+                # With another type (range of integers).
+                var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var 4..8: x1;")
+                @test var_array == ""
+                @test var_type == "4..8"
+                @test var_name == "x1"
+                @test var_annotations == ""
+                @test var_value == ""
+
+                # With another type (range of floats).
+                var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var 4.5..8.4: x1;")
+                @test var_array == ""
+                @test var_type == "4.5..8.4"
+                @test var_name == "x1"
+                @test var_annotations == ""
+                @test var_value == ""
+
+                # With another type (set of floats, intension).
+                var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var set of 4.5..8.4: x1;")
+                @test var_array == ""
+                @test var_type == "set of 4.5..8.4"
+                @test var_name == "x1"
+                @test var_annotations == ""
+                @test var_value == ""
+
+                # With another type (set of floats, extension).
+                var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var set of {4.5, 8.4}: x1;") 
+                @test var_array == ""
+                @test var_type == "set of {4.5, 8.4}"
+                @test var_name == "x1"
+                @test var_annotations == ""
+                @test var_value == ""
+
+                # With annotations.
+                var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 :: some_annotation;")
+                @test var_array == ""
+                @test var_type == "int"
+                @test var_name == "x1"
+                @test var_annotations == "some_annotation"
+                @test var_value == ""
+
+                # With value.
+                var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 = some_value;")
+                @test var_array == ""
+                @test var_type == "int"
+                @test var_name == "x1"
+                @test var_annotations == ""
+                @test var_value == "some_value"
+
+                # With annotations and value.
+                var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("var int: x1 :: some_annotation = some_value;")
+                @test var_array == ""
+                @test var_type == "int"
+                @test var_name == "x1"
+                @test var_annotations == "some_annotation"
+                @test var_value == "some_value"
+
+                # Array declaration.
+                var_array, var_type, var_name, var_annotations, var_value = CP.FlatZinc.split_variable("array [1..5] of var int: x1;")
+                @test var_array == "[1..5]"
+                @test var_type == "int"
+                @test var_name == "x1"
+                @test var_annotations == ""
+                @test var_value == ""
+            end
+
+            @testset "Variable entry" begin
+                m = CP.FlatZinc.Optimizer()
+                @test MOI.is_empty(m)
+
+                CP.FlatZinc.parse_variable!("var int: x;", m)
+                @test !MOI.is_empty(m)
+                @test MOI.get(m, MOI.NumberOfVariables()) == 1
+                @test MOI.get(m, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == 1
+            end
         end
 
-        @testset "parse_range" begin
-            @test_throws AssertionError CP.FlatZinc.parse_range("")
-            @test_throws AssertionError CP.FlatZinc.parse_range("5")
-            @test_throws ErrorException CP.FlatZinc.parse_range("[2..5]")
-            @test_throws ErrorException CP.FlatZinc.parse_range("[2..5] ")
-            @test_throws ErrorException CP.FlatZinc.parse_range(" [2..5]")
-            @test_throws ErrorException CP.FlatZinc.parse_range(" [2..5] ")
-
-            @test CP.FlatZinc.parse_range("1..5") == (CP.FlatZinc.FznInt, 1, 5)
-            @test CP.FlatZinc.parse_range("1  ..  5") == (CP.FlatZinc.FznInt, 1, 5)
-            @test CP.FlatZinc.parse_range("1..9846515") == (CP.FlatZinc.FznInt, 1, 9846515)
-            @test CP.FlatZinc.parse_range("1.. 9846515") == (CP.FlatZinc.FznInt, 1, 9846515)
-
-            @test CP.FlatZinc.parse_range("1..1.5") == (CP.FlatZinc.FznFloat, 1, 1.5)
-            @test CP.FlatZinc.parse_range("1  ..  1.5") == (CP.FlatZinc.FznFloat, 1, 1.5)
-            @test CP.FlatZinc.parse_range("1..9.846515") == (CP.FlatZinc.FznFloat, 1, 9.846515)
-            @test CP.FlatZinc.parse_range("1.. 9.846515") == (CP.FlatZinc.FznFloat, 1, 9.846515)
-        end
-
-        @testset "parse_set" begin
-            @test_throws AssertionError CP.FlatZinc.parse_set("")
-            @test_throws AssertionError CP.FlatZinc.parse_set("5")
-            @test_throws AssertionError CP.FlatZinc.parse_set("[2..5]")
-            @test_throws AssertionError CP.FlatZinc.parse_set("{2, 5} ")
-            @test_throws AssertionError CP.FlatZinc.parse_set(" {2, 5}")
-            @test_throws AssertionError CP.FlatZinc.parse_set(" {2, 5} ")
-
-            @test CP.FlatZinc.parse_set("{}") == (CP.FlatZinc.FznInt, Int[])
-            @test CP.FlatZinc.parse_set("{2}") == (CP.FlatZinc.FznInt, [2])
-            @test CP.FlatZinc.parse_set("{2, 5}") == (CP.FlatZinc.FznInt, [2, 5])
-            @test CP.FlatZinc.parse_set("{ 2 , 5 }") == (CP.FlatZinc.FznInt, [2, 5])
-            @test CP.FlatZinc.parse_set("{1, 9846515}") == (CP.FlatZinc.FznInt, [1, 9846515])
-
-            # No empty float set, impossible to distinguish from integers.
-            @test CP.FlatZinc.parse_set("{2.0}") == (CP.FlatZinc.FznFloat, [2.0])
-            @test CP.FlatZinc.parse_set("{2.0, 5.1}") == (CP.FlatZinc.FznFloat, [2.0, 5.1])
-            @test CP.FlatZinc.parse_set("{ 2.0 , 5.1 }") == (CP.FlatZinc.FznFloat, [2.0, 5.1])
-            @test CP.FlatZinc.parse_set("{1.0, 9.846515}") == (CP.FlatZinc.FznFloat, [1.0, 9.846515])
-        end
-
-        @testset "parse_variable_type" begin
-            @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of")
-            @test_throws ErrorException CP.FlatZinc.parse_variable_type("set of [2..5]")
-            @test_throws ErrorException CP.FlatZinc.parse_variable_type("set of [2..5")
-            @test_throws ErrorException CP.FlatZinc.parse_variable_type("set of 2..5]")
-            @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of {2, 5")
-            @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of 2, 5}")
-            @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of {2..5")
-            @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of 2..5}")
-
-            @test CP.FlatZinc.parse_variable_type("bool") == (CP.FlatZinc.FznBool, CP.FlatZinc.FznScalar, nothing, nothing, nothing)
-            @test CP.FlatZinc.parse_variable_type("int") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznScalar, nothing, nothing, nothing)
-            @test CP.FlatZinc.parse_variable_type("float") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznScalar, nothing, nothing, nothing)
-            @test CP.FlatZinc.parse_variable_type("set of int") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, nothing)
-
-            @test CP.FlatZinc.parse_variable_type("set of {}") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, Int[])
-            @test CP.FlatZinc.parse_variable_type("set of {2}") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, [2])
-            @test CP.FlatZinc.parse_variable_type("set of {2, 5}") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, [2, 5])
-            @test CP.FlatZinc.parse_variable_type("set of { 2 , 5 }") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, [2, 5])
-            @test CP.FlatZinc.parse_variable_type("set of {1, 9846515}") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, [1, 9846515])
-
-            # No empty float set, impossible to distinguish from integers.
-            @test CP.FlatZinc.parse_variable_type("set of {2.0}") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznSet, nothing, nothing, [2.0])
-            @test CP.FlatZinc.parse_variable_type("set of {2.0, 5.1}") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznSet, nothing, nothing, [2.0, 5.1])
-            @test CP.FlatZinc.parse_variable_type("set of { 2.0 , 5.1 }") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznSet, nothing, nothing, [2.0, 5.1])
-            @test CP.FlatZinc.parse_variable_type("set of {1.0, 9.846515}") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznSet, nothing, nothing, [1.0, 9.846515])
-
-            @test CP.FlatZinc.parse_variable_type("set of 2..5") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, 2, 5, nothing)
-        end
-
-        # m = CP.FlatZinc.Optimizer()
-        # @test MOI.is_empty(m)
-
-        # @test_throws ErrorException read!(IOBuffer(b"42"), m)
+        m = CP.FlatZinc.Optimizer()
+        @test MOI.is_empty(m)
     end
 end

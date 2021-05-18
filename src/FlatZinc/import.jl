@@ -131,8 +131,16 @@ function parse_variable!(item::AbstractString, model::Optimizer)
         moi_var = MOI.add_variable(model)
     else
         moi_var, _ = MOI.add_constrained_variable(model, moi_set)
+    end
 
     # - Ease the retrieval of the variable by name for further use.
+    if var_name in keys(model.name_to_var)
+        error("Duplicate variable name: $(var_name).")
+    end
+    model.name_to_var[var_name] = moi_var
+
+    # - Add a range constraint.
+    if var_min !== nothing && var_max !== nothing
         MOI.add_constraint(model, moi_var, MOI.Interval(var_min, var_max))
     end
 
@@ -155,6 +163,22 @@ end
 function parse_solve!(item::AbstractString, model::Optimizer)
     error("Solves are not supported.")
     return nothing
+end
+
+# -----------------------------------------------------------------------------
+# - Mapping between internal state and MOI sets.
+# -----------------------------------------------------------------------------
+
+function map_to_moi(var_type::FznVariableType)
+    if var_type == FznBool 
+        return MOI.ZeroOne()
+    elseif var_type == FznInt 
+        return MOI.Integer()
+    elseif var_type == FznFloat
+        return nothing
+    else
+        @assert false
+    end
 end
 
 # -----------------------------------------------------------------------------
