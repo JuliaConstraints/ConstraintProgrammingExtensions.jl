@@ -845,6 +845,7 @@ function write_constraint(
     s::MOI.EqualTo{Float64},
     ::Val{:float}
 )
+    # Hypothesis: !cons.output_as_part_of_variable.
     print(
         io,
         "float_eq($(_fzn_f(model, f.variable)), $(s.set.value))",
@@ -926,22 +927,6 @@ function write_constraint(
     print(
         io,
         "float_lin_eq_reif($(coefficients), [$(_fzn_f(model, variables))], $(value), $(_fzn_f(model, vars_1[1])))",
-    )
-    return nothing
-end
-
-function write_constraint(
-    io::IO,
-    model::Optimizer,
-    ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
-    s::MOI.EqualTo{Float64},
-    ::Val{:float}
-)
-    # Hypothesis: !cons.output_as_part_of_variable.
-    print(
-        io,
-        "float_eq($(_fzn_f(model, f)), $(s.value))",
     )
     return nothing
 end
