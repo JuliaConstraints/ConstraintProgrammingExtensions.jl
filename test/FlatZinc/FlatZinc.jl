@@ -1248,6 +1248,27 @@
             @test CP.FlatZinc.parse_range("1.. 9.846515") == ("float", 1, 9.846515)
         end
 
+        @testset "parse_set" begin
+            @test_throws AssertionError CP.FlatZinc.parse_set("")
+            @test_throws AssertionError CP.FlatZinc.parse_set("5")
+            @test_throws AssertionError CP.FlatZinc.parse_set("[2..5]")
+            @test_throws AssertionError CP.FlatZinc.parse_set("{2, 5} ")
+            @test_throws AssertionError CP.FlatZinc.parse_set(" {2, 5}")
+            @test_throws AssertionError CP.FlatZinc.parse_set(" {2, 5} ")
+
+            @test CP.FlatZinc.parse_set("{}") == ("int", Int[])
+            @test CP.FlatZinc.parse_set("{2}") == ("int", [2])
+            @test CP.FlatZinc.parse_set("{2, 5}") == ("int", [2, 5])
+            @test CP.FlatZinc.parse_set("{ 2 , 5 }") == ("int", [2, 5])
+            @test CP.FlatZinc.parse_set("{1, 9846515}") == ("int", [1, 9846515])
+
+            # No empty float set, impossible to distinguish from integers.
+            @test CP.FlatZinc.parse_set("{2.0}") == ("float", [2.0])
+            @test CP.FlatZinc.parse_set("{2.0, 5.1}") == ("float", [2.0, 5.1])
+            @test CP.FlatZinc.parse_set("{ 2.0 , 5.1 }") == ("float", [2.0, 5.1])
+            @test CP.FlatZinc.parse_set("{1.0, 9.846515}") == ("float", [1.0, 9.846515])
+        end
+
         # m = CP.FlatZinc.Optimizer()
         # @test MOI.is_empty(m)
 

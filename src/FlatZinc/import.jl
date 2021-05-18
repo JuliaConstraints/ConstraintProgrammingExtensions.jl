@@ -170,13 +170,59 @@ end
 
 function parse_set(set::String)
     # Typical inputs: "{}", "{1, 2, 3}"
+    # Typical inputs: "{}", "{1.0, 2.1, 3.2}"
+    @assert length(set) >= 2
 
     # Get rid of the curly braces
     @assert set[1] == '{'
     @assert set[end] == '}'
     set = set[2:end-1]
+    
+    # First, try to parse as integers: this is more restrictive than floats.
+    try
+        return ("int", parse_set_int(set))
+    catch
+        try
+            return ("float", parse_set_float(set))
+        catch
+            error("Ill-formed input: {$set}.")
+            return nothing
+        end
+    end
+end
 
+function parse_set_int(set::String)
+    # Typical inputs: "", "1, 2, 3"
 
+    values = Int[]
+    while length(set) > 0
+        if occursin(',', set)
+            value, set = split(set, ',', limit=2)
+            push!(values, parse(Int, value))
+        else
+            push!(values, parse(Int, set))
+            break
+        end
+    end
+
+    return values
+end
+
+function parse_set_float(set::String)
+    # Typical inputs: "", "1.0, 2.1, 3.2"
+
+    values = Float64[]
+    while length(set) > 0
+        if occursin(',', set)
+            value, set = split(set, ',', limit=2)
+            push!(values, parse(Float64, value))
+        else
+            push!(values, parse(Float64, set))
+            break
+        end
+    end
+
+    return values
 end
 
 function parse_variable_type(var_type::String)
