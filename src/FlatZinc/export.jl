@@ -259,9 +259,9 @@ function write_constraint(
     model::Optimizer,
     index::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::Union{CP.Reified{MOI.EqualTo{T}}, CP.Reified{MOI.LessThan{T}}},
+    s::Union{CP.Reified{MOI.EqualTo{T}}, CP.Reified{MOI.LessThan{T}}, CP.Reified{CP.Strictly{MOI.LessThan{T}, T}}, CP.Reified{CP.DifferentFrom{T}}},
 ) where {T}
-    # *_lin_eq_le_reif, *_lin_le_reif
+    # *_eq_reif, *_le_reif, *_lt_reif, *_ne_reif
     write_constraint(io, model, index, f, s, Val(_promote_type(model, f.variables)))
     return nothing
 end
@@ -271,15 +271,13 @@ function write_constraint(
     model::Optimizer,
     index::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction{T},
-    s::Union{CP.Reified{MOI.EqualTo{U}}, CP.Reified{MOI.LessThan{U}}},
+    s::Union{CP.Reified{MOI.EqualTo{U}}, CP.Reified{MOI.LessThan{U}}, CP.Reified{CP.Strictly{MOI.LessThan{U}, U}}, CP.Reified{CP.DifferentFrom{T}}},
 ) where {T, U}
-    # *_lin_eq_reif, *_lin_le_reif
-    variables, _ = _saf_to_coef_vars(f)
+    # *_lin_eq_reif, *_lin_le_reif, *_lin_lt_reif, *_lin_ne_reif
+    variables = _vaf_to_vars(f)
     write_constraint(io, model, index, f, s, Val(_promote_type(model, variables)))
     return nothing
 end
-
-# *_lin_lt: not needed, only float_lin_lt available in FlatZinc.
 
 function write_constraint(
     io::IO,
@@ -443,16 +441,21 @@ function write_constraint(
     ::Val{:int}
 )
     @assert MOI.output_dimension(f) == 2
-    @assert CP.is_binary(model, f.variables[1])
-    @assert CP.is_integer(model, f.variables[2])
-    @assert coefficients[1] == 1
+    vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
+    @assert length(vars_1) == 1
+    @assert length(coeffs_1) == 1
+    @assert CP.is_binary(model, vars_1[1])
+    for v in _vaf_to_vars(f, 2)
+        @assert CP.is_integer(model, v) || CP.is_binary(model, v)
+    end
+    @assert coeffs_1[1] == 1
 
-    variables, coefficients = _saf_to_coef_vars(f)
-    value = s.value - f.constant
+    variables, coefficients, constant = _vaf_to_coef_vars(f, 2)
+    value = s.set.value - constant
 
     print(
         io,
-        "int_lin_eq_reif($(coefficients[2:end]), [$(_fzn_f(model, variables[2:end]))], $(value), $(_fzn_f(model, variables[1])))",
+        "int_lin_eq_reif($(coefficients), [$(_fzn_f(model, variables))], $(value), $(_fzn_f(model, vars_1[1])))",
     )
     return nothing
 end
@@ -515,6 +518,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Reified{CP.DifferentFrom{Int}},
+    ::Val{:int}
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
@@ -523,6 +527,34 @@ function write_constraint(
     print(
         io,
         "int_ne_reif($(_fzn_f(model, f.variables[2])), $(s.set.value), $(_fzn_f(model, f.variables[1])))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorAffineFunction,
+    s::CP.Reified{CP.DifferentFrom{Int}},
+    ::Val{:int}
+)
+    @assert MOI.output_dimension(f) == 2
+    vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
+    @assert length(vars_1) == 1
+    @assert length(coeffs_1) == 1
+    @assert CP.is_binary(model, vars_1[1])
+    for v in _vaf_to_vars(f, 2)
+        @assert CP.is_integer(model, v) || CP.is_binary(model, v)
+    end
+    @assert coeffs_1[1] == 1
+
+    variables, coefficients, constant = _vaf_to_coef_vars(f, 2)
+    value = s.set.value - constant
+
+    print(
+        io,
+        "int_lin_ne_reif($(coefficients), [$(_fzn_f(model, variables))], $(value), $(_fzn_f(model, vars_1[1])))",
     )
     return nothing
 end
@@ -545,12 +577,41 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Reified{CP.Strictly{MOI.LessThan{Int}, Int}},
+    ::Val{:int}
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
     @assert CP.is_integer(model, f.variables[2])
 
     print(io, "int_lt_reif($(_fzn_f(model, f.variables[2])), $(s.set.set.upper), $(_fzn_f(model, f.variables[1])))")
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorAffineFunction,
+    s::CP.Reified{CP.Strictly{MOI.LessThan{Int}, Int}},
+    ::Val{:int}
+)
+    @assert MOI.output_dimension(f) == 2
+    vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
+    @assert length(vars_1) == 1
+    @assert length(coeffs_1) == 1
+    @assert CP.is_binary(model, vars_1[1])
+    for v in _vaf_to_vars(f, 2)
+        @assert CP.is_integer(model, v) || CP.is_binary(model, v)
+    end
+    @assert coeffs_1[1] == 1
+
+    variables, coefficients, constant = _vaf_to_coef_vars(f, 2)
+    value = s.set.set.upper - constant
+
+    print(
+        io,
+        "int_lin_lt_reif($(coefficients), [$(_fzn_f(model, variables))], $(value), $(_fzn_f(model, vars_1[1])))",
+    )
     return nothing
 end
 
@@ -839,6 +900,34 @@ function write_constraint(
     io::IO,
     model::Optimizer,
     ::MOI.ConstraintIndex,
+    f::MOI.VectorAffineFunction,
+    s::CP.Reified{MOI.LessThan{Int}},
+    ::Val{:int}
+)
+    @assert MOI.output_dimension(f) == 2
+    vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
+    @assert length(vars_1) == 1
+    @assert length(coeffs_1) == 1
+    @assert CP.is_binary(model, vars_1[1])
+    for v in _vaf_to_vars(f, 2)
+        @assert CP.is_integer(model, v) || CP.is_binary(model, v)
+    end
+    @assert coeffs_1[1] == 1
+
+    variables, coefficients, constant = _vaf_to_coef_vars(f, 2)
+    value = s.set.upper - constant
+
+    print(
+        io,
+        "int_lin_le_reif($(coefficients), [$(_fzn_f(model, variables))], $(value), $(_fzn_f(model, vars_1[1])))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::CP.Strictly{MOI.LessThan{Float64}},
 )
@@ -857,6 +946,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Reified{CP.Strictly{MOI.LessThan{Float64}, Float64}},
+    ::Val{:float}
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
@@ -864,6 +954,34 @@ function write_constraint(
     print(
         io,
         "float_lt_reif($(_fzn_f(model, f.variables[2])), $(s.set.set.upper), $(_fzn_f(model, f.variables[1])))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorAffineFunction,
+    s::CP.Reified{CP.Strictly{MOI.LessThan{Float64}, Float64}},
+    ::Val{:float}
+)
+    @assert MOI.output_dimension(f) == 2
+    vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
+    @assert length(vars_1) == 1
+    @assert length(coeffs_1) == 1
+    @assert CP.is_binary(model, vars_1[1])
+    for v in _vaf_to_vars(f, 2)
+        @assert CP.is_integer(model, v) || CP.is_binary(model, v)
+    end
+    @assert coeffs_1[1] == 1
+
+    variables, coefficients, constant = _vaf_to_coef_vars(f, 2)
+    value = s.set.set.upper - constant
+
+    print(
+        io,
+        "int_lin_le_reif($(coefficients), [$(_fzn_f(model, variables))], $(value), $(_fzn_f(model, vars_1[1])))",
     )
     return nothing
 end
@@ -890,6 +1008,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Reified{CP.DifferentFrom{Float64}},
+    ::Val{:float}
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
@@ -897,6 +1016,31 @@ function write_constraint(
     print(
         io,
         "float_ne_reif($(_fzn_f(model, f.variables[2])), $(s.set.value), $(_fzn_f(model, f.variables[1])))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorAffineFunction,
+    s::CP.Reified{CP.DifferentFrom{Float64}},
+    ::Val{:float}
+)
+    @assert MOI.output_dimension(f) == 2
+    vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
+    @assert length(vars_1) == 1
+    @assert length(coeffs_1) == 1
+    @assert CP.is_binary(model, vars_1[1])
+    @assert coeffs_1[1] == 1
+
+    variables, coefficients, constant = _vaf_to_coef_vars(f, 2)
+    value = s.set.value - constant
+
+    print(
+        io,
+        "float_lin_le_reif($(coefficients), [$(_fzn_f(model, variables))], $(value), $(_fzn_f(model, vars_1[1])))",
     )
     return nothing
 end
@@ -974,4 +1118,25 @@ function _saf_to_coef_vars(f::MOI.ScalarAffineFunction)
     coefficients = Int[t.coefficient for t in f.terms]
 
     return variables, coefficients
+end
+
+function _vaf_to_vars(f::MOI.VectorAffineFunction)
+    MOIU.canonicalize!(f)
+    variables = MOI.VariableIndex[t.scalar_term.variable_index for t in f.terms]
+    return variables
+end
+
+function _vaf_to_vars(f::MOI.VectorAffineFunction, dim::Int)
+    MOIU.canonicalize!(f)
+    variables = MOI.VariableIndex[t.scalar_term.variable_index for t in f.terms if t.output_index == dim]
+    return variables
+end
+
+function _vaf_to_coef_vars(f::MOI.VectorAffineFunction, dim::Int)
+    MOIU.canonicalize!(f)
+    variables = MOI.VariableIndex[t.scalar_term.variable_index for t in f.terms if t.output_index == dim]
+    coefficients = Int[t.scalar_term.coefficient for t in f.terms if t.output_index == dim]
+    constant = f.constants[dim]
+
+    return variables, coefficients, constant
 end

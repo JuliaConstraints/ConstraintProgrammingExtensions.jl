@@ -769,28 +769,45 @@
             @test MOI.is_empty(m)
     
             # Create variable.
+            w, w_bool = MOI.add_constrained_variable(m, MOI.ZeroOne())
             x, x_bool = MOI.add_constrained_variable(m, MOI.ZeroOne())
             y, y_int = MOI.add_constrained_variable(m, MOI.Integer())
+            z, z_int = MOI.add_constrained_variable(m, MOI.Integer())
     
             @test !MOI.is_empty(m)
+            @test MOI.is_valid(m, w)
+            @test MOI.is_valid(m, w_bool)
             @test MOI.is_valid(m, x)
             @test MOI.is_valid(m, x_bool)
             @test MOI.is_valid(m, y)
             @test MOI.is_valid(m, y_int)
+            @test MOI.is_valid(m, z)
+            @test MOI.is_valid(m, z_int)
     
             # Don't set names to check whether they are made unique before 
             # generating the model.
     
             # Add constraints. 
-            c1 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.EqualTo(2)))
-            c2 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.LessThan(2)))
-            c3 = MOI.add_constraint(m, [x, y], CP.Reified(CP.Strictly(MOI.LessThan(2))))
+            vaf = MOI.VectorAffineFunction(
+                MOI.VectorAffineTerm.(
+                    [1, 2, 2, 2],
+                    MOI.ScalarAffineTerm.([1, 1, 1, 1], [w, x, y, z]),
+                ),
+                [0, 0],
+            )
+
+            c1 = MOI.add_constraint(m, vaf, CP.Reified(MOI.EqualTo(2)))
+            c2 = MOI.add_constraint(m, vaf, CP.Reified(MOI.LessThan(2)))
+            c3 = MOI.add_constraint(m, vaf, CP.Reified(CP.Strictly(MOI.LessThan(2))))
+            c4 = MOI.add_constraint(m, vaf, CP.Reified(CP.DifferentFrom(2)))
     
             @test MOI.is_valid(m, c1)
+            @test MOI.is_valid(m, c2)
             @test MOI.is_valid(m, c3)
+            @test MOI.is_valid(m, c4)
     
             # Test some attributes for these constraints.
-            @test length(MOI.get(m, MOI.ListOfConstraints())) == 5
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 6
     
             # Generate the FZN file.
             io = IOBuffer(truncate=true)
@@ -798,13 +815,16 @@
             fzn = String(take!(io))
     
             @test fzn == """var bool: x1;
-                var int: x2;
+                var bool: x2;
+                var int: x3;
+                var int: x4;
                 
                 
                 
-                constraint int_eq_reif(x2, 2, x1);
-                constraint int_le_reif(x1, 2, x1);
-                constraint int_lt_reif(x2, 2, x1);
+                constraint int_lin_eq_reif([1, 1, 1], [x2, x3, x4], 2, x1);
+                constraint int_lin_le_reif([1, 1, 1], [x2, x3, x4], 2, x1);
+                constraint int_lin_lt_reif([1, 1, 1], [x2, x3, x4], 2, x1);
+                constraint int_lin_ne_reif([1, 1, 1], [x2, x3, x4], 2, x1);
                 
                 solve satisfy;
                 """
