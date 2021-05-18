@@ -388,7 +388,7 @@
                 
 
                 constraint int_lin_ne([1, 1], [x1, x2], 2);
-                constraint float_lin_ne([1, 2], [x3, x4], 2.0);
+                constraint float_lin_ne([1.0, 2.0], [x3, x4], 2.0);
                 
                 solve satisfy;
                 """
@@ -478,7 +478,7 @@
             @test match(r"^x\d+$", xn) !== nothing
         end
 
-        @testset "Constraints: MOI.ScalarAffineFunction in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan}" begin
+        @testset "Constraints: MOI.ScalarAffineFunction in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
     
@@ -574,9 +574,9 @@
                 constraint int_lin_le([1, 1], [x1, x2], 2);
                 constraint bool_lin_eq([1, 1], [x3, x4], 1);
                 constraint bool_lin_eq([1, 1], [x3, x4], 0);
-                constraint float_lin_eq([1, 2], [x5, x6], 2.0);
-                constraint float_lin_le([1, 2], [x5, x6], 2.0);
-                constraint float_lin_lt([1, 2], [x5, x6], 2.0);
+                constraint float_lin_eq([1.0, 2.0], [x5, x6], 2.0);
+                constraint float_lin_le([1.0, 2.0], [x5, x6], 2.0);
+                constraint float_lin_lt([1.0, 2.0], [x5, x6], 2.0);
                 
                 solve satisfy;
                 """
@@ -588,7 +588,7 @@
             end
         end
         
-        @testset "Constraints: MOI.SingleVariable in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan}" begin
+        @testset "Constraints: MOI.SingleVariable in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
     
@@ -653,7 +653,7 @@
             end
         end
 
-        @testset "Constraints: CP.Reified{MOI.VectorOfVariables of integers in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan}}" begin
+        @testset "Constraints: CP.Reified{MOI.VectorOfVariables of integers in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
     
@@ -709,7 +709,7 @@
             end
         end
 
-        @testset "Constraints: CP.Reified{MOI.VectorOfVariables of floats in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan}}" begin
+        @testset "Constraints: CP.Reified{MOI.VectorOfVariables of floats in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
     
@@ -764,7 +764,7 @@
             end
         end
 
-        @testset "Constraints: CP.Reified{MOI.VectorAffineFunction of integers in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan}}" begin
+        @testset "Constraints: CP.Reified{MOI.VectorAffineFunction of integers in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
     
@@ -825,6 +825,77 @@
                 constraint int_lin_le_reif([1, 1, 1], [x2, x3, x4], 2, x1);
                 constraint int_lin_lt_reif([1, 1, 1], [x2, x3, x4], 2, x1);
                 constraint int_lin_ne_reif([1, 1, 1], [x2, x3, x4], 2, x1);
+                
+                solve satisfy;
+                """
+
+            # Test that the names have been correctly transformed.
+            for v in [x, y]
+                vn = MOI.get(m, MOI.VariableName(), v)
+                @test match(r"^x\d+$", vn) !== nothing
+            end
+        end
+
+        @testset "Constraints: CP.Reified{MOI.VectorAffineFunction of floats in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan}}" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
+    
+            # Create variable.
+            w, w_bool = MOI.add_constrained_variable(m, MOI.ZeroOne())
+            x, x_bool = MOI.add_constrained_variable(m, MOI.ZeroOne())
+            y, y_int = MOI.add_constrained_variable(m, MOI.Integer())
+            z = MOI.add_variable(m)
+    
+            @test !MOI.is_empty(m)
+            @test MOI.is_valid(m, w)
+            @test MOI.is_valid(m, w_bool)
+            @test MOI.is_valid(m, x)
+            @test MOI.is_valid(m, x_bool)
+            @test MOI.is_valid(m, y)
+            @test MOI.is_valid(m, y_int)
+            @test MOI.is_valid(m, z)
+    
+            # Don't set names to check whether they are made unique before 
+            # generating the model.
+    
+            # Add constraints. 
+            vaf = MOI.VectorAffineFunction(
+                MOI.VectorAffineTerm.(
+                    [1, 2, 2, 2],
+                    MOI.ScalarAffineTerm.([1.0, 1.0, 1.0, 1.0], [w, x, y, z]),
+                ),
+                [0.0, 0.0],
+            )
+
+            c1 = MOI.add_constraint(m, vaf, CP.Reified(MOI.EqualTo(2.0)))
+            c2 = MOI.add_constraint(m, vaf, CP.Reified(MOI.LessThan(2.0)))
+            c3 = MOI.add_constraint(m, vaf, CP.Reified(CP.Strictly(MOI.LessThan(2.0))))
+            c4 = MOI.add_constraint(m, vaf, CP.Reified(CP.DifferentFrom(2.0)))
+    
+            @test MOI.is_valid(m, c1)
+            @test MOI.is_valid(m, c2)
+            @test MOI.is_valid(m, c3)
+            @test MOI.is_valid(m, c4)
+    
+            # Test some attributes for these constraints.
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 6
+    
+            # Generate the FZN file.
+            io = IOBuffer(truncate=true)
+            write(io, m)
+            fzn = String(take!(io))
+    
+            @test fzn == """var bool: x1;
+                var bool: x2;
+                var int: x3;
+                var float: x4;
+                
+                
+                
+                constraint float_lin_eq_reif([1.0, 1.0, 1.0], [x2, x3, x4], 2.0, x1);
+                constraint float_lin_le_reif([1.0, 1.0, 1.0], [x2, x3, x4], 2.0, x1);
+                constraint float_lin_lt_reif([1.0, 1.0, 1.0], [x2, x3, x4], 2.0, x1);
+                constraint float_lin_ne_reif([1.0, 1.0, 1.0], [x2, x3, x4], 2.0, x1);
                 
                 solve satisfy;
                 """
