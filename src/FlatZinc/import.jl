@@ -6,6 +6,7 @@
 
 @enum FznParserstate FznPredicate FznParameter FznVar FznConstraint FznSolve FznDone
 @enum FznVariableType FznBool FznInt FznFloat
+@enum FznVariableValueMultiplicity FznScalar FznSet
 
 const FZN_PARAMETER_TYPES_PREFIX = String["bool", "int", "float", "set of int", "array"]
 
@@ -118,7 +119,7 @@ function parse_variable!(item::AbstractString, model::Optimizer)
     @show var_type
 
     # Map to MOI constructs and add into the model.
-    if var_multiplicity != "scalar"
+    if var_multiplicity != FznScalar
         error("Set variables are not supported.")
     end
 
@@ -257,20 +258,20 @@ function parse_variable_type(var_type::AbstractString)
 
     # Return tuple: 
     # - variable type: FznVariableType
-    # - variable multiplicity: String ("scalar", "set")
+    # - variable multiplicity: FznVariableValueMultiplicity
     # - range minimum: Union{Nothing, Int, Float64}
     # - range maximum: Union{Nothing, Int, Float64}
     # - allowed values: Union{Nothing, Vector{Int}, Vector{Float64}}
 
     # Basic variable type.
     if var_type == "bool"
-        return (FznBool, "scalar", nothing, nothing, nothing)
+        return (FznBool, FznScalar, nothing, nothing, nothing)
     elseif var_type == "int"
-        return (FznInt, "scalar", nothing, nothing, nothing)
+        return (FznInt, FznScalar, nothing, nothing, nothing)
     elseif var_type == "float"
-        return (FznFloat, "scalar", nothing, nothing, nothing)
+        return (FznFloat, FznScalar, nothing, nothing, nothing)
     elseif var_type == "set of int"
-        return (FznInt, "set", nothing, nothing, nothing)
+        return (FznInt, FznSet, nothing, nothing, nothing)
     end
 
     # Sets, both ranges and sets in extension.
@@ -283,12 +284,12 @@ function parse_variable_type(var_type::AbstractString)
 
         if startswith(var_type, '{') && endswith(var_type, '}')
             var_type, var_values = parse_set(var_type)
-            return (var_type, "set", nothing, nothing, var_values)
+            return (var_type, FznSet, nothing, nothing, var_values)
         end
 
         if !startswith(var_type, '{') && !endswith(var_type, '}') && occursin("..", var_type)
             var_type, var_min, var_max = parse_range(var_type)
-            return (var_type, "set", var_min, var_max, nothing)
+            return (var_type, FznSet, var_min, var_max, nothing)
         end
 
         @assert false
@@ -298,13 +299,13 @@ function parse_variable_type(var_type::AbstractString)
     # this might conflict with other cases ("set of 1..4", for instance).
     if occursin("..", var_type)
         var_type, var_min, var_max = parse_range(var_type)
-        return (var_type, "scalar", var_min, var_max, nothing)
+        return (var_type, FznScalar, var_min, var_max, nothing)
     end
 
     # Scalar variables, with sets given in extension.
     if startswith(var_type, '{') && endswith(var_type, '}')
         var_type, var_values = parse_set(var_type)
-        return (var_type, "scalar", nothing, nothing, var_values)
+        return (var_type, FznScalar, nothing, nothing, var_values)
     end
 
     # If no return previously, this could not be parsed.

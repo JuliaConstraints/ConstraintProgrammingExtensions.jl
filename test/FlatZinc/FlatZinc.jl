@@ -1279,24 +1279,24 @@
             @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of {2..5")
             @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of 2..5}")
 
-            @test CP.FlatZinc.parse_variable_type("bool") == (CP.FlatZinc.FznBool, "scalar", nothing, nothing, nothing)
-            @test CP.FlatZinc.parse_variable_type("int") == (CP.FlatZinc.FznInt, "scalar", nothing, nothing, nothing)
-            @test CP.FlatZinc.parse_variable_type("float") == (CP.FlatZinc.FznFloat, "scalar", nothing, nothing, nothing)
-            @test CP.FlatZinc.parse_variable_type("set of int") == (CP.FlatZinc.FznInt, "set", nothing, nothing, nothing)
+            @test CP.FlatZinc.parse_variable_type("bool") == (CP.FlatZinc.FznBool, CP.FlatZinc.FznScalar, nothing, nothing, nothing)
+            @test CP.FlatZinc.parse_variable_type("int") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznScalar, nothing, nothing, nothing)
+            @test CP.FlatZinc.parse_variable_type("float") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznScalar, nothing, nothing, nothing)
+            @test CP.FlatZinc.parse_variable_type("set of int") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, nothing)
 
-            @test CP.FlatZinc.parse_variable_type("set of {}") == (CP.FlatZinc.FznInt, "set", nothing, nothing, Int[])
-            @test CP.FlatZinc.parse_variable_type("set of {2}") == (CP.FlatZinc.FznInt, "set", nothing, nothing, [2])
-            @test CP.FlatZinc.parse_variable_type("set of {2, 5}") == (CP.FlatZinc.FznInt, "set", nothing, nothing, [2, 5])
-            @test CP.FlatZinc.parse_variable_type("set of { 2 , 5 }") == (CP.FlatZinc.FznInt, "set", nothing, nothing, [2, 5])
-            @test CP.FlatZinc.parse_variable_type("set of {1, 9846515}") == (CP.FlatZinc.FznInt, "set", nothing, nothing, [1, 9846515])
+            @test CP.FlatZinc.parse_variable_type("set of {}") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, Int[])
+            @test CP.FlatZinc.parse_variable_type("set of {2}") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, [2])
+            @test CP.FlatZinc.parse_variable_type("set of {2, 5}") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, [2, 5])
+            @test CP.FlatZinc.parse_variable_type("set of { 2 , 5 }") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, [2, 5])
+            @test CP.FlatZinc.parse_variable_type("set of {1, 9846515}") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, nothing, nothing, [1, 9846515])
 
             # No empty float set, impossible to distinguish from integers.
-            @test CP.FlatZinc.parse_variable_type("set of {2.0}") == (CP.FlatZinc.FznFloat, "set", nothing, nothing, [2.0])
-            @test CP.FlatZinc.parse_variable_type("set of {2.0, 5.1}") == (CP.FlatZinc.FznFloat, "set", nothing, nothing, [2.0, 5.1])
-            @test CP.FlatZinc.parse_variable_type("set of { 2.0 , 5.1 }") == (CP.FlatZinc.FznFloat, "set", nothing, nothing, [2.0, 5.1])
-            @test CP.FlatZinc.parse_variable_type("set of {1.0, 9.846515}") == (CP.FlatZinc.FznFloat, "set", nothing, nothing, [1.0, 9.846515])
+            @test CP.FlatZinc.parse_variable_type("set of {2.0}") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznSet, nothing, nothing, [2.0])
+            @test CP.FlatZinc.parse_variable_type("set of {2.0, 5.1}") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznSet, nothing, nothing, [2.0, 5.1])
+            @test CP.FlatZinc.parse_variable_type("set of { 2.0 , 5.1 }") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznSet, nothing, nothing, [2.0, 5.1])
+            @test CP.FlatZinc.parse_variable_type("set of {1.0, 9.846515}") == (CP.FlatZinc.FznFloat, CP.FlatZinc.FznSet, nothing, nothing, [1.0, 9.846515])
 
-            @test CP.FlatZinc.parse_variable_type("set of 2..5") == (CP.FlatZinc.FznInt, "set", 2, 5, nothing)
+            @test CP.FlatZinc.parse_variable_type("set of 2..5") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, 2, 5, nothing)
         end
 
         # m = CP.FlatZinc.Optimizer()
