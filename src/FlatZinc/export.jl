@@ -493,25 +493,6 @@ function write_constraint(
     io::IO,
     model::Optimizer,
     ::MOI.ConstraintIndex,
-    f::MOI.VectorAffineFunction,
-    s::MOI.LessThan{Int},
-    ::Val{:int}
-)
-    @assert MOI.output_dimension(f) == 2
-
-    variables, coefficients = _saf_to_coef_vars(f)
-    value = s.upper - f.constant
-    print(
-        io,
-        "int_lin_le_reif($(coefficients[2:end]), [$(_fzn_f(model, variables[2:end]))], $(value), $(_fzn_f(model, variables[1])))",
-    )
-    return nothing
-end
-
-function write_constraint(
-    io::IO,
-    model::Optimizer,
-    ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
     s::CP.DifferentFrom{Int},
 )
