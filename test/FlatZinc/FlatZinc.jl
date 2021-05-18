@@ -609,21 +609,19 @@
             end
         end
         
-        @testset "Constraints: MOI.SingleVariable in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom" begin
+        @testset "Constraints: MOI.SingleVariable of integer in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
     
             # Create variable.
             x, x_int = MOI.add_constrained_variable(m, MOI.Integer())
             y, y_bool = MOI.add_constrained_variable(m, MOI.ZeroOne())
-            z = MOI.add_variable(m)
     
             @test !MOI.is_empty(m)
             @test MOI.is_valid(m, x)
             @test MOI.is_valid(m, x_int)
             @test MOI.is_valid(m, y)
             @test MOI.is_valid(m, y_bool)
-            @test MOI.is_valid(m, z)
     
             # Don't set names to check whether they are made unique before 
             # generating the model.
@@ -634,10 +632,8 @@
             c3 = MOI.add_constraint(m, x, MOI.EqualTo(4))
             c4 = MOI.add_constraint(m, y, MOI.EqualTo(false))
             c5 = MOI.add_constraint(m, y, MOI.EqualTo(1)) # 1 will be cast to true.
-            c6 = MOI.add_constraint(m, z, MOI.EqualTo(5.0))
-            c7 = MOI.add_constraint(m, x, CP.DifferentFrom(2))
-            c8 = MOI.add_constraint(m, y, CP.DifferentFrom(false))
-            c9 = MOI.add_constraint(m, z, CP.DifferentFrom(2.0))
+            c6 = MOI.add_constraint(m, x, CP.DifferentFrom(2))
+            c7 = MOI.add_constraint(m, y, CP.DifferentFrom(false))
     
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
@@ -646,11 +642,9 @@
             @test MOI.is_valid(m, c5)
             @test MOI.is_valid(m, c6)
             @test MOI.is_valid(m, c7)
-            @test MOI.is_valid(m, c8)
-            @test MOI.is_valid(m, c9)
     
             # Test some attributes for these constraints.
-            @test length(MOI.get(m, MOI.ListOfConstraints())) == 10
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 8
     
             # Generate the FZN file.
             io = IOBuffer(truncate=true)
@@ -659,7 +653,6 @@
 
             @test fzn == """var int: x1;
                 var bool: x2;
-                var float: x3;
                 
                 
                 
@@ -668,16 +661,59 @@
                 constraint int_eq(x1, 4);
                 constraint bool_eq(x2, false);
                 constraint bool_eq(x2, true);
-                constraint float_eq(x3, 5.0);
                 constraint int_ne(x1, 2);
                 constraint int_ne(x2, false);
-                constraint float_ne(x3, 2.0);
                 
                 solve satisfy;
                 """
 
             # Test that the names have been correctly transformed.
-            for v in [x, y, z]
+            for v in [x, y]
+                vn = MOI.get(m, MOI.VariableName(), v)
+                @test match(r"^x\d+$", vn) !== nothing
+            end
+        end
+        
+        @testset "Constraints: MOI.SingleVariable of float in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
+    
+            # Create variable.
+            x = MOI.add_variable(m)
+    
+            @test !MOI.is_empty(m)
+            @test MOI.is_valid(m, x)
+    
+            # Don't set names to check whether they are made unique before 
+            # generating the model.
+    
+            # Add constraints. 
+            c1 = MOI.add_constraint(m, x, MOI.EqualTo(5.0))
+            c2 = MOI.add_constraint(m, x, CP.DifferentFrom(2.0))
+    
+            @test MOI.is_valid(m, c1)
+            @test MOI.is_valid(m, c2)
+    
+            # Test some attributes for these constraints.
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 2
+    
+            # Generate the FZN file.
+            io = IOBuffer(truncate=true)
+            write(io, m)
+            fzn = String(take!(io))
+
+            @test fzn == """var float: x1;
+                
+                
+                
+                constraint float_eq(x1, 5.0);
+                constraint float_ne(x1, 2.0);
+                
+                solve satisfy;
+                """
+
+            # Test that the names have been correctly transformed.
+            for v in [x]
                 vn = MOI.get(m, MOI.VariableName(), v)
                 @test match(r"^x\d+$", vn) !== nothing
             end
