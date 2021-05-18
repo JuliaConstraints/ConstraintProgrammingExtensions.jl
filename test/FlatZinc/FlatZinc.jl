@@ -544,6 +544,21 @@
                 ),
                 CP.Strictly(MOI.LessThan(2.0)),
             )
+            c8 = MOI.add_constraint(
+                m,
+                MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], y), 0),
+                CP.DifferentFrom(true),
+            )
+            c9 = MOI.add_constraint(
+                m,
+                MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1.0, 1.0], z), 0.0),
+                CP.DifferentFrom(1.0),
+            )
+            c10 = MOI.add_constraint(
+                m,
+                MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], x), 0),
+                CP.DifferentFrom(1),
+            )
     
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
@@ -552,9 +567,12 @@
             @test MOI.is_valid(m, c5)
             @test MOI.is_valid(m, c6)
             @test MOI.is_valid(m, c7)
+            @test MOI.is_valid(m, c8)
+            @test MOI.is_valid(m, c9)
+            @test MOI.is_valid(m, c10)
     
             # Test some attributes for these constraints.
-            @test length(MOI.get(m, MOI.ListOfConstraints())) == 8
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 11
     
             # Generate the FZN file.
             io = IOBuffer(truncate=true)
@@ -577,6 +595,9 @@
                 constraint float_lin_eq([1.0, 2.0], [x5, x6], 2.0);
                 constraint float_lin_le([1.0, 2.0], [x5, x6], 2.0);
                 constraint float_lin_lt([1.0, 2.0], [x5, x6], 2.0);
+                constraint int_lin_ne([1, 1], [x3, x4], 1);
+                constraint float_lin_ne([1.0, 1.0], [x5, x6], 1.0);
+                constraint int_lin_ne([1, 1], [x1, x2], 1);
                 
                 solve satisfy;
                 """
@@ -612,8 +633,11 @@
             c2 = MOI.add_constraint(m, x, CP.Strictly(MOI.LessThan(2)))
             c3 = MOI.add_constraint(m, x, MOI.EqualTo(4))
             c4 = MOI.add_constraint(m, y, MOI.EqualTo(false))
-            c5 = MOI.add_constraint(m, y, MOI.EqualTo(1))
+            c5 = MOI.add_constraint(m, y, MOI.EqualTo(1)) # 1 will be cast to true.
             c6 = MOI.add_constraint(m, z, MOI.EqualTo(5.0))
+            c7 = MOI.add_constraint(m, x, CP.DifferentFrom(2))
+            c8 = MOI.add_constraint(m, y, CP.DifferentFrom(false))
+            c9 = MOI.add_constraint(m, z, CP.DifferentFrom(2.0))
     
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
@@ -621,9 +645,12 @@
             @test MOI.is_valid(m, c4)
             @test MOI.is_valid(m, c5)
             @test MOI.is_valid(m, c6)
+            @test MOI.is_valid(m, c7)
+            @test MOI.is_valid(m, c8)
+            @test MOI.is_valid(m, c9)
     
             # Test some attributes for these constraints.
-            @test length(MOI.get(m, MOI.ListOfConstraints())) == 7
+            @test length(MOI.get(m, MOI.ListOfConstraints())) == 10
     
             # Generate the FZN file.
             io = IOBuffer(truncate=true)
@@ -640,8 +667,11 @@
                 constraint int_lt(x1, 2);
                 constraint int_eq(x1, 4);
                 constraint bool_eq(x2, false);
-                constraint bool_eq(x2, 1);
+                constraint bool_eq(x2, true);
                 constraint float_eq(x3, 5.0);
+                constraint int_ne(x1, 2);
+                constraint int_ne(x2, false);
+                constraint float_ne(x3, 2.0);
                 
                 solve satisfy;
                 """
@@ -836,7 +866,7 @@
             end
         end
 
-        @testset "Constraints: CP.Reified{MOI.VectorAffineFunction of floats in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan}}" begin
+        @testset "Constraints: CP.Reified{MOI.VectorAffineFunction of floats in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
     

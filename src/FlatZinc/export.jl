@@ -501,10 +501,64 @@ function write_constraint(
     io::IO,
     model::Optimizer,
     ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::CP.DifferentFrom{Int},
+)
+    @assert CP.is_integer(model, f.variable) || CP.is_binary(model, f.variable)
+    print(
+        io,
+        "int_ne($(_fzn_f(model, f.variable)), $(s.value))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::CP.DifferentFrom{Bool},
+)
+    @assert CP.is_binary(model, f.variable)
+    print(
+        io,
+        "int_ne($(_fzn_f(model, f.variable)), $(s.value))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.ScalarAffineFunction,
+    s::CP.DifferentFrom{Bool},
+)
+    variables, coefficients = _saf_to_coef_vars(f)
+    for v in variables
+        @assert CP.is_binary(model, v)
+    end
+
+    value = s.value - f.constant
+    print(
+        io,
+        "int_lin_ne($(coefficients), [$(_fzn_f(model, variables))], $(value))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::CP.DifferentFrom{Int},
 )
     variables, coefficients = _saf_to_coef_vars(f)
+    for v in variables
+        @assert CP.is_integer(model, v) || CP.is_binary(model, v)
+    end
+
     value = s.value - f.constant
     print(
         io,
@@ -686,7 +740,7 @@ function write_constraint(
     # Hypothesis: !cons.output_as_part_of_variable.
     print(
         io,
-        "bool_eq($(_fzn_f(model, f)), $(s.value))",
+        "bool_eq($(_fzn_f(model, f)), $(Bool(s.value)))",
     )
     return nothing
 end
@@ -1027,10 +1081,6 @@ function write_constraint(
     variables, coefficients, constant = _vaf_to_coef_vars(f, 2)
     value = Float64(s.set.set.upper - constant)
 
-    @show value
-    @show "$value"
-    @show "float_lin_lt_reif($(coefficients), [$(_fzn_f(model, variables))], $(value), $(_fzn_f(model, vars_1[1])))"
-
     print(
         io,
         "float_lin_lt_reif($(coefficients), [$(_fzn_f(model, variables))], $(value), $(_fzn_f(model, vars_1[1])))",
@@ -1050,6 +1100,20 @@ function write_constraint(
     print(
         io,
         "float_lin_ne($(coefficients), [$(_fzn_f(model, variables))], $(value))",
+    )
+    return nothing
+end
+
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.SingleVariable,
+    s::CP.DifferentFrom{Float64},
+)
+    print(
+        io,
+        "float_ne($(_fzn_f(model, f.variable)), $(s.value))",
     )
     return nothing
 end
