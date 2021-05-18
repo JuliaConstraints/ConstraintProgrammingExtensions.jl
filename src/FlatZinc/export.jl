@@ -775,7 +775,7 @@ function write_constraint(
     ::Val{:bool}
 )
     variables, coefficients = _saf_to_coef_vars(f)
-    value = s.value - f.constant
+    value = s.upper - f.constant
     print(
         io,
         "bool_lin_le($(coefficients), [$(_fzn_f(model, variables))], $(value))",

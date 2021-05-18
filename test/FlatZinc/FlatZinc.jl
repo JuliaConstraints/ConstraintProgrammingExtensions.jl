@@ -559,6 +559,11 @@
                 MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], x), 0),
                 CP.DifferentFrom(1),
             )
+            c11 = MOI.add_constraint(
+                m,
+                MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1], y), 0),
+                MOI.LessThan(1),
+            )
     
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
@@ -570,6 +575,7 @@
             @test MOI.is_valid(m, c8)
             @test MOI.is_valid(m, c9)
             @test MOI.is_valid(m, c10)
+            @test MOI.is_valid(m, c11)
     
             # Test some attributes for these constraints.
             @test length(MOI.get(m, MOI.ListOfConstraints())) == 11
@@ -598,6 +604,7 @@
                 constraint int_lin_ne([1, 1], [x3, x4], 1);
                 constraint float_lin_ne([1.0, 1.0], [x5, x6], 1.0);
                 constraint int_lin_ne([1, 1], [x1, x2], 1);
+                constraint bool_lin_le([1, 1], [x3, x4], 1);
                 
                 solve satisfy;
                 """
