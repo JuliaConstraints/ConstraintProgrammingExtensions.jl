@@ -5,6 +5,7 @@
 # =============================================================================
 
 @enum FznParserstate FznPredicate FznParameter FznVar FznConstraint FznSolve FznDone
+@enum FznVariableType FznBool FznInt FznFloat
 
 const FZN_PARAMETER_TYPES_PREFIX = String["bool", "int", "float", "set of int", "array"]
 
@@ -97,15 +98,31 @@ function parse_variable!(item::AbstractString, model::Optimizer)
     # Complex input: "array [1..5] of var int: x1;"
     # Complex input: "var int: x1 :: some_annotation = some_value;"
 
+    # Split the item into interesting parts. 
     var_array, var_type, var_name, var_annotations, var_value = split_variable(item)
 
+    # Parse the parts if need be.
     if var_array === nothing
-        var_array = 1
+        var_array_length = 1
     else
-        var_array = parse_array_type(var_array)
+        var_array_length = parse_array_type(var_array)
     end
 
-    var_type = parse_variable_type(var_type)
+    var_type, var_multiplicity, var_min, var_max, var_allowed_values = parse_variable_type(var_type)
+
+    if length(var_annotations) > 0
+        @warn "Annotations are not supported and are currently ignored."
+    end
+
+    @show var_array_length
+    @show var_type
+
+    # Map to MOI constructs and add into the model.
+    if var_multiplicity != "scalar"
+        error("Set variables are not supported.")
+    end
+
+
 
     return nothing
 end
@@ -163,13 +180,13 @@ function parse_range(range::AbstractString)
         low_int = parse(Int, low)
         hi_int = parse(Int, hi)
 
-        return ("int", low_int, hi_int)
+        return (FznInt, low_int, hi_int)
     catch
         try
             low = parse(Float64, low)
             hi = parse(Float64, hi)
 
-            return ("float", low, hi)
+            return (FznFloat, low, hi)
         catch
             error("Ill-formed input: $low, $hi.")
             return nothing
@@ -189,10 +206,10 @@ function parse_set(set::AbstractString)
     
     # First, try to parse as integers: this is more restrictive than floats.
     try
-        return ("int", parse_set_int(set))
+        return (FznInt, parse_set_int(set))
     catch
         try
-            return ("float", parse_set_float(set))
+            return (FznFloat, parse_set_float(set))
         catch
             error("Ill-formed input: {$set}.")
             return nothing
@@ -239,21 +256,21 @@ function parse_variable_type(var_type::AbstractString)
     # Complex inputs: "1..5", "{1, 2, 3}", "1.5..1.7", "set of {1, 2, 3}", "set of 1..2"
 
     # Return tuple: 
-    # - variable type: String ("bool", "int", "float")
-    # - variable type: String ("scalar", "set")
+    # - variable type: FznVariableType
+    # - variable multiplicity: String ("scalar", "set")
     # - range minimum: Union{Nothing, Int, Float64}
     # - range maximum: Union{Nothing, Int, Float64}
     # - allowed values: Union{Nothing, Vector{Int}, Vector{Float64}}
 
     # Basic variable type.
     if var_type == "bool"
-        return ("bool", "scalar", nothing, nothing, nothing)
+        return (FznBool, "scalar", nothing, nothing, nothing)
     elseif var_type == "int"
-        return ("int", "scalar", nothing, nothing, nothing)
+        return (FznInt, "scalar", nothing, nothing, nothing)
     elseif var_type == "float"
-        return ("float", "scalar", nothing, nothing, nothing)
+        return (FznFloat, "scalar", nothing, nothing, nothing)
     elseif var_type == "set of int"
-        return ("int", "set", nothing, nothing, nothing)
+        return (FznInt, "set", nothing, nothing, nothing)
     end
 
     # Sets, both ranges and sets in extension.
