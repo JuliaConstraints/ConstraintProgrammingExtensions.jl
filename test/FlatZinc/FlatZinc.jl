@@ -1102,9 +1102,35 @@
     end
 
     @testset "Reading" begin
-        m = CP.FlatZinc.Optimizer()
-        @test MOI.is_empty(m)
+        @testset "Item-splitting helper" begin
+            io = IOBuffer(b"""var int: x1; 
+                constraint int_eq(x1, 2);
+                solve satisfy;""")
 
-        @test_throws ErrorException read!(IOBuffer("42"), m)
+            @test CP.FlatZinc.get_fzn_item(io) == "var int: x1;"
+            @test CP.FlatZinc.get_fzn_item(io) == "constraint int_eq(x1, 2);"
+            @test CP.FlatZinc.get_fzn_item(io) == "solve satisfy;"
+            @test CP.FlatZinc.get_fzn_item(io) == ""
+
+            io = IOBuffer(b"""var int: x1; 
+                var int: x2; % Comment at the end of a line
+                
+                % Comment feeling alone.
+                
+                constraint int_lin_eq([1, 1], [x1, x2], 2);
+                
+                solve satisfy;""")
+
+            @test CP.FlatZinc.get_fzn_item(io) == "var int: x1;"
+            @test CP.FlatZinc.get_fzn_item(io) == "var int: x2;"
+            @test CP.FlatZinc.get_fzn_item(io) == "constraint int_lin_eq([1, 1], [x1, x2], 2);"
+            @test CP.FlatZinc.get_fzn_item(io) == "solve satisfy;"
+            @test CP.FlatZinc.get_fzn_item(io) == ""
+        end
+
+        # m = CP.FlatZinc.Optimizer()
+        # @test MOI.is_empty(m)
+
+        # @test_throws ErrorException read!(IOBuffer(b"42"), m)
     end
 end

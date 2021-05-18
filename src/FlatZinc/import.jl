@@ -24,9 +24,10 @@ function Base.read!(io::IO, model::Optimizer)
         # Read an item from the file.
         item = get_fzn_item(io)
         
-        # Skip blank lines.
+        # When get_fzn_item returns an empty line, it has not found any more 
+        # item to parse.
         if isempty(item)
-            continue  
+            break
         end
 
         # Depending on the state, different tokens are expected. Not all 
@@ -121,14 +122,20 @@ function get_fzn_item(io::IO)
         # Stop reading this character and continue normally at the next line.
         if c == '%'
             readline(io)
-            continue
+
+            # If something was read, return this item. If not, continue reading.
+            if length(string(strip(item))) == 0
+                continue
+            else
+                break
+            end
         end
 
         # Push the new character into the string.
         item *= c
 
         # An item is delimited by a semicolon.
-        if c == '%'
+        if c == ';'
             break
         end
     end
