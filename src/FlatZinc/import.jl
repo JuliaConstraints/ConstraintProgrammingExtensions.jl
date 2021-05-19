@@ -531,10 +531,19 @@ function split_constraint(item::AbstractString)
     cons_verb, item = split(item, '(', limit=2)
     cons_verb = strip(cons_verb)
     item = lstrip(item)
+
+    # Check whether annotations are present.
+    if occursin("::", item)
+        item, cons_annotations = split(item, "::", limit=2)
+        item = rstrip(item)
+        cons_annotations = strip(cons_annotations)
+    else
+        cons_annotations = nothing
+    end
     
     # Eliminate the closing parenthesis.
     @assert item[end] == ')'
     cons_args = lstrip(item[1:end-1])
 
-    return (cons_verb, cons_args)
+    return (cons_verb, cons_args, cons_annotations)
 end

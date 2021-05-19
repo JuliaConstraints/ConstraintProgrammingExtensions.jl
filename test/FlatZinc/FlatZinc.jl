@@ -1415,9 +1415,9 @@
                 @test_throws AssertionError CP.FlatZinc.split_constraint("")
                 @test_throws AssertionError CP.FlatZinc.split_constraint("var int: x456389564;")
 
-                @test CP.FlatZinc.split_constraint("constraint int_le(0, x);") == ("int_le", "0, x")
-                @test CP.FlatZinc.split_constraint("constraint int_lin_eq([2, 3], [x, y], 10);") == ("int_lin_eq", "[2, 3], [x, y], 10")
-                @test CP.FlatZinc.split_constraint("constraint int_lin_eq([2, 3], [x, y], 10) :: domain;") == ("int_le", "0, x")
+                @test CP.FlatZinc.split_constraint("constraint int_le(0, x);") == ("int_le", "0, x", nothing)
+                @test CP.FlatZinc.split_constraint("constraint int_lin_eq([2, 3], [x, y], 10);") == ("int_lin_eq", "[2, 3], [x, y], 10", nothing)
+                @test CP.FlatZinc.split_constraint("constraint int_lin_eq([2, 3], [x, y], 10) :: domain;") == ("int_lin_eq", "[2, 3], [x, y], 10", "domain")
             end
         end
 
