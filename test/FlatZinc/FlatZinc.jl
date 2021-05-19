@@ -1434,7 +1434,7 @@
         @testset "Constraint section" begin
             @testset "Split a constraint entry" begin
                 @test_throws AssertionError CP.FlatZinc.split_constraint("")
-                @test_throws AssertionError CP.FlatZinc.split_constraint("var int: x456389564;")
+                @test_throws AssertionError CP.FlatZinc.split_constraint("var int: x456389564;") # More than 10 characters to avoid the first assertion.
 
                 @test CP.FlatZinc.split_constraint("constraint int_le(0, x);") == ("int_le", "0, x", nothing)
                 @test CP.FlatZinc.split_constraint("constraint int_lin_eq([2, 3], [x, y], 10);") == ("int_lin_eq", "[2, 3], [x, y], 10", nothing)
