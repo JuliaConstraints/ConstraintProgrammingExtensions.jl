@@ -191,15 +191,8 @@ end
 # -----------------------------------------------------------------------------
 
 function map_to_moi(var_type::FznVariableType)
-    if var_type == FznBool 
-        return MOI.ZeroOne()
-    elseif var_type == FznInt 
-        return MOI.Integer()
-    elseif var_type == FznFloat
-        return nothing
-    else
-        @assert false
-    end
+    mapping = Dict(FznBool => MOI.ZeroOne(), FznInt => MOI.Integer(), FznFloat => nothing)
+    return mapping[var_type]
 end
 
 # -----------------------------------------------------------------------------
