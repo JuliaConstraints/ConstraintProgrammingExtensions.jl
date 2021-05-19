@@ -85,12 +85,12 @@ end
 # - High-level parsing functions (FlatZinc items).
 # -----------------------------------------------------------------------------
 
-function parse_predicate!(item::AbstractString, model::Optimizer)
+function parse_predicate!(::AbstractString, ::Optimizer)
     error("Predicates are not supported.")
     return nothing
 end
 
-function parse_parameter!(item::AbstractString, model::Optimizer)
+function parse_parameter!(::AbstractString, ::Optimizer)
     error("Parameters are not supported.")
     return nothing
 end
@@ -411,6 +411,11 @@ function split_variable(item::AbstractString)
 
     @assert length(item) > 5
 
+    # Get rid of the semicolon (;) at the end.
+    @assert item[end] == ';'
+    item = lstrip(item[1:end-1])
+
+    # Detect whether this is one variable or an array of variables.
     if startswith(item, "var")
         return split_variable_scalar(item)
     elseif startswith(item, "array") && occursin("var", item)
@@ -439,30 +444,22 @@ function split_variable_scalar(item::AbstractString)
         item = lstrip(item)
 
         if occursin('=', item)
-            var_annotations, item = split(item, '=', limit=2)
+            var_annotations, var_value = split(item, '=', limit=2)
             var_annotations = strip(var_annotations)
-            item = lstrip(item)
-
-            var_value, item = split(item, ';', limit=2)
             var_value = strip(var_value)
         else
-            var_annotations, item = split(item, ';', limit=2)
-            var_annotations = strip(var_annotations)
+            var_annotations = strip(item)
             var_value = ""
         end
     else
         var_annotations = ""
 
         if occursin('=', item)
-            var_name, item = split(item, '=', limit=2)
+            var_name, var_value = split(item, '=', limit=2)
             var_name = strip(var_name)
-            item = lstrip(item)
-
-            var_value, item = split(item, ';', limit=2)
             var_value = strip(var_value)
         else
-            var_name, item = split(item, ';', limit=2)
-            var_name = strip(var_name)
+            var_name = strip(item)
             var_value = ""
         end
     end
@@ -489,9 +486,13 @@ function split_variable_array(item::AbstractString)
 end
 
 function split_solve(item::AbstractString)
-    # Typical input: "solve satisfy;", "solve minimize x1;", "solve maximize x1;
+    # Typical input: "solve satisfy;", "solve minimize x1;", "solve maximize x1;"
 
     @assert length(item) > 5
+
+    # Get rid of the semicolon (;) at the end.
+    @assert item[end] == ';'
+    item = lstrip(item[1:end-1])
 
     # Get rid of the "var" keyword at the beginning. 
     @assert item[1:5] == "solve"
@@ -501,10 +502,10 @@ function split_solve(item::AbstractString)
     if startswith(item, "satisfy")
         return (FznSatisfy, nothing)
     elseif startswith(item, "minimize")
-        item = strip(item[9:end-1])
+        item = strip(item[9:end])
         return (FznMinimise, item)
     elseif startswith(item, "maximize")
-        item = strip(item[9:end-1])
+        item = strip(item[9:end])
         return (FznMaximise, item)
     end
     @assert false
