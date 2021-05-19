@@ -1132,7 +1132,7 @@
                 % Comment feeling alone.
                 
                 solve satisfy;""")
-                
+
             @test CP.FlatZinc.get_fzn_item(io) == "solve satisfy;"
             @test CP.FlatZinc.get_fzn_item(io) == ""
         end
@@ -1407,6 +1407,17 @@
                 @test m.constraint_info[8].f == MOI.SingleVariable(moi_var_7)
                 @test m.constraint_info[8].s == CP.Domain(Set([0.0, 7.0]))
                 @test !m.constraint_info[8].output_as_part_of_variable
+            end
+        end
+
+        @testset "Constraint section" begin
+            @testset "Split a constraint entry" begin
+                @test_throws AssertionError CP.FlatZinc.split_constraint("")
+                @test_throws AssertionError CP.FlatZinc.split_constraint("var int: x456389564;")
+
+                @test CP.FlatZinc.split_constraint("constraint int_le(0, x);") == ("int_le", "0, x")
+                @test CP.FlatZinc.split_constraint("constraint int_lin_eq([2, 3], [x, y], 10);") == ("int_lin_eq", "[2, 3], [x, y], 10")
+                @test CP.FlatZinc.split_constraint("constraint int_lin_eq([2, 3], [x, y], 10) :: domain;") == ("int_le", "0, x")
             end
         end
 

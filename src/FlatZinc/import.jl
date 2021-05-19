@@ -8,6 +8,9 @@
 @enum FznVariableType FznBool FznInt FznFloat
 @enum FznVariableValueMultiplicity FznScalar FznSet
 @enum FznObjective FznSatisfy FznMinimise FznMaximise
+@enum FznConstraintIdentifier begin
+    FznIntLe
+end
 
 const FZN_PARAMETER_TYPES_PREFIX = String["bool", "int", "float", "set of int", "array"]
 
@@ -509,4 +512,29 @@ function split_solve(item::AbstractString)
         return (FznMaximise, item)
     end
     @assert false
+end
+
+function split_constraint(item::AbstractString)
+    # Typical input: "constraint int_le(0, x);"
+
+    @assert length(item) > 10
+
+    # Get rid of the "constraint" keyword at the beginning. 
+    @assert item[1:10] == "constraint"
+    item = lstrip(item[11:end])
+
+    # Get rid of the semicolon (;) at the end.
+    @assert item[end] == ';'
+    item = lstrip(item[1:end-1])
+
+    # Locate the verb of the constraint.
+    cons_verb, item = split(item, '(', limit=2)
+    cons_verb = strip(cons_verb)
+    item = lstrip(item)
+    
+    # Eliminate the closing parenthesis.
+    @assert item[end] == ')'
+    cons_args = lstrip(item[1:end-1])
+
+    return (cons_verb, cons_args)
 end
