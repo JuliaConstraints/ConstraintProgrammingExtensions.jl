@@ -1126,6 +1126,15 @@
             @test CP.FlatZinc.get_fzn_item(io) == "constraint int_lin_eq([1, 1], [x1, x2], 2);"
             @test CP.FlatZinc.get_fzn_item(io) == "solve satisfy;"
             @test CP.FlatZinc.get_fzn_item(io) == ""
+
+            io = IOBuffer(b"""% Comment at the beginning of a file
+                
+                % Comment feeling alone.
+                
+                solve satisfy;""")
+                
+            @test CP.FlatZinc.get_fzn_item(io) == "solve satisfy;"
+            @test CP.FlatZinc.get_fzn_item(io) == ""
         end
 
         @testset "Parsing helpers" begin
@@ -1171,6 +1180,7 @@
                 @test_throws AssertionError CP.FlatZinc.parse_set("{2, 5} ")
                 @test_throws AssertionError CP.FlatZinc.parse_set(" {2, 5}")
                 @test_throws AssertionError CP.FlatZinc.parse_set(" {2, 5} ")
+                @test_throws AssertionError CP.FlatZinc.parse_set(" {a, b} ")
 
                 @test CP.FlatZinc.parse_set("{}") == (CP.FlatZinc.FznInt, Int[])
                 @test CP.FlatZinc.parse_set("{2}") == (CP.FlatZinc.FznInt, [2])
@@ -1194,6 +1204,7 @@
                 @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of 2, 5}")
                 @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of {2..5")
                 @test_throws AssertionError CP.FlatZinc.parse_variable_type("set of 2..5}")
+                @test_throws AssertionError CP.FlatZinc.parse_variable_type("this is garbage")
 
                 @test CP.FlatZinc.parse_variable_type("bool") == (CP.FlatZinc.FznBool, CP.FlatZinc.FznScalar, nothing, nothing, nothing)
                 @test CP.FlatZinc.parse_variable_type("int") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznScalar, nothing, nothing, nothing)
