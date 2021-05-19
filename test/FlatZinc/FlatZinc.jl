@@ -1441,7 +1441,42 @@
                 @test CP.FlatZinc.split_constraint("constraint int_lin_eq([2, 3], [x, y], 10) :: domain;") == ("int_lin_eq", "[2, 3], [x, y], 10", "domain")
             end
 
-            @testset "Parse constraint verbs" begin
+            @testset "Split arguments" begin
+                @test_throws AssertionError CP.FlatZinc.split_constraint_arguments("")
+
+                @test CP.FlatZinc.split_constraint_arguments("1") == ["1"]
+                @test CP.FlatZinc.split_constraint_arguments("1.1") == ["1.1"]
+                @test CP.FlatZinc.split_constraint_arguments("x1") == ["x1"]
+                @test CP.FlatZinc.split_constraint_arguments("true") == ["true"]
+                @test CP.FlatZinc.split_constraint_arguments("false") == ["false"]
+
+                @test CP.FlatZinc.split_constraint_arguments("1,") == ["1"]
+                @test CP.FlatZinc.split_constraint_arguments("1.1,") == ["1.1"]
+                @test CP.FlatZinc.split_constraint_arguments("x1,") == ["x1"]
+                @test CP.FlatZinc.split_constraint_arguments("true,") == ["true"]
+                @test CP.FlatZinc.split_constraint_arguments("false,") == ["false"]
+
+                @test CP.FlatZinc.split_constraint_arguments("1, 1.1") == ["1", "1.1"]
+                @test CP.FlatZinc.split_constraint_arguments("1.1, x1") == ["1.1", "x1"]
+                @test CP.FlatZinc.split_constraint_arguments("x1, true") == ["x1", "true"]
+                @test CP.FlatZinc.split_constraint_arguments("true, false") == ["true", "false"]
+                @test CP.FlatZinc.split_constraint_arguments("false, 1") == ["false", "1"]
+                @test CP.FlatZinc.split_constraint_arguments("false  ,     1") == ["false", "1"]
+
+                @test CP.FlatZinc.split_constraint_arguments("[1, 1.1]") == Union{AbstractString, Vector{AbstractString}}[AbstractString["1", "1.1"]]
+                @test CP.FlatZinc.split_constraint_arguments("[1.1, x1]") == Union{AbstractString, Vector{AbstractString}}[AbstractString["1.1", "x1"]]
+                @test CP.FlatZinc.split_constraint_arguments("[x1, true]") == Union{AbstractString, Vector{AbstractString}}[AbstractString["x1", "true"]]
+                @test CP.FlatZinc.split_constraint_arguments("[true, false]") == Union{AbstractString, Vector{AbstractString}}[AbstractString["true", "false"]]
+                @test CP.FlatZinc.split_constraint_arguments("[false, 1]") == Union{AbstractString, Vector{AbstractString}}[AbstractString["false", "1"]]
+
+                @test CP.FlatZinc.split_constraint_arguments("[1, 1.1], x1") == Union{AbstractString, Vector{AbstractString}}[AbstractString["1", "1.1"], "x1"]
+                @test CP.FlatZinc.split_constraint_arguments("[1.1, x1], true") == Union{AbstractString, Vector{AbstractString}}[AbstractString["1.1", "x1"], "true"]
+                @test CP.FlatZinc.split_constraint_arguments("[x1, true], false") == Union{AbstractString, Vector{AbstractString}}[AbstractString["x1", "true"], "false"]
+                @test CP.FlatZinc.split_constraint_arguments("[true, false], 1") == Union{AbstractString, Vector{AbstractString}}[AbstractString["true", "false"], "1"]
+                @test CP.FlatZinc.split_constraint_arguments("[false, 1], 1.1") == Union{AbstractString, Vector{AbstractString}}[AbstractString["false", "1"], "1.1"]
+            end
+
+            @testset "Parse constraint verbs from strings into enumeration" begin
                 @test CP.FlatZinc.parse_constraint_verb("array_int_element") == CP.FlatZinc.FznArrayIntElement
                 # Call it a day.
             end

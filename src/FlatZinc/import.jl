@@ -680,7 +680,7 @@ function parse_constraint_verb(cons_verb::AbstractString)
 end
 
 # -----------------------------------------------------------------------------
-# - String-level parsing functions.
+# - String-level parsing functions. This section corresponds to a tokenizer.
 # -----------------------------------------------------------------------------
 
 function get_fzn_item(io::IO)
@@ -853,4 +853,70 @@ function split_constraint(item::AbstractString)
     cons_args = lstrip(item[1:end-1])
 
     return (cons_verb, cons_args, cons_annotations)
+end
+
+function split_constraint_arguments(cons_args::AbstractString)::Vector{Union{AbstractString, Vector{AbstractString}}}
+    # Typical input: "0, x"
+
+    @assert length(cons_args) > 0
+    
+    # Arguments are separated with commas: if there is none, there is just 
+    # one argument.
+    if !occursin(',', cons_args)
+        return [cons_args]
+    end
+
+    # There are only two types of arguments: basic ones and arrays.
+    # - Basic expressions: either a constant or a variable identifier.
+    # - Array expressions: a series of basic expressions between square 
+    #   brackets, separated by commas. An array cannot be contained in an 
+    #   array (this simplified the code enormously).
+
+    args = Union{AbstractString, Vector{AbstractString}}[]
+    while length(cons_args) > 0
+        if cons_args[1] == '['
+            # Start of array: find the end of the array, parse between.
+            index = findfirst(']', cons_args)
+            array = strip(cons_args[2:index-1])
+            cons_args = strip(cons_args[index+1:end])
+            
+            # If there is a comma after the array, consume it.
+            if occursin(',', cons_args)
+                index = findfirst(',', cons_args)
+                cons_args = lstrip(cons_args[index+1:end])
+            end
+
+            # Parse the contents of the array.
+            array_args = AbstractString[]
+            while length(array) > 0
+                # Basic expression: find the next comma if there is one.
+                if !occursin(',', array)
+                    push!(array_args, array)
+                    break
+                else
+                    index = findfirst(',', array)
+                    arg = strip(array[1:index-1])
+                    array = strip(array[index+1:end])
+    
+                    push!(array_args, arg)
+                end
+            end
+
+            push!(args, array_args)
+        else
+            # Basic expression: find the next comma if there is one.
+            if !occursin(',', cons_args)
+                push!(args, cons_args)
+                break
+            else
+                index = findfirst(',', cons_args)
+                arg = strip(cons_args[1:index-1])
+                cons_args = strip(cons_args[index+1:end])
+
+                push!(args, arg)
+            end
+        end
+    end
+
+    return args
 end
