@@ -1306,10 +1306,96 @@
                 m = CP.FlatZinc.Optimizer()
                 @test MOI.is_empty(m)
 
-                CP.FlatZinc.parse_variable!("var int: x;", m)
+                moi_var_1 = CP.FlatZinc.parse_variable!("var bool: x1;", m)
                 @test !MOI.is_empty(m)
                 @test MOI.get(m, MOI.NumberOfVariables()) == 1
+                @test MOI.get(m, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == 1
+                @test length(m.variable_info) == 1
+                @test m.variable_info[moi_var_1] !== nothing
+                @test m.variable_info[moi_var_1].name == "x1"
+                @test m.variable_info[moi_var_1].set == MOI.ZeroOne()
+                @test length(m.constraint_info) == 1
+                @test m.constraint_info[1].f == MOI.SingleVariable(moi_var_1)
+                @test m.constraint_info[1].s == MOI.ZeroOne()
+                @test m.constraint_info[1].output_as_part_of_variable
+
+                moi_var_2 = CP.FlatZinc.parse_variable!("var int: x2;", m)
+                @test !MOI.is_empty(m)
+                @test MOI.get(m, MOI.NumberOfVariables()) == 2
                 @test MOI.get(m, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == 1
+                @test length(m.variable_info) == 2
+                @test m.variable_info[moi_var_2] !== nothing
+                @test m.variable_info[moi_var_2].name == "x2"
+                @test m.variable_info[moi_var_2].set == MOI.Integer()
+                @test length(m.constraint_info) == 2
+                @test m.constraint_info[2].f == MOI.SingleVariable(moi_var_2)
+                @test m.constraint_info[2].s == MOI.Integer()
+                @test m.constraint_info[2].output_as_part_of_variable
+
+                moi_var_3 = CP.FlatZinc.parse_variable!("var float: x3;", m)
+                @test !MOI.is_empty(m)
+                @test MOI.get(m, MOI.NumberOfVariables()) == 3
+                @test length(m.variable_info) == 3
+                @test m.variable_info[moi_var_3] !== nothing
+                @test m.variable_info[moi_var_3].name == "x3"
+                @test m.variable_info[moi_var_3].set == MOI.Reals(1)
+                @test length(m.constraint_info) == 2
+
+                moi_var_4 = CP.FlatZinc.parse_variable!("var 0..7: x4;", m)
+                @test !MOI.is_empty(m)
+                @test MOI.get(m, MOI.NumberOfVariables()) == 4
+                @test MOI.get(m, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == 2
+                @test length(m.variable_info) == 4
+                @test m.variable_info[moi_var_4] !== nothing
+                @test m.variable_info[moi_var_4].name == "x4"
+                @test m.variable_info[moi_var_4].set == MOI.Integer()
+                @test length(m.constraint_info) == 4
+                @test m.constraint_info[3].f == MOI.SingleVariable(moi_var_4)
+                @test m.constraint_info[3].s == MOI.Integer()
+                @test m.constraint_info[3].output_as_part_of_variable
+                @test m.constraint_info[4].f == MOI.SingleVariable(moi_var_4)
+                @test m.constraint_info[4].s == MOI.Interval(0, 7)
+                @test !m.constraint_info[4].output_as_part_of_variable
+
+                moi_var_5 = CP.FlatZinc.parse_variable!("var 0.0..7.0: x5;", m)
+                @test !MOI.is_empty(m)
+                @test MOI.get(m, MOI.NumberOfVariables()) == 5
+                @test length(m.variable_info) == 5
+                @test m.variable_info[moi_var_5] !== nothing
+                @test m.variable_info[moi_var_5].name == "x5"
+                @test m.variable_info[moi_var_5].set == MOI.Reals(1)
+                @test length(m.constraint_info) == 5
+                @test m.constraint_info[5].f == MOI.SingleVariable(moi_var_5)
+                @test m.constraint_info[5].s == MOI.Interval(0.0, 7.0)
+                @test !m.constraint_info[5].output_as_part_of_variable
+
+                moi_var_6 = CP.FlatZinc.parse_variable!("var {0, 7}: x6;", m)
+                @test !MOI.is_empty(m)
+                @test MOI.get(m, MOI.NumberOfVariables()) == 6
+                @test MOI.get(m, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == 3
+                @test length(m.variable_info) == 6
+                @test m.variable_info[moi_var_6] !== nothing
+                @test m.variable_info[moi_var_6].name == "x6"
+                @test m.variable_info[moi_var_6].set == MOI.Integer()
+                @test length(m.constraint_info) == 7
+                @test m.constraint_info[6].f == MOI.SingleVariable(moi_var_6)
+                @test m.constraint_info[6].s == MOI.Integer()
+                @test m.constraint_info[6].output_as_part_of_variable
+                @test m.constraint_info[7].f == MOI.SingleVariable(moi_var_6)
+                @test m.constraint_info[7].s == CP.Domain(Set([0, 7]))
+                @test !m.constraint_info[7].output_as_part_of_variable
+
+                moi_var_7 = CP.FlatZinc.parse_variable!("var {0.0, 7.0}: x7;", m)
+                @test !MOI.is_empty(m)
+                @test MOI.get(m, MOI.NumberOfVariables()) == 7
+                @test length(m.variable_info) == 7
+                @test m.variable_info[moi_var_7] !== nothing
+                @test m.variable_info[moi_var_7].name == "x7"
+                @test m.variable_info[moi_var_7].set == MOI.Reals(1)
+                @test length(m.constraint_info) == 8
+                @test m.constraint_info[8].f == MOI.SingleVariable(moi_var_7)
+                @test m.constraint_info[8].s == CP.Domain(Set([0.0, 7.0]))
+                @test !m.constraint_info[8].output_as_part_of_variable
             end
         end
 

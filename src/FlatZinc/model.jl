@@ -155,9 +155,9 @@ function MOI.set(
     model::Optimizer,
     ::MOI.VariableName,
     v::MOI.VariableIndex,
-    name::String,
+    name::AbstractString,
 )
-    model.variable_info[v].name = name
+    model.variable_info[v].name = string(name)
     return
 end
 
@@ -392,7 +392,7 @@ function MOI.get(
 end
 
 function MOI.get(model::Optimizer, ::MOI.NumberOfConstraints{F, S}) where {F, S}
-    return length(model.constraint_info)
+    return sum(1 for c in model.constraint_info if typeof(c.f) == F && typeof(c.s) == S)
 end
 
 function MOI.get(model::Optimizer, ::MOI.ListOfConstraints)

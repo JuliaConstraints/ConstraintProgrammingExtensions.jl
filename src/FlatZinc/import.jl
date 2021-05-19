@@ -133,6 +133,9 @@ function parse_variable!(item::AbstractString, model::Optimizer)
         moi_var, _ = MOI.add_constrained_variable(model, moi_set)
     end
 
+    # - Set the name of the variable.
+    MOI.set(model, MOI.VariableName(), moi_var, var_name)
+
     # - Ease the retrieval of the variable by name for further use.
     if var_name in keys(model.name_to_var)
         error("Duplicate variable name: $(var_name).")
@@ -152,7 +155,7 @@ function parse_variable!(item::AbstractString, model::Optimizer)
     # - Fix the value.
     # TODO: play with var_value.
 
-    return nothing
+    return moi_var
 end
 
 function parse_constraint!(item::AbstractString, model::Optimizer)
