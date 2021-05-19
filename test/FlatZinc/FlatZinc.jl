@@ -1440,6 +1440,11 @@
                 @test CP.FlatZinc.split_constraint("constraint int_lin_eq([2, 3], [x, y], 10);") == ("int_lin_eq", "[2, 3], [x, y], 10", nothing)
                 @test CP.FlatZinc.split_constraint("constraint int_lin_eq([2, 3], [x, y], 10) :: domain;") == ("int_lin_eq", "[2, 3], [x, y], 10", "domain")
             end
+
+            @testset "Parse constraint verbs" begin
+                @test CP.FlatZinc.parse_constraint_verb("array_int_element") == CP.FlatZinc.FznArrayIntElement
+                # Call it a day.
+            end
         end
 
         @testset "Solve section" begin
