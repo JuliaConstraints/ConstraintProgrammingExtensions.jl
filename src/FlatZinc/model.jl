@@ -98,6 +98,13 @@ end
 
 # Set the objective.
 
+function MOI.get(
+    model::Optimizer,
+    ::MOI.ObjectiveFunction{MOI.SingleVariable},
+)
+    return model.objective_function
+end
+
 function MOI.set(
     model::Optimizer,
     ::MOI.ObjectiveFunction{MOI.SingleVariable},
@@ -105,6 +112,13 @@ function MOI.set(
 )
     model.objective_function = f
     return nothing
+end
+
+function MOI.get(
+    model::Optimizer,
+    ::MOI.ObjectiveSense,
+)
+    return model.objective_sense
 end
 
 function MOI.set(

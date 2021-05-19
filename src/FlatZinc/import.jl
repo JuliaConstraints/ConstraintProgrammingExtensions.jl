@@ -7,6 +7,7 @@
 @enum FznParserstate FznPredicate FznParameter FznVar FznConstraint FznSolve FznDone
 @enum FznVariableType FznBool FznInt FznFloat
 @enum FznVariableValueMultiplicity FznScalar FznSet
+@enum FznObjective FznSatisfy FznMinimise FznMaximise
 
 const FZN_PARAMETER_TYPES_PREFIX = String["bool", "int", "float", "set of int", "array"]
 
@@ -164,7 +165,24 @@ function parse_constraint!(item::AbstractString, model::Optimizer)
 end
 
 function parse_solve!(item::AbstractString, model::Optimizer)
-    error("Solves are not supported.")
+    # Typical input: "solve satisfy;", "solve minimize x1;", "solve maximize x1;
+    obj_sense, obj_var = CP.FlatZinc.split_solve(item)
+
+    if obj_var !== nothing
+        @assert obj_var in keys(model.name_to_var)
+        moi_var = model.name_to_var[obj_var]
+    end
+
+    if obj_sense == FznSatisfy
+        MOI.set(model, MOI.ObjectiveSense(), MOI.FEASIBILITY_SENSE)
+    elseif obj_sense == FznMinimise
+        MOI.set(model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(model, MOI.ObjectiveFunction{MOI.SingleVariable}(), MOI.SingleVariable(moi_var))
+    elseif obj_sense == FznMaximise
+        MOI.set(model, MOI.ObjectiveSense(), MOI.MAX_SENSE)
+        MOI.set(model, MOI.ObjectiveFunction{MOI.SingleVariable}(), MOI.SingleVariable(moi_var))
+    end
+
     return nothing
 end
 
@@ -398,7 +416,7 @@ function split_variable(item::AbstractString)
     # Complex input: "array [1..5] of var int: x1;" -> array
     # Complex input: "var int: x1 :: some_annotation = some_value;" -> scalar
 
-    @assert length(item) > 4
+    @assert length(item) > 5
 
     if startswith(item, "var")
         return split_variable_scalar(item)
@@ -411,6 +429,7 @@ end
 
 function split_variable_scalar(item::AbstractString)
     # Get rid of the "var" keyword at the beginning. 
+    @assert length(item) > 3
     @assert item[1:3] == "var"
     item = lstrip(item[4:end])
 
@@ -460,6 +479,7 @@ end
 
 function split_variable_array(item::AbstractString)
     # Get rid of the "array" keyword at the beginning. 
+    @assert length(item) > 5
     @assert item[1:5] == "array"
     item = lstrip(item[6:end])
 
@@ -473,4 +493,26 @@ function split_variable_array(item::AbstractString)
     _, var_type, var_name, var_annotations, var_value = split_variable_scalar(item)
     
     return (var_array, var_type, var_name, var_annotations, var_value)
+end
+
+function split_solve(item::AbstractString)
+    # Typical input: "solve satisfy;", "solve minimize x1;", "solve maximize x1;
+
+    @assert length(item) > 5
+
+    # Get rid of the "var" keyword at the beginning. 
+    @assert item[1:5] == "solve"
+    item = lstrip(item[6:end])
+
+    # Three operators are possible. 
+    if startswith(item, "satisfy")
+        return (FznSatisfy, nothing)
+    elseif startswith(item, "minimize")
+        item = strip(item[9:end-1])
+        return (FznMinimise, item)
+    elseif startswith(item, "maximize")
+        item = strip(item[9:end-1])
+        return (FznMaximise, item)
+    end
+    @assert false
 end

@@ -1410,6 +1410,59 @@
             end
         end
 
+        @testset "Solve section" begin
+            @testset "Split a solve entry" begin
+                @test_throws AssertionError CP.FlatZinc.split_solve("")
+                @test_throws AssertionError CP.FlatZinc.split_solve("var int: x1;")
+                @test_throws AssertionError CP.FlatZinc.split_solve("solve var int: x1;")
+
+                # Satisfy.
+                obj_sense, obj_var = CP.FlatZinc.split_solve("solve satisfy;")
+                @test obj_sense == CP.FlatZinc.FznSatisfy
+                @test obj_var === nothing
+
+                obj_sense, obj_var = CP.FlatZinc.split_solve("solve    satisfy   ;")
+                @test obj_sense == CP.FlatZinc.FznSatisfy
+                @test obj_var === nothing
+
+                # Minimise.
+                obj_sense, obj_var = CP.FlatZinc.split_solve("solve minimize x1;")
+                @test obj_sense == CP.FlatZinc.FznMinimise
+                @test obj_var == "x1"
+
+                obj_sense, obj_var = CP.FlatZinc.split_solve("solve    minimize    x1   ;")
+                @test obj_sense == CP.FlatZinc.FznMinimise
+                @test obj_var == "x1"
+
+                # Maximise.
+                obj_sense, obj_var = CP.FlatZinc.split_solve("solve maximize x1;")
+                @test obj_sense == CP.FlatZinc.FznMaximise
+                @test obj_var == "x1"
+
+                obj_sense, obj_var = CP.FlatZinc.split_solve("solve    maximize    x1   ;")
+                @test obj_sense == CP.FlatZinc.FznMaximise
+                @test obj_var == "x1"
+            end
+
+            @testset "Solve entry" begin
+                m = CP.FlatZinc.Optimizer()
+                @test MOI.is_empty(m)
+                moi_var = CP.FlatZinc.parse_variable!("var bool: x1;", m)
+                @test MOI.get(m, MOI.ObjectiveSense()) == MOI.FEASIBILITY_SENSE
+
+                CP.FlatZinc.parse_solve!("solve satisfy;", m)
+                @test MOI.get(m, MOI.ObjectiveSense()) == MOI.FEASIBILITY_SENSE
+
+                CP.FlatZinc.parse_solve!("solve minimize x1;", m)
+                @test MOI.get(m, MOI.ObjectiveSense()) == MOI.MIN_SENSE
+                @test MOI.get(m, MOI.ObjectiveFunction{MOI.SingleVariable}()) == MOI.SingleVariable(moi_var)
+
+                CP.FlatZinc.parse_solve!("solve maximize x1;", m)
+                @test MOI.get(m, MOI.ObjectiveSense()) == MOI.MAX_SENSE
+                @test MOI.get(m, MOI.ObjectiveFunction{MOI.SingleVariable}()) == MOI.SingleVariable(moi_var)
+            end
+        end
+
         m = CP.FlatZinc.Optimizer()
         @test MOI.is_empty(m)
     end
