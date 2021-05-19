@@ -9,7 +9,156 @@
 @enum FznVariableValueMultiplicity FznScalar FznSet
 @enum FznObjective FznSatisfy FznMinimise FznMaximise
 @enum FznConstraintIdentifier begin
+    # To be kept consistent with parse_constraint_verb. 
+    
+    # Integers. 
+    # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#integer-flatzinc-builtins
+    FznArrayIntElement
+    FznArrayIntMaximum
+    FznArrayIntMinimum
+    FznVarIntElement
+    FznIntAbs
+    FznIntDiv
+    FznIntEq
+    FznIntEqReif
     FznIntLe
+    FznIntLeReif
+    FznIntLinEq
+    FznIntLinEqReif
+    FznIntLinLe
+    FznIntLinLeReif
+    FznIntLinNe
+    FznIntLinNeReif
+    FznIntLt
+    FznIntLtReif
+    FznIntMax
+    FznIntMin
+    FznIntMod
+    FznIntNe
+    FznIntNeReif
+    FznIntPlus
+    FznIntPow
+    FznIntTimes
+    FznIntIn
+    # Booleans. 
+    # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#bool-flatzinc-builtins
+    FznArrayBoolAnd
+    FznArrayBoolElement
+    FznArrayBoolOr
+    FznArrayBoolXor
+    FznArrayVarBoolElement
+    FznBoolToInt
+    FznBoolAnd
+    FznBoolClause # Reif below.
+    FznBoolEq
+    FznBoolEqReif
+    FznBoolLe
+    FznBoolLeReif
+    FznBoolLinEq # No _reif.
+    FznBoolLinLe # No _reif.
+    FznBoolLt
+    FznBoolLtReif
+    FznBoolNot
+    FznBoolOr
+    FznBoolXor # No _reif, even though the doc seems to imply its existence.
+    # Sets.
+    # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#set-flatzinc-builtins
+    FznArraySetElement
+    FznArrayVarSetElement
+    FznSetCard
+    FznSetDiff
+    FznSetEq
+    FznSetEqReif
+    FznSetIn
+    FznSetInReif
+    FznSetIntersect
+    FznSetLe
+    FznSetLeReif
+    FznSetLt
+    FznSetLtReif
+    FznSetNe
+    FznSetNeReif
+    FznSetSubset
+    FznSetSubsetReif
+    FznSetSuperset
+    FznSetSupersetReif
+    FznSetSymdiff
+    FznSetUnion
+    # Floats.
+    # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#float-flatzinc-builtins
+    FznArrayFloatElement
+    FznArrayFloatMaximum
+    FznArrayFloatMinimum
+    FznArrayVarFloatElement
+    FznFloatAbs
+    FznFloatAcos
+    FznFloatAcosh
+    FznFloatAsin
+    FznFloatAsinh
+    FznFloatAtan
+    FznFloatAtanh
+    FznFloatCos
+    FznFloatCosh
+    FznFloatDiv
+    FznFloatDom
+    FznFloatEq
+    FznFloatEqReif
+    FznFloatExp
+    FznFloatIn
+    FznFloatInReif
+    FznFloatLe
+    FznFloatLeReif
+    FznFloatLinEq
+    FznFloatLinEqReif
+    FznFloatLinLe
+    FznFloatLinLeReif
+    FznFloatLinLt
+    FznFloatLinLtReif
+    FznFloatLinNe
+    FznFloatLinNeReif
+    FznFloatLn
+    FznFloatLog10
+    FznFloatLog2
+    FznFloatLt
+    FznFloatLtReif
+    FznFloatMax
+    FznFloatMin
+    FznFloatNe
+    FznFloatNeReif
+    FznFloatPlus
+    FznFloatPow
+    FznFloatSin
+    FznFloatSinh
+    FznFloatSqrt
+    FznFloatTan
+    FznFloatTanh
+    FznFloatTimes
+    FznIntToFloat
+    # New in MiniZinc 2.0.0. Most of them are already included above.
+    # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-0-0
+    FznBoolClauseReif
+    # New in MiniZinc 2.0.2.
+    # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-0-2
+    FznArrayVarBoolElementNonshifted
+    FznArrayVarFloatElementNonshifted
+    FznArrayVarIntElementNonshifted
+    FznArrayVarSetElementNonshifted
+    # New in MiniZinc 2.1.0. All of them are already included above.
+    # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-1-0
+    # New in MiniZinc 2.1.1. Unimplementable here.
+    # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-1-1
+    # New in MiniZinc 2.2.1. 
+    # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-2-1
+    FznIntPowFixed
+    # New in MiniZinc 2.3.3. 
+    # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-3-3
+    FznFloatSetInt
+    # New in MiniZinc 2.5.2. 
+    # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-5-2
+    FznArrayVarBoolElement2DNonshifted
+    FznArrayVarFloatElement2DNonshifted
+    FznArrayVarIntElement2DNonshifted
+    FznArrayVarSetElement2DNonshifted
 end
 
 const FZN_PARAMETER_TYPES_PREFIX = String["bool", "int", "float", "set of int", "array"]
@@ -373,6 +522,161 @@ function parse_variable_type(var_type::AbstractString)
 
     # If no return previously, this could not be parsed.
     @assert false
+end
+
+function parse_constraint_verb(cons_verb::AbstractString)
+    # To be kept consistent with FznConstraintIdentifier.
+    mapping = Dict(
+        # Integers. 
+        # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#integer-flatzinc-builtins
+        "array_int_element" => FznArrayIntElement, 
+        "array_int_maximum" => FznArrayIntMaximum, 
+        "array_int_minimum" => FznArrayIntMinimum, 
+        "array_var_int_element" => FznVarIntElement, 
+        "int_abs" => FznIntAbs,
+        "int_div" => FznIntDiv,
+        "int_eq" => FznIntEq,
+        "int_eq_reif" => FznIntEqReif,
+        "int_le" => FznIntLe,
+        "int_le_reif" => FznIntLeReif,
+        "int_lin_eq" => FznIntLinEq,
+        "int_lin_eq_reif" => FznIntLinEqReif,
+        "int_lin_le" => FznIntLinLe,
+        "int_lin_le_reif" => FznIntLinLeReif,
+        "int_lin_ne" => FznIntLinNe,
+        "int_lin_ne_reif" => FznIntLinNeReif,
+        "int_lt" => FznIntLt,
+        "int_lt_reif" => FznIntLtReif,
+        "int_max" => FznIntMax,
+        "int_min" => FznIntMin,
+        "int_mod" => FznIntMod,
+        "int_ne" => FznIntNe,
+        "int_ne_reif" => FznIntNeReif,
+        "int_plus" => FznIntPlus,
+        "int_pow" => FznIntPow,
+        "int_times" => FznIntTimes,
+        "int_in" => FznIntIn,
+        # Booleans. 
+        # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#bool-flatzinc-builtins
+        "array_bool_and" => FznArrayBoolAnd,
+        "array_bool_element" => FznArrayBoolElement,
+        "array_bool_or" => FznArrayBoolOr,
+        "array_bool_xor" => FznArrayBoolXor,
+        "array_var_bool_element" => FznArrayVarBoolElement,
+        "bool2int" => FznBoolToInt,
+        "bool_and" => FznBoolAnd,
+        "bool_clause" => FznBoolClause, # Reif below.
+        "bool_eq" => FznBoolEq,
+        "bool_eq_reif" => FznBoolEqReif,
+        "bool_le" => FznBoolLe,
+        "bool_le_reif" => FznBoolLeReif,
+        "bool_lin_eq" => FznBoolLinEq, # No _reif.
+        "bool_lin_le" => FznBoolLinLe, # No _reif.
+        "bool_lt" => FznBoolLt,
+        "bool_lt_reif" => FznBoolLtReif,
+        "bool_not" => FznBoolNot,
+        "bool_or" => FznBoolOr,
+        "bool_xor" => FznBoolXor, # No _reif, even though the doc seems to imply its existence.
+        # Sets.
+        # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#set-flatzinc-builtins
+        "array_set_element" => FznArraySetElement,
+        "array_var_set_element" => FznArrayVarSetElement,
+        "set_card" => FznSetCard,
+        "set_diff" => FznSetDiff,
+        "set_eq" => FznSetEq,
+        "set_eq_reif" => FznSetEqReif,
+        "set_in" => FznSetIn,
+        "set_in_reif" => FznSetInReif,
+        "set_intersect" => FznSetIntersect,
+        "set_le" => FznSetLe,
+        "set_le_reif" => FznSetLeReif,
+        "set_lt" => FznSetLt,
+        "set_lt_reif" => FznSetLtReif,
+        "set_ne" => FznSetNe,
+        "set_ne_reif" => FznSetNeReif,
+        "set_subset" => FznSetSubset,
+        "set_subset_reif" => FznSetSubsetReif,
+        "set_superset" => FznSetSuperset,
+        "set_superset_reif" => FznSetSupersetReif,
+        "set_symdiff" => FznSetSymdiff,
+        "set_union" => FznSetUnion,
+        # Floats.
+        # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#float-flatzinc-builtins
+        "array_float_element" => FznArrayFloatElement,
+        "array_float_maximum" => FznArrayFloatMaximum,
+        "array_float_minimum" => FznArrayFloatMinimum,
+        "array_var_float_element" => FznArrayVarFloatElement,
+        "float_abs" => FznFloatAbs,
+        "float_acos" => FznFloatAcos,
+        "float_acosh" => FznFloatAcosh,
+        "float_asin" => FznFloatAsin,
+        "float_asinh" => FznFloatAsinh,
+        "float_atan" => FznFloatAtan,
+        "float_atanh" => FznFloatAtanh,
+        "float_cos" => FznFloatCos,
+        "float_cosh" => FznFloatCosh,
+        "float_div" => FznFloatDiv,
+        "float_dom" => FznFloatDom,
+        "float_eq" => FznFloatEq,
+        "float_eq_reif" => FznFloatEqReif,
+        "float_exp" => FznFloatExp,
+        "float_in" => FznFloatIn,
+        "float_in_reif" => FznFloatInReif,
+        "float_le" => FznFloatLe,
+        "float_le_reif" => FznFloatLeReif,
+        "float_lin_eq" => FznFloatLinEq,
+        "float_lin_eq_reif" => FznFloatLinEqReif,
+        "float_lin_le" => FznFloatLinLe,
+        "float_lin_le_reif" => FznFloatLinLeReif,
+        "float_lin_lt" => FznFloatLinLt,
+        "float_lin_lt_reif" => FznFloatLinLtReif,
+        "float_lin_ne" => FznFloatLinNe,
+        "float_lin_ne_reif" => FznFloatLinNeReif,
+        "float_ln" => FznFloatLn,
+        "float_log10" => FznFloatLog10,
+        "float_log2" => FznFloatLog2,
+        "float_lt" => FznFloatLt,
+        "float_lt_reif" => FznFloatLtReif,
+        "float_max" => FznFloatMax,
+        "float_min" => FznFloatMin,
+        "float_ne" => FznFloatNe,
+        "float_ne_reif" => FznFloatNeReif,
+        "float_plus" => FznFloatPlus,
+        "float_pow" => FznFloatPow,
+        "float_sin" => FznFloatSin,
+        "float_sinh" => FznFloatSinh,
+        "float_sqrt" => FznFloatSqrt,
+        "float_tan" => FznFloatTan,
+        "float_tanh" => FznFloatTanh,
+        "float_times" => FznFloatTimes,
+        "int2float" => FznIntToFloat,
+        # New in MiniZinc 2.0.0. Most of them are already included above.
+        # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-0-0
+        "bool_clause_reif" => FznBoolClauseReif,
+        # New in MiniZinc 2.0.2.
+        # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-0-2
+        "array_var_bool_element_nonshifted" => FznArrayVarBoolElementNonshifted,
+        "array_var_float_element_nonshifted" => FznArrayVarFloatElementNonshifted,
+        "array_var_int_element_nonshifted" => FznArrayVarIntElementNonshifted,
+        "array_var_set_element_nonshifted" => FznArrayVarSetElementNonshifted,
+        # New in MiniZinc 2.1.0. All of them are already included above.
+        # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-1-0
+        # New in MiniZinc 2.1.1. Unimplementable here.
+        # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-1-1
+        # New in MiniZinc 2.2.1. 
+        # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-2-1
+        "int_pow_fixed" => FznIntPowFixed,
+        # New in MiniZinc 2.3.3. 
+        # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-3-3
+        "float_set_in" => FznFloatSetInt,
+        # New in MiniZinc 2.5.2. 
+        # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-5-2
+        "array_var_bool_element2d_nonshifted" => FznArrayVarBoolElement2DNonshifted,
+        "array_var_float_element2d_nonshifted" => FznArrayVarFloatElement2DNonshifted,
+        "array_var_int_element2d_nonshifted" => FznArrayVarIntElement2DNonshifted,
+        "array_var_set_element2d_nonshifted" => FznArrayVarSetElement2DNonshifted,
+    )
+    return mapping[cons_verb]
 end
 
 # -----------------------------------------------------------------------------
