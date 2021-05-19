@@ -1227,6 +1227,18 @@
             end
         end
 
+        @testset "Predicate section" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
+            @test_throws ErrorException CP.FlatZinc.parse_predicate!("", m)
+        end
+
+        @testset "Parameter section" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
+            @test_throws ErrorException CP.FlatZinc.parse_parameter!("", m)
+        end
+
         @testset "Variable section" begin
             @testset "Split a variable entry" begin
                 @test_throws AssertionError CP.FlatZinc.split_variable("")
@@ -1330,6 +1342,8 @@
                 @test m.constraint_info[1].s == MOI.ZeroOne()
                 @test m.constraint_info[1].output_as_part_of_variable
 
+                @test_throws ErrorException CP.FlatZinc.parse_variable!("var bool: x1;", m)
+
                 moi_var_2 = CP.FlatZinc.parse_variable!("var int: x2;", m)
                 @test !MOI.is_empty(m)
                 @test MOI.get(m, MOI.NumberOfVariables()) == 2
@@ -1407,6 +1421,13 @@
                 @test m.constraint_info[8].f == MOI.SingleVariable(moi_var_7)
                 @test m.constraint_info[8].s == CP.Domain(Set([0.0, 7.0]))
                 @test !m.constraint_info[8].output_as_part_of_variable
+
+                # TODO: implement this.
+                @test_throws ErrorException CP.FlatZinc.parse_variable!("array [1..5] of var int: x1;", m)
+
+                @test_throws ErrorException CP.FlatZinc.parse_variable!("var set of int: x1;", m)
+
+                @test_logs (:warn, "Annotations are not supported and are currently ignored.") CP.FlatZinc.parse_variable!("var {0.0, 7.0}: x42 :: SOME_ANNOTATION;", m)
             end
         end
 

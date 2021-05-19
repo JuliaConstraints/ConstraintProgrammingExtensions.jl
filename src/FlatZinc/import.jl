@@ -119,6 +119,12 @@ function parse_variable!(item::AbstractString, model::Optimizer)
         @warn "Annotations are not supported and are currently ignored."
     end
 
+    # Check for name duplicate early on. This avoids starting to fill the MOI
+    # model and then failing for an avoidable reason.
+    if var_name in keys(model.name_to_var)
+        error("Duplicate variable name: $(var_name).")
+    end
+
     # Map to MOI constructs and add into the model.
     if var_multiplicity != FznScalar
         error("Set variables are not supported.")
@@ -141,9 +147,6 @@ function parse_variable!(item::AbstractString, model::Optimizer)
     MOI.set(model, MOI.VariableName(), moi_var, var_name)
 
     # - Ease the retrieval of the variable by name for further use.
-    if var_name in keys(model.name_to_var)
-        error("Duplicate variable name: $(var_name).")
-    end
     model.name_to_var[var_name] = moi_var
 
     # - Add a range constraint.
