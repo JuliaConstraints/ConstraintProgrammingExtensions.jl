@@ -1471,22 +1471,69 @@
                 @test CP.FlatZinc.split_constraint_arguments("false, 1") == ["false", "1"]
                 @test CP.FlatZinc.split_constraint_arguments("false  ,     1") == ["false", "1"]
 
-                @test CP.FlatZinc.split_constraint_arguments("[1, 1.1]") == Union{AbstractString, Vector{AbstractString}}[AbstractString["1", "1.1"]]
-                @test CP.FlatZinc.split_constraint_arguments("[1.1, x1]") == Union{AbstractString, Vector{AbstractString}}[AbstractString["1.1", "x1"]]
-                @test CP.FlatZinc.split_constraint_arguments("[x1, true]") == Union{AbstractString, Vector{AbstractString}}[AbstractString["x1", "true"]]
-                @test CP.FlatZinc.split_constraint_arguments("[true, false]") == Union{AbstractString, Vector{AbstractString}}[AbstractString["true", "false"]]
-                @test CP.FlatZinc.split_constraint_arguments("[false, 1]") == Union{AbstractString, Vector{AbstractString}}[AbstractString["false", "1"]]
+                @test CP.FlatZinc.split_constraint_arguments("[1, 1.1]") == CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["1", "1.1"]]
+                @test CP.FlatZinc.split_constraint_arguments("[1.1, x1]") == CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["1.1", "x1"]]
+                @test CP.FlatZinc.split_constraint_arguments("[x1, true]") == CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["x1", "true"]]
+                @test CP.FlatZinc.split_constraint_arguments("[true, false]") == CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["true", "false"]]
+                @test CP.FlatZinc.split_constraint_arguments("[false, 1]") == CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["false", "1"]]
 
-                @test CP.FlatZinc.split_constraint_arguments("[1, 1.1], x1") == Union{AbstractString, Vector{AbstractString}}[AbstractString["1", "1.1"], "x1"]
-                @test CP.FlatZinc.split_constraint_arguments("[1.1, x1], true") == Union{AbstractString, Vector{AbstractString}}[AbstractString["1.1", "x1"], "true"]
-                @test CP.FlatZinc.split_constraint_arguments("[x1, true], false") == Union{AbstractString, Vector{AbstractString}}[AbstractString["x1", "true"], "false"]
-                @test CP.FlatZinc.split_constraint_arguments("[true, false], 1") == Union{AbstractString, Vector{AbstractString}}[AbstractString["true", "false"], "1"]
-                @test CP.FlatZinc.split_constraint_arguments("[false, 1], 1.1") == Union{AbstractString, Vector{AbstractString}}[AbstractString["false", "1"], "1.1"]
+                @test CP.FlatZinc.split_constraint_arguments("[1, 1.1], x1") == CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["1", "1.1"], "x1"]
+                @test CP.FlatZinc.split_constraint_arguments("[1.1, x1], true") == CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["1.1", "x1"], "true"]
+                @test CP.FlatZinc.split_constraint_arguments("[x1, true], false") == CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["x1", "true"], "false"]
+                @test CP.FlatZinc.split_constraint_arguments("[true, false], 1") == CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["true", "false"], "1"]
+                @test CP.FlatZinc.split_constraint_arguments("[false, 1], 1.1") == CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["false", "1"], "1.1"]
+            end
+
+            @testset "Parse arguments" begin
+                @test CP.FlatZinc.parse_constraint_arguments(["1"]) == [1]
+                @test CP.FlatZinc.parse_constraint_arguments(["1.1"]) == [1.1]
+                @test CP.FlatZinc.parse_constraint_arguments(["x1"]) == ["x1"]
+                @test CP.FlatZinc.parse_constraint_arguments(["true"]) == [true]
+                @test CP.FlatZinc.parse_constraint_arguments(["false"]) == [false]
+
+                @test CP.FlatZinc.parse_constraint_arguments(["1", "1.1"]) == [1, 1.1]
+                @test CP.FlatZinc.parse_constraint_arguments(["1.1", "x1"]) == [1.1, "x1"]
+                @test CP.FlatZinc.parse_constraint_arguments(["x1", "true"]) == ["x1", true]
+                @test CP.FlatZinc.parse_constraint_arguments(["true", "false"]) == [true, false]
+                @test CP.FlatZinc.parse_constraint_arguments(["false", "1"]) == [false, 1]
+
+                @test CP.FlatZinc.parse_constraint_arguments(CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["1", "1.1"]]) == [[1, 1.1]]
+                @test CP.FlatZinc.parse_constraint_arguments(CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["1.1", "x1"]]) == [[1.1, "x1"]]
+                @test CP.FlatZinc.parse_constraint_arguments(CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["x1", "true"]]) == [["x1", true]]
+                @test CP.FlatZinc.parse_constraint_arguments(CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["true", "false"]]) == [[true, false]]
+                @test CP.FlatZinc.parse_constraint_arguments(CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["false", "1"]]) == [[false, 1]]
+
+                @test CP.FlatZinc.parse_constraint_arguments(CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["1", "1.1"], "x1"]) == [[1, 1.1], "x1"]
+                @test CP.FlatZinc.parse_constraint_arguments(CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["1.1", "x1"], "true"]) == [[1.1, "x1"], true]
+                @test CP.FlatZinc.parse_constraint_arguments(CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["x1", "true"], "false"]) == [["x1", true], false]
+                @test CP.FlatZinc.parse_constraint_arguments(CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["true", "false"], "1"]) == [[true, false], 1]
+                @test CP.FlatZinc.parse_constraint_arguments(CP.FlatZinc.FZN_UNPARSED_ARGUMENT[AbstractString["false", "1"], "1.1"]) == [[false, 1], 1.1]
             end
 
             @testset "Parse constraint verbs from strings into enumeration" begin
                 @test CP.FlatZinc.parse_constraint_verb("array_int_element") == CP.FlatZinc.FznArrayIntElement
                 # Call it a day.
+            end
+
+            @testset "Constraint entry" begin
+                m = CP.FlatZinc.Optimizer()
+                @test MOI.is_empty(m)
+
+                x1 = CP.FlatZinc.parse_variable!("var bool: x1;", m)
+                x2 = CP.FlatZinc.parse_variable!("var bool: x2;", m)
+                x3 = CP.FlatZinc.parse_variable!("var int: x3;", m)
+                x4 = CP.FlatZinc.parse_variable!("var int: x4;", m)
+                x5 = CP.FlatZinc.parse_variable!("var float: x5;", m)
+                x6 = CP.FlatZinc.parse_variable!("var float: x6;", m)
+
+                # Missing semicolon (;).
+                @test_throws AssertionError CP.FlatZinc.parse_constraint!("constraint array_int_element(x2, [1, 2, 3], x2)", m)
+
+                CP.FlatZinc.parse_constraint!("constraint array_int_element(x3, [1, 2, 3], x4);", m)
+                @test length(m.constraint_info) == 5
+                @test m.constraint_info[5].f == MOI.VectorOfVariables([x4, x3])
+                @test m.constraint_info[5].s == CP.Element([1, 2, 3])
+                @test !m.constraint_info[5].output_as_part_of_variable
             end
         end
 

@@ -161,6 +161,9 @@
     FznArrayVarSetElement2DNonshifted
 end
 
+const FZN_UNPARSED_ARGUMENT = Union{AbstractString, Vector{AbstractString}}
+const FZN_UNPARSED_ARGUMENT_LIST = Vector{FZN_UNPARSED_ARGUMENT}
+
 const FZN_PARAMETER_TYPES_PREFIX = String["bool", "int", "float", "set of int", "array"]
 
 function Base.read!(io::IO, model::Optimizer)
@@ -315,7 +318,17 @@ function parse_variable!(item::AbstractString, model::Optimizer)
 end
 
 function parse_constraint!(item::AbstractString, model::Optimizer)
-    error("Constraints are not supported.")
+    cons_verb, cons_args, cons_annotations = split_constraint(item)
+    cons_verb = parse_constraint_verb(cons_verb)
+    cons_args = split_constraint_arguments(cons_args)
+    cons_args = parse_constraint_arguments(cons_args)
+
+    if cons_annotations !== nothing
+        @warn "Annotations are not supported and are currently ignored."
+    end
+
+    add_constraint_to_model(cons_verb, cons_args, model)
+
     return nothing
 end
 
@@ -348,6 +361,25 @@ end
 function map_to_moi(var_type::FznVariableType)
     mapping = Dict(FznBool => MOI.ZeroOne(), FznInt => MOI.Integer(), FznFloat => nothing)
     return mapping[var_type]
+end
+
+function add_constraint_to_model(cons::FznConstraintIdentifier, args, model::Optimizer)
+    return add_constraint_to_model(Val(cons), args, model)
+end
+
+function add_constraint_to_model(::Val{FznArrayIntElement}, args, model::Optimizer)
+    @assert length(args) == 3
+    @assert typeof(args[1]) <: AbstractString
+    @assert typeof(args[2]) <: Vector
+    @assert typeof(args[3]) <: AbstractString
+
+    moi_var_index = model.name_to_var[args[1]]
+    moi_var_value = model.name_to_var[args[3]]
+    array = Int.(args[2])
+
+    MOI.add_constraint(model, MOI.VectorOfVariables([moi_var_value, moi_var_index]), CP.Element(array))
+
+    return nothing
 end
 
 # -----------------------------------------------------------------------------
@@ -679,6 +711,20 @@ function parse_constraint_verb(cons_verb::AbstractString)
     return mapping[cons_verb]
 end
 
+function parse_constraint_arguments(cons_args::Vector)
+    args = Any[]
+
+    for a in cons_args
+        if typeof(a) <: Vector
+            push!(args, parse_constraint_arguments(a))
+        else
+            push!(args, parse_basic_expression(a))
+        end
+    end
+
+    return args
+end
+
 function parse_basic_expression(expr::AbstractString)
     # Far from type stability, but hard to avoid: the output might be a 
     # Boolean, a number, or a variable, without a way to know it beforehand.
@@ -883,7 +929,7 @@ function split_constraint(item::AbstractString)
     return (cons_verb, cons_args, cons_annotations)
 end
 
-function split_constraint_arguments(cons_args::AbstractString)::Vector{Union{AbstractString, Vector{AbstractString}}}
+function split_constraint_arguments(cons_args::AbstractString)::FZN_UNPARSED_ARGUMENT_LIST
     # Typical input: "0, x"
 
     @assert length(cons_args) > 0
@@ -900,7 +946,7 @@ function split_constraint_arguments(cons_args::AbstractString)::Vector{Union{Abs
     #   brackets, separated by commas. An array cannot be contained in an 
     #   array (this simplified the code enormously).
 
-    args = Union{AbstractString, Vector{AbstractString}}[]
+    args = FZN_UNPARSED_ARGUMENT[]
     while length(cons_args) > 0
         if cons_args[1] == '['
             # Start of array: find the end of the array, parse between.
