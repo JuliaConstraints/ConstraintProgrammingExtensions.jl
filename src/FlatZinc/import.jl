@@ -363,20 +363,23 @@ function map_to_moi(var_type::FznVariableType)
     return mapping[var_type]
 end
 
+function mixed_var_int_to_moi_var(v::AbstractString, model::Optimizer)
+    return model.name_to_var[v]
+end
+
+function mixed_var_int_to_moi_var(v::Integer, model::Optimizer)
+    moi_var, _ = MOI.add_constrained_variable(model, MOI.Integer())
+    MOI.add_constraint(model, MOI.SingleVariable(moi_var), MOI.EqualTo(v))
+    return moi_var
+end
+
+function mixed_var_int_to_moi_var(v::Any, ::Optimizer)
+    error("Unexpected literal: $v. Expected a variable or an integer.")
+    return nothing
+end
+
 function array_mixed_var_int_to_moi_var(array::Vector, model::Optimizer)
-    moi_var_array = MOI.VariableIndex[]
-    for v in array
-        if typeof(v) <: AbstractString
-            push!(moi_var_array, model.name_to_var[v])
-        elseif typeof(v) <: Integer
-            moi_var, _ = MOI.add_constrained_variable(model, MOI.Integer())
-            MOI.add_constraint(model, MOI.SingleVariable(moi_var), MOI.EqualTo(v))
-            push!(moi_var_array, moi_var)
-        else
-            error("Unexpected literal: $v. Expected a variable or an integer.")
-        end
-    end
-    return moi_var_array
+    return MOI.VariableIndex[mixed_var_int_to_moi_var(v, model) for v in array]
 end
 
 function add_constraint_to_model(cons::FznConstraintIdentifier, args, model::Optimizer)
