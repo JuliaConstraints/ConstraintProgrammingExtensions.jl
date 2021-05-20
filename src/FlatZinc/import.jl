@@ -679,6 +679,34 @@ function parse_constraint_verb(cons_verb::AbstractString)
     return mapping[cons_verb]
 end
 
+function parse_basic_expression(expr::AbstractString)
+    # Far from type stability, but hard to avoid: the output might be a 
+    # Boolean, a number, or a variable, without a way to know it beforehand.
+
+    # Simplest cases: Boolean constants.
+    if expr == "true"
+        return true
+    end
+    if expr == "false"
+        return false
+    end
+
+    # Try to parse as an integer or a float.
+    try
+        return parse(Int, expr)
+    catch
+        # Do nothing.
+    end
+    try
+        return parse(Float64, expr)
+    catch
+        # Do nothing.
+    end
+
+    # Nothing matched: it must be a variable.
+    return expr
+end
+
 # -----------------------------------------------------------------------------
 # - String-level parsing functions. This section corresponds to a tokenizer.
 # -----------------------------------------------------------------------------

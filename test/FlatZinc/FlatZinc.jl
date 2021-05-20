@@ -1225,6 +1225,14 @@
 
                 @test CP.FlatZinc.parse_variable_type("set of 2..5") == (CP.FlatZinc.FznInt, CP.FlatZinc.FznSet, 2, 5, nothing)
             end
+
+            @testset "parse_basic_expression" begin
+                @test CP.FlatZinc.parse_basic_expression("true") == true
+                @test CP.FlatZinc.parse_basic_expression("false") == false
+                @test CP.FlatZinc.parse_basic_expression("1") == 1
+                @test CP.FlatZinc.parse_basic_expression("1.0") == 1.0
+                @test CP.FlatZinc.parse_basic_expression("x1") == "x1"
+            end
         end
 
         @testset "Predicate section" begin
