@@ -396,9 +396,11 @@ function add_constraint_to_model(::Val{FznArrayIntElement}, args, model::Optimiz
     moi_var_value = model.name_to_var[args[3]]
     array = Int.(args[2])
 
-    moi_con = MOI.add_constraint(model, MOI.VectorOfVariables([moi_var_value, moi_var_index]), CP.Element(array))
-
-    return moi_con
+    return MOI.add_constraint(
+        model, 
+        MOI.VectorOfVariables([moi_var_value, moi_var_index]), 
+        CP.Element(array)
+    )
 end
 
 function add_constraint_to_model(::Val{FznArrayIntMaximum}, args, model::Optimizer)
@@ -409,9 +411,11 @@ function add_constraint_to_model(::Val{FznArrayIntMaximum}, args, model::Optimiz
     moi_var_max = model.name_to_var[args[1]]
     moi_var_array = array_mixed_var_int_to_moi_var(args[2], model)
 
-    moi_con = MOI.add_constraint(model, MOI.VectorOfVariables([moi_var_max, moi_var_array...]), CP.MaximumAmong(length(args[2])))
-
-    return moi_con
+    return MOI.add_constraint(
+        model, 
+        MOI.VectorOfVariables([moi_var_max, moi_var_array...]), 
+        CP.MaximumAmong(length(args[2]))
+    )
 end
 
 function add_constraint_to_model(::Val{FznArrayIntMinimum}, args, model::Optimizer)
@@ -422,9 +426,11 @@ function add_constraint_to_model(::Val{FznArrayIntMinimum}, args, model::Optimiz
     moi_var_min = model.name_to_var[args[1]]
     moi_var_array = array_mixed_var_int_to_moi_var(args[2], model)
 
-    moi_con = MOI.add_constraint(model, MOI.VectorOfVariables([moi_var_min, moi_var_array...]), CP.MinimumAmong(length(args[2])))
-
-    return moi_con
+    return MOI.add_constraint(
+        model, 
+        MOI.VectorOfVariables([moi_var_min, moi_var_array...]), 
+        CP.MinimumAmong(length(args[2]))
+    )
 end
 
 function add_constraint_to_model(::Val{FznVarIntElement}, args, model::Optimizer)
@@ -437,13 +443,86 @@ function add_constraint_to_model(::Val{FznVarIntElement}, args, model::Optimizer
     moi_var_array = array_mixed_var_int_to_moi_var(args[2], model)
     moi_var_value = model.name_to_var[args[3]]
 
-    moi_con = MOI.add_constraint(
+    return MOI.add_constraint(
         model, 
         MOI.VectorOfVariables([moi_var_value, moi_var_index, moi_var_array...]), 
         CP.ElementVariableArray(length(args[2]))
     )
+end
 
-    return moi_con
+function add_constraint_to_model(::Val{FznIntEq}, args, model::Optimizer)
+    @assert length(args) == 2
+    @assert typeof(args[1]) <: AbstractString || typeof(args[2]) <: AbstractString
+
+    moi_lhs = args[1]
+    moi_rhs = args[2]
+
+    # Both are variable: encode the constraint "x - y = 0".
+    if typeof(moi_lhs) <: AbstractString && typeof(moi_rhs) <: AbstractString
+        moi_lhs = model.name_to_var[moi_lhs]
+        moi_rhs = model.name_to_var[moi_rhs]
+
+        return MOI.add_constraint(
+            model, 
+            MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, -1], [moi_lhs, moi_rhs]), 0), 
+            MOI.EqualTo(0)
+        )
+    end
+
+    # Only one variable: consider that lhs is a variable.
+    if typeof(moi_rhs) <: AbstractString
+        moi_lhs, moi_rhs = moi_rhs, moi_lhs
+    end
+
+    moi_lhs = model.name_to_var[moi_lhs]
+
+    return MOI.add_constraint(
+        model, 
+        MOI.SingleVariable(moi_lhs), 
+        MOI.EqualTo(moi_rhs)
+    )
+end
+
+function add_constraint_to_model(::Val{FznIntEqReif}, args, model::Optimizer)
+    @assert length(args) == 3
+    @assert typeof(args[1]) <: AbstractString || typeof(args[2]) <: AbstractString
+    @assert typeof(args[3]) <: AbstractString
+
+    moi_lhs = args[1]
+    moi_rhs = args[2]
+    moi_reif = model.name_to_var[args[3]]
+
+    # Both are variable: encode the constraint "z <=> (x - y = 0)".
+    if typeof(moi_lhs) <: AbstractString && typeof(moi_rhs) <: AbstractString
+        moi_lhs = model.name_to_var[moi_lhs]
+        moi_rhs = model.name_to_var[moi_rhs]
+        
+        return MOI.add_constraint(
+            model, 
+            MOI.VectorAffineFunction(
+                [
+                    MOI.VectorAffineTerm(1, MOI.ScalarAffineTerm(1, moi_reif)),
+                    MOI.VectorAffineTerm(2, MOI.ScalarAffineTerm(1, moi_lhs)),
+                    MOI.VectorAffineTerm(2, MOI.ScalarAffineTerm(-1, moi_rhs)),
+                ], 
+                [0, 0]
+            ), 
+            CP.Reified(MOI.EqualTo(0))
+        )
+    end
+
+    # Only one variable: consider that lhs is a variable.
+    if typeof(moi_rhs) <: AbstractString
+        moi_lhs, moi_rhs = moi_rhs, moi_lhs
+    end
+
+    moi_lhs = model.name_to_var[moi_lhs]
+
+    return MOI.add_constraint(
+        model, 
+        MOI.VectorOfVariables([moi_reif, moi_lhs]), 
+        CP.Reified(MOI.EqualTo(moi_rhs))
+    )
 end
 
 # FznIntAbs: not supported yet.
