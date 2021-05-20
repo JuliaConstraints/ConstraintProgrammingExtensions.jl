@@ -202,7 +202,7 @@ MOI.dimension(set::CountDistinct) = set.dimension + 1
 """
     Element{T <: Real}(values::Vector{T})
 
-``\\{(x, i) \\in \\mathbb{R}^d \\times \\mathbb{N}^d | x = values[i]\\}``
+``\\{(x, i) \\in \\mathbb{R} \\times \\mathbb{N} | x = values[i]\\}``
 
 Less formally, the first element constrained in this set will take the value of
 `values` at the index given by the second element.
@@ -223,6 +223,32 @@ end
 MOI.dimension(set::Element{T}) where {T} = 2
 Base.copy(set::Element{T}) where {T} = Element(copy(set.values))
 Base.:(==)(x::Element{T}, y::Element{T}) where {T} = x.values == y.values
+
+"""
+    ElementVariableArray(dimension::Int)
+
+``\\{(x, i, values) \\in \\mathbb{R} \\times \\mathbb{N} \\times \\mathbb{R}^{dimension} | x = values[i]\\}``
+
+Less formally, the first element constrained in this set will take the value of
+`values` at the index given by the second element in the array given by the 
+remaining elements constrained in the set.
+
+## Examples
+
+    [x, 3, a, b, c] in ElementVariableArray(3)
+    # Enforces that x = c, because 6 is the 3rd element from the array [a, b, c].
+
+    [y, j, a, b, c] in ElementVariableArray(3)
+    # Enforces that y = array[j], depending on the value of j (an integer
+    # between 1 and 3), from the array [a, b, c].
+"""
+struct ElementVariableArray <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+MOI.dimension(set::ElementVariableArray) = 2 + set.dimension
+Base.copy(set::ElementVariableArray) = ElementVariableArray(set.dimension)
+Base.:(==)(x::ElementVariableArray, y::ElementVariableArray) = x.dimension == y.dimension
 
 """
     MinimumDistance{T <: Real}(dimension::Int, k::T)

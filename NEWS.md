@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.2.4
+-------------
+
+Added the `ElementVariableArray` set.
+
+Support FlatZinc reading.
+
+
 Version 0.2.3
 -------------
 
