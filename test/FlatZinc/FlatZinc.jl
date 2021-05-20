@@ -1533,7 +1533,49 @@
                 @test length(m.constraint_info) == 5
                 @test m.constraint_info[5].f == MOI.VectorOfVariables([x4, x3])
                 @test m.constraint_info[5].s == CP.Element([1, 2, 3])
-                @test !m.constraint_info[5].output_as_part_of_variable
+
+                CP.FlatZinc.parse_constraint!("constraint array_int_maximum(x3, [1, 2, 3]);", m)
+                @test length(m.constraint_info) == 12
+                for i in 1:3
+                    @test typeof(m.constraint_info[6 + (i - 1) * 2 + 0].f) <: MOI.SingleVariable
+                    @test m.constraint_info[6 + (i - 1) * 2 + 0].s == MOI.Integer()
+                    @test typeof(m.constraint_info[6 + (i - 1) * 2 + 1].f) <: MOI.SingleVariable
+                    @test typeof(m.constraint_info[6 + (i - 1) * 2 + 1].s) <: MOI.EqualTo{Int}
+                end
+                @test typeof(m.constraint_info[12].f) <: MOI.VectorOfVariables
+                @test m.constraint_info[12].f.variables[1] == x3
+                @test m.constraint_info[12].s == CP.MaximumAmong(3)
+
+                CP.FlatZinc.parse_constraint!("constraint array_int_maximum(x3, [x3, x4]);", m)
+                @test length(m.constraint_info) == 13
+                @test m.constraint_info[13].f.variables[1] == x3
+                @test m.constraint_info[13].f.variables[2] == x3
+                @test m.constraint_info[13].f.variables[3] == x4
+                @test m.constraint_info[13].s == CP.MaximumAmong(2)
+
+                CP.FlatZinc.parse_constraint!("constraint array_int_minimum(x3, [1, 2, 3]);", m)
+                @test length(m.constraint_info) == 20
+                for i in 1:3
+                    @test typeof(m.constraint_info[14 + (i - 1) * 2 + 0].f) <: MOI.SingleVariable
+                    @test m.constraint_info[14 + (i - 1) * 2 + 0].s == MOI.Integer()
+                    @test typeof(m.constraint_info[14 + (i - 1) * 2 + 1].f) <: MOI.SingleVariable
+                    @test typeof(m.constraint_info[14 + (i - 1) * 2 + 1].s) <: MOI.EqualTo{Int}
+                end
+                @test typeof(m.constraint_info[20].f) <: MOI.VectorOfVariables
+                @test m.constraint_info[20].f.variables[1] == x3
+                @test m.constraint_info[20].s == CP.MinimumAmong(3)
+
+                CP.FlatZinc.parse_constraint!("constraint array_int_minimum(x3, [x3, x4]);", m)
+                @test length(m.constraint_info) == 21
+                @test m.constraint_info[21].f.variables[1] == x3
+                @test m.constraint_info[21].f.variables[2] == x3
+                @test m.constraint_info[21].f.variables[3] == x4
+                @test m.constraint_info[21].s == CP.MinimumAmong(2)
+
+                CP.FlatZinc.parse_constraint!("constraint array_var_int_element(x3, [x1, x2, x3, x4], x4);", m)
+                @test length(m.constraint_info) == 22
+                @test m.constraint_info[22].f == MOI.VectorOfVariables([x4, x3, x1, x2, x3, x4])
+                @test m.constraint_info[22].s == CP.ElementVariableArray(4)
             end
         end
 

@@ -363,6 +363,22 @@ function map_to_moi(var_type::FznVariableType)
     return mapping[var_type]
 end
 
+function array_mixed_var_int_to_moi_var(array::Vector, model::Optimizer)
+    moi_var_array = MOI.VariableIndex[]
+    for v in array
+        if typeof(v) <: AbstractString
+            push!(moi_var_array, model.name_to_var[v])
+        elseif typeof(v) <: Integer
+            moi_var, _ = MOI.add_constrained_variable(model, MOI.Integer())
+            MOI.add_constraint(model, MOI.SingleVariable(moi_var), MOI.EqualTo(v))
+            push!(moi_var_array, moi_var)
+        else
+            error("Unexpected literal: $v. Expected a variable or an integer.")
+        end
+    end
+    return moi_var_array
+end
+
 function add_constraint_to_model(cons::FznConstraintIdentifier, args, model::Optimizer)
     return add_constraint_to_model(Val(cons), args, model)
 end
@@ -377,10 +393,58 @@ function add_constraint_to_model(::Val{FznArrayIntElement}, args, model::Optimiz
     moi_var_value = model.name_to_var[args[3]]
     array = Int.(args[2])
 
-    MOI.add_constraint(model, MOI.VectorOfVariables([moi_var_value, moi_var_index]), CP.Element(array))
+    moi_con = MOI.add_constraint(model, MOI.VectorOfVariables([moi_var_value, moi_var_index]), CP.Element(array))
 
-    return nothing
+    return moi_con
 end
+
+function add_constraint_to_model(::Val{FznArrayIntMaximum}, args, model::Optimizer)
+    @assert length(args) == 2
+    @assert typeof(args[1]) <: AbstractString
+    @assert typeof(args[2]) <: Vector
+
+    moi_var_max = model.name_to_var[args[1]]
+    moi_var_array = array_mixed_var_int_to_moi_var(args[2], model)
+
+    moi_con = MOI.add_constraint(model, MOI.VectorOfVariables([moi_var_max, moi_var_array...]), CP.MaximumAmong(length(args[2])))
+
+    return moi_con
+end
+
+function add_constraint_to_model(::Val{FznArrayIntMinimum}, args, model::Optimizer)
+    @assert length(args) == 2
+    @assert typeof(args[1]) <: AbstractString
+    @assert typeof(args[2]) <: Vector
+
+    moi_var_min = model.name_to_var[args[1]]
+    moi_var_array = array_mixed_var_int_to_moi_var(args[2], model)
+
+    moi_con = MOI.add_constraint(model, MOI.VectorOfVariables([moi_var_min, moi_var_array...]), CP.MinimumAmong(length(args[2])))
+
+    return moi_con
+end
+
+function add_constraint_to_model(::Val{FznVarIntElement}, args, model::Optimizer)
+    @assert length(args) == 3
+    @assert typeof(args[1]) <: AbstractString
+    @assert typeof(args[2]) <: Vector
+    @assert typeof(args[3]) <: AbstractString
+
+    moi_var_index = model.name_to_var[args[1]]
+    moi_var_array = array_mixed_var_int_to_moi_var(args[2], model)
+    moi_var_value = model.name_to_var[args[3]]
+
+    moi_con = MOI.add_constraint(
+        model, 
+        MOI.VectorOfVariables([moi_var_value, moi_var_index, moi_var_array...]), 
+        CP.ElementVariableArray(length(args[2]))
+    )
+
+    return moi_con
+end
+
+# FznIntAbs: not supported yet.
+# FznIntDiv: not supported yet.
 
 # -----------------------------------------------------------------------------
 # - Low-level parsing functions (other grammar rules), independent of MOI.
