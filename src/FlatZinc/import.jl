@@ -450,7 +450,7 @@ function add_constraint_to_model(::Val{FznVarIntElement}, args, model::Optimizer
     )
 end
 
-function add_constraint_to_model(::Val{FznIntEq}, args, model::Optimizer)
+function add_constraint_to_model(cons_verb::Union{Val{FznIntEq}, Val{FznIntLe}}, args, model::Optimizer)
     @assert length(args) == 2
     @assert typeof(args[1]) <: AbstractString || typeof(args[2]) <: AbstractString
 
@@ -462,28 +462,48 @@ function add_constraint_to_model(::Val{FznIntEq}, args, model::Optimizer)
         moi_lhs = model.name_to_var[moi_lhs]
         moi_rhs = model.name_to_var[moi_rhs]
 
+        moi_set = if cons_verb == Val(FznIntEq)
+            MOI.EqualTo(0)
+        elseif cons_verb == Val(FznIntLe)
+            MOI.LessThan(0)
+        end
+
         return MOI.add_constraint(
             model, 
             MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, -1], [moi_lhs, moi_rhs]), 0), 
-            MOI.EqualTo(0)
+            moi_set
         )
     end
 
     # Only one variable: consider that lhs is a variable.
+    lhs_coeff = 1
+    rhs_coeff = 1
     if typeof(moi_rhs) <: AbstractString
         moi_lhs, moi_rhs = moi_rhs, moi_lhs
+
+        # For a <= constraint, reversing the order means that signs must change too.
+        if cons_verb == Val(FznIntLe)
+            lhs_coeff = -1
+            rhs_coeff = -1
+        end
     end
 
     moi_lhs = model.name_to_var[moi_lhs]
 
+    moi_set = if cons_verb == Val(FznIntEq)
+        MOI.EqualTo(rhs_coeff * moi_rhs)
+    elseif cons_verb == Val(FznIntLe)
+        MOI.LessThan(rhs_coeff * moi_rhs)
+    end
+
     return MOI.add_constraint(
         model, 
-        MOI.SingleVariable(moi_lhs), 
-        MOI.EqualTo(moi_rhs)
+        MOI.ScalarAffineFunction([MOI.ScalarAffineTerm(lhs_coeff, moi_lhs)], 0), 
+        moi_set
     )
 end
 
-function add_constraint_to_model(::Val{FznIntEqReif}, args, model::Optimizer)
+function add_constraint_to_model(cons_verb::Union{Val{FznIntEqReif}, Val{FznIntLeReif}}, args, model::Optimizer)
     @assert length(args) == 3
     @assert typeof(args[1]) <: AbstractString || typeof(args[2]) <: AbstractString
     @assert typeof(args[3]) <: AbstractString
@@ -496,6 +516,12 @@ function add_constraint_to_model(::Val{FznIntEqReif}, args, model::Optimizer)
     if typeof(moi_lhs) <: AbstractString && typeof(moi_rhs) <: AbstractString
         moi_lhs = model.name_to_var[moi_lhs]
         moi_rhs = model.name_to_var[moi_rhs]
+
+        moi_set = if cons_verb == Val(FznIntEqReif)
+            CP.Reified(MOI.EqualTo(0))
+        elseif cons_verb == Val(FznIntLeReif)
+            CP.Reified(MOI.LessThan(0))
+        end
         
         return MOI.add_constraint(
             model, 
@@ -507,21 +533,41 @@ function add_constraint_to_model(::Val{FznIntEqReif}, args, model::Optimizer)
                 ], 
                 [0, 0]
             ), 
-            CP.Reified(MOI.EqualTo(0))
+            moi_set
         )
     end
 
     # Only one variable: consider that lhs is a variable.
+    lhs_coeff = 1
+    rhs_coeff = 1
     if typeof(moi_rhs) <: AbstractString
         moi_lhs, moi_rhs = moi_rhs, moi_lhs
+
+        # For a <= constraint, reversing the order means that signs must change too.
+        if cons_verb == Val(FznIntLeReif)
+            lhs_coeff = -1
+            rhs_coeff = -1
+        end
     end
 
     moi_lhs = model.name_to_var[moi_lhs]
 
+    moi_set = if cons_verb == Val(FznIntEqReif)
+        CP.Reified(MOI.EqualTo(rhs_coeff * moi_rhs))
+    elseif cons_verb == Val(FznIntLeReif)
+        CP.Reified(MOI.LessThan(rhs_coeff * moi_rhs))
+    end
+
     return MOI.add_constraint(
         model, 
-        MOI.VectorOfVariables([moi_reif, moi_lhs]), 
-        CP.Reified(MOI.EqualTo(moi_rhs))
+        MOI.VectorAffineFunction(
+            [
+                MOI.VectorAffineTerm(1, MOI.ScalarAffineTerm(1, moi_reif)), 
+                MOI.VectorAffineTerm(2, MOI.ScalarAffineTerm(lhs_coeff, moi_lhs)), 
+            ],
+            [0, 0]
+        ), 
+        moi_set
     )
 end
 
