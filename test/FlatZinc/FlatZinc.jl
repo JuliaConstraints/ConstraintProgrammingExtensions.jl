@@ -1525,733 +1525,1297 @@
                 x4 = CP.FlatZinc.parse_variable!("var int: x4;", m)
                 x5 = CP.FlatZinc.parse_variable!("var float: x5;", m)
                 x6 = CP.FlatZinc.parse_variable!("var float: x6;", m)
+                
+                nc = 0
 
                 # Missing semicolon (;).
                 @test_throws AssertionError CP.FlatZinc.parse_constraint!("constraint array_int_element(x2, [1, 2, 3], x2)", m)
 
                 CP.FlatZinc.parse_constraint!("constraint array_int_element(x3, [1, 2, 3], x4);", m)
-                @test length(m.constraint_info) == 5
-                @test m.constraint_info[5].f == MOI.VectorOfVariables([x4, x3])
-                @test m.constraint_info[5].s == CP.Element([1, 2, 3])
+                nc += 5
+                @test length(m.constraint_info) == nc
+                @test m.constraint_info[nc].f == MOI.VectorOfVariables([x4, x3])
+                @test m.constraint_info[nc].s == CP.Element([1, 2, 3])
 
                 CP.FlatZinc.parse_constraint!("constraint array_int_maximum(x3, [1, 2, 3]);", m)
-                @test length(m.constraint_info) == 12
                 for i in 1:3
-                    @test typeof(m.constraint_info[6 + (i - 1) * 2 + 0].f) <: MOI.SingleVariable
-                    @test m.constraint_info[6 + (i - 1) * 2 + 0].s == MOI.Integer()
-                    @test typeof(m.constraint_info[6 + (i - 1) * 2 + 1].f) <: MOI.SingleVariable
-                    @test typeof(m.constraint_info[6 + (i - 1) * 2 + 1].s) <: MOI.EqualTo{Int}
+                    nc += 1
+                    @test typeof(m.constraint_info[nc].f) <: MOI.SingleVariable
+                    @test m.constraint_info[nc].s == MOI.Integer()
+
+                    nc += 1
+                    @test typeof(m.constraint_info[nc].f) <: MOI.SingleVariable
+                    @test typeof(m.constraint_info[nc].s) <: MOI.EqualTo{Int}
                 end
+                nc += 1
+                @test length(m.constraint_info) == nc
                 @test typeof(m.constraint_info[12].f) <: MOI.VectorOfVariables
                 @test m.constraint_info[12].f.variables[1] == x3
                 @test m.constraint_info[12].s == CP.MaximumAmong(3)
 
                 CP.FlatZinc.parse_constraint!("constraint array_int_maximum(x3, [x3, x4]);", m)
-                @test length(m.constraint_info) == 13
+                nc += 1
+                @test length(m.constraint_info) == nc
                 @test m.constraint_info[13].f.variables[1] == x3
                 @test m.constraint_info[13].f.variables[2] == x3
                 @test m.constraint_info[13].f.variables[3] == x4
                 @test m.constraint_info[13].s == CP.MaximumAmong(2)
 
                 CP.FlatZinc.parse_constraint!("constraint array_int_minimum(x3, [1, 2, 3]);", m)
-                @test length(m.constraint_info) == 20
                 for i in 1:3
-                    @test typeof(m.constraint_info[14 + (i - 1) * 2 + 0].f) <: MOI.SingleVariable
-                    @test m.constraint_info[14 + (i - 1) * 2 + 0].s == MOI.Integer()
-                    @test typeof(m.constraint_info[14 + (i - 1) * 2 + 1].f) <: MOI.SingleVariable
-                    @test typeof(m.constraint_info[14 + (i - 1) * 2 + 1].s) <: MOI.EqualTo{Int}
+                    nc += 1
+                    @test typeof(m.constraint_info[nc].f) <: MOI.SingleVariable
+                    @test m.constraint_info[nc].s == MOI.Integer()
+                    nc += 1
+
+                    @test typeof(m.constraint_info[nc].f) <: MOI.SingleVariable
+                    @test typeof(m.constraint_info[nc].s) <: MOI.EqualTo{Int}
                 end
-                @test typeof(m.constraint_info[20].f) <: MOI.VectorOfVariables
-                @test m.constraint_info[20].f.variables[1] == x3
-                @test m.constraint_info[20].s == CP.MinimumAmong(3)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorOfVariables
+                @test m.constraint_info[nc].f.variables[1] == x3
+                @test m.constraint_info[nc].s == CP.MinimumAmong(3)
 
                 CP.FlatZinc.parse_constraint!("constraint array_int_minimum(x3, [x3, x4]);", m)
-                @test length(m.constraint_info) == 21
-                @test m.constraint_info[21].f.variables[1] == x3
-                @test m.constraint_info[21].f.variables[2] == x3
-                @test m.constraint_info[21].f.variables[3] == x4
-                @test m.constraint_info[21].s == CP.MinimumAmong(2)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test m.constraint_info[nc].f.variables[1] == x3
+                @test m.constraint_info[nc].f.variables[2] == x3
+                @test m.constraint_info[nc].f.variables[3] == x4
+                @test m.constraint_info[nc].s == CP.MinimumAmong(2)
 
                 CP.FlatZinc.parse_constraint!("constraint array_var_int_element(x3, [x1, x2, x3, x4], x4);", m)
-                @test length(m.constraint_info) == 22
-                @test m.constraint_info[22].f == MOI.VectorOfVariables([x4, x3, x1, x2, x3, x4])
-                @test m.constraint_info[22].s == CP.ElementVariableArray(4)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test m.constraint_info[nc].f == MOI.VectorOfVariables([x4, x3, x1, x2, x3, x4])
+                @test m.constraint_info[nc].s == CP.ElementVariableArray(4)
 
                 CP.FlatZinc.parse_constraint!("constraint int_eq(x3, x4);", m)
-                @test length(m.constraint_info) == 23
-                @test typeof(m.constraint_info[23].f) <: MOI.ScalarAffineFunction{Int}
-                @test m.constraint_info[23].f.constant == 0
-                @test length(m.constraint_info[23].f.terms) == 2
-                @test m.constraint_info[23].f.terms[1].coefficient == 1
-                @test m.constraint_info[23].f.terms[1].variable_index == x3
-                @test m.constraint_info[23].f.terms[2].coefficient == -1
-                @test m.constraint_info[23].f.terms[2].variable_index == x4
-                @test m.constraint_info[23].s == MOI.EqualTo(0)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1
+                @test m.constraint_info[nc].f.terms[2].variable_index == x4
+                @test m.constraint_info[nc].s == MOI.EqualTo(0)
 
                 CP.FlatZinc.parse_constraint!("constraint int_eq(3, x4);", m)
-                @test length(m.constraint_info) == 24
-                @test typeof(m.constraint_info[24].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
-                @test length(m.constraint_info[24].f.terms) == 1
-                @test m.constraint_info[24].f.terms[1].coefficient == 1
-                @test m.constraint_info[24].f.terms[1].variable_index == x4
-                @test m.constraint_info[24].s == MOI.EqualTo(3)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x4
+                @test m.constraint_info[nc].s == MOI.EqualTo(3)
 
                 CP.FlatZinc.parse_constraint!("constraint int_eq(x3, 4);", m)
-                @test length(m.constraint_info) == 25
-                @test typeof(m.constraint_info[25].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
-                @test length(m.constraint_info[25].f.terms) == 1
-                @test m.constraint_info[25].f.terms[1].coefficient == 1
-                @test m.constraint_info[25].f.terms[1].variable_index == x3
-                @test m.constraint_info[25].s == MOI.EqualTo(4)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].s == MOI.EqualTo(4)
 
                 CP.FlatZinc.parse_constraint!("constraint int_eq_reif(x3, x4, x1);", m)
-                @test length(m.constraint_info) == 26
-                @test typeof(m.constraint_info[26].f) <: MOI.VectorAffineFunction{Int}
-                @test m.constraint_info[26].f.constants == [0, 0]
-                @test length(m.constraint_info[26].f.terms) == 3
-                @test m.constraint_info[26].f.terms[1].output_index == 1
-                @test m.constraint_info[26].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[26].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[26].f.terms[2].output_index == 2
-                @test m.constraint_info[26].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[26].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[26].f.terms[3].output_index == 2
-                @test m.constraint_info[26].f.terms[3].scalar_term.coefficient == -1
-                @test m.constraint_info[26].f.terms[3].scalar_term.variable_index == x4
-                @test m.constraint_info[26].s == CP.Reified(MOI.EqualTo(0))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int}
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === -1
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(0))
 
                 CP.FlatZinc.parse_constraint!("constraint int_eq_reif(3, x4, x1);", m)
-                @test length(m.constraint_info) == 27
-                @test typeof(m.constraint_info[27].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
-                @test m.constraint_info[27].f.constants == [0, 0]
-                @test length(m.constraint_info[27].f.terms) == 2
-                @test m.constraint_info[27].f.terms[1].output_index == 1
-                @test m.constraint_info[27].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[27].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[27].f.terms[2].output_index == 2
-                @test m.constraint_info[27].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[27].f.terms[2].scalar_term.variable_index == x4
-                @test m.constraint_info[27].s == CP.Reified(MOI.EqualTo(3))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(3))
 
                 CP.FlatZinc.parse_constraint!("constraint int_eq_reif(x3, 4, x1);", m)
-                @test length(m.constraint_info) == 28
-                @test typeof(m.constraint_info[28].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
-                @test m.constraint_info[28].f.constants == [0, 0]
-                @test length(m.constraint_info[28].f.terms) == 2
-                @test m.constraint_info[28].f.terms[1].output_index == 1
-                @test m.constraint_info[28].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[28].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[28].f.terms[2].output_index == 2
-                @test m.constraint_info[28].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[28].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[28].s == CP.Reified(MOI.EqualTo(4))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(4))
 
                 CP.FlatZinc.parse_constraint!("constraint int_le(x3, x4);", m)
-                @test length(m.constraint_info) == 29
-                @test typeof(m.constraint_info[29].f) <: MOI.ScalarAffineFunction{Int}
-                @test m.constraint_info[29].f.constant == 0
-                @test length(m.constraint_info[29].f.terms) == 2
-                @test m.constraint_info[29].f.terms[1].coefficient == 1
-                @test m.constraint_info[29].f.terms[1].variable_index == x3
-                @test m.constraint_info[29].f.terms[2].coefficient == -1
-                @test m.constraint_info[29].f.terms[2].variable_index == x4
-                @test m.constraint_info[29].s == MOI.LessThan(0)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1
+                @test m.constraint_info[nc].f.terms[2].variable_index == x4
+                @test m.constraint_info[nc].s == MOI.LessThan(0)
 
                 CP.FlatZinc.parse_constraint!("constraint int_le(3, x4);", m)
-                @test length(m.constraint_info) == 30
-                @test typeof(m.constraint_info[30].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x4).
-                @test m.constraint_info[30].f.constant == 0
-                @test length(m.constraint_info[30].f.terms) == 1
-                @test m.constraint_info[30].f.terms[1].coefficient == -1
-                @test m.constraint_info[30].f.terms[1].variable_index == x4
-                @test m.constraint_info[30].s == MOI.LessThan(-3)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x4).
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === -1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x4
+                @test m.constraint_info[nc].s == MOI.LessThan(-3)
 
                 CP.FlatZinc.parse_constraint!("constraint int_le(x3, 4);", m)
-                @test length(m.constraint_info) == 31
-                @test typeof(m.constraint_info[31].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x3).
-                @test m.constraint_info[31].f.constant == 0
-                @test length(m.constraint_info[31].f.terms) == 1
-                @test m.constraint_info[31].f.terms[1].coefficient == 1
-                @test m.constraint_info[31].f.terms[1].variable_index == x3
-                @test m.constraint_info[31].s == MOI.LessThan(4)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x3).
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].s == MOI.LessThan(4)
 
                 CP.FlatZinc.parse_constraint!("constraint int_le_reif(x3, x4, x1);", m)
-                @test length(m.constraint_info) == 32
-                @test typeof(m.constraint_info[32].f) <: MOI.VectorAffineFunction{Int}
-                @test m.constraint_info[32].f.constants == [0, 0]
-                @test length(m.constraint_info[32].f.terms) == 3
-                @test m.constraint_info[32].f.terms[1].output_index == 1
-                @test m.constraint_info[32].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[32].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[32].f.terms[2].output_index == 2
-                @test m.constraint_info[32].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[32].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[32].f.terms[3].output_index == 2
-                @test m.constraint_info[32].f.terms[3].scalar_term.coefficient == -1
-                @test m.constraint_info[32].f.terms[3].scalar_term.variable_index == x4
-                @test m.constraint_info[32].s == CP.Reified(MOI.LessThan(0))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int}
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === -1
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(0))
 
                 CP.FlatZinc.parse_constraint!("constraint int_le_reif(3, x4, x1);", m)
-                @test length(m.constraint_info) == 33
-                @test typeof(m.constraint_info[33].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
-                @test m.constraint_info[33].f.constants == [0, 0]
-                @test length(m.constraint_info[33].f.terms) == 2
-                @test m.constraint_info[33].f.terms[1].output_index == 1
-                @test m.constraint_info[33].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[33].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[33].f.terms[2].output_index == 2
-                @test m.constraint_info[33].f.terms[2].scalar_term.coefficient == -1
-                @test m.constraint_info[33].f.terms[2].scalar_term.variable_index == x4
-                @test m.constraint_info[33].s == CP.Reified(MOI.LessThan(-3))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === -1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(-3))
 
                 CP.FlatZinc.parse_constraint!("constraint int_le_reif(x3, 4, x1);", m)
-                @test length(m.constraint_info) == 34
-                @test typeof(m.constraint_info[34].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
-                @test m.constraint_info[34].f.constants == [0, 0]
-                @test length(m.constraint_info[34].f.terms) == 2
-                @test m.constraint_info[34].f.terms[1].output_index == 1
-                @test m.constraint_info[34].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[34].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[34].f.terms[2].output_index == 2
-                @test m.constraint_info[34].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[34].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[34].s == CP.Reified(MOI.LessThan(4))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(4))
 
                 CP.FlatZinc.parse_constraint!("constraint int_lin_eq([2, 3], [x1, x2], 5);", m)
-                @test length(m.constraint_info) == 35
-                @test typeof(m.constraint_info[35].f) <: MOI.ScalarAffineFunction{Int}
-                @test m.constraint_info[35].f.constant == 0
-                @test length(m.constraint_info[35].f.terms) == 2
-                @test m.constraint_info[35].f.terms[1].coefficient == 2
-                @test m.constraint_info[35].f.terms[1].variable_index == x1
-                @test m.constraint_info[35].f.terms[2].coefficient == 3
-                @test m.constraint_info[35].f.terms[2].variable_index == x2
-                @test m.constraint_info[35].s == MOI.EqualTo(5)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 2
+                @test m.constraint_info[nc].f.terms[1].variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].coefficient === 3
+                @test m.constraint_info[nc].f.terms[2].variable_index == x2
+                @test m.constraint_info[nc].s == MOI.EqualTo(5)
 
                 CP.FlatZinc.parse_constraint!("constraint int_lin_eq_reif([2, 3], [x1, x2], 5, x1);", m)
-                @test length(m.constraint_info) == 36
-                @test typeof(m.constraint_info[36].f) <: MOI.VectorAffineFunction{Int}
-                @test m.constraint_info[36].f.constants == [0, 0]
-                @test length(m.constraint_info[36].f.terms) == 3
-                @test m.constraint_info[36].f.terms[1].output_index == 1
-                @test m.constraint_info[36].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[36].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[36].f.terms[2].output_index == 2
-                @test m.constraint_info[36].f.terms[2].scalar_term.coefficient == 2
-                @test m.constraint_info[36].f.terms[2].scalar_term.variable_index == x1
-                @test m.constraint_info[36].f.terms[3].output_index == 2
-                @test m.constraint_info[36].f.terms[3].scalar_term.coefficient == 3
-                @test m.constraint_info[36].f.terms[3].scalar_term.variable_index == x2
-                @test m.constraint_info[36].s == CP.Reified(MOI.EqualTo(5))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int}
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === 3
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x2
+                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(5))
 
                 CP.FlatZinc.parse_constraint!("constraint int_lin_le([2, 3], [x1, x2], 5);", m)
-                @test length(m.constraint_info) == 37
-                @test typeof(m.constraint_info[37].f) <: MOI.ScalarAffineFunction{Int}
-                @test m.constraint_info[37].f.constant == 0
-                @test length(m.constraint_info[37].f.terms) == 2
-                @test m.constraint_info[37].f.terms[1].coefficient == 2
-                @test m.constraint_info[37].f.terms[1].variable_index == x1
-                @test m.constraint_info[37].f.terms[2].coefficient == 3
-                @test m.constraint_info[37].f.terms[2].variable_index == x2
-                @test m.constraint_info[37].s == MOI.LessThan(5)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 2
+                @test m.constraint_info[nc].f.terms[1].variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].coefficient === 3
+                @test m.constraint_info[nc].f.terms[2].variable_index == x2
+                @test m.constraint_info[nc].s == MOI.LessThan(5)
 
                 CP.FlatZinc.parse_constraint!("constraint int_lin_le_reif([2, 3], [x1, x2], 5, x1);", m)
-                @test length(m.constraint_info) == 38
-                @test typeof(m.constraint_info[38].f) <: MOI.VectorAffineFunction{Int}
-                @test m.constraint_info[38].f.constants == [0, 0]
-                @test length(m.constraint_info[38].f.terms) == 3
-                @test m.constraint_info[38].f.terms[1].output_index == 1
-                @test m.constraint_info[38].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[38].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[38].f.terms[2].output_index == 2
-                @test m.constraint_info[38].f.terms[2].scalar_term.coefficient == 2
-                @test m.constraint_info[38].f.terms[2].scalar_term.variable_index == x1
-                @test m.constraint_info[38].f.terms[3].output_index == 2
-                @test m.constraint_info[38].f.terms[3].scalar_term.coefficient == 3
-                @test m.constraint_info[38].f.terms[3].scalar_term.variable_index == x2
-                @test m.constraint_info[38].s == CP.Reified(MOI.LessThan(5))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int}
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === 3
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x2
+                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(5))
 
                 CP.FlatZinc.parse_constraint!("constraint int_lin_ne([2, 3], [x1, x2], 5);", m)
-                @test length(m.constraint_info) == 39
-                @test typeof(m.constraint_info[39].f) <: MOI.ScalarAffineFunction{Int}
-                @test m.constraint_info[39].f.constant == 0
-                @test length(m.constraint_info[39].f.terms) == 2
-                @test m.constraint_info[39].f.terms[1].coefficient == 2
-                @test m.constraint_info[39].f.terms[1].variable_index == x1
-                @test m.constraint_info[39].f.terms[2].coefficient == 3
-                @test m.constraint_info[39].f.terms[2].variable_index == x2
-                @test m.constraint_info[39].s == CP.DifferentFrom(5)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 2
+                @test m.constraint_info[nc].f.terms[1].variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].coefficient === 3
+                @test m.constraint_info[nc].f.terms[2].variable_index == x2
+                @test m.constraint_info[nc].s == CP.DifferentFrom(5)
 
                 CP.FlatZinc.parse_constraint!("constraint int_lin_ne_reif([2, 3], [x1, x2], 5, x1);", m)
-                @test length(m.constraint_info) == 40
-                @test typeof(m.constraint_info[40].f) <: MOI.VectorAffineFunction{Int}
-                @test m.constraint_info[40].f.constants == [0, 0]
-                @test length(m.constraint_info[40].f.terms) == 3
-                @test m.constraint_info[40].f.terms[1].output_index == 1
-                @test m.constraint_info[40].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[40].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[40].f.terms[2].output_index == 2
-                @test m.constraint_info[40].f.terms[2].scalar_term.coefficient == 2
-                @test m.constraint_info[40].f.terms[2].scalar_term.variable_index == x1
-                @test m.constraint_info[40].f.terms[3].output_index == 2
-                @test m.constraint_info[40].f.terms[3].scalar_term.coefficient == 3
-                @test m.constraint_info[40].f.terms[3].scalar_term.variable_index == x2
-                @test m.constraint_info[40].s == CP.Reified(CP.DifferentFrom(5))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int}
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === 3
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x2
+                @test m.constraint_info[nc].s == CP.Reified(CP.DifferentFrom(5))
 
                 CP.FlatZinc.parse_constraint!("constraint int_lt(x3, x4);", m)
-                @test length(m.constraint_info) == 41
-                @test typeof(m.constraint_info[41].f) <: MOI.ScalarAffineFunction{Int}
-                @test m.constraint_info[41].f.constant == 0
-                @test length(m.constraint_info[41].f.terms) == 2
-                @test m.constraint_info[41].f.terms[1].coefficient == 1
-                @test m.constraint_info[41].f.terms[1].variable_index == x3
-                @test m.constraint_info[41].f.terms[2].coefficient == -1
-                @test m.constraint_info[41].f.terms[2].variable_index == x4
-                @test m.constraint_info[41].s == CP.Strictly(MOI.LessThan(0))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1
+                @test m.constraint_info[nc].f.terms[2].variable_index == x4
+                @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(0))
 
                 CP.FlatZinc.parse_constraint!("constraint int_lt(3, x4);", m)
-                @test length(m.constraint_info) == 42
-                @test typeof(m.constraint_info[42].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x4).
-                @test m.constraint_info[42].f.constant == 0
-                @test length(m.constraint_info[42].f.terms) == 1
-                @test m.constraint_info[42].f.terms[1].coefficient == -1
-                @test m.constraint_info[42].f.terms[1].variable_index == x4
-                @test m.constraint_info[42].s == CP.Strictly(MOI.LessThan(-3))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x4).
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === -1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x4
+                @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(-3))
 
                 CP.FlatZinc.parse_constraint!("constraint int_lt(x3, 4);", m)
-                @test length(m.constraint_info) == 43
-                @test typeof(m.constraint_info[43].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x3).
-                @test m.constraint_info[43].f.constant == 0
-                @test length(m.constraint_info[43].f.terms) == 1
-                @test m.constraint_info[43].f.terms[1].coefficient == 1
-                @test m.constraint_info[43].f.terms[1].variable_index == x3
-                @test m.constraint_info[43].s == CP.Strictly(MOI.LessThan(4))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x3).
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(4))
 
                 CP.FlatZinc.parse_constraint!("constraint int_lt_reif(x3, x4, x1);", m)
-                @test length(m.constraint_info) == 44
-                @test typeof(m.constraint_info[44].f) <: MOI.VectorAffineFunction{Int}
-                @test m.constraint_info[44].f.constants == [0, 0]
-                @test length(m.constraint_info[44].f.terms) == 3
-                @test m.constraint_info[44].f.terms[1].output_index == 1
-                @test m.constraint_info[44].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[44].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[44].f.terms[2].output_index == 2
-                @test m.constraint_info[44].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[44].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[44].f.terms[3].output_index == 2
-                @test m.constraint_info[44].f.terms[3].scalar_term.coefficient == -1
-                @test m.constraint_info[44].f.terms[3].scalar_term.variable_index == x4
-                @test m.constraint_info[44].s == CP.Reified(CP.Strictly(MOI.LessThan(0)))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int}
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === -1
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(CP.Strictly(MOI.LessThan(0)))
 
                 CP.FlatZinc.parse_constraint!("constraint int_lt_reif(3, x4, x1);", m)
-                @test length(m.constraint_info) == 45
-                @test typeof(m.constraint_info[45].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
-                @test m.constraint_info[45].f.constants == [0, 0]
-                @test length(m.constraint_info[45].f.terms) == 2
-                @test m.constraint_info[45].f.terms[1].output_index == 1
-                @test m.constraint_info[45].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[45].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[45].f.terms[2].output_index == 2
-                @test m.constraint_info[45].f.terms[2].scalar_term.coefficient == -1
-                @test m.constraint_info[45].f.terms[2].scalar_term.variable_index == x4
-                @test m.constraint_info[45].s == CP.Reified(CP.Strictly(MOI.LessThan(-3)))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === -1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(CP.Strictly(MOI.LessThan(-3)))
 
                 CP.FlatZinc.parse_constraint!("constraint int_lt_reif(x3, 4, x1);", m)
-                @test length(m.constraint_info) == 46
-                @test typeof(m.constraint_info[46].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
-                @test m.constraint_info[46].f.constants == [0, 0]
-                @test length(m.constraint_info[46].f.terms) == 2
-                @test m.constraint_info[46].f.terms[1].output_index == 1
-                @test m.constraint_info[46].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[46].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[46].f.terms[2].output_index == 2
-                @test m.constraint_info[46].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[46].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[46].s == CP.Reified(CP.Strictly(MOI.LessThan(4)))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].s == CP.Reified(CP.Strictly(MOI.LessThan(4)))
 
                 CP.FlatZinc.parse_constraint!("constraint int_max(x1, x2, x3);", m)
-                @test length(m.constraint_info) == 47
-                @test typeof(m.constraint_info[47].f) <: MOI.VectorOfVariables
-                @test m.constraint_info[47].f.variables[1] == x3
-                @test m.constraint_info[47].f.variables[2] == x1
-                @test m.constraint_info[47].f.variables[3] == x2
-                @test m.constraint_info[47].s == CP.MaximumAmong(2)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorOfVariables
+                @test m.constraint_info[nc].f.variables[1] == x3
+                @test m.constraint_info[nc].f.variables[2] == x1
+                @test m.constraint_info[nc].f.variables[3] == x2
+                @test m.constraint_info[nc].s == CP.MaximumAmong(2)
 
                 CP.FlatZinc.parse_constraint!("constraint int_min(x1, x2, x3);", m)
-                @test length(m.constraint_info) == 48
-                @test typeof(m.constraint_info[48].f) <: MOI.VectorOfVariables
-                @test m.constraint_info[48].f.variables[1] == x3
-                @test m.constraint_info[48].f.variables[2] == x1
-                @test m.constraint_info[48].f.variables[3] == x2
-                @test m.constraint_info[48].s == CP.MinimumAmong(2)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorOfVariables
+                @test m.constraint_info[nc].f.variables[1] == x3
+                @test m.constraint_info[nc].f.variables[2] == x1
+                @test m.constraint_info[nc].f.variables[3] == x2
+                @test m.constraint_info[nc].s == CP.MinimumAmong(2)
 
                 CP.FlatZinc.parse_constraint!("constraint int_ne(x3, x4);", m)
-                @test length(m.constraint_info) == 49
-                @test typeof(m.constraint_info[49].f) <: MOI.ScalarAffineFunction{Int}
-                @test m.constraint_info[49].f.constant == 0
-                @test length(m.constraint_info[49].f.terms) == 2
-                @test m.constraint_info[49].f.terms[1].coefficient == 1
-                @test m.constraint_info[49].f.terms[1].variable_index == x3
-                @test m.constraint_info[49].f.terms[2].coefficient == -1
-                @test m.constraint_info[49].f.terms[2].variable_index == x4
-                @test m.constraint_info[49].s == CP.DifferentFrom(0)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1
+                @test m.constraint_info[nc].f.terms[2].variable_index == x4
+                @test m.constraint_info[nc].s == CP.DifferentFrom(0)
 
                 CP.FlatZinc.parse_constraint!("constraint int_ne(3, x4);", m)
-                @test length(m.constraint_info) == 50
-                @test typeof(m.constraint_info[50].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
-                @test length(m.constraint_info[50].f.terms) == 1
-                @test m.constraint_info[50].f.terms[1].coefficient == 1
-                @test m.constraint_info[50].f.terms[1].variable_index == x4
-                @test m.constraint_info[50].s == CP.DifferentFrom(3)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x4
+                @test m.constraint_info[nc].s == CP.DifferentFrom(3)
 
                 CP.FlatZinc.parse_constraint!("constraint int_ne(x3, 4);", m)
-                @test length(m.constraint_info) == 51
-                @test typeof(m.constraint_info[51].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
-                @test length(m.constraint_info[51].f.terms) == 1
-                @test m.constraint_info[51].f.terms[1].coefficient == 1
-                @test m.constraint_info[51].f.terms[1].variable_index == x3
-                @test m.constraint_info[51].s == CP.DifferentFrom(4)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].s == CP.DifferentFrom(4)
 
                 CP.FlatZinc.parse_constraint!("constraint int_ne_reif(x3, x4, x1);", m)
-                @test length(m.constraint_info) == 52
-                @test typeof(m.constraint_info[52].f) <: MOI.VectorAffineFunction{Int}
-                @test m.constraint_info[52].f.constants == [0, 0]
-                @test length(m.constraint_info[52].f.terms) == 3
-                @test m.constraint_info[52].f.terms[1].output_index == 1
-                @test m.constraint_info[52].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[52].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[52].f.terms[2].output_index == 2
-                @test m.constraint_info[52].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[52].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[52].f.terms[3].output_index == 2
-                @test m.constraint_info[52].f.terms[3].scalar_term.coefficient == -1
-                @test m.constraint_info[52].f.terms[3].scalar_term.variable_index == x4
-                @test m.constraint_info[52].s == CP.Reified(CP.DifferentFrom(0))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int}
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === -1
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(CP.DifferentFrom(0))
 
                 CP.FlatZinc.parse_constraint!("constraint int_ne_reif(3, x4, x1);", m)
-                @test length(m.constraint_info) == 53
-                @test typeof(m.constraint_info[53].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
-                @test m.constraint_info[53].f.constants == [0, 0]
-                @test length(m.constraint_info[53].f.terms) == 2
-                @test m.constraint_info[53].f.terms[1].output_index == 1
-                @test m.constraint_info[53].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[53].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[53].f.terms[2].output_index == 2
-                @test m.constraint_info[53].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[53].f.terms[2].scalar_term.variable_index == x4
-                @test m.constraint_info[53].s == CP.Reified(CP.DifferentFrom(3))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(CP.DifferentFrom(3))
 
                 CP.FlatZinc.parse_constraint!("constraint int_ne_reif(x3, 4, x1);", m)
-                @test length(m.constraint_info) == 54
-                @test typeof(m.constraint_info[54].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
-                @test m.constraint_info[54].f.constants == [0, 0]
-                @test length(m.constraint_info[54].f.terms) == 2
-                @test m.constraint_info[54].f.terms[1].output_index == 1
-                @test m.constraint_info[54].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[54].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[54].f.terms[2].output_index == 2
-                @test m.constraint_info[54].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[54].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[54].s == CP.Reified(CP.DifferentFrom(4))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].s == CP.Reified(CP.DifferentFrom(4))
 
                 CP.FlatZinc.parse_constraint!("constraint int_plus(x1, x2, x3);", m)
-                @test length(m.constraint_info) == 55
-                @test typeof(m.constraint_info[55].f) <: MOI.ScalarAffineFunction
-                @test length(m.constraint_info[55].f.terms) == 3
-                @test m.constraint_info[55].f.terms[1].coefficient == 1
-                @test m.constraint_info[55].f.terms[1].variable_index == x1
-                @test m.constraint_info[55].f.terms[2].coefficient == 1
-                @test m.constraint_info[55].f.terms[2].variable_index == x2
-                @test m.constraint_info[55].f.terms[3].coefficient == -1
-                @test m.constraint_info[55].f.terms[3].variable_index == x3
-                @test m.constraint_info[55].s == MOI.EqualTo(0)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].variable_index == x2
+                @test m.constraint_info[nc].f.terms[3].coefficient === -1
+                @test m.constraint_info[nc].f.terms[3].variable_index == x3
+                @test m.constraint_info[nc].s == MOI.EqualTo(0)
 
                 CP.FlatZinc.parse_constraint!("constraint array_bool_element(x3, [true, false, false], x1);", m)
-                @test length(m.constraint_info) == 56
-                @test m.constraint_info[56].f == MOI.VectorOfVariables([x1, x3])
-                @test m.constraint_info[56].s == CP.Element([true, false, false])
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test m.constraint_info[nc].f == MOI.VectorOfVariables([x1, x3])
+                @test m.constraint_info[nc].s == CP.Element([true, false, false])
 
                 CP.FlatZinc.parse_constraint!("constraint array_var_bool_element(x3, [x1, x2], x1);", m)
-                @test length(m.constraint_info) == 57
-                @test m.constraint_info[57].f == MOI.VectorOfVariables([x1, x3, x1, x2])
-                @test m.constraint_info[57].s == CP.ElementVariableArray(2)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test m.constraint_info[nc].f == MOI.VectorOfVariables([x1, x3, x1, x2])
+                @test m.constraint_info[nc].s == CP.ElementVariableArray(2)
+
+                CP.FlatZinc.parse_constraint!("constraint bool2int(x1, x3);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1
+                @test m.constraint_info[nc].f.terms[2].variable_index == x3
+                @test m.constraint_info[nc].s == MOI.EqualTo(0)
 
                 CP.FlatZinc.parse_constraint!("constraint bool_eq(x3, x4);", m)
-                @test length(m.constraint_info) == 58
-                @test typeof(m.constraint_info[58].f) <: MOI.ScalarAffineFunction{Int}
-                @test m.constraint_info[58].f.constant == 0
-                @test length(m.constraint_info[58].f.terms) == 2
-                @test m.constraint_info[58].f.terms[1].coefficient == 1
-                @test m.constraint_info[58].f.terms[1].variable_index == x3
-                @test m.constraint_info[58].f.terms[2].coefficient == -1
-                @test m.constraint_info[58].f.terms[2].variable_index == x4
-                @test m.constraint_info[58].s == MOI.EqualTo(0)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1
+                @test m.constraint_info[nc].f.terms[2].variable_index == x4
+                @test m.constraint_info[nc].s == MOI.EqualTo(0)
 
                 CP.FlatZinc.parse_constraint!("constraint bool_eq(3, x4);", m)
-                @test length(m.constraint_info) == 59
-                @test typeof(m.constraint_info[59].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
-                @test length(m.constraint_info[59].f.terms) == 1
-                @test m.constraint_info[59].f.terms[1].coefficient == 1
-                @test m.constraint_info[59].f.terms[1].variable_index == x4
-                @test m.constraint_info[59].s == MOI.EqualTo(3)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x4
+                @test m.constraint_info[nc].s == MOI.EqualTo(3)
 
                 CP.FlatZinc.parse_constraint!("constraint bool_eq(x3, 4);", m)
-                @test length(m.constraint_info) == 60
-                @test typeof(m.constraint_info[60].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
-                @test length(m.constraint_info[60].f.terms) == 1
-                @test m.constraint_info[60].f.terms[1].coefficient == 1
-                @test m.constraint_info[60].f.terms[1].variable_index == x3
-                @test m.constraint_info[60].s == MOI.EqualTo(4)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].s == MOI.EqualTo(4)
 
                 CP.FlatZinc.parse_constraint!("constraint bool_eq_reif(x3, x4, x1);", m)
-                @test length(m.constraint_info) == 61
-                @test typeof(m.constraint_info[61].f) <: MOI.VectorAffineFunction{Int}
-                @test m.constraint_info[61].f.constants == [0, 0]
-                @test length(m.constraint_info[61].f.terms) == 3
-                @test m.constraint_info[61].f.terms[1].output_index == 1
-                @test m.constraint_info[61].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[61].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[61].f.terms[2].output_index == 2
-                @test m.constraint_info[61].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[61].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[61].f.terms[3].output_index == 2
-                @test m.constraint_info[61].f.terms[3].scalar_term.coefficient == -1
-                @test m.constraint_info[61].f.terms[3].scalar_term.variable_index == x4
-                @test m.constraint_info[61].s == CP.Reified(MOI.EqualTo(0))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int}
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === -1
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(0))
 
                 CP.FlatZinc.parse_constraint!("constraint bool_eq_reif(3, x4, x1);", m)
-                @test length(m.constraint_info) == 62
-                @test typeof(m.constraint_info[62].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
-                @test m.constraint_info[62].f.constants == [0, 0]
-                @test length(m.constraint_info[62].f.terms) == 2
-                @test m.constraint_info[62].f.terms[1].output_index == 1
-                @test m.constraint_info[62].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[62].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[62].f.terms[2].output_index == 2
-                @test m.constraint_info[62].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[62].f.terms[2].scalar_term.variable_index == x4
-                @test m.constraint_info[62].s == CP.Reified(MOI.EqualTo(3))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(3))
 
                 CP.FlatZinc.parse_constraint!("constraint bool_eq_reif(x3, 4, x1);", m)
-                @test length(m.constraint_info) == 63
-                @test typeof(m.constraint_info[63].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
-                @test m.constraint_info[63].f.constants == [0, 0]
-                @test length(m.constraint_info[63].f.terms) == 2
-                @test m.constraint_info[63].f.terms[1].output_index == 1
-                @test m.constraint_info[63].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[63].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[63].f.terms[2].output_index == 2
-                @test m.constraint_info[63].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[63].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[63].s == CP.Reified(MOI.EqualTo(4))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(4))
 
                 CP.FlatZinc.parse_constraint!("constraint bool_le(x3, x4);", m)
-                @test length(m.constraint_info) == 64
-                @test typeof(m.constraint_info[64].f) <: MOI.ScalarAffineFunction{Int}
-                @test m.constraint_info[64].f.constant == 0
-                @test length(m.constraint_info[64].f.terms) == 2
-                @test m.constraint_info[64].f.terms[1].coefficient == 1
-                @test m.constraint_info[64].f.terms[1].variable_index == x3
-                @test m.constraint_info[64].f.terms[2].coefficient == -1
-                @test m.constraint_info[64].f.terms[2].variable_index == x4
-                @test m.constraint_info[64].s == MOI.LessThan(0)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1
+                @test m.constraint_info[nc].f.terms[2].variable_index == x4
+                @test m.constraint_info[nc].s == MOI.LessThan(0)
 
                 CP.FlatZinc.parse_constraint!("constraint bool_le(3, x4);", m)
-                @test length(m.constraint_info) == 65
-                @test typeof(m.constraint_info[65].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x4).
-                @test m.constraint_info[65].f.constant == 0
-                @test length(m.constraint_info[65].f.terms) == 1
-                @test m.constraint_info[65].f.terms[1].coefficient == -1
-                @test m.constraint_info[65].f.terms[1].variable_index == x4
-                @test m.constraint_info[65].s == MOI.LessThan(-3)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x4).
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === -1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x4
+                @test m.constraint_info[nc].s == MOI.LessThan(-3)
 
                 CP.FlatZinc.parse_constraint!("constraint bool_le(x3, 4);", m)
-                @test length(m.constraint_info) == 66
-                @test typeof(m.constraint_info[66].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x3).
-                @test m.constraint_info[66].f.constant == 0
-                @test length(m.constraint_info[66].f.terms) == 1
-                @test m.constraint_info[66].f.terms[1].coefficient == 1
-                @test m.constraint_info[66].f.terms[1].variable_index == x3
-                @test m.constraint_info[66].s == MOI.LessThan(4)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x3).
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].s == MOI.LessThan(4)
 
                 CP.FlatZinc.parse_constraint!("constraint bool_le_reif(x3, x4, x1);", m)
-                @test length(m.constraint_info) == 67
-                @test typeof(m.constraint_info[67].f) <: MOI.VectorAffineFunction{Int}
-                @test m.constraint_info[67].f.constants == [0, 0]
-                @test length(m.constraint_info[67].f.terms) == 3
-                @test m.constraint_info[67].f.terms[1].output_index == 1
-                @test m.constraint_info[67].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[67].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[67].f.terms[2].output_index == 2
-                @test m.constraint_info[67].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[67].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[67].f.terms[3].output_index == 2
-                @test m.constraint_info[67].f.terms[3].scalar_term.coefficient == -1
-                @test m.constraint_info[67].f.terms[3].scalar_term.variable_index == x4
-                @test m.constraint_info[67].s == CP.Reified(MOI.LessThan(0))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int}
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === -1
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(0))
 
                 CP.FlatZinc.parse_constraint!("constraint bool_le_reif(3, x4, x1);", m)
-                @test length(m.constraint_info) == 68
-                @test typeof(m.constraint_info[68].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
-                @test m.constraint_info[68].f.constants == [0, 0]
-                @test length(m.constraint_info[68].f.terms) == 2
-                @test m.constraint_info[68].f.terms[1].output_index == 1
-                @test m.constraint_info[68].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[68].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[68].f.terms[2].output_index == 2
-                @test m.constraint_info[68].f.terms[2].scalar_term.coefficient == -1
-                @test m.constraint_info[68].f.terms[2].scalar_term.variable_index == x4
-                @test m.constraint_info[68].s == CP.Reified(MOI.LessThan(-3))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === -1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(-3))
 
                 CP.FlatZinc.parse_constraint!("constraint bool_le_reif(x3, 4, x1);", m)
-                @test length(m.constraint_info) == 69
-                @test typeof(m.constraint_info[69].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
-                @test m.constraint_info[69].f.constants == [0, 0]
-                @test length(m.constraint_info[69].f.terms) == 2
-                @test m.constraint_info[69].f.terms[1].output_index == 1
-                @test m.constraint_info[69].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[69].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[69].f.terms[2].output_index == 2
-                @test m.constraint_info[69].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[69].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[69].s == CP.Reified(MOI.LessThan(4))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(4))
 
                 CP.FlatZinc.parse_constraint!("constraint bool_lin_eq([2, 3], [x1, x2], 5);", m)
-                @test length(m.constraint_info) == 70
-                @test typeof(m.constraint_info[70].f) <: MOI.ScalarAffineFunction{Int}
-                @test m.constraint_info[70].f.constant == 0
-                @test length(m.constraint_info[70].f.terms) == 2
-                @test m.constraint_info[70].f.terms[1].coefficient == 2
-                @test m.constraint_info[70].f.terms[1].variable_index == x1
-                @test m.constraint_info[70].f.terms[2].coefficient == 3
-                @test m.constraint_info[70].f.terms[2].variable_index == x2
-                @test m.constraint_info[70].s == MOI.EqualTo(5)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 2
+                @test m.constraint_info[nc].f.terms[1].variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].coefficient === 3
+                @test m.constraint_info[nc].f.terms[2].variable_index == x2
+                @test m.constraint_info[nc].s == MOI.EqualTo(5)
 
                 CP.FlatZinc.parse_constraint!("constraint bool_lin_le([2, 3], [x1, x2], 5);", m)
-                @test length(m.constraint_info) == 71
-                @test typeof(m.constraint_info[71].f) <: MOI.ScalarAffineFunction{Int}
-                @test m.constraint_info[71].f.constant == 0
-                @test length(m.constraint_info[71].f.terms) == 2
-                @test m.constraint_info[71].f.terms[1].coefficient == 2
-                @test m.constraint_info[71].f.terms[1].variable_index == x1
-                @test m.constraint_info[71].f.terms[2].coefficient == 3
-                @test m.constraint_info[71].f.terms[2].variable_index == x2
-                @test m.constraint_info[71].s == MOI.LessThan(5)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 2
+                @test m.constraint_info[nc].f.terms[1].variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].coefficient === 3
+                @test m.constraint_info[nc].f.terms[2].variable_index == x2
+                @test m.constraint_info[nc].s == MOI.LessThan(5)
 
                 CP.FlatZinc.parse_constraint!("constraint bool_lt(x3, x4);", m)
-                @test length(m.constraint_info) == 72
-                @test typeof(m.constraint_info[72].f) <: MOI.ScalarAffineFunction{Int}
-                @test m.constraint_info[72].f.constant == 0
-                @test length(m.constraint_info[72].f.terms) == 2
-                @test m.constraint_info[72].f.terms[1].coefficient == 1
-                @test m.constraint_info[72].f.terms[1].variable_index == x3
-                @test m.constraint_info[72].f.terms[2].coefficient == -1
-                @test m.constraint_info[72].f.terms[2].variable_index == x4
-                @test m.constraint_info[72].s == CP.Strictly(MOI.LessThan(0))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1
+                @test m.constraint_info[nc].f.terms[2].variable_index == x4
+                @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(0))
 
                 CP.FlatZinc.parse_constraint!("constraint bool_lt(3, x4);", m)
-                @test length(m.constraint_info) == 73
-                @test typeof(m.constraint_info[73].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x4).
-                @test m.constraint_info[73].f.constant == 0
-                @test length(m.constraint_info[73].f.terms) == 1
-                @test m.constraint_info[73].f.terms[1].coefficient == -1
-                @test m.constraint_info[73].f.terms[1].variable_index == x4
-                @test m.constraint_info[73].s == CP.Strictly(MOI.LessThan(-3))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x4).
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === -1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x4
+                @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(-3))
 
                 CP.FlatZinc.parse_constraint!("constraint bool_lt(x3, 4);", m)
-                @test length(m.constraint_info) == 74
-                @test typeof(m.constraint_info[74].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x3).
-                @test m.constraint_info[74].f.constant == 0
-                @test length(m.constraint_info[74].f.terms) == 1
-                @test m.constraint_info[74].f.terms[1].coefficient == 1
-                @test m.constraint_info[74].f.terms[1].variable_index == x3
-                @test m.constraint_info[74].s == CP.Strictly(MOI.LessThan(4))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x3).
+                @test m.constraint_info[nc].f.constant === 0
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(4))
 
                 CP.FlatZinc.parse_constraint!("constraint bool_lt_reif(x3, x4, x1);", m)
-                @test length(m.constraint_info) == 75
-                @test typeof(m.constraint_info[75].f) <: MOI.VectorAffineFunction{Int}
-                @test m.constraint_info[75].f.constants == [0, 0]
-                @test length(m.constraint_info[75].f.terms) == 3
-                @test m.constraint_info[75].f.terms[1].output_index == 1
-                @test m.constraint_info[75].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[75].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[75].f.terms[2].output_index == 2
-                @test m.constraint_info[75].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[75].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[75].f.terms[3].output_index == 2
-                @test m.constraint_info[75].f.terms[3].scalar_term.coefficient == -1
-                @test m.constraint_info[75].f.terms[3].scalar_term.variable_index == x4
-                @test m.constraint_info[75].s == CP.Reified(CP.Strictly(MOI.LessThan(0)))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int}
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === -1
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(CP.Strictly(MOI.LessThan(0)))
 
                 CP.FlatZinc.parse_constraint!("constraint bool_lt_reif(3, x4, x1);", m)
-                @test length(m.constraint_info) == 76
-                @test typeof(m.constraint_info[76].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
-                @test m.constraint_info[76].f.constants == [0, 0]
-                @test length(m.constraint_info[76].f.terms) == 2
-                @test m.constraint_info[76].f.terms[1].output_index == 1
-                @test m.constraint_info[76].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[76].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[76].f.terms[2].output_index == 2
-                @test m.constraint_info[76].f.terms[2].scalar_term.coefficient == -1
-                @test m.constraint_info[76].f.terms[2].scalar_term.variable_index == x4
-                @test m.constraint_info[76].s == CP.Reified(CP.Strictly(MOI.LessThan(-3)))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x4]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === -1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(CP.Strictly(MOI.LessThan(-3)))
 
                 CP.FlatZinc.parse_constraint!("constraint bool_lt_reif(x3, 4, x1);", m)
-                @test length(m.constraint_info) == 77
-                @test typeof(m.constraint_info[77].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
-                @test m.constraint_info[77].f.constants == [0, 0]
-                @test length(m.constraint_info[77].f.terms) == 2
-                @test m.constraint_info[77].f.terms[1].output_index == 1
-                @test m.constraint_info[77].f.terms[1].scalar_term.coefficient == 1
-                @test m.constraint_info[77].f.terms[1].scalar_term.variable_index == x1
-                @test m.constraint_info[77].f.terms[2].output_index == 2
-                @test m.constraint_info[77].f.terms[2].scalar_term.coefficient == 1
-                @test m.constraint_info[77].f.terms[2].scalar_term.variable_index == x3
-                @test m.constraint_info[77].s == CP.Reified(CP.Strictly(MOI.LessThan(4)))
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Int} # Equivalent to MOI.VectorOfVariables([x1, x3]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].s == CP.Reified(CP.Strictly(MOI.LessThan(4)))
                 
                 CP.FlatZinc.parse_constraint!("constraint array_float_element(x3, [1.0, 2.0, 3.0], x5);", m)
-                @test length(m.constraint_info) == 78
-                @test m.constraint_info[78].f == MOI.VectorOfVariables([x5, x3])
-                @test m.constraint_info[78].s == CP.Element([1.0, 2.0, 3.0])
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test m.constraint_info[nc].f == MOI.VectorOfVariables([x5, x3])
+                @test m.constraint_info[nc].s == CP.Element([1.0, 2.0, 3.0])
 
                 CP.FlatZinc.parse_constraint!("constraint array_float_maximum(x5, [1.0, 2.0, 3.0]);", m)
-                @test length(m.constraint_info) == 82
                 for i in 1:3
-                    @test typeof(m.constraint_info[79 + i - 1].f) <: MOI.SingleVariable
-                    @test typeof(m.constraint_info[79 + i - 1].s) <: MOI.EqualTo{Float64}
+                    nc += 1
+                    @test typeof(m.constraint_info[nc].f) <: MOI.SingleVariable
+                    @test typeof(m.constraint_info[nc].s) <: MOI.EqualTo{Float64}
                 end
-                @test typeof(m.constraint_info[82].f) <: MOI.VectorOfVariables
-                @test m.constraint_info[82].f.variables[1] == x5
-                @test m.constraint_info[82].s == CP.MaximumAmong(3)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorOfVariables
+                @test m.constraint_info[nc].f.variables[1] == x5
+                @test m.constraint_info[nc].s == CP.MaximumAmong(3)
 
                 CP.FlatZinc.parse_constraint!("constraint array_float_maximum(x5, [x5, x6]);", m)
-                @test length(m.constraint_info) == 83
-                @test m.constraint_info[83].f.variables[1] == x5
-                @test m.constraint_info[83].f.variables[2] == x5
-                @test m.constraint_info[83].f.variables[3] == x6
-                @test m.constraint_info[83].s == CP.MaximumAmong(2)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test m.constraint_info[nc].f.variables[1] == x5
+                @test m.constraint_info[nc].f.variables[2] == x5
+                @test m.constraint_info[nc].f.variables[3] == x6
+                @test m.constraint_info[nc].s == CP.MaximumAmong(2)
 
                 CP.FlatZinc.parse_constraint!("constraint array_float_minimum(x5, [1.0, 2.0, 3.0]);", m)
-                @test length(m.constraint_info) == 87
                 for i in 1:3
-                    @test typeof(m.constraint_info[84 + i - 1].f) <: MOI.SingleVariable
-                    @test typeof(m.constraint_info[84 + i - 1].s) <: MOI.EqualTo{Float64}
+                    nc += 1
+                    @test typeof(m.constraint_info[nc].f) <: MOI.SingleVariable
+                    @test typeof(m.constraint_info[nc].s) <: MOI.EqualTo{Float64}
                 end
-                @test typeof(m.constraint_info[87].f) <: MOI.VectorOfVariables
-                @test m.constraint_info[87].f.variables[1] == x5
-                @test m.constraint_info[87].s == CP.MinimumAmong(3)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorOfVariables
+                @test m.constraint_info[nc].f.variables[1] == x5
+                @test m.constraint_info[nc].s == CP.MinimumAmong(3)
 
                 CP.FlatZinc.parse_constraint!("constraint array_float_minimum(x5, [x5, x6]);", m)
-                @test length(m.constraint_info) == 88
-                @test m.constraint_info[88].f.variables[1] == x5
-                @test m.constraint_info[88].f.variables[2] == x5
-                @test m.constraint_info[88].f.variables[3] == x6
-                @test m.constraint_info[88].s == CP.MinimumAmong(2)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test m.constraint_info[nc].f.variables[1] == x5
+                @test m.constraint_info[nc].f.variables[2] == x5
+                @test m.constraint_info[nc].f.variables[3] == x6
+                @test m.constraint_info[nc].s == CP.MinimumAmong(2)
 
                 CP.FlatZinc.parse_constraint!("constraint array_var_float_element(x3, [x1, x2, x3, x4, x5, x6], x6);", m)
-                @test length(m.constraint_info) == 89
-                @test m.constraint_info[89].f == MOI.VectorOfVariables([x6, x3, x1, x2, x3, x4, x5, x6])
-                @test m.constraint_info[89].s == CP.ElementVariableArray(6)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test m.constraint_info[nc].f == MOI.VectorOfVariables([x6, x3, x1, x2, x3, x4, x5, x6])
+                @test m.constraint_info[nc].s == CP.ElementVariableArray(6)
+
+                CP.FlatZinc.parse_constraint!("constraint float_eq(x5, x6);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x5
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[2].variable_index == x6
+                @test m.constraint_info[nc].s == MOI.EqualTo(0.0)
+
+                CP.FlatZinc.parse_constraint!("constraint float_eq(3, x4);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x4
+                @test m.constraint_info[nc].s == MOI.EqualTo(3.0)
+
+                CP.FlatZinc.parse_constraint!("constraint float_eq(x3, 4);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].s == MOI.EqualTo(4.0)
+
+                CP.FlatZinc.parse_constraint!("constraint float_eq_reif(x3, x4, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(0.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_eq_reif(3, x4, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64} # Equivalent to MOI.VectorOfVariables([x1, x4]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(3.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_eq_reif(x3, 4, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64} # Equivalent to MOI.VectorOfVariables([x1, x3]).
+                @test m.constraint_info[nc].f.constants == [0, 0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(4.0))
+                
+                CP.FlatZinc.parse_constraint!("constraint float_in(x5, 1.0, 2.0);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test m.constraint_info[nc].f == MOI.SingleVariable(x5)
+                @test m.constraint_info[nc].s == MOI.Interval(1.0, 2.0)
+                
+                CP.FlatZinc.parse_constraint!("constraint float_in_reif(x5, 1.0, 2.0, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test m.constraint_info[nc].f == MOI.VectorOfVariables([x1, x5])
+                @test m.constraint_info[nc].s == CP.Reified(MOI.Interval(1.0, 2.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_le(x3, x4);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[2].variable_index == x4
+                @test m.constraint_info[nc].s == MOI.LessThan(0.0)
+
+                CP.FlatZinc.parse_constraint!("constraint float_le(3, x4);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64} # Equivalent to MOI.SingleVariable(x4).
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x4
+                @test m.constraint_info[nc].s == MOI.LessThan(-3.0)
+
+                CP.FlatZinc.parse_constraint!("constraint float_le(x3, 4);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64} # Equivalent to MOI.SingleVariable(x3).
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].s == MOI.LessThan(4.0)
+
+                CP.FlatZinc.parse_constraint!("constraint float_le_reif(x3, x4, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(0.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_le_reif(3.0, x4, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64} # Equivalent to MOI.VectorOfVariables([x1, x4]).
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(-3.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_le_reif(x3, 4.0, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64} # Equivalent to MOI.VectorOfVariables([x1, x3]).
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(4.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_lin_eq([2.0, 3.0], [x1, x2], 5.0);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 2.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].coefficient === 3.0
+                @test m.constraint_info[nc].f.terms[2].variable_index == x2
+                @test m.constraint_info[nc].s == MOI.EqualTo(5.0)
+
+                CP.FlatZinc.parse_constraint!("constraint float_lin_eq_reif([2.0, 3.0], [x1, x2], 5.0, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 2.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === 3.0
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x2
+                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(5.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_lin_le([2.0, 3.0], [x1, x2], 5.0);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 2.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].coefficient === 3.0
+                @test m.constraint_info[nc].f.terms[2].variable_index == x2
+                @test m.constraint_info[nc].s == MOI.LessThan(5.0)
+
+                CP.FlatZinc.parse_constraint!("constraint float_lin_le_reif([2.0, 3.0], [x1, x2], 5.0, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 2.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === 3.0
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x2
+                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(5.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_lin_lt([2.0, 3.0], [x1, x2], 5.0);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 2.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].coefficient === 3.0
+                @test m.constraint_info[nc].f.terms[2].variable_index == x2
+                @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(5.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_lin_lt_reif([2.0, 3.0], [x1, x2], 5.0, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 2.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === 3.0
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x2
+                @test m.constraint_info[nc].s == CP.Reified(CP.Strictly(MOI.LessThan(5.0)))
+
+                CP.FlatZinc.parse_constraint!("constraint float_lin_ne([2.0, 3.0], [x1, x2], 5.0);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 2.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].coefficient === 3.0
+                @test m.constraint_info[nc].f.terms[2].variable_index == x2
+                @test m.constraint_info[nc].s == CP.DifferentFrom(5.0)
+
+                CP.FlatZinc.parse_constraint!("constraint float_lin_ne_reif([2.0, 3.0], [x1, x2], 5.0, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 2.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === 3.0
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x2
+                @test m.constraint_info[nc].s == CP.Reified(CP.DifferentFrom(5.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_lt(x3, x4);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[2].variable_index == x4
+                @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(0.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_lt(3.0, x4);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64} # Equivalent to MOI.SingleVariable(x4).
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x4
+                @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(-3.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_lt(x3, 4.0);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64} # Equivalent to MOI.SingleVariable(x3).
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(4.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_lt_reif(x3, x4, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(CP.Strictly(MOI.LessThan(0.0)))
+
+                CP.FlatZinc.parse_constraint!("constraint float_lt_reif(3.0, x4, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64} # Equivalent to MOI.VectorOfVariables([x1, x4]).
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(CP.Strictly(MOI.LessThan(-3.0)))
+
+                CP.FlatZinc.parse_constraint!("constraint float_lt_reif(x3, 4.0, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64} # Equivalent to MOI.VectorOfVariables([x1, x3]).
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].s == CP.Reified(CP.Strictly(MOI.LessThan(4.0)))
+
+                CP.FlatZinc.parse_constraint!("constraint float_max(x1, x2, x3);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorOfVariables
+                @test m.constraint_info[nc].f.variables[1] == x3
+                @test m.constraint_info[nc].f.variables[2] == x1
+                @test m.constraint_info[nc].f.variables[3] == x2
+                @test m.constraint_info[nc].s == CP.MaximumAmong(2)
+
+                CP.FlatZinc.parse_constraint!("constraint float_min(x1, x2, x3);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorOfVariables
+                @test m.constraint_info[nc].f.variables[1] == x3
+                @test m.constraint_info[nc].f.variables[2] == x1
+                @test m.constraint_info[nc].f.variables[3] == x2
+                @test m.constraint_info[nc].s == CP.MinimumAmong(2)
+
+                CP.FlatZinc.parse_constraint!("constraint float_ne(x3, x4);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[2].variable_index == x4
+                @test m.constraint_info[nc].s == CP.DifferentFrom(0.0)
+
+                CP.FlatZinc.parse_constraint!("constraint float_ne(3.0, x4);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x4
+                @test m.constraint_info[nc].s == CP.DifferentFrom(3.0)
+
+                CP.FlatZinc.parse_constraint!("constraint float_ne(x3, 4.0);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
+                @test length(m.constraint_info[nc].f.terms) == 1
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].s == CP.DifferentFrom(4.0)
+
+                CP.FlatZinc.parse_constraint!("constraint float_ne_reif(x3, x4, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].f.terms[3].output_index == 2
+                @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(CP.DifferentFrom(0.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_ne_reif(3.0, x4, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64} # Equivalent to MOI.VectorOfVariables([x1, x4]).
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x4
+                @test m.constraint_info[nc].s == CP.Reified(CP.DifferentFrom(3.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_ne_reif(x3, 4.0, x1);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.VectorAffineFunction{Float64} # Equivalent to MOI.VectorOfVariables([x1, x3]).
+                @test m.constraint_info[nc].f.constants == [0.0, 0.0]
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].output_index == 1
+                @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].output_index == 2
+                @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index == x3
+                @test m.constraint_info[nc].s == CP.Reified(CP.DifferentFrom(4.0))
+
+                CP.FlatZinc.parse_constraint!("constraint float_plus(x1, x2, x3);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction
+                @test length(m.constraint_info[nc].f.terms) == 3
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x1
+                @test m.constraint_info[nc].f.terms[2].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[2].variable_index == x2
+                @test m.constraint_info[nc].f.terms[3].coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[3].variable_index == x3
+                @test m.constraint_info[nc].s == MOI.EqualTo(0.0)
+
+                CP.FlatZinc.parse_constraint!("constraint int2float(x3, x5);", m)
+                nc += 1
+                @test length(m.constraint_info) == nc
+                @test typeof(m.constraint_info[nc].f) <: MOI.ScalarAffineFunction{Float64}
+                @test m.constraint_info[nc].f.constant === 0.0
+                @test length(m.constraint_info[nc].f.terms) == 2
+                @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
+                @test m.constraint_info[nc].f.terms[1].variable_index == x3
+                @test m.constraint_info[nc].f.terms[2].coefficient === -1.0
+                @test m.constraint_info[nc].f.terms[2].variable_index == x5
+                @test m.constraint_info[nc].s == MOI.EqualTo(0.0)
             end
         end
 
