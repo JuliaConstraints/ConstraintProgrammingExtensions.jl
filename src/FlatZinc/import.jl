@@ -10,7 +10,7 @@
 @enum FznObjective FznSatisfy FznMinimise FznMaximise
 @enum FznConstraintIdentifier begin
     # To be kept consistent with parse_constraint_verb. 
-    
+
     # Integers. 
     # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#integer-flatzinc-builtins
     FznArrayIntElement
@@ -164,7 +164,8 @@ end
 const FZN_UNPARSED_ARGUMENT = Union{AbstractString, Vector{AbstractString}}
 const FZN_UNPARSED_ARGUMENT_LIST = Vector{FZN_UNPARSED_ARGUMENT}
 
-const FZN_PARAMETER_TYPES_PREFIX = String["bool", "int", "float", "set of int", "array"]
+const FZN_PARAMETER_TYPES_PREFIX =
+    String["bool", "int", "float", "set of int", "array"]
 
 function Base.read!(io::IO, model::Optimizer)
     if !MOI.is_empty(model)
@@ -181,7 +182,7 @@ function Base.read!(io::IO, model::Optimizer)
 
         # Read an item from the file.
         item = get_fzn_item(io)
-        
+
         # When get_fzn_item returns an empty line, it has not found any more 
         # item to parse.
         if isempty(item)
@@ -200,7 +201,10 @@ function Base.read!(io::IO, model::Optimizer)
         end
 
         if state == FznParameter
-            if any(startswith(item, par_type) for par_type in FZN_PARAMETER_TYPES_PREFIX)
+            if any(
+                startswith(item, par_type) for
+                par_type in FZN_PARAMETER_TYPES_PREFIX
+            )
                 parse_parameter!(item, model)
             else
                 state = FznVar
@@ -256,7 +260,8 @@ function parse_variable!(item::AbstractString, model::Optimizer)
     # Complex input: "var int: x1 :: some_annotation = some_value;"
 
     # Split the item into interesting parts. 
-    var_array, var_type, var_name, var_annotations, var_value = split_variable(item)
+    var_array, var_type, var_name, var_annotations, var_value =
+        split_variable(item)
 
     # Parse the parts if need be.
     if var_array == ""
@@ -265,7 +270,8 @@ function parse_variable!(item::AbstractString, model::Optimizer)
         var_array_length = parse_array_type(var_array)
     end
 
-    var_type, var_multiplicity, var_min, var_max, var_allowed_values = parse_variable_type(var_type)
+    var_type, var_multiplicity, var_min, var_max, var_allowed_values =
+        parse_variable_type(var_type)
 
     if length(var_annotations) > 0
         @warn "Annotations are not supported and are currently ignored."
@@ -345,10 +351,18 @@ function parse_solve!(item::AbstractString, model::Optimizer)
         MOI.set(model, MOI.ObjectiveSense(), MOI.FEASIBILITY_SENSE)
     elseif obj_sense == FznMinimise
         MOI.set(model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
-        MOI.set(model, MOI.ObjectiveFunction{MOI.SingleVariable}(), MOI.SingleVariable(moi_var))
+        MOI.set(
+            model,
+            MOI.ObjectiveFunction{MOI.SingleVariable}(),
+            MOI.SingleVariable(moi_var),
+        )
     elseif obj_sense == FznMaximise
         MOI.set(model, MOI.ObjectiveSense(), MOI.MAX_SENSE)
-        MOI.set(model, MOI.ObjectiveFunction{MOI.SingleVariable}(), MOI.SingleVariable(moi_var))
+        MOI.set(
+            model,
+            MOI.ObjectiveFunction{MOI.SingleVariable}(),
+            MOI.SingleVariable(moi_var),
+        )
     end
 
     return nothing
@@ -359,7 +373,11 @@ end
 # -----------------------------------------------------------------------------
 
 function map_to_moi(var_type::FznVariableType)
-    mapping = Dict(FznBool => MOI.ZeroOne(), FznInt => MOI.Integer(), FznFloat => nothing)
+    mapping = Dict(
+        FznBool => MOI.ZeroOne(),
+        FznInt => MOI.Integer(),
+        FznFloat => nothing,
+    )
     return mapping[var_type]
 end
 
@@ -429,14 +447,28 @@ function array_mixed_var_bool_to_moi_var(array::Vector, model::Optimizer)
 end
 
 function array_mixed_var_float_to_moi_var(array::Vector, model::Optimizer)
-    return MOI.VariableIndex[mixed_var_float_to_moi_var(v, model) for v in array]
+    return MOI.VariableIndex[
+        mixed_var_float_to_moi_var(v, model) for v in array
+    ]
 end
 
-function add_constraint_to_model(cons::FznConstraintIdentifier, args, model::Optimizer)
+function add_constraint_to_model(
+    cons::FznConstraintIdentifier,
+    args,
+    model::Optimizer,
+)
     return add_constraint_to_model(Val(cons), args, model)
 end
 
-function add_constraint_to_model(cons_verb::Union{Val{FznArrayIntElement}, Val{FznArrayBoolElement}, Val{FznArrayFloatElement}}, args, model::Optimizer)
+function add_constraint_to_model(
+    cons_verb::Union{
+        Val{FznArrayIntElement},
+        Val{FznArrayBoolElement},
+        Val{FznArrayFloatElement},
+    },
+    args,
+    model::Optimizer,
+)
     @assert length(args) == 3
     @assert typeof(args[1]) <: AbstractString
     @assert typeof(args[2]) <: Vector
@@ -454,38 +486,61 @@ function add_constraint_to_model(cons_verb::Union{Val{FznArrayIntElement}, Val{F
     end
 
     return MOI.add_constraint(
-        model, 
-        MOI.VectorOfVariables([moi_var_value, moi_var_index]), 
-        CP.Element(array)
+        model,
+        MOI.VectorOfVariables([moi_var_value, moi_var_index]),
+        CP.Element(array),
     )
 end
 
-function add_constraint_to_model(cons_verb::Union{Val{FznArrayIntMaximum}, Val{FznArrayIntMinimum}, Val{FznArrayFloatMaximum}, Val{FznArrayFloatMinimum}}, args, model::Optimizer)
+function add_constraint_to_model(
+    cons_verb::Union{
+        Val{FznArrayIntMaximum},
+        Val{FznArrayIntMinimum},
+        Val{FznArrayFloatMaximum},
+        Val{FznArrayFloatMinimum},
+    },
+    args,
+    model::Optimizer,
+)
     @assert length(args) == 2
     @assert typeof(args[1]) <: AbstractString
     @assert typeof(args[2]) <: Vector
 
     moi_var = model.name_to_var[args[1]]
-    moi_var_array = if cons_verb == Val(FznArrayIntMaximum) || cons_verb == Val(FznArrayIntMinimum)
-        array_mixed_var_int_to_moi_var(args[2], model)
-    elseif cons_verb == Val(FznArrayFloatMaximum) || cons_verb == Val(FznArrayFloatMinimum)
-        array_mixed_var_float_to_moi_var(args[2], model)
-    end
-    
-    moi_set = if cons_verb == Val(FznArrayIntMaximum) || cons_verb == Val(FznArrayFloatMaximum)
-        CP.MaximumAmong(length(args[2]))
-    elseif cons_verb == Val(FznArrayIntMinimum) || cons_verb == Val(FznArrayFloatMinimum)
-        CP.MinimumAmong(length(args[2]))
-    end
+    moi_var_array =
+        if cons_verb == Val(FznArrayIntMaximum) ||
+           cons_verb == Val(FznArrayIntMinimum)
+            array_mixed_var_int_to_moi_var(args[2], model)
+        elseif cons_verb == Val(FznArrayFloatMaximum) ||
+               cons_verb == Val(FznArrayFloatMinimum)
+            array_mixed_var_float_to_moi_var(args[2], model)
+        end
+
+    moi_set =
+        if cons_verb == Val(FznArrayIntMaximum) ||
+           cons_verb == Val(FznArrayFloatMaximum)
+            CP.MaximumAmong(length(args[2]))
+        elseif cons_verb == Val(FznArrayIntMinimum) ||
+               cons_verb == Val(FznArrayFloatMinimum)
+            CP.MinimumAmong(length(args[2]))
+        end
 
     return MOI.add_constraint(
-        model, 
-        MOI.VectorOfVariables([moi_var, moi_var_array...]), 
-        moi_set
+        model,
+        MOI.VectorOfVariables([moi_var, moi_var_array...]),
+        moi_set,
     )
 end
 
-function add_constraint_to_model(cons_verb::Union{Val{FznArrayVarIntElement}, Val{FznArrayVarBoolElement}, Val{FznArrayVarFloatElement}}, args, model::Optimizer)
+function add_constraint_to_model(
+    cons_verb::Union{
+        Val{FznArrayVarIntElement},
+        Val{FznArrayVarBoolElement},
+        Val{FznArrayVarFloatElement},
+    },
+    args,
+    model::Optimizer,
+)
     @assert length(args) == 3
     @assert typeof(args[1]) <: AbstractString
     @assert typeof(args[2]) <: Vector
@@ -493,8 +548,8 @@ function add_constraint_to_model(cons_verb::Union{Val{FznArrayVarIntElement}, Va
 
     moi_var_index = model.name_to_var[args[1]]
     moi_var_value = model.name_to_var[args[3]]
-    
-    moi_var_array = if cons_verb == Val(FznArrayVarIntElement) 
+
+    moi_var_array = if cons_verb == Val(FznArrayVarIntElement)
         array_mixed_var_int_to_moi_var(args[2], model)
     elseif cons_verb == Val(FznArrayVarBoolElement)
         array_mixed_var_bool_to_moi_var(args[2], model)
@@ -503,52 +558,84 @@ function add_constraint_to_model(cons_verb::Union{Val{FznArrayVarIntElement}, Va
     end
 
     return MOI.add_constraint(
-        model, 
-        MOI.VectorOfVariables([moi_var_value, moi_var_index, moi_var_array...]), 
-        CP.ElementVariableArray(length(args[2]))
+        model,
+        MOI.VectorOfVariables([moi_var_value, moi_var_index, moi_var_array...]),
+        CP.ElementVariableArray(length(args[2])),
     )
 end
 
 function add_constraint_to_model(
-        cons_verb::Union{
-            Val{FznIntEq}, Val{FznIntLe}, Val{FznIntLt}, Val{FznIntNe},
-            Val{FznBoolEq}, Val{FznBoolLe}, Val{FznBoolLt}, 
-            Val{FznFloatEq}, Val{FznFloatLe}, Val{FznFloatLt}, Val{FznFloatNe}, 
-        }, 
-        args, 
-        model::Optimizer
-    )
+    cons_verb::Union{
+        Val{FznIntEq},
+        Val{FznIntLe},
+        Val{FznIntLt},
+        Val{FznIntNe},
+        Val{FznBoolEq},
+        Val{FznBoolLe},
+        Val{FznBoolLt},
+        Val{FznFloatEq},
+        Val{FznFloatLe},
+        Val{FznFloatLt},
+        Val{FznFloatNe},
+    },
+    args,
+    model::Optimizer,
+)
     @assert length(args) == 2
-    @assert typeof(args[1]) <: AbstractString || typeof(args[2]) <: AbstractString
+    @assert typeof(args[1]) <: AbstractString ||
+            typeof(args[2]) <: AbstractString
 
     moi_lhs = args[1]
     moi_rhs = args[2]
 
-    type = if cons_verb == Val(FznIntEq) || cons_verb == Val(FznBoolEq) || cons_verb == Val(FznIntLe) || cons_verb == Val(FznBoolLe) || cons_verb == Val(FznIntLt) || cons_verb == Val(FznBoolLt) || cons_verb == Val(FznIntNe)
-        Int
-    elseif cons_verb == Val(FznFloatEq) || cons_verb == Val(FznFloatLe) || cons_verb == Val(FznFloatLt) || cons_verb == Val(FznFloatNe)
-        Float64
-    end
+    type =
+        if cons_verb == Val(FznIntEq) ||
+           cons_verb == Val(FznBoolEq) ||
+           cons_verb == Val(FznIntLe) ||
+           cons_verb == Val(FznBoolLe) ||
+           cons_verb == Val(FznIntLt) ||
+           cons_verb == Val(FznBoolLt) ||
+           cons_verb == Val(FznIntNe)
+            Int
+        elseif cons_verb == Val(FznFloatEq) ||
+               cons_verb == Val(FznFloatLe) ||
+               cons_verb == Val(FznFloatLt) ||
+               cons_verb == Val(FznFloatNe)
+            Float64
+        end
 
     # Both are variable: encode the constraint "x - y = 0".
     if typeof(moi_lhs) <: AbstractString && typeof(moi_rhs) <: AbstractString
         moi_lhs = model.name_to_var[moi_lhs]
         moi_rhs = model.name_to_var[moi_rhs]
 
-        moi_set = if cons_verb == Val(FznIntEq) || cons_verb == Val(FznBoolEq) || cons_verb == Val(FznFloatEq)
-            MOI.EqualTo(zero(type))
-        elseif cons_verb == Val(FznIntLe) || cons_verb == Val(FznBoolLe) || cons_verb == Val(FznFloatLe)
-            MOI.LessThan(zero(type))
-        elseif cons_verb == Val(FznIntLt) || cons_verb == Val(FznBoolLt) || cons_verb == Val(FznFloatLt)
-            CP.Strictly(MOI.LessThan(zero(type)))
-        elseif cons_verb == Val(FznIntNe) || cons_verb == Val(FznFloatNe)
-            CP.DifferentFrom(zero(type))
-        end
+        moi_set =
+            if cons_verb == Val(FznIntEq) ||
+               cons_verb == Val(FznBoolEq) ||
+               cons_verb == Val(FznFloatEq)
+                MOI.EqualTo(zero(type))
+            elseif cons_verb == Val(FznIntLe) ||
+                   cons_verb == Val(FznBoolLe) ||
+                   cons_verb == Val(FznFloatLe)
+                MOI.LessThan(zero(type))
+            elseif cons_verb == Val(FznIntLt) ||
+                   cons_verb == Val(FznBoolLt) ||
+                   cons_verb == Val(FznFloatLt)
+                CP.Strictly(MOI.LessThan(zero(type)))
+            elseif cons_verb == Val(FznIntNe) || cons_verb == Val(FznFloatNe)
+                CP.DifferentFrom(zero(type))
+            end
 
         return MOI.add_constraint(
-            model, 
-            MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([one(type), -one(type)], [moi_lhs, moi_rhs]), zero(type)), 
-            moi_set
+            model,
+            MOI.ScalarAffineFunction(
+                MOI.ScalarAffineTerm.(
+                    [one(type), -one(type)],
+                    [moi_lhs, moi_rhs],
+                ),
+                zero(type),
+            ),
+            moi_set,
         )
     end
 
@@ -559,7 +646,12 @@ function add_constraint_to_model(
         moi_lhs, moi_rhs = moi_rhs, moi_lhs
 
         # For a <= constraint, reversing the order means that signs must change too.
-        if cons_verb == Val(FznIntLe) || cons_verb == Val(FznIntLt) || cons_verb == Val(FznBoolLe) || cons_verb == Val(FznBoolLt) || cons_verb == Val(FznFloatLe) || cons_verb == Val(FznFloatLt)
+        if cons_verb == Val(FznIntLe) ||
+           cons_verb == Val(FznIntLt) ||
+           cons_verb == Val(FznBoolLe) ||
+           cons_verb == Val(FznBoolLt) ||
+           cons_verb == Val(FznFloatLe) ||
+           cons_verb == Val(FznFloatLt)
             lhs_coeff = -one(type)
             rhs_coeff = -one(type)
         end
@@ -567,72 +659,118 @@ function add_constraint_to_model(
 
     moi_lhs = model.name_to_var[moi_lhs]
 
-    moi_set = if cons_verb == Val(FznIntEq) || cons_verb == Val(FznBoolEq) || cons_verb == Val(FznFloatEq)
-        MOI.EqualTo(rhs_coeff * moi_rhs)
-    elseif cons_verb == Val(FznIntLe) || cons_verb == Val(FznBoolLe) || cons_verb == Val(FznFloatLe)
-        MOI.LessThan(rhs_coeff * moi_rhs)
-    elseif cons_verb == Val(FznIntLt) || cons_verb == Val(FznBoolLt) || cons_verb == Val(FznFloatLt)
-        CP.Strictly(MOI.LessThan(rhs_coeff * moi_rhs))
-    elseif cons_verb == Val(FznIntNe) || cons_verb == Val(FznFloatNe)
-        CP.DifferentFrom(rhs_coeff * moi_rhs)
-    end
+    moi_set =
+        if cons_verb == Val(FznIntEq) ||
+           cons_verb == Val(FznBoolEq) ||
+           cons_verb == Val(FznFloatEq)
+            MOI.EqualTo(rhs_coeff * moi_rhs)
+        elseif cons_verb == Val(FznIntLe) ||
+               cons_verb == Val(FznBoolLe) ||
+               cons_verb == Val(FznFloatLe)
+            MOI.LessThan(rhs_coeff * moi_rhs)
+        elseif cons_verb == Val(FznIntLt) ||
+               cons_verb == Val(FznBoolLt) ||
+               cons_verb == Val(FznFloatLt)
+            CP.Strictly(MOI.LessThan(rhs_coeff * moi_rhs))
+        elseif cons_verb == Val(FznIntNe) || cons_verb == Val(FznFloatNe)
+            CP.DifferentFrom(rhs_coeff * moi_rhs)
+        end
 
     return MOI.add_constraint(
-        model, 
-        MOI.ScalarAffineFunction([MOI.ScalarAffineTerm(lhs_coeff, moi_lhs)], zero(type)), 
-        moi_set
+        model,
+        MOI.ScalarAffineFunction(
+            [MOI.ScalarAffineTerm(lhs_coeff, moi_lhs)],
+            zero(type),
+        ),
+        moi_set,
     )
 end
 
 function add_constraint_to_model(
-        cons_verb::Union{
-            Val{FznIntEqReif}, Val{FznIntLeReif}, Val{FznIntLtReif}, Val{FznIntNeReif},
-            Val{FznBoolEqReif}, Val{FznBoolLeReif}, Val{FznBoolLtReif},
-            Val{FznFloatEqReif}, Val{FznFloatLeReif}, Val{FznFloatLtReif}, Val{FznFloatNeReif},
-        }, 
-        args, 
-        model::Optimizer
-    )
+    cons_verb::Union{
+        Val{FznIntEqReif},
+        Val{FznIntLeReif},
+        Val{FznIntLtReif},
+        Val{FznIntNeReif},
+        Val{FznBoolEqReif},
+        Val{FznBoolLeReif},
+        Val{FznBoolLtReif},
+        Val{FznFloatEqReif},
+        Val{FznFloatLeReif},
+        Val{FznFloatLtReif},
+        Val{FznFloatNeReif},
+    },
+    args,
+    model::Optimizer,
+)
     @assert length(args) == 3
-    @assert typeof(args[1]) <: AbstractString || typeof(args[2]) <: AbstractString
+    @assert typeof(args[1]) <: AbstractString ||
+            typeof(args[2]) <: AbstractString
     @assert typeof(args[3]) <: AbstractString
 
     moi_lhs = args[1]
     moi_rhs = args[2]
     moi_reif = model.name_to_var[args[3]]
 
-    type = if cons_verb == Val(FznIntEqReif) || cons_verb == Val(FznBoolEqReif) || cons_verb == Val(FznIntLeReif) || cons_verb == Val(FznBoolLeReif) || cons_verb == Val(FznIntLtReif) || cons_verb == Val(FznBoolLtReif) || cons_verb == Val(FznIntNeReif)
-        Int
-    elseif cons_verb == Val(FznFloatEqReif) || cons_verb == Val(FznFloatLeReif) || cons_verb == Val(FznFloatLtReif) || cons_verb == Val(FznFloatNeReif)
-        Float64
-    end
+    type =
+        if cons_verb == Val(FznIntEqReif) ||
+           cons_verb == Val(FznBoolEqReif) ||
+           cons_verb == Val(FznIntLeReif) ||
+           cons_verb == Val(FznBoolLeReif) ||
+           cons_verb == Val(FznIntLtReif) ||
+           cons_verb == Val(FznBoolLtReif) ||
+           cons_verb == Val(FznIntNeReif)
+            Int
+        elseif cons_verb == Val(FznFloatEqReif) ||
+               cons_verb == Val(FznFloatLeReif) ||
+               cons_verb == Val(FznFloatLtReif) ||
+               cons_verb == Val(FznFloatNeReif)
+            Float64
+        end
 
     # Both are variable: encode the constraint "z <=> (x - y = 0)".
     if typeof(moi_lhs) <: AbstractString && typeof(moi_rhs) <: AbstractString
         moi_lhs = model.name_to_var[moi_lhs]
         moi_rhs = model.name_to_var[moi_rhs]
 
-        moi_set = if cons_verb == Val(FznIntEqReif) || cons_verb == Val(FznBoolEqReif) || cons_verb == Val(FznFloatEqReif)
-            CP.Reified(MOI.EqualTo(zero(type)))
-        elseif cons_verb == Val(FznIntLeReif) || cons_verb == Val(FznBoolLeReif) || cons_verb == Val(FznFloatLeReif)
-            CP.Reified(MOI.LessThan(zero(type)))
-        elseif cons_verb == Val(FznIntLtReif) || cons_verb == Val(FznBoolLtReif) || cons_verb == Val(FznFloatLtReif)
-            CP.Reified(CP.Strictly(MOI.LessThan(zero(type))))
-        elseif cons_verb == Val(FznIntNeReif) || cons_verb == Val(FznFloatNeReif)
-            CP.Reified(CP.DifferentFrom(zero(type)))
-        end
-        
+        moi_set =
+            if cons_verb == Val(FznIntEqReif) ||
+               cons_verb == Val(FznBoolEqReif) ||
+               cons_verb == Val(FznFloatEqReif)
+                CP.Reified(MOI.EqualTo(zero(type)))
+            elseif cons_verb == Val(FznIntLeReif) ||
+                   cons_verb == Val(FznBoolLeReif) ||
+                   cons_verb == Val(FznFloatLeReif)
+                CP.Reified(MOI.LessThan(zero(type)))
+            elseif cons_verb == Val(FznIntLtReif) ||
+                   cons_verb == Val(FznBoolLtReif) ||
+                   cons_verb == Val(FznFloatLtReif)
+                CP.Reified(CP.Strictly(MOI.LessThan(zero(type))))
+            elseif cons_verb == Val(FznIntNeReif) ||
+                   cons_verb == Val(FznFloatNeReif)
+                CP.Reified(CP.DifferentFrom(zero(type)))
+            end
+
         return MOI.add_constraint(
-            model, 
+            model,
             MOI.VectorAffineFunction(
                 [
-                    MOI.VectorAffineTerm(1, MOI.ScalarAffineTerm(one(type), moi_reif)),
-                    MOI.VectorAffineTerm(2, MOI.ScalarAffineTerm(one(type), moi_lhs)),
-                    MOI.VectorAffineTerm(2, MOI.ScalarAffineTerm(-one(type), moi_rhs)),
-                ], 
-                [zero(type), zero(type)]
-            ), 
-            moi_set
+                    MOI.VectorAffineTerm(
+                        1,
+                        MOI.ScalarAffineTerm(one(type), moi_reif),
+                    ),
+                    MOI.VectorAffineTerm(
+                        2,
+                        MOI.ScalarAffineTerm(one(type), moi_lhs),
+                    ),
+                    MOI.VectorAffineTerm(
+                        2,
+                        MOI.ScalarAffineTerm(-one(type), moi_rhs),
+                    ),
+                ],
+                [zero(type), zero(type)],
+            ),
+            moi_set,
         )
     end
 
@@ -643,7 +781,12 @@ function add_constraint_to_model(
         moi_lhs, moi_rhs = moi_rhs, moi_lhs
 
         # For a <= constraint, reversing the order means that signs must change too.
-        if cons_verb == Val(FznIntLeReif) || cons_verb == Val(FznIntLtReif) || cons_verb == Val(FznBoolLeReif) || cons_verb == Val(FznBoolLtReif) || cons_verb == Val(FznFloatLeReif) || cons_verb == Val(FznFloatLtReif)
+        if cons_verb == Val(FznIntLeReif) ||
+           cons_verb == Val(FznIntLtReif) ||
+           cons_verb == Val(FznBoolLeReif) ||
+           cons_verb == Val(FznBoolLtReif) ||
+           cons_verb == Val(FznFloatLeReif) ||
+           cons_verb == Val(FznFloatLtReif)
             lhs_coeff = -one(type)
             rhs_coeff = -one(type)
         end
@@ -651,26 +794,40 @@ function add_constraint_to_model(
 
     moi_lhs = model.name_to_var[moi_lhs]
 
-    moi_set = if cons_verb == Val(FznIntEqReif) || cons_verb == Val(FznBoolEqReif) || cons_verb == Val(FznFloatEqReif)
-        CP.Reified(MOI.EqualTo(rhs_coeff * moi_rhs))
-    elseif cons_verb == Val(FznIntLeReif) || cons_verb == Val(FznBoolLeReif) || cons_verb == Val(FznFloatLeReif)
-        CP.Reified(MOI.LessThan(rhs_coeff * moi_rhs))
-    elseif cons_verb == Val(FznIntLtReif) || cons_verb == Val(FznBoolLtReif) || cons_verb == Val(FznFloatLtReif)
-        CP.Reified(CP.Strictly(MOI.LessThan(rhs_coeff * moi_rhs)))
-    elseif cons_verb == Val(FznIntNeReif) || cons_verb == Val(FznFloatNeReif)
-        CP.Reified(CP.DifferentFrom(rhs_coeff * moi_rhs))
-    end
+    moi_set =
+        if cons_verb == Val(FznIntEqReif) ||
+           cons_verb == Val(FznBoolEqReif) ||
+           cons_verb == Val(FznFloatEqReif)
+            CP.Reified(MOI.EqualTo(rhs_coeff * moi_rhs))
+        elseif cons_verb == Val(FznIntLeReif) ||
+               cons_verb == Val(FznBoolLeReif) ||
+               cons_verb == Val(FznFloatLeReif)
+            CP.Reified(MOI.LessThan(rhs_coeff * moi_rhs))
+        elseif cons_verb == Val(FznIntLtReif) ||
+               cons_verb == Val(FznBoolLtReif) ||
+               cons_verb == Val(FznFloatLtReif)
+            CP.Reified(CP.Strictly(MOI.LessThan(rhs_coeff * moi_rhs)))
+        elseif cons_verb == Val(FznIntNeReif) ||
+               cons_verb == Val(FznFloatNeReif)
+            CP.Reified(CP.DifferentFrom(rhs_coeff * moi_rhs))
+        end
 
     return MOI.add_constraint(
-        model, 
+        model,
         MOI.VectorAffineFunction(
             [
-                MOI.VectorAffineTerm(1, MOI.ScalarAffineTerm(one(type), moi_reif)), 
-                MOI.VectorAffineTerm(2, MOI.ScalarAffineTerm(lhs_coeff, moi_lhs)), 
+                MOI.VectorAffineTerm(
+                    1,
+                    MOI.ScalarAffineTerm(one(type), moi_reif),
+                ),
+                MOI.VectorAffineTerm(
+                    2,
+                    MOI.ScalarAffineTerm(lhs_coeff, moi_lhs),
+                ),
             ],
-            [zero(type), zero(type)]
-        ), 
-        moi_set
+            [zero(type), zero(type)],
+        ),
+        moi_set,
     )
 end
 
@@ -680,26 +837,48 @@ end
 # FznIntLeReif: implemented within FznIntEqReif.
 
 function add_constraint_to_model(
-        cons_verb::Union{
-            Val{FznIntLinEq}, Val{FznIntLinLe}, Val{FznIntLinNe}, 
-            Val{FznBoolLinEq}, Val{FznBoolLinLe},
-            Val{FznFloatLinEq}, Val{FznFloatLinLe}, Val{FznFloatLinLt}, Val{FznFloatLinNe}, 
-            Val{FznIntLinEqReif}, Val{FznIntLinLeReif}, Val{FznIntLinNeReif},
-            Val{FznFloatLinEqReif}, Val{FznFloatLinLeReif}, Val{FznFloatLinLtReif}, Val{FznFloatLinNeReif}, 
-        }, 
-        args, 
-        model::Optimizer
-    )
+    cons_verb::Union{
+        Val{FznIntLinEq},
+        Val{FznIntLinLe},
+        Val{FznIntLinNe},
+        Val{FznBoolLinEq},
+        Val{FznBoolLinLe},
+        Val{FznFloatLinEq},
+        Val{FznFloatLinLe},
+        Val{FznFloatLinLt},
+        Val{FznFloatLinNe},
+        Val{FznIntLinEqReif},
+        Val{FznIntLinLeReif},
+        Val{FznIntLinNeReif},
+        Val{FznFloatLinEqReif},
+        Val{FznFloatLinLeReif},
+        Val{FznFloatLinLtReif},
+        Val{FznFloatLinNeReif},
+    },
+    args,
+    model::Optimizer,
+)
     if cons_verb ∈ [
-            Val(FznIntLinEq), Val(FznIntLinLe), Val(FznIntLinNe), 
-            Val(FznBoolLinEq), Val(FznBoolLinLe), 
-            Val(FznFloatLinEq), Val(FznFloatLinLe), Val(FznFloatLinLt), Val(FznFloatLinNe)
-        ]
+        Val(FznIntLinEq),
+        Val(FznIntLinLe),
+        Val(FznIntLinNe),
+        Val(FznBoolLinEq),
+        Val(FznBoolLinLe),
+        Val(FznFloatLinEq),
+        Val(FznFloatLinLe),
+        Val(FznFloatLinLt),
+        Val(FznFloatLinNe),
+    ]
         @assert length(args) == 3
     elseif cons_verb ∈ [
-            Val(FznIntLinEqReif), Val(FznIntLinLeReif), Val(FznIntLinNeReif), 
-            Val(FznFloatLinEqReif), Val(FznFloatLinLeReif), Val(FznFloatLinLtReif), Val(FznFloatLinNeReif)
-        ]
+        Val(FznIntLinEqReif),
+        Val(FznIntLinLeReif),
+        Val(FznIntLinNeReif),
+        Val(FznFloatLinEqReif),
+        Val(FznFloatLinLeReif),
+        Val(FznFloatLinLtReif),
+        Val(FznFloatLinNeReif),
+    ]
         @assert length(args) == 4
     else
         @assert false
@@ -707,97 +886,145 @@ function add_constraint_to_model(
 
     @assert typeof(args[1]) <: Vector
     @assert typeof(args[2]) <: Vector
-    
+
     if cons_verb ∈ [
-        Val(FznIntLinEq), Val(FznIntLinLe), Val(FznIntLinNe), 
-        Val(FznBoolLinEq), Val(FznBoolLinLe), 
-        Val(FznIntLinEqReif), Val(FznIntLinLeReif), Val(FznIntLinNeReif)
+        Val(FznIntLinEq),
+        Val(FznIntLinLe),
+        Val(FznIntLinNe),
+        Val(FznBoolLinEq),
+        Val(FznBoolLinLe),
+        Val(FznIntLinEqReif),
+        Val(FznIntLinLeReif),
+        Val(FznIntLinNeReif),
     ]
         @assert typeof(args[3]) <: Integer
     else
         @assert typeof(args[3]) <: Real
     end
     if cons_verb ∈ [
-            Val(FznIntLinEqReif), Val(FznIntLinLeReif), Val(FznIntLinNeReif),
-            Val(FznFloatLinEqReif), Val(FznFloatLinLeReif), Val(FznFloatLinLtReif), Val(FznFloatLinNeReif)
-        ]
+        Val(FznIntLinEqReif),
+        Val(FznIntLinLeReif),
+        Val(FznIntLinNeReif),
+        Val(FznFloatLinEqReif),
+        Val(FznFloatLinLeReif),
+        Val(FznFloatLinLtReif),
+        Val(FznFloatLinNeReif),
+    ]
         @assert typeof(args[4]) <: AbstractString
     end
 
     @assert length(args[1]) == length(args[2])
 
     # Create the linear combination.
-    type = if cons_verb ∈ [
-        Val(FznIntLinEq), Val(FznIntLinLe), Val(FznIntLinNe), 
-        Val(FznBoolLinEq), Val(FznBoolLinLe), 
-        Val(FznIntLinEqReif), Val(FznIntLinLeReif), Val(FznIntLinNeReif)
-    ]
-        Int
-    else
-        Float64
-    end
+    type =
+        if cons_verb ∈ [
+            Val(FznIntLinEq),
+            Val(FznIntLinLe),
+            Val(FznIntLinNe),
+            Val(FznBoolLinEq),
+            Val(FznBoolLinLe),
+            Val(FznIntLinEqReif),
+            Val(FznIntLinLeReif),
+            Val(FznIntLinNeReif),
+        ]
+            Int
+        else
+            Float64
+        end
 
     moi_terms = [
-        MOI.ScalarAffineTerm{type}(args[1][i], model.name_to_var[args[2][i]])
-        for i in 1:length(args[1])
+        MOI.ScalarAffineTerm{type}(args[1][i], model.name_to_var[args[2][i]]) for i in 1:length(args[1])
     ]
 
     # Non-reified constraint.
     if cons_verb ∈ [
-            Val(FznIntLinEq), Val(FznIntLinLe), Val(FznIntLinNe), 
-            Val(FznBoolLinEq), Val(FznBoolLinLe),
-            Val(FznFloatLinEq), Val(FznFloatLinLe), Val(FznFloatLinLt), Val(FznFloatLinNe)
-        ]
+        Val(FznIntLinEq),
+        Val(FznIntLinLe),
+        Val(FznIntLinNe),
+        Val(FznBoolLinEq),
+        Val(FznBoolLinLe),
+        Val(FznFloatLinEq),
+        Val(FznFloatLinLe),
+        Val(FznFloatLinLt),
+        Val(FznFloatLinNe),
+    ]
         moi_fct = MOI.ScalarAffineFunction(moi_terms, zero(type))
-        
+
         cst = type(args[3])
-        moi_set = if cons_verb == Val(FznIntLinEq) || cons_verb == Val(FznBoolLinEq) || cons_verb == Val(FznFloatLinEq)
-            MOI.EqualTo(cst)
-        elseif cons_verb == Val(FznIntLinLe) || cons_verb == Val(FznBoolLinLe) || cons_verb == Val(FznFloatLinLe)
-            MOI.LessThan(cst)
-        elseif cons_verb == Val(FznFloatLinLt)
-            CP.Strictly(MOI.LessThan(cst))
-        elseif cons_verb == Val(FznIntLinNe) || cons_verb == Val(FznFloatLinNe)
-            CP.DifferentFrom(cst)
-        end
+        moi_set =
+            if cons_verb == Val(FznIntLinEq) ||
+               cons_verb == Val(FznBoolLinEq) ||
+               cons_verb == Val(FznFloatLinEq)
+                MOI.EqualTo(cst)
+            elseif cons_verb == Val(FznIntLinLe) ||
+                   cons_verb == Val(FznBoolLinLe) ||
+                   cons_verb == Val(FznFloatLinLe)
+                MOI.LessThan(cst)
+            elseif cons_verb == Val(FznFloatLinLt)
+                CP.Strictly(MOI.LessThan(cst))
+            elseif cons_verb == Val(FznIntLinNe) ||
+                   cons_verb == Val(FznFloatLinNe)
+                CP.DifferentFrom(cst)
+            end
 
         return MOI.add_constraint(model, moi_fct, moi_set)
     end
 
     # Reified constraint
     if cons_verb ∈ [
-            Val(FznIntLinEqReif), Val(FznIntLinLeReif), Val(FznIntLinNeReif),
-            Val(FznFloatLinEqReif), Val(FznFloatLinLeReif), Val(FznFloatLinLtReif), Val(FznFloatLinNeReif)
-        ]
+        Val(FznIntLinEqReif),
+        Val(FznIntLinLeReif),
+        Val(FznIntLinNeReif),
+        Val(FznFloatLinEqReif),
+        Val(FznFloatLinLeReif),
+        Val(FznFloatLinLtReif),
+        Val(FznFloatLinNeReif),
+    ]
         moi_fct = MOI.VectorAffineFunction(
             [
-                MOI.VectorAffineTerm(1, MOI.ScalarAffineTerm(one(type), model.name_to_var[args[4]])),
-                MOI.VectorAffineTerm.(2, moi_terms)...
-            ], 
-            [zero(type), zero(type)]
+                MOI.VectorAffineTerm(
+                    1,
+                    MOI.ScalarAffineTerm(one(type), model.name_to_var[args[4]]),
+                ),
+                MOI.VectorAffineTerm.(2, moi_terms)...,
+            ],
+            [zero(type), zero(type)],
         )
-        
+
         cst = type(args[3])
-        moi_set = if cons_verb == Val(FznIntLinEqReif) || cons_verb == Val(FznFloatLinEqReif)
-            CP.Reified(MOI.EqualTo(cst))
-        elseif cons_verb == Val(FznIntLinLeReif) || cons_verb == Val(FznFloatLinLeReif)
-            CP.Reified(MOI.LessThan(cst))
-        elseif cons_verb == Val(FznFloatLinLtReif)
-            CP.Reified(CP.Strictly(MOI.LessThan(cst)))
-        elseif cons_verb == Val(FznIntLinNeReif) || cons_verb == Val(FznFloatLinNeReif)
-            CP.Reified(CP.DifferentFrom(cst))
-        end
+        moi_set =
+            if cons_verb == Val(FznIntLinEqReif) ||
+               cons_verb == Val(FznFloatLinEqReif)
+                CP.Reified(MOI.EqualTo(cst))
+            elseif cons_verb == Val(FznIntLinLeReif) ||
+                   cons_verb == Val(FznFloatLinLeReif)
+                CP.Reified(MOI.LessThan(cst))
+            elseif cons_verb == Val(FznFloatLinLtReif)
+                CP.Reified(CP.Strictly(MOI.LessThan(cst)))
+            elseif cons_verb == Val(FznIntLinNeReif) ||
+                   cons_verb == Val(FznFloatLinNeReif)
+                CP.Reified(CP.DifferentFrom(cst))
+            end
 
         return MOI.add_constraint(model, moi_fct, moi_set)
     end
-    
+
     @assert false
 end
 
 # FznIntLt: implemented within FznIntEq.
 # FznIntLtReif: implemented within FznIntEqReif.
 
-function add_constraint_to_model(cons_verb::Union{Val{FznIntMax}, Val{FznIntMin}, Val{FznFloatMax}, Val{FznFloatMin}}, args, model::Optimizer)
+function add_constraint_to_model(
+    cons_verb::Union{
+        Val{FznIntMax},
+        Val{FznIntMin},
+        Val{FznFloatMax},
+        Val{FznFloatMin},
+    },
+    args,
+    model::Optimizer,
+)
     @assert length(args) == 3
     for i in 1:3
         @assert typeof(args[i]) <: AbstractString
@@ -813,9 +1040,9 @@ function add_constraint_to_model(cons_verb::Union{Val{FznIntMax}, Val{FznIntMin}
     end
 
     return MOI.add_constraint(
-        model, 
-        MOI.VectorOfVariables([moi_var, moi_var_array...]), 
-        moi_set
+        model,
+        MOI.VectorOfVariables([moi_var, moi_var_array...]),
+        moi_set,
     )
 end
 
@@ -823,7 +1050,11 @@ end
 # FznIntNe: implemented within FznIntEq.
 # FznIntNeReif: implemented within FznIntEqReif.
 
-function add_constraint_to_model(cons_verb::Union{Val{FznIntPlus}, Val{FznFloatPlus}}, args, model::Optimizer)
+function add_constraint_to_model(
+    cons_verb::Union{Val{FznIntPlus}, Val{FznFloatPlus}},
+    args,
+    model::Optimizer,
+)
     @assert length(args) == 3
     for i in 1:3
         @assert typeof(args[i]) <: AbstractString
@@ -839,9 +1070,15 @@ function add_constraint_to_model(cons_verb::Union{Val{FznIntPlus}, Val{FznFloatP
     end
 
     return MOI.add_constraint(
-        model, 
-        MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([one(type), one(type), -one(type)], [moi_operands..., moi_var]), zero(type)), 
-        MOI.EqualTo(zero(type))
+        model,
+        MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.(
+                [one(type), one(type), -one(type)],
+                [moi_operands..., moi_var],
+            ),
+            zero(type),
+        ),
+        MOI.EqualTo(zero(type)),
     )
 end
 
@@ -864,9 +1101,12 @@ function add_constraint_to_model(::Val{FznBoolToInt}, args, model::Optimizer)
     moi_var_int = model.name_to_var[args[2]]
 
     return MOI.add_constraint(
-        model, 
-        MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, -1], [moi_var_bool, moi_var_int]), 0), 
-        MOI.EqualTo(0)
+        model,
+        MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([1, -1], [moi_var_bool, moi_var_int]),
+            0,
+        ),
+        MOI.EqualTo(0),
     )
 end
 
@@ -938,9 +1178,9 @@ function add_constraint_to_model(::Val{FznFloatIn}, args, model::Optimizer)
     bound_max = Float64(args[3])
 
     return MOI.add_constraint(
-        model, 
-        MOI.SingleVariable(moi_var), 
-        MOI.Interval(bound_min, bound_max)
+        model,
+        MOI.SingleVariable(moi_var),
+        MOI.Interval(bound_min, bound_max),
     )
 end
 
@@ -957,9 +1197,9 @@ function add_constraint_to_model(::Val{FznFloatInReif}, args, model::Optimizer)
     moi_bool_var = model.name_to_var[args[4]]
 
     return MOI.add_constraint(
-        model, 
-        MOI.VectorOfVariables([moi_bool_var, moi_var]), 
-        CP.Reified(MOI.Interval(bound_min, bound_max))
+        model,
+        MOI.VectorOfVariables([moi_bool_var, moi_var]),
+        CP.Reified(MOI.Interval(bound_min, bound_max)),
     )
 end
 
@@ -1016,9 +1256,12 @@ function add_constraint_to_model(::Val{FznIntToFloat}, args, model::Optimizer)
     moi_var_float = model.name_to_var[args[2]]
 
     return MOI.add_constraint(
-        model, 
-        MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1.0, -1.0], [moi_var_int, moi_var_float]), 0.0), 
-        MOI.EqualTo(0.0)
+        model,
+        MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([1.0, -1.0], [moi_var_int, moi_var_float]),
+            0.0,
+        ),
+        MOI.EqualTo(0.0),
     )
 end
 
@@ -1088,7 +1331,7 @@ function parse_set(set::AbstractString)
     @assert set[1] == '{'
     @assert set[end] == '}'
     set = set[2:end-1]
-    
+
     # First, try to parse as integers: this is more restrictive than floats.
     try
         return (FznInt, parse_set_int(set))
@@ -1171,7 +1414,9 @@ function parse_variable_type(var_type::AbstractString)
             return (var_type, FznSet, nothing, nothing, var_values)
         end
 
-        if !startswith(var_type, '{') && !endswith(var_type, '}') && occursin("..", var_type)
+        if !startswith(var_type, '{') &&
+           !endswith(var_type, '}') &&
+           occursin("..", var_type)
             var_type, var_min, var_max = parse_range(var_type)
             return (var_type, FznSet, var_min, var_max, nothing)
         end
@@ -1201,10 +1446,10 @@ function parse_constraint_verb(cons_verb::AbstractString)
     mapping = Dict(
         # Integers. 
         # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#integer-flatzinc-builtins
-        "array_int_element" => FznArrayIntElement, 
-        "array_int_maximum" => FznArrayIntMaximum, 
-        "array_int_minimum" => FznArrayIntMinimum, 
-        "array_var_int_element" => FznArrayVarIntElement, 
+        "array_int_element" => FznArrayIntElement,
+        "array_int_maximum" => FznArrayIntMaximum,
+        "array_int_minimum" => FznArrayIntMinimum,
+        "array_var_int_element" => FznArrayVarIntElement,
         "int_abs" => FznIntAbs,
         "int_div" => FznIntDiv,
         "int_eq" => FznIntEq,
@@ -1327,10 +1572,14 @@ function parse_constraint_verb(cons_verb::AbstractString)
         "bool_clause_reif" => FznBoolClauseReif,
         # New in MiniZinc 2.0.2.
         # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-0-2
-        "array_var_bool_element_nonshifted" => FznArrayVarBoolElementNonshifted,
-        "array_var_float_element_nonshifted" => FznArrayVarFloatElementNonshifted,
-        "array_var_int_element_nonshifted" => FznArrayVarIntElementNonshifted,
-        "array_var_set_element_nonshifted" => FznArrayVarSetElementNonshifted,
+        "array_var_bool_element_nonshifted" =>
+            FznArrayVarBoolElementNonshifted,
+        "array_var_float_element_nonshifted" =>
+            FznArrayVarFloatElementNonshifted,
+        "array_var_int_element_nonshifted" =>
+            FznArrayVarIntElementNonshifted,
+        "array_var_set_element_nonshifted" =>
+            FznArrayVarSetElementNonshifted,
         # New in MiniZinc 2.1.0. All of them are already included above.
         # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-1-0
         # New in MiniZinc 2.1.1. Unimplementable here.
@@ -1343,10 +1592,14 @@ function parse_constraint_verb(cons_verb::AbstractString)
         "float_set_in" => FznFloatSetInt,
         # New in MiniZinc 2.5.2. 
         # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#flatzinc-builtins-added-in-minizinc-2-5-2
-        "array_var_bool_element2d_nonshifted" => FznArrayVarBoolElement2DNonshifted,
-        "array_var_float_element2d_nonshifted" => FznArrayVarFloatElement2DNonshifted,
-        "array_var_int_element2d_nonshifted" => FznArrayVarIntElement2DNonshifted,
-        "array_var_set_element2d_nonshifted" => FznArrayVarSetElement2DNonshifted,
+        "array_var_bool_element2d_nonshifted" =>
+            FznArrayVarBoolElement2DNonshifted,
+        "array_var_float_element2d_nonshifted" =>
+            FznArrayVarFloatElement2DNonshifted,
+        "array_var_int_element2d_nonshifted" =>
+            FznArrayVarIntElement2DNonshifted,
+        "array_var_set_element2d_nonshifted" =>
+            FznArrayVarSetElement2DNonshifted,
     )
     return mapping[cons_verb]
 end
@@ -1487,7 +1740,7 @@ function split_variable_scalar(item::AbstractString)
             var_value = ""
         end
     end
-    
+
     return ("", var_type, var_name, var_annotations, var_value)
 end
 
@@ -1504,8 +1757,9 @@ function split_variable_array(item::AbstractString)
     item = string(lstrip(item))
 
     # Parse the rest of the line.
-    _, var_type, var_name, var_annotations, var_value = split_variable_scalar(item)
-    
+    _, var_type, var_name, var_annotations, var_value =
+        split_variable_scalar(item)
+
     return (var_array, var_type, var_name, var_annotations, var_value)
 end
 
@@ -1561,7 +1815,7 @@ function split_constraint(item::AbstractString)
     else
         cons_annotations = nothing
     end
-    
+
     # Eliminate the closing parenthesis.
     @assert item[end] == ')'
     cons_args = lstrip(item[1:end-1])
@@ -1569,11 +1823,13 @@ function split_constraint(item::AbstractString)
     return (cons_verb, cons_args, cons_annotations)
 end
 
-function split_constraint_arguments(cons_args::AbstractString)::FZN_UNPARSED_ARGUMENT_LIST
+function split_constraint_arguments(
+    cons_args::AbstractString,
+)::FZN_UNPARSED_ARGUMENT_LIST
     # Typical input: "0, x"
 
     @assert length(cons_args) > 0
-    
+
     # Arguments are separated with commas: if there is none, there is just 
     # one argument.
     if !occursin(',', cons_args)
@@ -1593,7 +1849,7 @@ function split_constraint_arguments(cons_args::AbstractString)::FZN_UNPARSED_ARG
             index = findfirst(']', cons_args)
             array = strip(cons_args[2:index-1])
             cons_args = strip(cons_args[index+1:end])
-            
+
             # If there is a comma after the array, consume it.
             if occursin(',', cons_args)
                 index = findfirst(',', cons_args)
@@ -1611,7 +1867,7 @@ function split_constraint_arguments(cons_args::AbstractString)::FZN_UNPARSED_ARG
                     index = findfirst(',', array)
                     arg = strip(array[1:index-1])
                     array = strip(array[index+1:end])
-    
+
                     push!(array_args, arg)
                 end
             end

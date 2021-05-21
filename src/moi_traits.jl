@@ -22,7 +22,9 @@ end
 
 function has_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     # TODO: not just Float64.
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{Float64}}(v.value)
+    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{Float64}}(
+        v.value,
+    )
     return MOI.is_valid(model, c_idx)
 end
 
@@ -32,6 +34,7 @@ end
 
 function has_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     # TODO: not just Float64.
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{Float64}}(v.value)
+    c_idx =
+        MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{Float64}}(v.value)
     return MOI.is_valid(model, c_idx)
 end

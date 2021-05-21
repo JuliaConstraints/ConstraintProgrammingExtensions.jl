@@ -16,7 +16,7 @@ function Base.write(io::IO, model::Optimizer)
     # Reset the data structures holding set and array names.
     empty!(model.sets_id)
     empty!(model.arrs_id)
-    
+
     # Ensure variable names are unique.
     MOI.FileFormats.create_unique_variable_names(
         model,
@@ -155,11 +155,16 @@ function write_set(::IO, ::Optimizer, ::ConstraintInfo, ::MOI.AbstractSet)
     return nothing
 end
 
-function write_set(io::IO, model::Optimizer, con::ConstraintInfo, s::CP.Domain{Int})
+function write_set(
+    io::IO,
+    model::Optimizer,
+    con::ConstraintInfo,
+    s::CP.Domain{Int},
+)
     set_name = "SET" * string(length(model.sets_id))
     model.sets_id[con.index] = set_name
     set_value = join(collect(s.values), ", ")
-    
+
     print(io, "set of int: $(set_name) = {$(set_value)};")
     println(io)
     return nothing
@@ -172,37 +177,61 @@ function write_array(::IO, ::Optimizer, ::ConstraintInfo, ::MOI.AbstractSet)
     return nothing
 end
 
-function write_array(io::IO, model::Optimizer, con::ConstraintInfo, s::CP.Element{Bool})
+function write_array(
+    io::IO,
+    model::Optimizer,
+    con::ConstraintInfo,
+    s::CP.Element{Bool},
+)
     array_name = "ARRAY" * string(length(model.arrs_id))
     model.arrs_id[con.index] = array_name
     array_value = join(collect(s.values), ", ")
     array_length = length(s.values)
 
     values = join([ifelse(v, "1", "0") for v in s.values], ", ")
-    
-    print(io, "array [1..$(array_length)] of bool: $(array_name) = [$(array_value)];")
+
+    print(
+        io,
+        "array [1..$(array_length)] of bool: $(array_name) = [$(array_value)];",
+    )
     println(io)
     return nothing
 end
 
-function write_array(io::IO, model::Optimizer, con::ConstraintInfo, s::CP.Element{Int})
+function write_array(
+    io::IO,
+    model::Optimizer,
+    con::ConstraintInfo,
+    s::CP.Element{Int},
+)
     array_name = "ARRAY" * string(length(model.arrs_id))
     model.arrs_id[con.index] = array_name
     array_value = join(collect(s.values), ", ")
     array_length = length(s.values)
-    
-    print(io, "array [1..$(array_length)] of int: $(array_name) = [$(array_value)];")
+
+    print(
+        io,
+        "array [1..$(array_length)] of int: $(array_name) = [$(array_value)];",
+    )
     println(io)
     return nothing
 end
 
-function write_array(io::IO, model::Optimizer, con::ConstraintInfo, s::CP.Element{Float64})
+function write_array(
+    io::IO,
+    model::Optimizer,
+    con::ConstraintInfo,
+    s::CP.Element{Float64},
+)
     array_name = "ARRAY" * string(length(model.arrs_id))
     model.arrs_id[con.index] = array_name
     array_value = join(collect(s.values), ", ")
     array_length = length(s.values)
-    
-    print(io, "array [1..$(array_length)] of float: $(array_name) = [$(array_value)];")
+
+    print(
+        io,
+        "array [1..$(array_length)] of float: $(array_name) = [$(array_value)];",
+    )
     println(io)
     return nothing
 end
@@ -234,10 +263,22 @@ function write_constraint(
     model::Optimizer,
     index::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
-    s::Union{MOI.EqualTo{T}, MOI.LessThan{T}, CP.Strictly{MOI.LessThan{T}}, CP.DifferentFrom{T}},
+    s::Union{
+        MOI.EqualTo{T},
+        MOI.LessThan{T},
+        CP.Strictly{MOI.LessThan{T}},
+        CP.DifferentFrom{T},
+    },
 ) where {T}
     # *_eq, *_le, *_lt, *_ne
-    write_constraint(io, model, index, f, s, Val(_promote_type(model, [f.variable])))
+    write_constraint(
+        io,
+        model,
+        index,
+        f,
+        s,
+        Val(_promote_type(model, [f.variable])),
+    )
     return nothing
 end
 
@@ -250,7 +291,14 @@ function write_constraint(
 ) where {T, U}
     # *_lin_eq, *_lin_le
     variables, _ = _saf_to_coef_vars(f)
-    write_constraint(io, model, index, f, s, Val(_promote_type(model, variables)))
+    write_constraint(
+        io,
+        model,
+        index,
+        f,
+        s,
+        Val(_promote_type(model, variables)),
+    )
     return nothing
 end
 
@@ -259,10 +307,22 @@ function write_constraint(
     model::Optimizer,
     index::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::Union{CP.Reified{MOI.EqualTo{T}}, CP.Reified{MOI.LessThan{T}}, CP.Reified{CP.Strictly{MOI.LessThan{T}, T}}, CP.Reified{CP.DifferentFrom{T}}},
+    s::Union{
+        CP.Reified{MOI.EqualTo{T}},
+        CP.Reified{MOI.LessThan{T}},
+        CP.Reified{CP.Strictly{MOI.LessThan{T}, T}},
+        CP.Reified{CP.DifferentFrom{T}},
+    },
 ) where {T}
     # *_eq_reif, *_le_reif, *_lt_reif, *_ne_reif
-    write_constraint(io, model, index, f, s, Val(_promote_type(model, f.variables)))
+    write_constraint(
+        io,
+        model,
+        index,
+        f,
+        s,
+        Val(_promote_type(model, f.variables)),
+    )
     return nothing
 end
 
@@ -271,11 +331,23 @@ function write_constraint(
     model::Optimizer,
     index::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction{T},
-    s::Union{CP.Reified{MOI.EqualTo{U}}, CP.Reified{MOI.LessThan{U}}, CP.Reified{CP.Strictly{MOI.LessThan{U}, U}}, CP.Reified{CP.DifferentFrom{T}}},
+    s::Union{
+        CP.Reified{MOI.EqualTo{U}},
+        CP.Reified{MOI.LessThan{U}},
+        CP.Reified{CP.Strictly{MOI.LessThan{U}, U}},
+        CP.Reified{CP.DifferentFrom{T}},
+    },
 ) where {T, U}
     # *_lin_eq_reif, *_lin_le_reif, *_lin_lt_reif, *_lin_ne_reif
     variables = _vaf_to_vars(f)
-    write_constraint(io, model, index, f, s, Val(_promote_type(model, variables)))
+    write_constraint(
+        io,
+        model,
+        index,
+        f,
+        s,
+        Val(_promote_type(model, variables)),
+    )
     return nothing
 end
 
@@ -283,11 +355,18 @@ function write_constraint(
     io::IO,
     model::Optimizer,
     index::MOI.ConstraintIndex,
-    f::MOI.VectorOfVariables, 
+    f::MOI.VectorOfVariables,
     s::Union{CP.MaximumAmong, CP.MinimumAmong},
 )
     # array_*_maximum, array_*_minimum
-    write_constraint(io, model, index, f, s, Val(_promote_type(model, f.variables)))
+    write_constraint(
+        io,
+        model,
+        index,
+        f,
+        s,
+        Val(_promote_type(model, f.variables)),
+    )
     return nothing
 end
 
@@ -357,7 +436,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
     s::MOI.LessThan{Int},
-    ::Val{:int}
+    ::Val{:int},
 )
     @assert CP.is_integer(model, f) || CP.is_binary(model, f)
     print(io, "int_le($(_fzn_f(model, f)), $(s.upper))")
@@ -370,7 +449,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
     s::MOI.LessThan{Bool},
-    ::Val{:bool}
+    ::Val{:bool},
 )
     @assert CP.is_binary(model, f)
     print(io, "bool_le($(_fzn_f(model, f)), $(Bool(s.upper)))")
@@ -383,13 +462,17 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Reified{MOI.LessThan{Int}},
-    ::Val{:int}
+    ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
-    @assert CP.is_integer(model, f.variables[2]) || CP.is_binary(model, f.variables[2])
-    
-    print(io, "int_le_reif($(_fzn_f(model, f.variables[1])), $(s.set.upper), $(_fzn_f(model, f.variables[1])))")
+    @assert CP.is_integer(model, f.variables[2]) ||
+            CP.is_binary(model, f.variables[2])
+
+    print(
+        io,
+        "int_le_reif($(_fzn_f(model, f.variables[1])), $(s.set.upper), $(_fzn_f(model, f.variables[1])))",
+    )
     return nothing
 end
 
@@ -399,13 +482,10 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
     s::MOI.EqualTo{Int},
-    ::Val{:int}
+    ::Val{:int},
 )
     # Hypothesis: !cons.output_as_part_of_variable.
-    print(
-        io,
-        "int_eq($(_fzn_f(model, f)), $(s.value))",
-    )
+    print(io, "int_eq($(_fzn_f(model, f)), $(s.value))")
     return nothing
 end
 
@@ -415,7 +495,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::MOI.EqualTo{Int},
-    ::Val{:int}
+    ::Val{:int},
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.value - f.constant
@@ -432,7 +512,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Reified{MOI.EqualTo{Int}},
-    ::Val{:int}
+    ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
@@ -450,7 +530,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
     s::CP.Reified{MOI.EqualTo{Int}},
-    ::Val{:int}
+    ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
     vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
@@ -478,7 +558,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::MOI.LessThan{Int},
-    ::Val{:int}
+    ::Val{:int},
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.upper - f.constant
@@ -497,10 +577,7 @@ function write_constraint(
     s::CP.DifferentFrom{Int},
 )
     @assert CP.is_integer(model, f.variable) || CP.is_binary(model, f.variable)
-    print(
-        io,
-        "int_ne($(_fzn_f(model, f.variable)), $(s.value))",
-    )
+    print(io, "int_ne($(_fzn_f(model, f.variable)), $(s.value))")
     return nothing
 end
 
@@ -512,10 +589,7 @@ function write_constraint(
     s::CP.DifferentFrom{Bool},
 )
     @assert CP.is_binary(model, f.variable)
-    print(
-        io,
-        "int_ne($(_fzn_f(model, f.variable)), $(s.value))",
-    )
+    print(io, "int_ne($(_fzn_f(model, f.variable)), $(s.value))")
     return nothing
 end
 
@@ -565,7 +639,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Reified{CP.DifferentFrom{Int}},
-    ::Val{:int}
+    ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
@@ -584,7 +658,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
     s::CP.Reified{CP.DifferentFrom{Int}},
-    ::Val{:int}
+    ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
     vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
@@ -636,13 +710,16 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Reified{CP.Strictly{MOI.LessThan{Int}, Int}},
-    ::Val{:int}
+    ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
     @assert CP.is_integer(model, f.variables[2])
 
-    print(io, "int_lt_reif($(_fzn_f(model, f.variables[2])), $(s.set.set.upper), $(_fzn_f(model, f.variables[1])))")
+    print(
+        io,
+        "int_lt_reif($(_fzn_f(model, f.variables[2])), $(s.set.set.upper), $(_fzn_f(model, f.variables[1])))",
+    )
     return nothing
 end
 
@@ -652,7 +729,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
     s::CP.Reified{CP.Strictly{MOI.LessThan{Int}, Int}},
-    ::Val{:int}
+    ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
     vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
@@ -739,13 +816,10 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
     s::MOI.EqualTo{T},
-    ::Val{:bool}
+    ::Val{:bool},
 ) where {T <: Union{Int, Bool}}
     # Hypothesis: !cons.output_as_part_of_variable.
-    print(
-        io,
-        "bool_eq($(_fzn_f(model, f)), $(Bool(s.value)))",
-    )
+    print(io, "bool_eq($(_fzn_f(model, f)), $(Bool(s.value)))")
     return nothing
 end
 
@@ -755,7 +829,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::MOI.EqualTo{T},
-    ::Val{:bool}
+    ::Val{:bool},
 ) where {T <: Union{Int, Bool}}
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.value - f.constant
@@ -772,7 +846,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::MOI.LessThan{Int},
-    ::Val{:bool}
+    ::Val{:bool},
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = s.upper - f.constant
@@ -817,16 +891,36 @@ function write_constraint(
     return nothing
 end
 
-function write_constraint(io::IO, model::Optimizer, ::MOI.ConstraintIndex, f::MOI.VectorOfVariables, ::CP.MaximumAmong, ::Val{:float})
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorOfVariables,
+    ::CP.MaximumAmong,
+    ::Val{:float},
+)
     array = f.variables[2:end]
     value = f.variables[1]
-    print(io, "array_float_maximum($(_fzn_f(model, value)), [$(_fzn_f(model, array))])")
+    return print(
+        io,
+        "array_float_maximum($(_fzn_f(model, value)), [$(_fzn_f(model, array))])",
+    )
 end
 
-function write_constraint(io::IO, model::Optimizer, ::MOI.ConstraintIndex, f::MOI.VectorOfVariables, ::CP.MinimumAmong, ::Val{:float})
+function write_constraint(
+    io::IO,
+    model::Optimizer,
+    ::MOI.ConstraintIndex,
+    f::MOI.VectorOfVariables,
+    ::CP.MinimumAmong,
+    ::Val{:float},
+)
     array = f.variables[2:end]
     value = f.variables[1]
-    print(io, "array_float_minimum($(_fzn_f(model, value)), [$(_fzn_f(model, array))])")
+    return print(
+        io,
+        "array_float_minimum($(_fzn_f(model, value)), [$(_fzn_f(model, array))])",
+    )
 end
 
 # TODO: array_var_float_element, i.e. CP.Element with a variable array.
@@ -843,13 +937,10 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
     s::MOI.EqualTo{Float64},
-    ::Val{:float}
+    ::Val{:float},
 )
     # Hypothesis: !cons.output_as_part_of_variable.
-    print(
-        io,
-        "float_eq($(_fzn_f(model, f.variable)), $(s.value))",
-    )
+    print(io, "float_eq($(_fzn_f(model, f.variable)), $(s.value))")
     return nothing
 end
 
@@ -859,7 +950,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Reified{MOI.EqualTo{Float64}},
-    ::Val{:float}
+    ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
@@ -895,7 +986,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.ScalarAffineFunction,
     s::MOI.EqualTo{Float64},
-    ::Val{:float}
+    ::Val{:float},
 )
     variables, coefficients = _saf_to_coef_vars(f)
     value = Float64(s.value - f.constant)
@@ -912,7 +1003,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
     s::CP.Reified{MOI.EqualTo{Float64}},
-    ::Val{:float}
+    ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
     vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
@@ -937,7 +1028,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
     s::MOI.LessThan{Float64},
-    ::Val{:float}
+    ::Val{:float},
 )
     print(io, "float_le($(_fzn_f(model, f)), $(s.upper))")
     return nothing
@@ -949,7 +1040,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.SingleVariable,
     s::CP.Strictly{MOI.LessThan{Float64}, Float64},
-    ::Val{:float}
+    ::Val{:float},
 )
     print(io, "float_lt($(_fzn_f(model, f)), $(s.set.upper))")
     return nothing
@@ -977,7 +1068,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Reified{MOI.LessThan{Float64}},
-    ::Val{:float}
+    ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
@@ -995,7 +1086,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
     s::CP.Reified{MOI.LessThan{Int}},
-    ::Val{:int}
+    ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
     vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
@@ -1023,7 +1114,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
     s::CP.Reified{MOI.LessThan{Float64}},
-    ::Val{:float}
+    ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
     vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
@@ -1064,7 +1155,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Reified{CP.Strictly{MOI.LessThan{Float64}, Float64}},
-    ::Val{:float}
+    ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
@@ -1082,7 +1173,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
     s::CP.Reified{CP.Strictly{MOI.LessThan{Float64}, Float64}},
-    ::Val{:float}
+    ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
     vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
@@ -1124,10 +1215,7 @@ function write_constraint(
     f::MOI.SingleVariable,
     s::CP.DifferentFrom{Float64},
 )
-    print(
-        io,
-        "float_ne($(_fzn_f(model, f.variable)), $(s.value))",
-    )
+    print(io, "float_ne($(_fzn_f(model, f.variable)), $(s.value))")
     return nothing
 end
 
@@ -1137,7 +1225,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::CP.Reified{CP.DifferentFrom{Float64}},
-    ::Val{:float}
+    ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
     @assert CP.is_binary(model, f.variables[1])
@@ -1155,7 +1243,7 @@ function write_constraint(
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
     s::CP.Reified{CP.DifferentFrom{Float64}},
-    ::Val{:float}
+    ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
     vars_1, coeffs_1 = _vaf_to_coef_vars(f, 1)
@@ -1257,14 +1345,19 @@ end
 
 function _vaf_to_vars(f::MOI.VectorAffineFunction, dim::Int)
     MOIU.canonicalize!(f)
-    variables = MOI.VariableIndex[t.scalar_term.variable_index for t in f.terms if t.output_index == dim]
+    variables = MOI.VariableIndex[
+        t.scalar_term.variable_index for t in f.terms if t.output_index == dim
+    ]
     return variables
 end
 
 function _vaf_to_coef_vars(f::MOI.VectorAffineFunction, dim::Int)
     MOIU.canonicalize!(f)
-    variables = MOI.VariableIndex[t.scalar_term.variable_index for t in f.terms if t.output_index == dim]
-    coefficients = [t.scalar_term.coefficient for t in f.terms if t.output_index == dim]
+    variables = MOI.VariableIndex[
+        t.scalar_term.variable_index for t in f.terms if t.output_index == dim
+    ]
+    coefficients =
+        [t.scalar_term.coefficient for t in f.terms if t.output_index == dim]
     constant = f.constants[dim]
 
     return variables, coefficients, constant

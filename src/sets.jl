@@ -248,7 +248,9 @@ end
 
 MOI.dimension(set::ElementVariableArray) = 2 + set.dimension
 Base.copy(set::ElementVariableArray) = ElementVariableArray(set.dimension)
-Base.:(==)(x::ElementVariableArray, y::ElementVariableArray) = x.dimension == y.dimension
+function Base.:(==)(x::ElementVariableArray, y::ElementVariableArray)
+    return x.dimension == y.dimension
+end
 
 """
     MinimumDistance{T <: Real}(dimension::Int, k::T)
