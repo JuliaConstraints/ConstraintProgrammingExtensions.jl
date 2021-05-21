@@ -225,7 +225,7 @@ function Base.read!(io::IO, model::Optimizer)
 
         if state == FznSolve
             if startswith(item, "solve")
-                parse_constraint!(item, model)
+                parse_solve!(item, model)
                 state = FznDone
             else
                 error("Syntax error: expected a solve-item.")

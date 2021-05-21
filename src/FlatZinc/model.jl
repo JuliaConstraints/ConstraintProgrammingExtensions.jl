@@ -406,7 +406,13 @@ function MOI.get(
 end
 
 function MOI.get(model::Optimizer, ::MOI.NumberOfConstraints{F, S}) where {F, S}
-    return sum(1 for c in model.constraint_info if typeof(c.f) == F && typeof(c.s) == S)
+    count = 0
+    for c in model.constraint_info
+        if typeof(c.f) == F && typeof(c.s) == S
+            count += 1
+        end
+    end
+    return count
 end
 
 function MOI.get(model::Optimizer, ::MOI.ListOfConstraints)

@@ -2872,7 +2872,22 @@
             end
         end
 
-        m = CP.FlatZinc.Optimizer()
-        @test MOI.is_empty(m)
+        @testset "Base.read!" begin
+            m = CP.FlatZinc.Optimizer()
+            @test MOI.is_empty(m)
+
+            fzn = """var int: x1;
+            constraint int_le(0, x1);
+            solve maximize x1;"""
+
+            read!(IOBuffer(fzn), m)
+            
+            @test !MOI.is_empty(m)
+            @test MOI.get(m, MOI.NumberOfVariables()) == 1
+            @test MOI.get(m, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == 1
+            @test MOI.get(m, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.LessThan}()) == 0
+            @test MOI.get(m, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{Int}, MOI.LessThan}()) == 0
+            @test MOI.get(m, MOI.ObjectiveSense()) == MOI.MAX_SENSE
+        end
     end
 end
