@@ -645,6 +645,28 @@ end
 # FznIntLt: implemented within FznIntEq.
 # FznIntLtReif: implemented within FznIntEqReif.
 
+function add_constraint_to_model(cons_verb::Union{Val{FznIntMax}, Val{FznIntMin}}, args, model::Optimizer)
+    @assert length(args) == 3
+    for i in 1:3
+        @assert typeof(args[i]) <: AbstractString
+    end
+
+    moi_var = model.name_to_var[args[3]]
+    moi_var_array = [model.name_to_var[args[1]], model.name_to_var[args[2]]]
+
+    moi_set = if cons_verb == Val(FznIntMax)
+        CP.MaximumAmong(2)
+    elseif cons_verb == Val(FznIntMin)
+        CP.MinimumAmong(2)
+    end
+
+    return MOI.add_constraint(
+        model, 
+        MOI.VectorOfVariables([moi_var, moi_var_array...]), 
+        moi_set
+    )
+end
+
 # -----------------------------------------------------------------------------
 # - Low-level parsing functions (other grammar rules), independent of MOI.
 # -----------------------------------------------------------------------------

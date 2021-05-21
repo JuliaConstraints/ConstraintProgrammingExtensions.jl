@@ -1868,6 +1868,22 @@
                 @test m.constraint_info[46].f.terms[2].scalar_term.coefficient == 1
                 @test m.constraint_info[46].f.terms[2].scalar_term.variable_index == x3
                 @test m.constraint_info[46].s == CP.Reified(CP.Strictly(MOI.LessThan(4)))
+
+                CP.FlatZinc.parse_constraint!("constraint int_max(x1, x2, x3);", m)
+                @test length(m.constraint_info) == 47
+                @test typeof(m.constraint_info[47].f) <: MOI.VectorOfVariables
+                @test m.constraint_info[47].f.variables[1] == x3
+                @test m.constraint_info[47].f.variables[2] == x1
+                @test m.constraint_info[47].f.variables[3] == x2
+                @test m.constraint_info[47].s == CP.MaximumAmong(2)
+
+                CP.FlatZinc.parse_constraint!("constraint int_min(x1, x2, x3);", m)
+                @test length(m.constraint_info) == 48
+                @test typeof(m.constraint_info[48].f) <: MOI.VectorOfVariables
+                @test m.constraint_info[48].f.variables[1] == x3
+                @test m.constraint_info[48].f.variables[2] == x1
+                @test m.constraint_info[48].f.variables[3] == x2
+                @test m.constraint_info[48].s == CP.MinimumAmong(2)
             end
         end
 
