@@ -441,7 +441,7 @@ function add_constraint_to_model(::Val{FznVarIntElement}, args, model::Optimizer
     )
 end
 
-function add_constraint_to_model(cons_verb::Union{Val{FznIntEq}, Val{FznIntLe}, Val{FznIntLt}}, args, model::Optimizer)
+function add_constraint_to_model(cons_verb::Union{Val{FznIntEq}, Val{FznIntLe}, Val{FznIntLt}, Val{FznIntNe}}, args, model::Optimizer)
     @assert length(args) == 2
     @assert typeof(args[1]) <: AbstractString || typeof(args[2]) <: AbstractString
 
@@ -459,6 +459,8 @@ function add_constraint_to_model(cons_verb::Union{Val{FznIntEq}, Val{FznIntLe}, 
             MOI.LessThan(0)
         elseif cons_verb == Val(FznIntLt)
             CP.Strictly(MOI.LessThan(0))
+        elseif cons_verb == Val(FznIntNe)
+            CP.DifferentFrom(0)
         end
 
         return MOI.add_constraint(
@@ -489,6 +491,8 @@ function add_constraint_to_model(cons_verb::Union{Val{FznIntEq}, Val{FznIntLe}, 
         MOI.LessThan(rhs_coeff * moi_rhs)
     elseif cons_verb == Val(FznIntLt)
         CP.Strictly(MOI.LessThan(rhs_coeff * moi_rhs))
+    elseif cons_verb == Val(FznIntNe)
+        CP.DifferentFrom(rhs_coeff * moi_rhs)
     end
 
     return MOI.add_constraint(
@@ -498,7 +502,7 @@ function add_constraint_to_model(cons_verb::Union{Val{FznIntEq}, Val{FznIntLe}, 
     )
 end
 
-function add_constraint_to_model(cons_verb::Union{Val{FznIntEqReif}, Val{FznIntLeReif}, Val{FznIntLtReif}}, args, model::Optimizer)
+function add_constraint_to_model(cons_verb::Union{Val{FznIntEqReif}, Val{FznIntLeReif}, Val{FznIntLtReif}, Val{FznIntNeReif}}, args, model::Optimizer)
     @assert length(args) == 3
     @assert typeof(args[1]) <: AbstractString || typeof(args[2]) <: AbstractString
     @assert typeof(args[3]) <: AbstractString
@@ -518,6 +522,8 @@ function add_constraint_to_model(cons_verb::Union{Val{FznIntEqReif}, Val{FznIntL
             CP.Reified(MOI.LessThan(0))
         elseif cons_verb == Val(FznIntLtReif)
             CP.Reified(CP.Strictly(MOI.LessThan(0)))
+        elseif cons_verb == Val(FznIntNeReif)
+            CP.Reified(CP.DifferentFrom(0))
         end
         
         return MOI.add_constraint(
@@ -555,6 +561,8 @@ function add_constraint_to_model(cons_verb::Union{Val{FznIntEqReif}, Val{FznIntL
         CP.Reified(MOI.LessThan(rhs_coeff * moi_rhs))
     elseif cons_verb == Val(FznIntLtReif)
         CP.Reified(CP.Strictly(MOI.LessThan(rhs_coeff * moi_rhs)))
+    elseif cons_verb == Val(FznIntNeReif)
+        CP.Reified(CP.DifferentFrom(rhs_coeff * moi_rhs))
     end
 
     return MOI.add_constraint(
@@ -666,6 +674,8 @@ function add_constraint_to_model(cons_verb::Union{Val{FznIntMax}, Val{FznIntMin}
         moi_set
     )
 end
+
+# int_mod: not supported yet.
 
 # -----------------------------------------------------------------------------
 # - Low-level parsing functions (other grammar rules), independent of MOI.
