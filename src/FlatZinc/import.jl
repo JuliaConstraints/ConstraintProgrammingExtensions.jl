@@ -576,10 +576,14 @@ end
 # FznIntLe: implemented within FznIntEq.
 # FznIntLeReif: implemented within FznIntEqReif.
 
-function add_constraint_to_model(cons_verb::Union{Val{FznIntLinEq}, Val{FznIntLinLe}, Val{FznIntLinEqReif}, Val{FznIntLinLeReif}}, args, model::Optimizer)
-    if cons_verb ∈ [Val(FznIntLinEq), Val(FznIntLinLe)]
+function add_constraint_to_model(
+        cons_verb::Union{Val{FznIntLinEq}, Val{FznIntLinLe}, Val{FznIntLinNe}, Val{FznIntLinEqReif}, Val{FznIntLinLeReif}, Val{FznIntLinNeReif}}, 
+        args, 
+        model::Optimizer
+    )
+    if cons_verb ∈ [Val(FznIntLinEq), Val(FznIntLinLe), Val(FznIntLinNe)]
         @assert length(args) == 3
-    elseif cons_verb ∈ [Val(FznIntLinEqReif), Val(FznIntLinLeReif)]
+    elseif cons_verb ∈ [Val(FznIntLinEqReif), Val(FznIntLinLeReif), Val(FznIntLinNeReif)]
         @assert length(args) == 4
     else
         @assert false
@@ -588,7 +592,7 @@ function add_constraint_to_model(cons_verb::Union{Val{FznIntLinEq}, Val{FznIntLi
     @assert typeof(args[1]) <: Vector
     @assert typeof(args[2]) <: Vector
     @assert typeof(args[3]) <: Integer
-    if cons_verb ∈ [Val(FznIntLinEqReif), Val(FznIntLinLeReif)]
+    if cons_verb ∈ [Val(FznIntLinEqReif), Val(FznIntLinLeReif), Val(FznIntLinNeReif)]
         @assert typeof(args[4]) <: AbstractString
     end
 
@@ -601,20 +605,22 @@ function add_constraint_to_model(cons_verb::Union{Val{FznIntLinEq}, Val{FznIntLi
     ]
 
     # Non-reified constraint.
-    if cons_verb ∈ [Val(FznIntLinEq), Val(FznIntLinLe)]
+    if cons_verb ∈ [Val(FznIntLinEq), Val(FznIntLinLe), Val(FznIntLinNe)]
         moi_fct = MOI.ScalarAffineFunction(moi_terms, 0)
         
         moi_set = if cons_verb == Val(FznIntLinEq)
             MOI.EqualTo(Int(args[3]))
         elseif cons_verb == Val(FznIntLinLe)
             MOI.LessThan(Int(args[3]))
+        elseif cons_verb == Val(FznIntLinNe)
+            CP.DifferentFrom(Int(args[3]))
         end
 
         return MOI.add_constraint(model, moi_fct, moi_set)
     end
 
     # Reified constraint
-    if cons_verb ∈ [Val(FznIntLinEqReif), Val(FznIntLinLeReif)]
+    if cons_verb ∈ [Val(FznIntLinEqReif), Val(FznIntLinLeReif), Val(FznIntLinNeReif)]
         moi_fct = MOI.VectorAffineFunction(
             [
                 MOI.VectorAffineTerm(1, MOI.ScalarAffineTerm(1, model.name_to_var[args[4]])),
@@ -627,6 +633,8 @@ function add_constraint_to_model(cons_verb::Union{Val{FznIntLinEq}, Val{FznIntLi
             CP.Reified(MOI.EqualTo(Int(args[3])))
         elseif cons_verb == Val(FznIntLinLeReif)
             CP.Reified(MOI.LessThan(Int(args[3])))
+        elseif cons_verb == Val(FznIntLinNeReif)
+            CP.Reified(CP.DifferentFrom(Int(args[3])))
         end
 
         return MOI.add_constraint(model, moi_fct, moi_set)

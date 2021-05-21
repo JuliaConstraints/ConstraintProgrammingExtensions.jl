@@ -1770,6 +1770,33 @@
                 @test m.constraint_info[38].f.terms[3].scalar_term.coefficient == 3
                 @test m.constraint_info[38].f.terms[3].scalar_term.variable_index == x2
                 @test m.constraint_info[38].s == CP.Reified(MOI.LessThan(5))
+
+                CP.FlatZinc.parse_constraint!("constraint int_lin_ne([2, 3], [x1, x2], 5);", m)
+                @test length(m.constraint_info) == 39
+                @test typeof(m.constraint_info[39].f) <: MOI.ScalarAffineFunction{Int}
+                @test m.constraint_info[39].f.constant == 0
+                @test length(m.constraint_info[39].f.terms) == 2
+                @test m.constraint_info[39].f.terms[1].coefficient == 2
+                @test m.constraint_info[39].f.terms[1].variable_index == x1
+                @test m.constraint_info[39].f.terms[2].coefficient == 3
+                @test m.constraint_info[39].f.terms[2].variable_index == x2
+                @test m.constraint_info[39].s == CP.DifferentFrom(5)
+
+                CP.FlatZinc.parse_constraint!("constraint int_lin_ne_reif([2, 3], [x1, x2], 5, x1);", m)
+                @test length(m.constraint_info) == 40
+                @test typeof(m.constraint_info[40].f) <: MOI.VectorAffineFunction{Int}
+                @test m.constraint_info[40].f.constants == [0, 0]
+                @test length(m.constraint_info[40].f.terms) == 3
+                @test m.constraint_info[40].f.terms[1].output_index == 1
+                @test m.constraint_info[40].f.terms[1].scalar_term.coefficient == 1
+                @test m.constraint_info[40].f.terms[1].scalar_term.variable_index == x1
+                @test m.constraint_info[40].f.terms[2].output_index == 2
+                @test m.constraint_info[40].f.terms[2].scalar_term.coefficient == 2
+                @test m.constraint_info[40].f.terms[2].scalar_term.variable_index == x1
+                @test m.constraint_info[40].f.terms[3].output_index == 2
+                @test m.constraint_info[40].f.terms[3].scalar_term.coefficient == 3
+                @test m.constraint_info[40].f.terms[3].scalar_term.variable_index == x2
+                @test m.constraint_info[40].s == CP.Reified(CP.DifferentFrom(5))
             end
         end
 
