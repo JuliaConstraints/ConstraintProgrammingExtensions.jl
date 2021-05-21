@@ -676,6 +676,28 @@ function add_constraint_to_model(cons_verb::Union{Val{FznIntMax}, Val{FznIntMin}
 end
 
 # int_mod: not supported yet.
+# FznIntNe: implemented within FznIntEq.
+# FznIntNeReif: implemented within FznIntEqReif.
+
+function add_constraint_to_model(::Val{FznIntPlus}, args, model::Optimizer)
+    @assert length(args) == 3
+    for i in 1:3
+        @assert typeof(args[i]) <: AbstractString
+    end
+
+    moi_var = model.name_to_var[args[3]]
+    moi_operands = [model.name_to_var[args[1]], model.name_to_var[args[2]]]
+
+    return MOI.add_constraint(
+        model, 
+        MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, 1, -1], [moi_operands..., moi_var]), 0), 
+        MOI.EqualTo(0)
+    )
+end
+
+# int_pow: not supported yet.
+# int_times: not supported yet.
+# set_in: not supported yet, missing sets.
 
 # -----------------------------------------------------------------------------
 # - Low-level parsing functions (other grammar rules), independent of MOI.

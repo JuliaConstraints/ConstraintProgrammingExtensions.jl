@@ -1953,6 +1953,18 @@
                 @test m.constraint_info[54].f.terms[2].scalar_term.coefficient == 1
                 @test m.constraint_info[54].f.terms[2].scalar_term.variable_index == x3
                 @test m.constraint_info[54].s == CP.Reified(CP.DifferentFrom(4))
+
+                CP.FlatZinc.parse_constraint!("constraint int_plus(x1, x2, x3);", m)
+                @test length(m.constraint_info) == 55
+                @test typeof(m.constraint_info[55].f) <: MOI.ScalarAffineFunction
+                @test length(m.constraint_info[55].f.terms) == 3
+                @test m.constraint_info[55].f.terms[1].coefficient == 1
+                @test m.constraint_info[55].f.terms[1].variable_index == x1
+                @test m.constraint_info[55].f.terms[2].coefficient == 1
+                @test m.constraint_info[55].f.terms[2].variable_index == x2
+                @test m.constraint_info[55].f.terms[3].coefficient == -1
+                @test m.constraint_info[55].f.terms[3].variable_index == x3
+                @test m.constraint_info[55].s == MOI.EqualTo(0)
             end
         end
 
