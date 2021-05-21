@@ -388,7 +388,34 @@ function mixed_var_bool_to_moi_var(v::Bool, model::Optimizer)
     return moi_var
 end
 
+function mixed_var_bool_to_moi_var(v::Integer, model::Optimizer)
+    moi_var, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
+    moi_set = if v == 0
+        MOI.EqualTo(false)
+    elseif v == 1
+        MOI.EqualTo(true)
+    else
+        error("Unexpected literal: $v. Expected a variable or a Boolean.")
+    end
+    MOI.add_constraint(model, MOI.SingleVariable(moi_var), moi_set)
+    return moi_var
+end
+
 function mixed_var_bool_to_moi_var(v::Any, ::Optimizer)
+    error("Unexpected literal: $v. Expected a variable or a Boolean.")
+    return nothing
+end
+
+function mixed_var_float_to_moi_var(v::AbstractString, model::Optimizer)
+    return model.name_to_var[v]
+end
+
+function mixed_var_float_to_moi_var(v::Real, model::Optimizer)
+    moi_var, _ = MOI.add_constrained_variable(model, MOI.EqualTo(v))
+    return moi_var
+end
+
+function mixed_var_float_to_moi_var(v::Any, ::Optimizer)
     error("Unexpected literal: $v. Expected a variable or a Boolean.")
     return nothing
 end
@@ -401,11 +428,15 @@ function array_mixed_var_bool_to_moi_var(array::Vector, model::Optimizer)
     return MOI.VariableIndex[mixed_var_bool_to_moi_var(v, model) for v in array]
 end
 
+function array_mixed_var_float_to_moi_var(array::Vector, model::Optimizer)
+    return MOI.VariableIndex[mixed_var_float_to_moi_var(v, model) for v in array]
+end
+
 function add_constraint_to_model(cons::FznConstraintIdentifier, args, model::Optimizer)
     return add_constraint_to_model(Val(cons), args, model)
 end
 
-function add_constraint_to_model(cons_verb::Union{Val{FznArrayIntElement}, Val{FznArrayBoolElement}}, args, model::Optimizer)
+function add_constraint_to_model(cons_verb::Union{Val{FznArrayIntElement}, Val{FznArrayBoolElement}, Val{FznArrayFloatElement}}, args, model::Optimizer)
     @assert length(args) == 3
     @assert typeof(args[1]) <: AbstractString
     @assert typeof(args[2]) <: Vector
@@ -418,6 +449,8 @@ function add_constraint_to_model(cons_verb::Union{Val{FznArrayIntElement}, Val{F
         Int.(args[2])
     elseif cons_verb == Val(FznArrayBoolElement)
         collect(Bool.(args[2])) # Need a Vector{T}, not a BitVector!
+    elseif cons_verb == Val(FznArrayFloatElement)
+        Float64.(args[2])
     end
 
     return MOI.add_constraint(
@@ -427,17 +460,21 @@ function add_constraint_to_model(cons_verb::Union{Val{FznArrayIntElement}, Val{F
     )
 end
 
-function add_constraint_to_model(cons_verb::Union{Val{FznArrayIntMaximum}, Val{FznArrayIntMinimum}}, args, model::Optimizer)
+function add_constraint_to_model(cons_verb::Union{Val{FznArrayIntMaximum}, Val{FznArrayIntMinimum}, Val{FznArrayFloatMaximum}, Val{FznArrayFloatMinimum}}, args, model::Optimizer)
     @assert length(args) == 2
     @assert typeof(args[1]) <: AbstractString
     @assert typeof(args[2]) <: Vector
 
     moi_var = model.name_to_var[args[1]]
-    moi_var_array = array_mixed_var_int_to_moi_var(args[2], model)
-
-    moi_set = if cons_verb == Val(FznArrayIntMaximum)
+    moi_var_array = if cons_verb == Val(FznArrayIntMaximum) || cons_verb == Val(FznArrayIntMinimum)
+        array_mixed_var_int_to_moi_var(args[2], model)
+    elseif cons_verb == Val(FznArrayFloatMaximum) || cons_verb == Val(FznArrayFloatMinimum)
+        array_mixed_var_float_to_moi_var(args[2], model)
+    end
+    
+    moi_set = if cons_verb == Val(FznArrayIntMaximum) || cons_verb == Val(FznArrayFloatMaximum)
         CP.MaximumAmong(length(args[2]))
-    elseif cons_verb == Val(FznArrayIntMinimum)
+    elseif cons_verb == Val(FznArrayIntMinimum) || cons_verb == Val(FznArrayFloatMinimum)
         CP.MinimumAmong(length(args[2]))
     end
 
@@ -448,7 +485,7 @@ function add_constraint_to_model(cons_verb::Union{Val{FznArrayIntMaximum}, Val{F
     )
 end
 
-function add_constraint_to_model(cons_verb::Union{Val{FznArrayVarIntElement}, Val{FznArrayVarBoolElement}}, args, model::Optimizer)
+function add_constraint_to_model(cons_verb::Union{Val{FznArrayVarIntElement}, Val{FznArrayVarBoolElement}, Val{FznArrayVarFloatElement}}, args, model::Optimizer)
     @assert length(args) == 3
     @assert typeof(args[1]) <: AbstractString
     @assert typeof(args[2]) <: Vector
@@ -459,8 +496,10 @@ function add_constraint_to_model(cons_verb::Union{Val{FznArrayVarIntElement}, Va
     
     moi_var_array = if cons_verb == Val(FznArrayVarIntElement) 
         array_mixed_var_int_to_moi_var(args[2], model)
-    elseif cons_verb == Val(FznVarBoolElement)
+    elseif cons_verb == Val(FznArrayVarBoolElement)
         array_mixed_var_bool_to_moi_var(args[2], model)
+    elseif cons_verb == Val(FznArrayVarFloatElement)
+        array_mixed_var_float_to_moi_var(args[2], model)
     end
 
     return MOI.add_constraint(
@@ -803,6 +842,11 @@ end
 # FznSetSupersetReif: not supported yet, missing sets.
 # FznSetSymdiff: not supported yet, missing sets.
 # FznSetUnion: not supported yet, missing sets.
+
+# FznArrayFloatElement: implemented with FznArrayIntElement.
+# FznArrayFloatMaximum: implemented with FznArrayIntMaximum.
+# FznArrayFloatMinimum: implemented with FznArrayIntMinimum.
+# FznArrayVarFloatElement: implemented with FznArrayVarIntElement.
 
 # -----------------------------------------------------------------------------
 # - Low-level parsing functions (other grammar rules), independent of MOI.
