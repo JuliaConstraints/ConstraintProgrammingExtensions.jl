@@ -573,6 +573,67 @@ end
 
 # FznIntAbs: not supported yet.
 # FznIntDiv: not supported yet.
+# FznIntLe: implemented within FznIntEq.
+# FznIntLeReif: implemented within FznIntEqReif.
+
+function add_constraint_to_model(cons_verb::Union{Val{FznIntLinEq}, Val{FznIntLinLe}, Val{FznIntLinEqReif}, Val{FznIntLinLeReif}}, args, model::Optimizer)
+    if cons_verb ∈ [Val(FznIntLinEq), Val(FznIntLinLe)]
+        @assert length(args) == 3
+    elseif cons_verb ∈ [Val(FznIntLinEqReif), Val(FznIntLinLeReif)]
+        @assert length(args) == 4
+    else
+        @assert false
+    end
+
+    @assert typeof(args[1]) <: Vector
+    @assert typeof(args[2]) <: Vector
+    @assert typeof(args[3]) <: Integer
+    if cons_verb ∈ [Val(FznIntLinEqReif), Val(FznIntLinLeReif)]
+        @assert typeof(args[4]) <: AbstractString
+    end
+
+    @assert length(args[1]) == length(args[2])
+
+    # Create the linear combination.
+    moi_terms = [
+        MOI.ScalarAffineTerm(args[1][i], model.name_to_var[args[2][i]])
+        for i in 1:length(args[1])
+    ]
+
+    # Non-reified constraint.
+    if cons_verb ∈ [Val(FznIntLinEq), Val(FznIntLinLe)]
+        moi_fct = MOI.ScalarAffineFunction(moi_terms, 0)
+        
+        moi_set = if cons_verb == Val(FznIntLinEq)
+            MOI.EqualTo(Int(args[3]))
+        elseif cons_verb == Val(FznIntLinLe)
+            MOI.LessThan(Int(args[3]))
+        end
+
+        return MOI.add_constraint(model, moi_fct, moi_set)
+    end
+
+    # Reified constraint
+    if cons_verb ∈ [Val(FznIntLinEqReif), Val(FznIntLinLeReif)]
+        moi_fct = MOI.VectorAffineFunction(
+            [
+                MOI.VectorAffineTerm(1, MOI.ScalarAffineTerm(1, model.name_to_var[args[4]])),
+                MOI.VectorAffineTerm.(2, moi_terms)...
+            ], 
+            [0, 0]
+        )
+        
+        moi_set = if cons_verb == Val(FznIntLinEqReif)
+            CP.Reified(MOI.EqualTo(Int(args[3])))
+        elseif cons_verb == Val(FznIntLinLeReif)
+            CP.Reified(MOI.LessThan(Int(args[3])))
+        end
+
+        return MOI.add_constraint(model, moi_fct, moi_set)
+    end
+    
+    @assert false
+end
 
 # -----------------------------------------------------------------------------
 # - Low-level parsing functions (other grammar rules), independent of MOI.
