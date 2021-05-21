@@ -1515,6 +1515,56 @@
                 # Call it a day.
             end
 
+            @testset "Array of mixed values to MOI variables" begin
+                @testset "Variables and Booleans" begin
+                    m = CP.FlatZinc.Optimizer()
+                    @test MOI.is_empty(m)
+
+                    x = CP.FlatZinc.parse_variable!("var bool: x;", m)
+                    @test MOI.get(m, MOI.NumberOfVariables()) == 1
+
+                    a = CP.FlatZinc.array_mixed_var_bool_to_moi_var(["x", true], m)
+                    @test MOI.get(m, MOI.NumberOfVariables()) == 2
+                    @test length(a) == 2
+                    @test a[1] == x
+                    @test a[2] != x
+
+                    @test_throws ErrorException CP.FlatZinc.array_mixed_var_bool_to_moi_var(["x", MOI.Interval], m)
+                end
+
+                @testset "Variables and integers" begin
+                    m = CP.FlatZinc.Optimizer()
+                    @test MOI.is_empty(m)
+
+                    x = CP.FlatZinc.parse_variable!("var int: x;", m)
+                    @test MOI.get(m, MOI.NumberOfVariables()) == 1
+
+                    a = CP.FlatZinc.array_mixed_var_int_to_moi_var(["x", 1], m)
+                    @test MOI.get(m, MOI.NumberOfVariables()) == 2
+                    @test length(a) == 2
+                    @test a[1] == x
+                    @test a[2] != x
+
+                    @test_throws ErrorException CP.FlatZinc.array_mixed_var_int_to_moi_var(["x", MOI.Interval], m)
+                end
+
+                @testset "Variables and floats" begin
+                    m = CP.FlatZinc.Optimizer()
+                    @test MOI.is_empty(m)
+
+                    x = CP.FlatZinc.parse_variable!("var float: x;", m)
+                    @test MOI.get(m, MOI.NumberOfVariables()) == 1
+
+                    a = CP.FlatZinc.array_mixed_var_float_to_moi_var(["x", 1.0], m)
+                    @test MOI.get(m, MOI.NumberOfVariables()) == 2
+                    @test length(a) == 2
+                    @test a[1] == x
+                    @test a[2] != x
+
+                    @test_throws ErrorException CP.FlatZinc.array_mixed_var_float_to_moi_var(["x", MOI.Interval], m)
+                end
+            end
+
             @testset "Constraint entry" begin
                 m = CP.FlatZinc.Optimizer()
                 @test MOI.is_empty(m)
