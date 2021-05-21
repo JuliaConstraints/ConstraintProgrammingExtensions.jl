@@ -2888,6 +2888,8 @@
             @test MOI.get(m, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.LessThan}()) == 0
             @test MOI.get(m, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{Int}, MOI.LessThan}()) == 0
             @test MOI.get(m, MOI.ObjectiveSense()) == MOI.MAX_SENSE
+
+            @test_throws ErrorException read!(IOBuffer(fzn), m)
         end
     end
 end
