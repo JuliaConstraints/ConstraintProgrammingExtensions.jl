@@ -4,7 +4,12 @@ import MathOptInterface
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
 
+import Base: sign
+
 include("moi_traits.jl")
+
+include("moi_dcp.jl")
+include("moi_fcts.jl")
 
 include("sets.jl") # Most sets.
 include("sets_combinatorial.jl") # Sets related to typical combinatorial problems.

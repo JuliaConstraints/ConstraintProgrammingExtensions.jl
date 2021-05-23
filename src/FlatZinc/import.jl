@@ -39,7 +39,7 @@
     FznIntPlus
     FznIntPow
     FznIntTimes
-    FznIntIn
+    # FznSetIn # Defined within sets.
     # Booleans. 
     # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#bool-flatzinc-builtins
     FznArrayBoolAnd
