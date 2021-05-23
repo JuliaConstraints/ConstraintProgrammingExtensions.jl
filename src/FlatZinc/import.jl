@@ -1472,7 +1472,6 @@ function parse_constraint_verb(cons_verb::AbstractString)
         "int_plus" => FznIntPlus,
         "int_pow" => FznIntPow,
         "int_times" => FznIntTimes,
-        "int_in" => FznIntIn,
         # Booleans. 
         # https://www.minizinc.org/doc-2.5.5/en/lib-flatzinc.html#bool-flatzinc-builtins
         "array_bool_and" => FznArrayBoolAnd,
