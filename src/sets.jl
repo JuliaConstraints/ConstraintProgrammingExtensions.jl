@@ -42,7 +42,7 @@ struct AllDifferentExceptConstant{T <: Number} <: MOI.AbstractVectorSet
     k::T
 end
 
-function Base.copy(set::AllDifferentExceptConstant{T}) where {T}
+function copy(set::AllDifferentExceptConstant{T}) where {T}
     return AllDifferentExceptConstant(set.dimension, copy(set.k))
 end
 function Base.:(==)(
@@ -72,7 +72,7 @@ struct Domain{T <: Number} <: MOI.AbstractScalarSet
     values::Set{T}
 end
 
-Base.copy(set::Domain{T}) where {T} = Domain(copy(set.values))
+copy(set::Domain{T}) where {T} = Domain(copy(set.values))
 Base.:(==)(x::Domain{T}, y::Domain{T}) where {T} = x.values == y.values
 
 """
@@ -95,7 +95,7 @@ struct AntiDomain{T <: Number} <: MOI.AbstractScalarSet
     values::Set{T}
 end
 
-Base.copy(set::AntiDomain{T}) where {T} = AntiDomain(copy(set.values))
+copy(set::AntiDomain{T}) where {T} = AntiDomain(copy(set.values))
 Base.:(==)(x::AntiDomain{T}, y::AntiDomain{T}) where {T} = x.values == y.values
 
 """
@@ -126,7 +126,7 @@ struct DifferentFrom{T <: Number} <: MOI.AbstractScalarSet
 end
 
 MOI.constant(set::DifferentFrom{T}) where {T} = set.value
-Base.copy(set::DifferentFrom{T}) where {T} = DifferentFrom(copy(set.value))
+copy(set::DifferentFrom{T}) where {T} = DifferentFrom(copy(set.value))
 function MOIU.shift_constant(set::DifferentFrom{T}, offset::T) where {T}
     return typeof(set)(MOI.constant(set) + offset)
 end
@@ -152,7 +152,7 @@ struct Count{T <: Real} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::Count{T}) where {T} = set.dimension + 1
-Base.copy(set::Count{T}) where {T} = Count(set.dimension, copy(set.value))
+copy(set::Count{T}) where {T} = Count(set.dimension, copy(set.value))
 function Base.:(==)(x::Count{T}, y::Count{T}) where {T}
     return x.dimension == y.dimension && x.value == y.value
 end
@@ -221,7 +221,7 @@ struct Element{T <: Real} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::Element{T}) where {T} = 2
-Base.copy(set::Element{T}) where {T} = Element(copy(set.values))
+copy(set::Element{T}) where {T} = Element(copy(set.values))
 Base.:(==)(x::Element{T}, y::Element{T}) where {T} = x.values == y.values
 
 """
@@ -247,7 +247,7 @@ struct ElementVariableArray <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::ElementVariableArray) = 2 + set.dimension
-Base.copy(set::ElementVariableArray) = ElementVariableArray(set.dimension)
+copy(set::ElementVariableArray) = ElementVariableArray(set.dimension)
 function Base.:(==)(x::ElementVariableArray, y::ElementVariableArray)
     return x.dimension == y.dimension
 end
@@ -268,7 +268,7 @@ struct MinimumDistance{T <: Real} <: MOI.AbstractVectorSet
     k::T
 end
 
-function Base.copy(set::MinimumDistance{T}) where {T}
+function copy(set::MinimumDistance{T}) where {T}
     return MinimumDistance(set.dimension, copy(set.k))
 end
 function Base.:(==)(x::MinimumDistance{T}, y::MinimumDistance{T}) where {T}
@@ -288,7 +288,7 @@ struct MaximumDistance{T <: Real} <: MOI.AbstractVectorSet
     k::T
 end
 
-function Base.copy(set::MaximumDistance{T}) where {T}
+function copy(set::MaximumDistance{T}) where {T}
     return MaximumDistance(set.dimension, copy(set.k))
 end
 function Base.:(==)(x::MaximumDistance{T}, y::MaximumDistance{T}) where {T}
@@ -321,7 +321,7 @@ end
 MOI.dimension(set::Inverse) = 2 * set.dimension
 
 # isbits types, nothing to copy
-function Base.copy(
+function copy(
     set::Union{AllDifferent, Membership, CountCompare, CountDistinct, Inverse},
 )
     return set

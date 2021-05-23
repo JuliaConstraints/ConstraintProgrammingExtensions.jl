@@ -180,7 +180,7 @@ struct Decreasing <: MOI.AbstractVectorSet
 end
 
 # isbits types, nothing to copy
-function Base.copy(
+function copy(
     set::Union{
         LexicographicallyLessThan,
         LexicographicallyGreaterThan,

@@ -12,7 +12,7 @@ struct Reified{S <: MOI.AbstractSet} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::Reified{S}) where {S} = 1 + MOI.dimension(set.set)
-Base.copy(set::Reified{S}) where {S} = Reified(copy(set.set))
+copy(set::Reified{S}) where {S} = Reified(copy(set.set))
 Base.:(==)(x::Reified{S}, y::Reified{S}) where {S} = x.set == y.set
 
 """
@@ -38,7 +38,7 @@ function MOI.dimension(set::Equivalence{S, T}) where {S, T}
     return MOI.dimension(set.set1) + MOI.dimension(set.set2)
 end
 
-function Base.copy(set::Equivalence{S, T}) where {S, T}
+function copy(set::Equivalence{S, T}) where {S, T}
     return Equivalence(copy(set.set1), copy(set.set2))
 end
 
@@ -64,7 +64,7 @@ function MOI.dimension(set::EquivalenceNot{S, T}) where {S, T}
     return MOI.dimension(set.set1) + MOI.dimension(set.set2)
 end
 
-function Base.copy(set::EquivalenceNot{S, T}) where {S, T}
+function copy(set::EquivalenceNot{S, T}) where {S, T}
     return EquivalenceNot(copy(set.set1), copy(set.set2))
 end
 
@@ -100,7 +100,7 @@ function MOI.dimension(set::IfThenElse{S, T, U}) where {S, T, U}
            MOI.dimension(set.false_constraint)
 end
 
-function Base.copy(set::IfThenElse{S, T, U}) where {S, T, U}
+function copy(set::IfThenElse{S, T, U}) where {S, T, U}
     return IfThenElse(
         copy(set.condition),
         copy(set.true_constraint),
@@ -133,7 +133,7 @@ function MOI.dimension(set::Imply{S, T}) where {S, T}
     return MOI.dimension(set.antecedent) + MOI.dimension(set.consequent)
 end
 
-function Base.copy(set::Imply{S, T}) where {S, T}
+function copy(set::Imply{S, T}) where {S, T}
     return Imply(copy(set.antecedent), copy(set.consequent))
 end
 
@@ -155,7 +155,7 @@ function MOI.dimension(set::Conjunction{Ts}) where {Ts}
     return sum(MOI.dimension(s) for s in set.constraints)
 end
 
-function Base.copy(set::Conjunction{Ts}) where {Ts}
+function copy(set::Conjunction{Ts}) where {Ts}
     return Conjunction(deepcopy(set.constraints))
 end
 
@@ -177,7 +177,7 @@ function MOI.dimension(set::Disjunction{Ts}) where {Ts}
     return sum(MOI.dimension(s) for s in set.constraints)
 end
 
-function Base.copy(set::Disjunction{Ts}) where {Ts}
+function copy(set::Disjunction{Ts}) where {Ts}
     return Disjunction(deepcopy(set.constraints))
 end
 
@@ -193,7 +193,7 @@ struct Negation{S <: MOI.AbstractSet} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::Negation{S}) where {S} = MOI.dimension(set.set)
-Base.copy(set::Negation{S}) where {S} = Negation(copy(set.set))
+copy(set::Negation{S}) where {S} = Negation(copy(set.set))
 Base.:(==)(x::Negation{S}, y::Negation{S}) where {S} = x.set == y.set
 
 """
@@ -219,6 +219,6 @@ struct False <: MOI.AbstractVectorSet end
 MOI.dimension(set::False) = 0
 
 # isbits types, nothing to copy
-function Base.copy(set::Union{True, False})
+function copy(set::Union{True, False})
     return set
 end

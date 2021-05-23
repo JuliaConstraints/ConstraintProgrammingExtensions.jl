@@ -23,7 +23,7 @@ struct Strictly{
     set::S
 end
 
-Base.copy(set::Strictly{S}) where {S} = Strictly(copy(set.set))
+copy(set::Strictly{S}) where {S} = Strictly(copy(set.set))
 MOI.constant(set::Strictly{S}) where {S} = MOI.constant(set.set)
 MOI.dimension(set::Strictly{S}) where {S} = MOI.dimension(set.set)
 function MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T}

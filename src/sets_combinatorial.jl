@@ -37,7 +37,7 @@ struct BinPacking{T <: Real} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::BinPacking) = set.n_bins + set.n_items
-function Base.copy(set::BinPacking{T}) where {T}
+function copy(set::BinPacking{T}) where {T}
     return BinPacking(set.n_bins, set.n_items, copy(set.weights))
 end
 function Base.:(==)(x::BinPacking{T}, y::BinPacking{T}) where {T}
@@ -95,7 +95,7 @@ struct FixedCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::FixedCapacityBinPacking) = set.n_bins + set.n_items
-function Base.copy(set::FixedCapacityBinPacking{T}) where {T}
+function copy(set::FixedCapacityBinPacking{T}) where {T}
     return FixedCapacityBinPacking(
         set.n_bins,
         set.n_items,
@@ -159,7 +159,7 @@ struct VariableCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::VariableCapacityBinPacking) = 2 * set.n_bins + set.n_items
-function Base.copy(set::VariableCapacityBinPacking{T}) where {T}
+function copy(set::VariableCapacityBinPacking{T}) where {T}
     return VariableCapacityBinPacking(
         set.n_bins,
         set.n_items,
@@ -189,7 +189,7 @@ struct Knapsack{T <: Real} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::Knapsack{T}) where {T} = length(set.weights)
-function Base.copy(set::Knapsack{T}) where {T}
+function copy(set::Knapsack{T}) where {T}
     return Knapsack(copy(set.weights), copy(set.capacity))
 end
 function Base.:(==)(x::Knapsack{T}, y::Knapsack{T}) where {T}
@@ -211,7 +211,7 @@ end
 function MOI.dimension(set::VariableCapacityKnapsack{T}) where {T}
     return length(set.weights) + 1
 end
-function Base.copy(set::VariableCapacityKnapsack{T}) where {T}
+function copy(set::VariableCapacityKnapsack{T}) where {T}
     return VariableCapacityKnapsack(copy(set.weights))
 end
 function Base.:(==)(
@@ -233,6 +233,6 @@ struct Contiguity <: MOI.AbstractVectorSet
 end
 
 # isbits types, nothing to copy
-function Base.copy(set::Contiguity)
+function copy(set::Contiguity)
     return set
 end
