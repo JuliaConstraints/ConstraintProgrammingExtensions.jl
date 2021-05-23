@@ -139,6 +139,16 @@ function ProductFunction(a::NL_SV_FCT, b::NL_SV_FCT)
     return NonlinearScalarProductFunction([factor_a, factor_b])
 end
 
+function SquareRootFunction(expr::NL_SV_FCT)
+    factor = NonlinearScalarFactor(1/2, expr)
+    return NonlinearScalarProductFunction([factor])
+end
+
+function InverseFunction(expr::NL_SV_FCT)
+    factor = NonlinearScalarFactor(-1, expr)
+    return NonlinearScalarProductFunction([factor])
+end
+
 # -----------------------------------------------------------------------------
 # - Relations with linear/quadratic types of MOI
 # -----------------------------------------------------------------------------
