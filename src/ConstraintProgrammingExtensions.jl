@@ -4,7 +4,7 @@ import MathOptInterface
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
 
-import Base: sign, copy
+import Base: sign, copy, convert
 
 include("moi_traits.jl")
 
