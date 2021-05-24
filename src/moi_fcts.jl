@@ -16,13 +16,22 @@ function NonlinearScalarAffineTerm(expr::NL_SV_FCT)
     return NonlinearScalarAffineTerm(1.0, expr)
 end
 
-struct NonlinearScalarAffineFunction{T} <: AbstractNonlinearScalarFunction
+function copy(t::NonlinearScalarAffineTerm{T}) where {T}
+    return NonlinearScalarAffineTerm(copy(t.coefficient), copy(t.expr))
+end
+
+
+mutable struct NonlinearScalarAffineFunction{T} <: AbstractNonlinearScalarFunction
     terms::Vector{NonlinearScalarAffineTerm{T}}
     constant::T
 end
 
-function NonlinearScalarAffineFunction{T}(terms::Vector{NonlinearScalarAffineTerm{T}}) where {T}
+function NonlinearScalarAffineFunction(terms::Vector{NonlinearScalarAffineTerm{T}}) where {T}
     return NonlinearScalarAffineFunction(terms, one(T))
+end
+
+function copy(f::NonlinearScalarAffineFunction{T}) where {T}
+    return NonlinearScalarAffineFunction(copy.(f.terms), copy(f.constant))
 end
 
 # -----------------------------------------------------------------------------
@@ -41,23 +50,37 @@ function NonlinearScalarFactor(expr::NL_SV_FCT)
     return NonlinearScalarFactor(1.0, expr)
 end
 
+function copy(f::NonlinearScalarFactor{T}) where {T}
+    return NonlinearScalarFactor(copy(f.exponent), copy(f.expr))
+end
+
+
 # Posynomial if the constant is > 0, signomial otherwise.
-struct NonlinearScalarProductFunction{T} <: AbstractNonlinearScalarFunction
+mutable struct NonlinearScalarProductFunction{T} <: AbstractNonlinearScalarFunction
     factors::Vector{NonlinearScalarFactor{T}}
     constant::T
 end
 
-function NonlinearScalarProductFunction{T}(factors::Vector{NonlinearScalarFactor{T}}) where {T}
+function NonlinearScalarProductFunction(factors::Vector{NonlinearScalarFactor{T}}) where {T}
     return NonlinearScalarProductFunction(factors, one(T))
+end
+
+function copy(f::NonlinearScalarProductFunction{T}) where {T}
+    return NonlinearScalarProductFunction(copy.(f.factors), copy(f.constant))
 end
 
 # -----------------------------------------------------------------------------
 # - Usual nonlinear combinations of functions
 # -----------------------------------------------------------------------------
 
-struct AbsoluteValueFunction{T} <: AbstractNonlinearScalarFunction
+struct AbsoluteValueFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
 end
+
+function copy(f::AbsoluteValueFunction)
+    return AbsoluteValueFunction(copy(f.expr))
+end
+
 
 struct ExponentialFunction{T} <: AbstractNonlinearScalarFunction
     exponent::T
@@ -68,6 +91,11 @@ function ExponentialFunction(expr::AbstractNonlinearScalarFunction)
     return ExponentialFunction{Float64}(ℯ, expr)
 end
 
+function copy(f::ExponentialFunction)
+    return ExponentialFunction(copy(f.exponent), copy(f.expr))
+end
+
+
 struct LogarithmFunction{T} <: AbstractNonlinearScalarFunction
     base::T
     expr::NL_SV_FCT
@@ -77,75 +105,87 @@ function LogarithmFunction(expr::AbstractNonlinearScalarFunction)
     return LogarithmFunction{Float64}(ℯ, expr)
 end
 
+function copy(f::LogarithmFunction)
+    return LogarithmFunction(copy(f.base), copy(f.expr))
+end
+
 # -----------------------------------------------------------------------------
 # - Trigonometry
 # -----------------------------------------------------------------------------
 
-struct CosineFunction{T} <: AbstractNonlinearScalarFunction
+struct CosineFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
 end
 
-struct SineFunction{T} <: AbstractNonlinearScalarFunction
+struct SineFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
 end
 
-struct TangentFunction{T} <: AbstractNonlinearScalarFunction
+struct TangentFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
 end
 
-struct ArcCosineFunction{T} <: AbstractNonlinearScalarFunction
+struct ArcCosineFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
 end
 
-struct ArcSineFunction{T} <: AbstractNonlinearScalarFunction
+struct ArcSineFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
 end
 
-struct ArcTangentFunction{T} <: AbstractNonlinearScalarFunction
+struct ArcTangentFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
 end
 
-struct HyperbolicCosineFunction{T} <: AbstractNonlinearScalarFunction
+struct HyperbolicCosineFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
 end
 
-struct HyperbolicSineFunction{T} <: AbstractNonlinearScalarFunction
+struct HyperbolicSineFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
 end
 
-struct HyperbolicTangentFunction{T} <: AbstractNonlinearScalarFunction
+struct HyperbolicTangentFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
 end
 
-struct ArcHyperbolicCosineFunction{T} <: AbstractNonlinearScalarFunction
+struct HyperbolicArcCosineFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
 end
 
-struct ArcHyperbolicSineFunction{T} <: AbstractNonlinearScalarFunction
+struct HyperbolicArcSineFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
 end
 
-struct ArcHyperbolicTangentFunction{T} <: AbstractNonlinearScalarFunction
+struct HyperbolicArcTangentFunction <: AbstractNonlinearScalarFunction
     expr::NL_SV_FCT
+end
+
+function copy(f::F) where {F <: Union{
+    CosineFunction, SineFunction, TangentFunction, 
+    ArcCosineFunction, ArcSineFunction, ArcTangentFunction, 
+    HyperbolicCosineFunction, HyperbolicSineFunction, HyperbolicTangentFunction, 
+    HyperbolicArcCosineFunction, HyperbolicArcSineFunction, HyperbolicArcTangentFunction,
+}}
+    return F(copy(f.expr))
 end
 
 # -----------------------------------------------------------------------------
 # - Nicer interface to some functions
 # -----------------------------------------------------------------------------
 
-function ProductFunction(a::NL_SV_FCT, b::NL_SV_FCT)
-    factor_a = NonlinearScalarFactor(a)
-    factor_b = NonlinearScalarFactor(b)
-    return NonlinearScalarProductFunction([factor_a, factor_b])
+function ProductFunction(fs::NL_SV_FCT...)
+    factors = [NonlinearScalarFactor(f) for f in fs]
+    return NonlinearScalarProductFunction(factors)
 end
 
 function SquareRootFunction(expr::NL_SV_FCT)
-    factor = NonlinearScalarFactor(1/2, expr)
+    factor = NonlinearScalarFactor(0.5, expr)
     return NonlinearScalarProductFunction([factor])
 end
 
 function InverseFunction(expr::NL_SV_FCT)
-    factor = NonlinearScalarFactor(-1, expr)
+    factor = NonlinearScalarFactor(-1.0, expr)
     return NonlinearScalarProductFunction([factor])
 end
 
