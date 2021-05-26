@@ -21,7 +21,6 @@ include("sets_reification.jl") # Sets that rely on the concept of reification (a
 
 include("Bridges/Bridges.jl")
 include("Test/Test.jl")
-include("Utilities/Utilities.jl")
 
 include("FlatZinc/FlatZinc.jl")
 include("XCSP/XCSP.jl")
