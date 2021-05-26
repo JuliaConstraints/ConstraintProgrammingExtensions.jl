@@ -9,5 +9,7 @@ const MOIB = MOI.Bridges
 const MOIBC = MOIB.Constraint
 
 include("set_fixedcapacitybinpacking.jl")
+const FixedCapacityBinPacking2BinPacking{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{FixedCapacityBinPacking2BinPackingBridge{T}, OT}
 
 end
