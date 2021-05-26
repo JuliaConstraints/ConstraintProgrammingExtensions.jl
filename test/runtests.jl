@@ -3,7 +3,6 @@ using MathOptInterface, ConstraintProgrammingExtensions
 using Test
 
 const CP = ConstraintProgrammingExtensions
-const COIU = CP.Utilities
 const COIT = CP.Test
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
