@@ -13,6 +13,7 @@ const MOIT = MOI.Test
     include("sets.jl")
     include("moi_traits.jl")
     include("moi_fcts.jl")
+    include("Bridges/Bridges.jl")
     include("FlatZinc/FlatZinc.jl")
     include("Test/Test.jl")
 end
