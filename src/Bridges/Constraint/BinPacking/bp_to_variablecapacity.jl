@@ -3,7 +3,7 @@ Bridges `CP.BinPacking` to `CP.VariableCapacityBinPacking` by creating
 capacity variables.
 """
 struct BinPacking2VariableCapacityBinPackingBridge{T} <: MOIBC.AbstractBridge
-    capa_var::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}
+    capa_var::Vector{MOI.VariableIndex}
     capa_con::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}}
     bp::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.VariableCapacityBinPacking{T}}
 end
