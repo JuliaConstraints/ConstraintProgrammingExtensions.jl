@@ -34,7 +34,7 @@ function MOIB.added_constraint_types(::Type{VariableCapacityKnapsack2MILPBridge{
     ]
 end
 
-return MOI.get(b::VariableCapacityKnapsack2MILPBridge, ::MOI.NumberOfVariables)
+function MOI.get(b::VariableCapacityKnapsack2MILPBridge, ::MOI.NumberOfVariables)
     return 0
 end
 
