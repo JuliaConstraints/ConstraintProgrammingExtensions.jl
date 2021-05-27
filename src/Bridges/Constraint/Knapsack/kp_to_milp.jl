@@ -33,7 +33,7 @@ function MOIB.added_constraint_types(::Type{Knapsack2MILPBridge{T}}) where {T}
     ]
 end
 
-return MOI.get(b::Knapsack2MILPBridge, ::MOI.NumberOfVariables)
+function MOI.get(b::Knapsack2MILPBridge, ::MOI.NumberOfVariables)
     return 0
 end
 

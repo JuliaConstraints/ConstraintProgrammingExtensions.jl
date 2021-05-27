@@ -8,6 +8,7 @@ const MOIU = MOI.Utilities
 const MOIB = MOI.Bridges
 const MOIBC = MOIB.Constraint
 
+include("helpers.jl")
 include("Constraint/Constraint.jl")
 
 end

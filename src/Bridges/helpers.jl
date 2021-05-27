@@ -60,7 +60,7 @@ function operate_dimension_coefficient(f, term::MOI.VectorAffineTerm)
     return MOI.VectorAffineTerm(
         term.output_index,
         operate_dimension_coefficient(
-            (v) -> f(v, term.output_index, 
+            (v) -> f(v, term.output_index), 
             term.scalar_term,
         ),
     )

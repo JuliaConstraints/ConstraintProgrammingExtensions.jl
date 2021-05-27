@@ -95,7 +95,7 @@ function MOIB.added_constraint_types(::Type{BinPacking2MILPBridge{T}}) where {T}
     ]
 end
 
-return MOI.get(b::BinPacking2MILPBridge, ::MOI.NumberOfVariables)
+function MOI.get(b::BinPacking2MILPBridge, ::MOI.NumberOfVariables)
     return length(b.assign_var)
 end
 
