@@ -2,22 +2,23 @@
 Bridges `CP.BinPacking` to a MILP by creating binary variables for the bin 
 assignment and MILP constraints.
 """
-struct BinPacking2MILPBridge{T} <: MOIBC.AbstractBridge
+struct VariableCapacityBinPacking2MILPBridge{T} <: MOIBC.AbstractBridge
     assign_var::Vector{MOI.VariableIndex}
     assign_con::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}}
     assign_unique::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
     assign_number::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
     assign_load::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
+    load_capacity::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{BinPacking2MILPBridge{T}},
+    ::Type{VariableCapacityBinPacking2MILPBridge{T}},
     model,
     f::MOI.VectorOfVariables,
     s::CP.FixedCapacityBinPacking{T},
 ) where {T}
     return MOIBC.bridge_constraint(
-        BinPacking2MILPBridge{T},
+        VariableCapacityBinPacking2MILPBridge{T},
         model,
         MOI.VectorAffineFunction{T}(f),
         s,
@@ -25,13 +26,14 @@ function MOIBC.bridge_constraint(
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{BinPacking2MILPBridge{T}},
+    ::Type{VariableCapacityBinPacking2MILPBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
     s::CP.FixedCapacityBinPacking{T},
 ) where {T}
     # Variables in f: 
     # - load (n_bins variables), integer or float
+    # - bin capacity (n_bins variables), integer or float
     # - assigned bin (n_items variables), integer
     f_scalars = MOIU.scalarize(f)
 
@@ -82,25 +84,40 @@ function MOIBC.bridge_constraint(
         assign_load[bin] = MOI.add_constraint(model, assign_load_f, MOI.EqualTo(zero(T)))
     end
 
-    return BinPacking2MILPBridge(assign_var, assign_con, assign_unique, assign_number, assign_load)
+    # Limit the load to the capacity: load <= capacity, implemented as 
+    # (load - capacity) <= 0.
+    load_capacity = Vector(undef, s.n_bins)
+    for bin in 1:s.n_bins
+        load_capacity_f = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.(
+                [one(T), -one(T)],
+                [f_scalars[bin], f_scalars[s.n_items + bin - 1]]
+            ),
+            zero(T)
+        )
+        load_capacity[bin] = MOI.add_constraint(model, load_capacity_f, MOI.LessThan(zero(T)))
+    end
+
+    return VariableCapacityBinPacking2MILPBridge(assign_var, assign_con, assign_unique, assign_number, assign_load, load_capacity)
 end
 
-function MOIB.added_constrained_variable_types(::Type{<:BinPacking2MILPBridge})
+function MOIB.added_constrained_variable_types(::Type{<:VariableCapacityBinPacking2MILPBridge})
     return [(MOI.ZeroOne,)]
 end
 
-function MOIB.added_constraint_types(::Type{BinPacking2MILPBridge{T}}) where {T}
+function MOIB.added_constraint_types(::Type{VariableCapacityBinPacking2MILPBridge{T}}) where {T}
     return [
-        (MOI.VectorAffineFunction{T}, MOI.EqualTo{T}),
+        (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
+        (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
     ]
 end
 
-return MOI.get(b::BinPacking2MILPBridge, ::MOI.NumberOfVariables)
+function MOI.get(b::VariableCapacityBinPacking2MILPBridge, ::MOI.NumberOfVariables)
     return length(b.assign_var)
 end
 
 function MOI.get(
-    b::BinPacking2MILPBridge{T},
+    b::VariableCapacityBinPacking2MILPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T},
         MOI.EqualTo{T},
@@ -110,7 +127,17 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::BinPacking2MILPBridge{T},
+    b::VariableCapacityBinPacking2MILPBridge{T},
+    ::MOI.NumberOfConstraints{
+        MOI.ScalarAffineFunction{T},
+        MOI.EqualTo{T},
+    },
+) where {T}
+    return length(b.assign_unique) + length(b.assign_number) + length(b.assign_load)
+end
+
+function MOI.get(
+    b::VariableCapacityBinPacking2MILPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.SingleVariable,
         MOI.ZeroOne,
@@ -120,14 +147,14 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::BinPacking2MILPBridge{T},
+    b::VariableCapacityBinPacking2MILPBridge{T},
     ::MOI.ListOfVariableIndices,
 ) where {T}
     return b.assign_var
 end
 
 function MOI.get(
-    b::BinPacking2MILPBridge{T},
+    b::VariableCapacityBinPacking2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.ScalarAffineFunction{T},
         MOI.EqualTo{T},
@@ -137,7 +164,17 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::BinPacking2MILPBridge{T},
+    b::VariableCapacityBinPacking2MILPBridge{T},
+    ::MOI.ListOfConstraintIndices{
+        MOI.ScalarAffineFunction{T},
+        MOI.LessThan{T},
+    },
+) where {T}
+    return b.load_capacity
+end
+
+function MOI.get(
+    b::VariableCapacityBinPacking2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.SingleVariable,
         MOI.ZeroOne,
