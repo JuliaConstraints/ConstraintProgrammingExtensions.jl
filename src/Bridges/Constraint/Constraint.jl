@@ -10,6 +10,10 @@ include("BinPacking/bp_to_milp.jl")
 const BinPacking2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{BinPacking2MILPBridge{T}, OT}
     
+include("BinPacking/variablecapacity_to_milp.jl")
+const VariableCapacityBinPacking2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{VariableCapacityBinPacking2MILPBridge{T}, OT}
+    
 include("Knapsack/kp_to_variablecapacity.jl")
 const Knapsack2VariableCapacityKnapsack{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Knapsack2VariableCapacityKnapsackBridge{T}, OT}
@@ -17,3 +21,7 @@ const Knapsack2VariableCapacityKnapsack{T, OT <: MOI.ModelLike} =
 include("Knapsack/kp_to_milp.jl")
 const Knapsack2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Knapsack2MILPBridge{T}, OT}
+    
+include("Knapsack/variablecapacity_to_milp.jl")
+const VariableCapacityKnapsack2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{VariableCapacityKnapsack2MILPBridge{T}, OT}
