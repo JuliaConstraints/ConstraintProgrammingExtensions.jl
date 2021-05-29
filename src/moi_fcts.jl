@@ -1,4 +1,12 @@
+# Common supertype for all nonlinear functions.
 abstract type AbstractNonlinearScalarFunction <: MOI.AbstractScalarFunction end
+
+# Common supertype for predicate constraints, those that return a Boolean 
+# value. They should have a simplified syntax at JuMP level: 
+#     @constraint(model, predicate(variables))
+# Also at MOI level: 
+#     MOI.add_constraint(model, predicate(variables))
+abstract type AbstractNonlinearPredicate <: AbstractNonlinearScalarFunction end
 
 const NL_SV_UNION = Union{MOI.SingleVariable, AbstractNonlinearScalarFunction}
 const NL_SV_FCT = Union{
