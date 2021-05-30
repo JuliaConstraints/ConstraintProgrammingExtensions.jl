@@ -1,6 +1,17 @@
 # Common supertype for all nonlinear functions.
 abstract type AbstractNonlinearScalarFunction <: MOI.AbstractScalarFunction end
 
+const NL_SV_UNION = Union{MOI.SingleVariable, AbstractNonlinearScalarFunction}
+const NL_SV_FCT = Union{
+    AbstractNonlinearScalarFunction, 
+    MOI.SingleVariable, 
+    NL_SV_UNION
+}
+
+# -----------------------------------------------------------------------------
+# - Predicate support
+# -----------------------------------------------------------------------------
+
 # Common supertype for predicate constraints, those that return a Boolean 
 # value. They should have a simplified syntax at JuMP level: 
 #     @constraint(model, predicate(variables))
@@ -8,12 +19,65 @@ abstract type AbstractNonlinearScalarFunction <: MOI.AbstractScalarFunction end
 #     MOI.add_constraint(model, predicate(variables))
 abstract type AbstractNonlinearPredicate <: AbstractNonlinearScalarFunction end
 
-const NL_SV_UNION = Union{MOI.SingleVariable, AbstractNonlinearScalarFunction}
-const NL_SV_FCT = Union{
-    AbstractNonlinearScalarFunction, 
-    MOI.SingleVariable, 
-    NL_SV_UNION
-}
+# Overload add_constraint to provide better error messages in the case 
+# of predicates.
+function MOI.add_constraint(
+    model::ModelLike,
+    func::AbstractNonlinearPredicate,
+)
+    return MOI.throw_add_constraint_error_fallback(model, func)
+end
+
+# No need for an indirection level at throw_add_constraint_error_fallback, 
+# no need to check "vectorness" compatibility. Thus, only go for 
+# correct_throw_add_constraint_error_fallback.
+function MOI.throw_add_constraint_error_fallback(
+    model::ModelLike,
+    func::AbstractNonlinearPredicate,
+    error_if_supported = AddPredicateNotAllowed{typeof(func)}(),
+)
+    if supports_constraint(model, typeof(func))
+        throw(error_if_supported)
+    else
+        throw(UnsupportedPredicate{typeof(func)}())
+    end
+end
+
+"""
+    struct UnsupportedPredicate{F<:AbstractNonlinearPredicate} <: MOI.UnsupportedError
+        message::String # Human-friendly explanation why the attribute cannot be set
+    end
+
+An error indicating that predicates of type `F` are not supported by
+the model, i.e. that [`supports_constraint`](@ref) returns `false`.
+"""
+struct UnsupportedPredicate{F <: AbstractNonlinearPredicate} <: MOI.UnsupportedError
+    message::String # Human-friendly explanation why the attribute cannot be set
+end
+UnsupportedPredicate{F}() where {F} = UnsupportedPredicate{F}("")
+
+function element_name(::UnsupportedPredicate{F}) where {F}
+    return "`$F` predicate"
+end
+
+"""
+    struct AddPredicateNotAllowed{F<:AbstractNonlinearPredicate} <: MOI.NotAllowedError
+        message::String # Human-friendly explanation why the attribute cannot be set
+    end
+
+An error indicating that predicates of type `F` are supported (see
+[`supports_constraint`](@ref)) but cannot be added.
+"""
+struct AddPredicateNotAllowed{F <: AbstractNonlinearPredicate} <:
+       MOI.NotAllowedError
+    message::String # Human-friendly explanation why the attribute cannot be set
+end
+AddPredicateNotAllowed{F}() where {F} = AddPredicateNotAllowed{F}("")
+
+function operation_name(::AddPredicateNotAllowed{F}) where {F}
+    return "Adding `$F` predicates"
+end
+
 
 # -----------------------------------------------------------------------------
 # - Affine expressions of nonlinear terms, inspired by MOI.ScalarAffineFunction
