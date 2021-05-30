@@ -1,5 +1,5 @@
 @testset "Constraint bridges" begin
     @testset "BinPacking" begin
-        include("set_fixedcapacitybinpacking.jl")
+        include("binpacking2milp.jl")
     end
 end
