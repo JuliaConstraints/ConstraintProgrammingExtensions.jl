@@ -22,7 +22,7 @@ abstract type AbstractNonlinearPredicate <: AbstractNonlinearScalarFunction end
 # Overload add_constraint to provide better error messages in the case 
 # of predicates.
 function MOI.add_constraint(
-    model::ModelLike,
+    model::MOI.ModelLike,
     func::AbstractNonlinearPredicate,
 )
     return MOI.throw_add_constraint_error_fallback(model, func)
@@ -32,7 +32,7 @@ end
 # no need to check "vectorness" compatibility. Thus, only go for 
 # correct_throw_add_constraint_error_fallback.
 function MOI.throw_add_constraint_error_fallback(
-    model::ModelLike,
+    model::MOI.ModelLike,
     func::AbstractNonlinearPredicate,
     error_if_supported = AddPredicateNotAllowed{typeof(func)}(),
 )

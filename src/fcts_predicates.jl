@@ -112,7 +112,7 @@ struct IsCapacitatedBinPackingFunction{F <: NL_SV_FCT, G <: Union{NL_SV_FCT, Rea
     weights::Vector{T}
 end
 
-struct IsKnapsackFunction{F <: NL_SV_FCT, G <: Union{NL_SV_FCT, Real}} <: AbstractNonlinearPredicate
+struct IsKnapsackFunction{F <: NL_SV_FCT, G <: Union{NL_SV_FCT, Real}, T <: Real} <: AbstractNonlinearPredicate
     in_knapsack::Vector{<:F}
     capacity::G
     weights::Vector{T}

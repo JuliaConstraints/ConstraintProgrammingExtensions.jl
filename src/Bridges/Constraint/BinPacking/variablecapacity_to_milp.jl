@@ -130,10 +130,10 @@ function MOI.get(
     b::VariableCapacityBinPacking2MILPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T},
-        MOI.EqualTo{T},
+        MOI.LessThan{T},
     },
 ) where {T}
-    return length(b.assign_unique) + length(b.assign_number) + length(b.assign_load)
+    return length(b.load_capacity)
 end
 
 function MOI.get(
