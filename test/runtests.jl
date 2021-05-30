@@ -10,6 +10,8 @@ const MOIB = MOI.Bridges
 const MOIT = MOI.Test
 const MOIU = MOI.Utilities
 
+include("Bridges/models.jl")
+
 @testset "ConstraintProgrammingExtensions" begin
     # include("sets.jl")
     # include("moi_traits.jl")
