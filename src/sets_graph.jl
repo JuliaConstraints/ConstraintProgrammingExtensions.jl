@@ -36,7 +36,7 @@ MOI.dimension(set::CircuitPath) = 2 * set.n_nodes
 
 A Hamiltonian circuit. If the vector `x` and the scalar `c` are constrained
 within a `WeightedCircuit(n, cost_matrix)`, each `x[i]` denotes the next node 
-in the graph, for `i ∈ [1, n]`.  `c` is the total cost of the circuit, defined as: 
+in the graph, for `i ∈ [1, n]`. `c` is the total cost of the circuit, defined as: 
 
 ``c = \\sum_{i=1}^n \\mathtt{cost_matrix}_{i, x[i]}``
 

@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# - Function version of some sets
+# - Function version of some sets that imply returning a value
 # -----------------------------------------------------------------------------
 
 struct CountFunction{F <: NL_SV_FCT, G <: NL_SV_FCT} <: AbstractNonlinearScalarFunction

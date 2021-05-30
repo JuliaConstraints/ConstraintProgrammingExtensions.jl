@@ -22,6 +22,7 @@ include("sets_graph.jl") # Sets that work on graphs.
 include("sets_reification.jl") # Sets that rely on the concept of reification (also called logical constraints).
 
 include("fcts.jl")
+include("fcts_predicates.jl")
 
 include("Bridges/Bridges.jl")
 include("Test/Test.jl")
