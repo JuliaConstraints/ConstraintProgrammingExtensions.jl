@@ -85,7 +85,15 @@ function MOIBC.bridge_constraint(
     return BinPacking2MILPBridge(assign_var, assign_con, assign_unique, assign_number, assign_load)
 end
 
-function MOIB.added_constrained_variable_types(::Type{<:BinPacking2MILPBridge})
+function MOI.supports_constraint(
+    ::Type{BinPacking2MILPBridge{T}},
+    ::Type{MOI.VectorOfVariables},
+    ::Type{CP.BinPacking{T}},
+) where {T}
+    return true
+end
+
+function MOIB.added_constrained_variable_types(::Type{BinPacking2MILPBridge{T}}) where {T}
     return [(MOI.ZeroOne,)]
 end
 
@@ -93,6 +101,14 @@ function MOIB.added_constraint_types(::Type{BinPacking2MILPBridge{T}}) where {T}
     return [
         (MOI.VectorAffineFunction{T}, MOI.EqualTo{T}),
     ]
+end
+
+function MOIBC.concrete_bridge_type(
+    ::Type{BinPacking2MILPBridge{T}},
+    ::Type{MOI.VectorOfVariables},
+    ::Type{CP.BinPacking{T}},
+) where {T}
+    return BinPacking2MILPBridge{T}
 end
 
 function MOI.get(b::BinPacking2MILPBridge, ::MOI.NumberOfVariables)

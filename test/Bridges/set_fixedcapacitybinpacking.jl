@@ -1,9 +1,11 @@
 @testset "FixedCapacityBinPacking2BinPacking" begin
-    mock = MOIU.MockOptimizer(MOIU.UniversalFallback(MOIU.Model{Float64}()))
-    config = MOIT.TestConfig()
-    bridged_mock = COIB.FixedCapacityBinPacking2BinPacking{Int}(mock)
+    mock = MOIU.MockOptimizer(MILPModel{Int}())
+    model = COIB.BinPacking2MILP{Int}(mock)
 
-    model = bridged_mock
+    @show model
+    # @show MOIB.is_bridged(model, typeof(MOI.SingleVariable), typeof(MOI.Integer))
+    @show MOIB.is_bridged(model, MOI.VectorOfVariables, CP.BinPacking{Int})
+    # @show @which MOI.supports_constraint(typeof(model), typeof(MOI.SingleVariable), typeof(MOI.Integer))
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
     @test MOI.supports_constraint(
@@ -11,7 +13,7 @@
         MOI.ScalarAffineFunction{Int},
         MOI.EqualTo{Int},
     )
-    @test MOI.supports_constraint(
+    @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorOfVariables,
         CP.BinPacking{Int},
