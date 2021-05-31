@@ -1,5 +1,7 @@
 module Bridges
 
+using LinearAlgebra
+
 using MathOptInterface
 using ConstraintProgrammingExtensions
 const CP = ConstraintProgrammingExtensions

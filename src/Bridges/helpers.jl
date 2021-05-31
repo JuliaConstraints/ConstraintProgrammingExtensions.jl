@@ -108,3 +108,18 @@ function Base.sum(func::MOI.VectorQuadraticFunction)
         )
     )
 end
+
+# --- standard operations on MOI functions
+
+function LinearAlgebra.dot(variable::MOI.VariableIndex, coefficient::T) where {T}
+    return MOI.ScalarAffineFunction(
+        [MOI.ScalarAffineTerm(coefficient, variable)], 
+        0
+    )
+end
+function LinearAlgebra.dot(coefficient::T, variable::MOI.VariableIndex) where {T}
+    return MOI.ScalarAffineFunction(
+        [MOI.ScalarAffineTerm(coefficient, variable)], 
+        0
+    )
+end
