@@ -91,7 +91,7 @@ end
 
 function MOI.supports_constraint(
     ::Type{BinPacking2MILPBridge{T}},
-    ::Type{MOI.VectorOfVariables},
+    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
     ::Type{CP.BinPacking{T}},
 ) where {T}
     return true
@@ -103,13 +103,13 @@ end
 
 function MOIB.added_constraint_types(::Type{BinPacking2MILPBridge{T}}) where {T}
     return [
-        (MOI.VectorAffineFunction{T}, MOI.EqualTo{T}),
+        (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
     ]
 end
 
 function MOIBC.concrete_bridge_type(
     ::Type{BinPacking2MILPBridge{T}},
-    ::Type{MOI.VectorOfVariables},
+    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
     ::Type{CP.BinPacking{T}},
 ) where {T}
     return BinPacking2MILPBridge{T}
@@ -142,8 +142,8 @@ end
 function MOI.get(
     b::BinPacking2MILPBridge{T},
     ::MOI.ListOfVariableIndices,
-) where {T}
-    return b.assign_var
+)::Vector{MOI.VariableIndex} where {T}
+    return vec(b.assign_var)
 end
 
 function MOI.get(
@@ -162,6 +162,6 @@ function MOI.get(
         MOI.SingleVariable,
         MOI.ZeroOne,
     },
-) where {T}
-    return b.assign_con
+)::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}} where {T}
+    return vec(b.assign_con)
 end
