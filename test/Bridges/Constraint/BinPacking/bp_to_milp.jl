@@ -49,6 +49,7 @@
     bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.BinPacking{Int}}(-1)]
 
     @testset "Bridge properties" begin
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.BinPacking{Int}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [(MOI.ScalarAffineFunction{Int}, MOI.EqualTo{Int})]
 
@@ -195,6 +196,7 @@ end
     bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.BinPacking{Int}}(-1)]
 
     @testset "Bridge properties" begin
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorAffineFunction{Int}, CP.BinPacking{Int}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [(MOI.ScalarAffineFunction{Int}, MOI.EqualTo{Int})]
 
