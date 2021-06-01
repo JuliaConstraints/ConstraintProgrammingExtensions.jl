@@ -110,16 +110,17 @@ function Base.sum(func::MOI.VectorQuadraticFunction)
 end
 
 # --- standard operations on MOI functions
+# https://github.com/jump-dev/MathOptInterface.jl/issues/1380
 
 function LinearAlgebra.dot(variable::MOI.VariableIndex, coefficient::T) where {T}
     return MOI.ScalarAffineFunction(
         [MOI.ScalarAffineTerm(coefficient, variable)], 
-        0
+        zero(T)
     )
 end
 function LinearAlgebra.dot(coefficient::T, variable::MOI.VariableIndex) where {T}
     return MOI.ScalarAffineFunction(
         [MOI.ScalarAffineTerm(coefficient, variable)], 
-        0
+        zero(T)
     )
 end
