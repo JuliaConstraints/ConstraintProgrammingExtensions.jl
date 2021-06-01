@@ -41,6 +41,14 @@ function MOIBC.bridge_constraint(
     return FixedCapacityBinPacking2BinPackingBridge(bp, capa)
 end
 
+function MOI.supports_constraint(
+    ::Type{FixedCapacityBinPacking2BinPackingBridge{T}},
+    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
+    ::Type{CP.FixedCapacityBinPacking{T}},
+) where {T}
+    return true
+end
+
 function MOIB.added_constrained_variable_types(::Type{<:FixedCapacityBinPacking2BinPackingBridge})
     return Tuple{DataType}[]
 end
@@ -50,6 +58,14 @@ function MOIB.added_constraint_types(::Type{FixedCapacityBinPacking2BinPackingBr
         (MOI.VectorAffineFunction{T}, CP.BinPacking{T}),
         (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
     ]
+end
+
+function MOIBC.concrete_bridge_type(
+    ::Type{FixedCapacityBinPacking2BinPackingBridge{T}},
+    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
+    ::Type{CP.FixedCapacityBinPacking{T}},
+) where {T}
+    return FixedCapacityBinPacking2BinPackingBridge{T}
 end
 
 MOI.get(b::FixedCapacityBinPacking2BinPackingBridge, ::MOI.NumberOfVariables) = 0
@@ -67,7 +83,7 @@ end
 function MOI.get(
     b::FixedCapacityBinPacking2BinPackingBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T},
+        MOI.ScalarAffineFunction{T},
         MOI.LessThan{T},
     },
 ) where {T}
@@ -87,7 +103,7 @@ end
 function MOI.get(
     b::FixedCapacityBinPacking2BinPackingBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T},
+        MOI.ScalarAffineFunction{T},
         MOI.LessThan{T},
     },
 ) where {T}

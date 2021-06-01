@@ -17,15 +17,13 @@
     n_items = 2
     weights = [3, 2]
     
+    x_load_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
+    x_capa_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     if n_bins == 1
-        x_load_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
         x_load_2 = nothing
-        x_capa_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
         x_capa_2 = nothing
     elseif n_bins == 2
-        x_load_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
         x_load_2, _ = MOI.add_constrained_variable(model, MOI.Integer())
-        x_capa_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
         x_capa_2, _ = MOI.add_constrained_variable(model, MOI.Integer())
     else
         @assert false
@@ -181,15 +179,13 @@ end
     n_items = 2
     weights = [3, 2]
     
+    x_load_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
+    x_capa_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     if n_bins == 1
-        x_load_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
         x_load_2 = nothing
-        x_capa_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
         x_capa_2 = nothing
     elseif n_bins == 2
-        x_load_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
         x_load_2, _ = MOI.add_constrained_variable(model, MOI.Integer())
-        x_capa_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
         x_capa_2, _ = MOI.add_constrained_variable(model, MOI.Integer())
     else
         @assert false
