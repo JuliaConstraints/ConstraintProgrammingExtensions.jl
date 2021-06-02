@@ -10,6 +10,10 @@ include("BinPacking/bp_to_milp.jl")
 const BinPacking2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{BinPacking2MILPBridge{T}, OT}
     
+include("BinPacking/varcapa_to_bp.jl")
+const VariableCapacityBinPacking2BinPacking{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{VariableCapacityBinPacking2BinPackingBridge{T}, OT}
+    
 include("BinPacking/varcapa_to_milp.jl")
 const VariableCapacityBinPacking2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{VariableCapacityBinPacking2MILPBridge{T}, OT}
