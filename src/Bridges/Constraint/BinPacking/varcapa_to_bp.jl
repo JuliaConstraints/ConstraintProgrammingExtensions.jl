@@ -27,12 +27,14 @@ function MOIBC.bridge_constraint(
     f::MOI.VectorAffineFunction{T},
     s::CP.VariableCapacityBinPacking{T},
 ) where {T}
+    f_scalars = MOIU.scalarize(f)
+
     # Create the simpler BinPacking set.
     bp_set = CP.BinPacking(s.n_bins, s.n_items, s.weights)
-    bp = MOI.add_constraint(model, f, bp_set)
+    new_f = MOIU.vectorize([f_scalars[1:s.n_bins]..., f_scalars[(2 * s.n_bins + 1):end]...])
+    bp = MOI.add_constraint(model, new_f, bp_set)
 
     # Add the capacity constraints.
-    f_scalars = MOIU.scalarize(f)
     capa = [
         MOI.add_constraint(model, f_scalars[i] - f_scalars[s.n_bins + i], MOI.LessThan(zero(T)))
         for i in 1:s.n_bins

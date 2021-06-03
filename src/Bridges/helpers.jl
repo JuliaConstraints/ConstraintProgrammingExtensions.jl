@@ -113,8 +113,8 @@ end
 # https://github.com/jump-dev/MathOptInterface.jl/issues/1380
 
 function LinearAlgebra.dot(x::Vector{MOI.VariableIndex}, y::Vector{T}) where {T <: Real}
-    return MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.(y, x), 0.0)
+    return MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.(y, x), zero(T))
 end
 function LinearAlgebra.dot(y::Vector{T}, x::Vector{MOI.VariableIndex}) where {T <: Real}
-    return MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.(y, x), 0.0)
+    return MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.(y, x), zero(T))
 end
