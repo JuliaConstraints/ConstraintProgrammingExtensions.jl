@@ -59,6 +59,14 @@ function MOIBC.bridge_constraint(
     return Knapsack2VariableCapacityKnapsackBridge(capa_var, capa_con, kp)
 end
 
+function MOI.supports_constraint(
+    ::Type{Knapsack2VariableCapacityKnapsackBridge{T}},
+    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
+    ::Type{CP.Knapsack{T}},
+) where {T}
+    return true
+end
+
 function MOIB.added_constrained_variable_types(::Type{<:Knapsack2VariableCapacityKnapsackBridge{<:Integer}})
     return [(MOI.Integer,)]
 end
@@ -71,6 +79,14 @@ function MOIB.added_constraint_types(::Type{Knapsack2VariableCapacityKnapsackBri
     return [
         (MOI.VectorAffineFunction{T}, CP.VariableCapacityKnapsack{T}),
     ]
+end
+
+function MOIBC.concrete_bridge_type(
+    ::Type{Knapsack2VariableCapacityKnapsackBridge{T}},
+    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
+    ::Type{CP.Knapsack{T}},
+) where {T}
+    return Knapsack2VariableCapacityKnapsackBridge{T}
 end
 
 MOI.get(b::Knapsack2VariableCapacityKnapsackBridge, ::MOI.NumberOfVariables) = 0
