@@ -1,29 +1,42 @@
-@testset "BinPacking2MILP: $(fct_type), $(n_bins) bin, 2 items" for fct_type in ["vector of variables", "vector affine function"], n_bins in [1, 2]
-    mock = MOIU.MockOptimizer(MILPModel{Int}())
-    model = COIB.BinPacking2MILP{Int}(mock)
+@testset "BinPacking2MILP: $(fct_type), $(n_bins) bin, 2 items, $(T)" for fct_type in ["vector of variables", "vector affine function"], n_bins in [1, 2], T in [Int, Float64]
+    mock = MOIU.MockOptimizer(MILPModel{T}())
+    model = COIB.BinPacking2MILP{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+    if T == Int
+        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+    end
     @test MOI.supports_constraint(
         model,
-        MOI.ScalarAffineFunction{Int},
-        MOI.EqualTo{Int},
+        MOI.ScalarAffineFunction{T},
+        MOI.EqualTo{T},
     )
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorOfVariables,
-        CP.BinPacking{Int},
+        CP.BinPacking{T},
     )
 
     n_items = 2
-    weights = [3, 2]
+    weights = T[3, 2]
 
-    x_load_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
-    if n_bins == 1
-        x_load_2 = nothing
-    elseif n_bins == 2
-        x_load_2, _ = MOI.add_constrained_variable(model, MOI.Integer())
-    else
-        @assert false
+    if T == Int
+        x_load_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
+        if n_bins == 1
+            x_load_2 = nothing
+        elseif n_bins == 2
+            x_load_2, _ = MOI.add_constrained_variable(model, MOI.Integer())
+        else
+            @assert false
+        end
+    elseif T == Float64
+        x_load_1 = MOI.add_variable(model)
+        if n_bins == 1
+            x_load_2 = nothing
+        elseif n_bins == 2
+            x_load_2 = MOI.add_variable(model)
+        else
+            @assert false
+        end
     end
     x_bin_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x_bin_2, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -38,21 +51,9 @@
         end
     elseif fct_type == "vector affine function"
         if n_bins == 1
-            MOI.VectorAffineFunction(
-                MOI.VectorAffineTerm.(
-                    1:3, 
-                    MOI.ScalarAffineTerm.(ones(Int, 3), [x_load_1, x_bin_1, x_bin_2])
-                ),
-                zeros(Int, 3)
-            )
+            MOIU.vectorize(MOI.SingleVariable.([x_load_1, x_bin_1, x_bin_2]))
         elseif n_bins == 2
-            MOI.VectorAffineFunction(
-                MOI.VectorAffineTerm.(
-                    1:4, 
-                    MOI.ScalarAffineTerm.(ones(Int, 4), [x_load_1, x_load_2, x_bin_1, x_bin_2])
-                ),
-                zeros(Int, 4)
-            )
+            MOIU.vectorize(MOI.SingleVariable.([x_load_1, x_load_2, x_bin_1, x_bin_2]))
         else
             @assert false
         end
@@ -69,20 +70,20 @@
     @test MOI.is_valid(model, x_bin_2)
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.BinPacking{Int}}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.BinPacking{T}}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.BinPacking{Int}) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.BinPacking{T}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
-        @test MOIB.added_constraint_types(typeof(bridge)) == [(MOI.ScalarAffineFunction{Int}, MOI.EqualTo{Int})]
+        @test MOIB.added_constraint_types(typeof(bridge)) == [(MOI.ScalarAffineFunction{T}, MOI.EqualTo{T})]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == n_bins * n_items
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == n_bins * n_items
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{Int}, MOI.EqualTo{Int}}()) == n_bins + 2 * n_items
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == n_bins + 2 * n_items
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == vec(bridge.assign_var)
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == vec(bridge.assign_con)
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{Int}, MOI.EqualTo{Int}}()) == [bridge.assign_unique..., bridge.assign_number..., bridge.assign_load...]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.assign_unique..., bridge.assign_number..., bridge.assign_load...]
     end
 
     @testset "Set of variables: one binary per item and per bin" begin
@@ -105,11 +106,11 @@
             @test MOI.is_valid(model, bridge.assign_unique[item])
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.assign_unique[item])
             @test length(f.terms) == n_bins
-            @test MOI.get(model, MOI.ConstraintSet(), bridge.assign_unique[item]) == MOI.EqualTo(1)
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.assign_unique[item]) == MOI.EqualTo(one(T))
 
             for bin in 1:n_bins
                 t = f.terms[bin]
-                @test t.coefficient === 1
+                @test t.coefficient === one(T)
                 @test t.variable_index == bridge.assign_var[item, bin]
             end
         end
@@ -121,15 +122,15 @@
             @test MOI.is_valid(model, bridge.assign_number[item])
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.assign_number[item])
             @test length(f.terms) == n_bins + 1
-            @test MOI.get(model, MOI.ConstraintSet(), bridge.assign_number[item]) == MOI.EqualTo(0)
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.assign_number[item]) == MOI.EqualTo(zero(T))
 
             t = f.terms[1]
-            @test t.coefficient === -1
+            @test t.coefficient === -one(T)
             @test t.variable_index == ((item == 1) ? x_bin_1 : x_bin_2)
 
             for bin in 1:n_bins
                 t = f.terms[1 + bin]
-                @test t.coefficient === bin
+                @test t.coefficient === T(bin)
                 @test t.variable_index == bridge.assign_var[item, bin]
             end
         end
@@ -141,10 +142,10 @@
             @test MOI.is_valid(model, bridge.assign_load[bin])
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.assign_load[bin])
             @test length(f.terms) == n_items + 1
-            @test MOI.get(model, MOI.ConstraintSet(), bridge.assign_load[bin]) == MOI.EqualTo(0)
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.assign_load[bin]) == MOI.EqualTo(zero(T))
 
             t = f.terms[1]
-            @test t.coefficient === -1
+            @test t.coefficient === -one(T)
             @test t.variable_index == ((bin == 1) ? x_load_1 : x_load_2)
 
             for item in 1:n_items

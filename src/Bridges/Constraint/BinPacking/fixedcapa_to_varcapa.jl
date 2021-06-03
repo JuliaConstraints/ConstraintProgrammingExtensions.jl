@@ -58,11 +58,11 @@ function MOIBC.bridge_constraint(
     s::CP.FixedCapacityBinPacking{T},
 ) where {T <: Real}
     # Add the capacity variables, without integer constraint.
-    capa_var = MOI.add_variables(model, 1:s.n_bins)
+    capa_var = MOI.add_variables(model, s.n_bins)
     capa_con = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}[]
 
     # Add the capacity constraints.
-    capa_bound = [MOI.add_constraint(model, capa_var[bin], MOI.LessThan(s.capacitaties[bin])) for bin in 1:s.n_bins]
+    capa_bound = [MOI.add_constraint(model, capa_var[bin], MOI.LessThan(s.capacities[bin])) for bin in 1:s.n_bins]
 
     # Create the variable-capacity bin-packing constraint.
     f_scalars = MOIU.scalarize(f)
