@@ -3,8 +3,8 @@ Bridges `CP.Knapsack` to `CP.VariableCapacityKnapsack` by creating
 capacity variables.
 """
 struct Knapsack2VariableCapacityKnapsackBridge{T} <: MOIBC.AbstractBridge
-    capa_var::Vector{MOI.VariableIndex}
-    capa_con::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}}
+    capa_var::MOI.VariableIndex
+    capa_con::Union{MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}, Nothing}
     kp::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.VariableCapacityKnapsack{T}}
 end
 
@@ -29,13 +29,14 @@ function MOIBC.bridge_constraint(
     s::CP.Knapsack{T},
 ) where {T <: Integer}
     # Add the capacity variables.
-    capa_var, capa_con = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:length(s.weights)])
+    capa_var, capa_con = MOI.add_constrained_variable(model, MOI.Integer())
 
     # Add the capacity constraints.
     f_scalars = MOIU.scalarize(f)
-    new_f = [f_scalars..., capa_var...]
+    f_capa = MOI.ScalarAffineFunction([MOI.ScalarAffineTerm(one(T), capa_var)], zero(T))
+    new_f = MOIU.vectorize([f_scalars..., f_capa])
     kp_set = CP.VariableCapacityKnapsack(s.weights)
-    kp = MOI.add_constraint(model, MOI.VectorAffineFunction(new_f), kp_set)
+    kp = MOI.add_constraint(model, new_f, kp_set)
 
     return Knapsack2VariableCapacityKnapsackBridge(capa_var, capa_con, kp)
 end
@@ -47,14 +48,15 @@ function MOIBC.bridge_constraint(
     s::CP.Knapsack{T},
 ) where {T <: Real}
     # Add the capacity variables.
-    capa_var = MOI.add_variables(model, length(s.weights))
-    capa_con = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}[]
+    capa_var = MOI.add_variable(model)
+    capa_con = nothing
 
     # Add the capacity constraints.
     f_scalars = MOIU.scalarize(f)
-    new_f = [f_scalars..., capa_var...]
+    f_capa = MOI.ScalarAffineFunction([MOI.ScalarAffineTerm(one(T), capa_var)], zero(T))
+    new_f = MOIU.vectorize([f_scalars..., f_capa])
     kp_set = CP.VariableCapacityKnapsack(s.weights)
-    kp = MOI.add_constraint(model, MOI.VectorAffineFunction(new_f), kp_set)
+    kp = MOI.add_constraint(model, new_f, kp_set)
 
     return Knapsack2VariableCapacityKnapsackBridge(capa_var, capa_con, kp)
 end
@@ -67,15 +69,22 @@ function MOI.supports_constraint(
     return true
 end
 
-function MOIB.added_constrained_variable_types(::Type{<:Knapsack2VariableCapacityKnapsackBridge{<:Integer}})
+function MOIB.added_constrained_variable_types(::Type{<:Knapsack2VariableCapacityKnapsackBridge{T}}) where {T <: Integer}
     return [(MOI.Integer,)]
 end
 
-function MOIB.added_constrained_variable_types(::Type{<:Knapsack2VariableCapacityKnapsackBridge{<:Real}})
+function MOIB.added_constrained_variable_types(::Type{<:Knapsack2VariableCapacityKnapsackBridge{T}}) where {T <: Real}
     return Tuple{DataType}[]
 end
 
-function MOIB.added_constraint_types(::Type{Knapsack2VariableCapacityKnapsackBridge{T}}) where {T}
+function MOIB.added_constraint_types(::Type{Knapsack2VariableCapacityKnapsackBridge{T}}) where {T <: Integer}
+    return [
+        (MOI.VectorAffineFunction{T}, CP.VariableCapacityKnapsack{T}),
+        (MOI.SingleVariable, MOI.Integer),
+    ]
+end
+
+function MOIB.added_constraint_types(::Type{Knapsack2VariableCapacityKnapsackBridge{T}}) where {T <: Real}
     return [
         (MOI.VectorAffineFunction{T}, CP.VariableCapacityKnapsack{T}),
     ]
@@ -84,12 +93,32 @@ end
 function MOIBC.concrete_bridge_type(
     ::Type{Knapsack2VariableCapacityKnapsackBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Knapsack{T}},
+    ::Type{CP.VariableCapacityKnapsack{T}},
 ) where {T}
     return Knapsack2VariableCapacityKnapsackBridge{T}
 end
 
-MOI.get(b::Knapsack2VariableCapacityKnapsackBridge, ::MOI.NumberOfVariables) = 0
+MOI.get(b::Knapsack2VariableCapacityKnapsackBridge, ::MOI.NumberOfVariables) = 1
+
+function MOI.get(
+    ::Knapsack2VariableCapacityKnapsackBridge{T},
+    ::MOI.NumberOfConstraints{
+        MOI.SingleVariable,
+        MOI.Integer,
+    },
+) where {T <: Integer}
+    return 1
+end
+
+function MOI.get(
+    ::Knapsack2VariableCapacityKnapsackBridge{T},
+    ::MOI.NumberOfConstraints{
+        MOI.SingleVariable,
+        MOI.Integer,
+    },
+) where {T <: Real}
+    return 0
+end
 
 function MOI.get(
     ::Knapsack2VariableCapacityKnapsackBridge{T},
@@ -103,29 +132,19 @@ end
 
 function MOI.get(
     b::Knapsack2VariableCapacityKnapsackBridge{T},
-    ::MOI.NumberOfConstraints{
-        MOI.SingleVariable,
-        MOI.Integer,
-    },
-) where {T}
-    return length(b.capa_con)
-end
-
-function MOI.get(
-    b::Knapsack2VariableCapacityKnapsackBridge{T},
     ::MOI.ListOfVariableIndices,
 ) where {T}
-    return b.capa_var
+    return [b.capa_var]
 end
 
 function MOI.get(
     b::Knapsack2VariableCapacityKnapsackBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.VectorAffineFunction{T},
-        CP.VariableCapacityBinPacking{T},
+        CP.VariableCapacityKnapsack{T},
     },
 ) where {T}
-    return [b.bp]
+    return [b.kp]
 end
 
 function MOI.get(
@@ -134,6 +153,7 @@ function MOI.get(
         MOI.SingleVariable,
         MOI.Integer,
     },
-) where {T}
-    return b.capa_con
+) where {T <: Integer}
+    return [b.capa_con]
 end
+# Undefined for <: Real.
