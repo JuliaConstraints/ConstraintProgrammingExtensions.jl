@@ -93,7 +93,7 @@ end
 function MOIBC.concrete_bridge_type(
     ::Type{Knapsack2VariableCapacityKnapsackBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.VariableCapacityKnapsack{T}},
+    ::Type{CP.Knapsack{T}},
 ) where {T}
     return Knapsack2VariableCapacityKnapsackBridge{T}
 end

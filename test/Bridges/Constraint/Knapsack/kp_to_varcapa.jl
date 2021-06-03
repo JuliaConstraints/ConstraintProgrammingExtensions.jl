@@ -64,6 +64,7 @@
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.VariableCapacityKnapsack{T}}()) == 1
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == ((T == Int) ? 1 : 0)
 
+        @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.capa_var]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.VariableCapacityKnapsack{T}}()) == [bridge.kp]
         if T == Int
             @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.Integer}()) == [bridge.capa_con]
