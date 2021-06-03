@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.2.5
+-------------
+
+Added bridges between high-level constraints, and also to MILP models.
+
+Nonlinear functions have been added, but are not yet used anywhere. No 
+semantic versioning is guaranteed for now regarding them.
+
+
 Version 0.2.4
 -------------
 

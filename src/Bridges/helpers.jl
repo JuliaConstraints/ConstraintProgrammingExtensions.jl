@@ -112,15 +112,9 @@ end
 # --- standard operations on MOI functions
 # https://github.com/jump-dev/MathOptInterface.jl/issues/1380
 
-function LinearAlgebra.dot(variable::MOI.VariableIndex, coefficient::T) where {T}
-    return MOI.ScalarAffineFunction(
-        [MOI.ScalarAffineTerm(coefficient, variable)], 
-        zero(T)
-    )
+function LinearAlgebra.dot(x::Vector{MOI.VariableIndex}, y::Vector{T}) where {T <: Real}
+    return MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.(y, x), 0.0)
 end
-function LinearAlgebra.dot(coefficient::T, variable::MOI.VariableIndex) where {T}
-    return MOI.ScalarAffineFunction(
-        [MOI.ScalarAffineTerm(coefficient, variable)], 
-        zero(T)
-    )
+function LinearAlgebra.dot(y::Vector{T}, x::Vector{MOI.VariableIndex}) where {T <: Real}
+    return MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.(y, x), 0.0)
 end
