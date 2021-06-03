@@ -3,6 +3,7 @@
     @testset "$(S)" for S in [
         CP.AllDifferent,
         CP.Membership,
+        CP.ElementVariableArray,
         CP.CountDistinct,
         CP.Inverse,
         CP.Contiguity,
@@ -50,6 +51,9 @@
         ]
             @test MOI.dimension(S(2)) == 2 + 1
             @test MOI.dimension(S(3)) == 3 + 1
+        elseif S == CP.ElementVariableArray
+            @test MOI.dimension(S(2)) == 2 + 2
+            @test MOI.dimension(S(3)) == 3 + 2
         elseif S in [
             CP.Inverse,
             CP.CircuitPath,
