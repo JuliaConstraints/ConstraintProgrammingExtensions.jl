@@ -59,7 +59,8 @@ end
     ValuedKnapsack{T <: Real}(weights::T, capacity::Vector{T})
 
 Ensures that the `n` first variables respect a knapsack constraint with fixed 
-weights and a fixed capacity, the last variable being the total value of the knapsack: 
+weights and a fixed capacity, the last variable being the total value of the 
+knapsack: 
 
 ``\\{(x, y) \\in \\{0, 1\\}^n \\times \\mathbb{R} | \\sum_{i=1}^n \\mathtt{weights[i]} x_i \\leq \\mathtt{capacity} \\land y = \\sum_{i=1}^n \\mathtt{values[i]} x_i \\}``.
 """

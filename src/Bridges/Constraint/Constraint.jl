@@ -29,3 +29,11 @@ const Knapsack2MILP{T, OT <: MOI.ModelLike} =
 include("Knapsack/varcapa_to_milp.jl")
 const VariableCapacityKnapsack2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{VariableCapacityKnapsack2MILPBridge{T}, OT}
+
+include("Knapsack/vkp_to_kp.jl")
+const ValuedKnapsack2Knapsack{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ValuedKnapsack2KnapsackBridge{T}, OT}
+
+include("Knapsack/varcapav_to_varcapa.jl")
+const VariableCapacityValuedKnapsack2VariableCapacityKnapsack{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{VariableCapacityValuedKnapsack2VariableCapacityKnapsackBrige{T}, OT}

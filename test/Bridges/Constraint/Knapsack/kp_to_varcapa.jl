@@ -1,4 +1,4 @@
-@testset "Knapsack2VariableCapacityKnapsackBridge: $(fct_type), $(n_bins) bin, 2 items, $(T)" for fct_type in ["vector of variables", "vector affine function"], n_bins in [1, 2], T in [Int, Float64]
+@testset "Knapsack2VariableCapacityKnapsackBridge: $(fct_type), 2 items, $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
     mock = MOIU.MockOptimizer(VariableCapacityKnapsackModel{T}())
     model = COIB.Knapsack2VariableCapacityKnapsack{T}(mock)
 
