@@ -224,96 +224,148 @@
         @test MOIU.shift_constant(CP.DifferentFrom(3), 1) == CP.DifferentFrom(4)
     end
 
-    @testset "BinPacking" begin
-        @test_throws AssertionError CP.BinPacking(1, 2, [1, 2, 3])
+    @testset "BinPacking family" begin
+        @testset "BinPacking" begin
+            @test_throws AssertionError CP.BinPacking(1, 2, [1, 2, 3])
 
-        @test CP.BinPacking(1, 2, [1, 2]) == CP.BinPacking(1, 2, [1, 2])
-        @test CP.BinPacking(2, 2, [1, 2]) != CP.BinPacking(1, 2, [1, 2])
-        @test CP.BinPacking(1, 3, [1, 2, 3]) != CP.BinPacking(1, 2, [1, 2])
+            @test CP.BinPacking(1, 2, [1, 2]) == CP.BinPacking(1, 2, [1, 2])
+            @test CP.BinPacking(2, 2, [1, 2]) != CP.BinPacking(1, 2, [1, 2])
+            @test CP.BinPacking(1, 3, [1, 2, 3]) != CP.BinPacking(1, 2, [1, 2])
 
-        s = CP.BinPacking(1, 2, [1, 2])
-        @test typeof(copy(s)) <: CP.BinPacking
-        @test copy(s) == s
+            s = CP.BinPacking(1, 2, [1, 2])
+            @test typeof(copy(s)) <: CP.BinPacking
+            @test copy(s) == s
 
-        @test MOI.dimension(CP.BinPacking(1, 2, [1, 2])) == 3
+            @test MOI.dimension(CP.BinPacking(1, 2, [1, 2])) == 3
+            
+            @test_throws AssertionError CP.BinPacking(1, 2, [-1, 2])
+            @test_throws AssertionError CP.BinPacking(0, 2, [1, 2])
+            @test_throws AssertionError CP.BinPacking(1, 0, [1, 2])
+        end
+
+        @testset "FixedCapacityBinPacking" begin
+            @test_throws AssertionError CP.FixedCapacityBinPacking(
+                1,
+                2,
+                [1, 2, 3],
+                [4],
+            )
+            @test_throws AssertionError CP.FixedCapacityBinPacking(
+                1,
+                2,
+                [1, 2],
+                [3, 4],
+            )
+            @test_throws AssertionError CP.FixedCapacityBinPacking(
+                1,
+                2,
+                [1, 2, 3],
+                [4, 5],
+            )
+
+            @test CP.FixedCapacityBinPacking(1, 2, [1, 2], [4]) ==
+                CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
+            @test CP.FixedCapacityBinPacking(2, 2, [1, 2], [4, 5]) !=
+                CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
+            @test CP.FixedCapacityBinPacking(1, 3, [1, 2, 3], [4]) !=
+                CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
+
+            s = CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
+            @test typeof(copy(s)) <: CP.FixedCapacityBinPacking
+            @test copy(s) == s
+
+            @test MOI.dimension(CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])) == 3
+
+            @test_throws AssertionError CP.FixedCapacityBinPacking(1, 2, [-1, 2], [4])
+            @test_throws AssertionError CP.FixedCapacityBinPacking(1, 2, [1, 2], [-4])
+            @test_throws AssertionError CP.FixedCapacityBinPacking(0, 2, [1, 2], [4])
+            @test_throws AssertionError CP.FixedCapacityBinPacking(1, 0, [1, 2], [4])
+        end
+
+        @testset "VariableCapacityBinPacking" begin
+            @test_throws AssertionError CP.VariableCapacityBinPacking(
+                1,
+                2,
+                [1, 2, 3],
+            )
+
+            @test CP.VariableCapacityBinPacking(1, 2, [1, 2]) ==
+                CP.VariableCapacityBinPacking(1, 2, [1, 2])
+            @test CP.VariableCapacityBinPacking(2, 2, [1, 2]) !=
+                CP.VariableCapacityBinPacking(1, 2, [1, 2])
+            @test CP.VariableCapacityBinPacking(1, 3, [1, 2, 3]) !=
+                CP.VariableCapacityBinPacking(1, 2, [1, 2])
+
+            s = CP.VariableCapacityBinPacking(1, 2, [1, 2])
+            @test typeof(copy(s)) <: CP.VariableCapacityBinPacking
+            @test copy(s) == s
+
+            @test MOI.dimension(CP.VariableCapacityBinPacking(1, 2, [1, 2])) == 4
+
+            @test_throws AssertionError CP.VariableCapacityBinPacking(1, 2, [-1, 2])
+            @test_throws AssertionError CP.VariableCapacityBinPacking(0, 2, [1, 2])
+            @test_throws AssertionError CP.VariableCapacityBinPacking(1, 0, [1, 2])
+        end
     end
 
-    @testset "FixedCapacityBinPacking" begin
-        @test_throws AssertionError CP.FixedCapacityBinPacking(
-            1,
-            2,
-            [1, 2, 3],
-            [4],
-        )
-        @test_throws AssertionError CP.FixedCapacityBinPacking(
-            1,
-            2,
-            [1, 2],
-            [3, 4],
-        )
-        @test_throws AssertionError CP.FixedCapacityBinPacking(
-            1,
-            2,
-            [1, 2, 3],
-            [4, 5],
-        )
+    @testset "Knapsack family" begin
+        @testset "Knapsack" begin
+            @test CP.Knapsack([1, 2, 3], 3) == CP.Knapsack([1, 2, 3], 3)
+            @test CP.Knapsack([1, 2, 3], 3) != CP.Knapsack([1, 2, 3], 4)
+            @test CP.Knapsack([1, 2, 3], 4) != CP.Knapsack([1, 2, 3], 3)
 
-        @test CP.FixedCapacityBinPacking(1, 2, [1, 2], [4]) ==
-              CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
-        @test CP.FixedCapacityBinPacking(2, 2, [1, 2], [4, 5]) !=
-              CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
-        @test CP.FixedCapacityBinPacking(1, 3, [1, 2, 3], [4]) !=
-              CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
+            s = CP.Knapsack([1, 2, 3], 3)
+            @test typeof(copy(s)) <: CP.Knapsack
+            @test copy(s) == s
 
-        s = CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
-        @test typeof(copy(s)) <: CP.FixedCapacityBinPacking
-        @test copy(s) == s
+            @test MOI.dimension(CP.Knapsack([1, 2, 3], 3)) == 3
 
-        @test MOI.dimension(CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])) == 3
-    end
+            @test_throws AssertionError CP.Knapsack([-1, 2, 3], 3)
+            @test_throws AssertionError CP.Knapsack([1, 2, 3], -3)
+        end
 
-    @testset "VariableCapacityBinPacking" begin
-        @test_throws AssertionError CP.VariableCapacityBinPacking(
-            1,
-            2,
-            [1, 2, 3],
-        )
+        @testset "VariableCapacityKnapsack" begin
+            @test CP.VariableCapacityKnapsack([1, 2, 3]) ==
+                CP.VariableCapacityKnapsack([1, 2, 3])
 
-        @test CP.VariableCapacityBinPacking(1, 2, [1, 2]) ==
-              CP.VariableCapacityBinPacking(1, 2, [1, 2])
-        @test CP.VariableCapacityBinPacking(2, 2, [1, 2]) !=
-              CP.VariableCapacityBinPacking(1, 2, [1, 2])
-        @test CP.VariableCapacityBinPacking(1, 3, [1, 2, 3]) !=
-              CP.VariableCapacityBinPacking(1, 2, [1, 2])
+            s = CP.VariableCapacityKnapsack([1, 2, 3])
+            @test typeof(copy(s)) <: CP.VariableCapacityKnapsack
+            @test copy(s) == s
 
-        s = CP.VariableCapacityBinPacking(1, 2, [1, 2])
-        @test typeof(copy(s)) <: CP.VariableCapacityBinPacking
-        @test copy(s) == s
+            @test MOI.dimension(CP.VariableCapacityKnapsack([1, 2, 3])) == 3 + 1
 
-        @test MOI.dimension(CP.VariableCapacityBinPacking(1, 2, [1, 2])) == 4
-    end
+            @test_throws AssertionError CP.VariableCapacityKnapsack([-1, 2, 3])
+        end
 
-    @testset "Knapsack" begin
-        @test CP.Knapsack([1, 2, 3], 3) == CP.Knapsack([1, 2, 3], 3)
-        @test CP.Knapsack([1, 2, 3], 3) != CP.Knapsack([1, 2, 3], 4)
-        @test CP.Knapsack([1, 2, 3], 4) != CP.Knapsack([1, 2, 3], 3)
+        @testset "ValuedKnapsack" begin
+            @test CP.ValuedKnapsack([1, 2, 3], [1, 2, 3], 3) == CP.ValuedKnapsack([1, 2, 3], [1, 2, 3], 3)
+            @test CP.ValuedKnapsack([1, 2, 3], [1, 2, 3], 3) != CP.ValuedKnapsack([1, 2, 3], [1, 2, 3], 4)
+            @test CP.ValuedKnapsack([1, 2, 3], [1, 2, 3], 4) != CP.ValuedKnapsack([1, 2, 3], [1, 2, 3], 3)
 
-        s = CP.Knapsack([1, 2, 3], 3)
-        @test typeof(copy(s)) <: CP.Knapsack
-        @test copy(s) == s
+            s = CP.ValuedKnapsack([1, 2, 3], [1, 2, 3], 3)
+            @test typeof(copy(s)) <: CP.ValuedKnapsack
+            @test copy(s) == s
 
-        @test MOI.dimension(CP.Knapsack([1, 2, 3], 3)) == 3
-    end
+            @test MOI.dimension(CP.ValuedKnapsack([1, 2, 3], [1, 2, 3], 3)) == 3 + 1
 
-    @testset "VariableCapacityKnapsack" begin
-        @test CP.VariableCapacityKnapsack([1, 2, 3]) ==
-              CP.VariableCapacityKnapsack([1, 2, 3])
+            @test_throws AssertionError CP.ValuedKnapsack([-1, 2, 3], [1, 2, 3], 3)
+            @test_throws AssertionError CP.ValuedKnapsack([1, 2, 3], [-1, 2, 3], 3)
+            @test_throws AssertionError CP.ValuedKnapsack([1, 2, 3], [1, 2, 3], -3)
+        end
 
-        s = CP.VariableCapacityKnapsack([1, 2, 3])
-        @test typeof(copy(s)) <: CP.VariableCapacityKnapsack
-        @test copy(s) == s
+        @testset "VariableCapacityValuedKnapsack" begin
+            @test CP.VariableCapacityValuedKnapsack([1, 2, 3], [1, 2, 3]) ==
+                CP.VariableCapacityValuedKnapsack([1, 2, 3], [1, 2, 3])
 
-        @test MOI.dimension(CP.VariableCapacityKnapsack([1, 2, 3])) == 3 + 1
+            s = CP.VariableCapacityValuedKnapsack([1, 2, 3], [1, 2, 3])
+            @test typeof(copy(s)) <: CP.VariableCapacityValuedKnapsack
+            @test copy(s) == s
+
+            @test MOI.dimension(CP.VariableCapacityValuedKnapsack([1, 2, 3], [1, 2, 3])) == 3 + 2
+
+            @test_throws AssertionError CP.VariableCapacityValuedKnapsack([-1, 2, 3], [1, 2, 3])
+            @test_throws AssertionError CP.VariableCapacityValuedKnapsack([1, 2, 3], [-1, 2, 3])
+        end
     end
 
     @testset "$(S)" for S in [CP.WeightedCircuit, CP.WeightedCircuitPath]

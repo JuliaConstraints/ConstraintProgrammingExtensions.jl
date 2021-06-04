@@ -44,3 +44,8 @@ end
 struct ArgumentMaximumFunction{F <: NL_SV_FCT} <: AbstractNonlinearScalarFunction
     array::Vector{<:F}
 end
+
+struct BinPackingLoadFunction{F <: NL_SV_FCT, T <: Real} <: AbstractNonlinearVectorFunction
+    bin_assignment::Vector{<:F}
+    weights::Vector{T}
+end

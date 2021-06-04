@@ -1,11 +1,19 @@
 # Common supertype for all nonlinear functions.
 abstract type AbstractNonlinearScalarFunction <: MOI.AbstractScalarFunction end
+abstract type AbstractNonlinearVectorFunction <: MOI.AbstractVectorFunction end
 
 const NL_SV_UNION = Union{MOI.SingleVariable, AbstractNonlinearScalarFunction}
 const NL_SV_FCT = Union{
     AbstractNonlinearScalarFunction, 
     MOI.SingleVariable, 
     NL_SV_UNION
+}
+
+const NL_VEC_SV_UNION = Union{MOI.VectorOfVariables, AbstractNonlinearVectorFunction}
+const NL_VEC_SV_FCT = Union{
+    AbstractNonlinearVectorFunction, 
+    MOI.VectorOfVariables, 
+    NL_VEC_SV_UNION
 }
 
 # -----------------------------------------------------------------------------

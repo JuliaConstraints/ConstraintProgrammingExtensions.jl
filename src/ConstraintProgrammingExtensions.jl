@@ -15,6 +15,8 @@ include("moi_fcts.jl")
 # Actual content.
 include("sets.jl") # Most sets.
 include("sets_combinatorial.jl") # Sets related to typical combinatorial problems.
+include("sets_combinatorial_binpacking.jl")
+include("sets_combinatorial_knapsack.jl")
 include("sets_sorting.jl") # Sets related to sorting values.
 include("sets_strictly.jl") # Strictly is defined for many of the above sets (sets.jl and sets_sorting.jl).
 include("sets_scheduling.jl") # Sets related to scheduling.
