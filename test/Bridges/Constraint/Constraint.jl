@@ -14,4 +14,8 @@
         include("Knapsack/vkp_to_kp.jl")
         include("Knapsack/varcapav_to_varcapa.jl")
     end
+
+    @testset "AllDifferent" begin
+        include("AllDifferent/ad_to_neq.jl")
+    end
 end
