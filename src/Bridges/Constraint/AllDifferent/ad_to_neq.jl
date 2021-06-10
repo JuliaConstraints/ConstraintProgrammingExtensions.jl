@@ -3,9 +3,12 @@ Bridges `CP.AllDifferent` to a series of `CP.DifferentFrom`.
 """
 struct AllDifferent2DifferentFromBridge{T} <: MOIBC.AbstractBridge
     # An upper-triangular matrix (i.e. nothing if i < j, constraint if i >= j).
-    cons::SparseMatrixCSC{
-        MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.DifferentFrom{T}}, 
-        Int,
+    # Standard sparse matrices cannot store anything that is not a Number 
+    # (more specifically, anything that does not implement `zero(T)`).
+    # https://github.com/JuliaLang/julia/issues/30573
+    cons::Dict{
+        Tuple{Int, Int},
+        MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T}}, 
     }
 end
 
@@ -30,23 +33,20 @@ function MOIBC.bridge_constraint(
     s::CP.AllDifferent,
 ) where {T}
     f_scalars = MOIU.scalarize(f)
+    dim = MOI.output_dimension(f)
 
-    # Upper-triangular matrix of constraints: i >= j.
-    cons = spzeros(
-        MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.DifferentFrom{T}}, 
-        MOI.dimension(f),
-        MOI.dimension(f),
-    )
-    # TODO: use a sizehint!?
+    # Upper-triangular matrix of constraints: i >= j, i.e. d(d-1)/2 elements.
+    cons = Dict{
+        Tuple{Int, Int},
+        MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T}}, 
+    }()
+    sizehint!(cons, dim * (dim - 1) / 2)
 
-    for i in 1:MOI.dimension(f)
-        for j in i:MOI.dimension(f)
+    for i in 1:dim
+        for j in (i+1):dim
             cons[i, j] = MOI.add_constraint(
                 model,
-                MOIU.vectorize([
-                    f_scalars[i],
-                    f_scalars[j],
-                ]),
+                f_scalars[i] - f_scalars[j],
                 CP.DifferentFrom(zero(T))
             )
         end
@@ -69,7 +69,7 @@ end
 
 function MOIB.added_constraint_types(::Type{AllDifferent2DifferentFromBridge{T}}) where {T}
     return [
-        (MOI.VectorAffineFunction{T}, CP.DifferentFrom{T}),
+        (MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T}),
     ]
 end
 
@@ -88,7 +88,7 @@ end
 function MOI.get(
     b::AllDifferent2DifferentFromBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.DifferentFrom{T},
+        MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T},
     },
 ) where {T}
     return length(b.cons)
@@ -97,8 +97,8 @@ end
 function MOI.get(
     b::AllDifferent2DifferentFromBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.DifferentFrom{T},
+        MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T},
     },
 ) where {T}
-    return b.cons
+    return collect(values(b.cons))
 end
