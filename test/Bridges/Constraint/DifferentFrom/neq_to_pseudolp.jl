@@ -1,6 +1,8 @@
-@testset "DifferentFrom2PseudoMILP: $(fct_type), 2 items, $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
+@testset "DifferentFrom2PseudoMILP: $(fct_type), $(T)" for fct_type in ["scalar affine function"], T in [Int, Bool, Float64]
     base = if T == Int
         IntPseudoMILPModel{Int}()
+    elseif T == Bool
+        BoolPseudoMILPModel{Bool}()
     elseif T == Float64
         FloatPseudoMILPModel{Float64}()
     else
@@ -23,49 +25,128 @@
         CP.DifferentFrom{T},
     )
 
-    # n_items = 2
-    # weights = T[3, 2]
-    # capacity = T(5)
+    if T == Int
+        x, _ = MOI.add_constrained_variable(model, MOI.Integer())
+    elseif T == Bool
+        x, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
+    elseif T == Float64
+        x = MOI.add_variable(model)
+    else
+        @assert false
+    end
 
-    # x_1, _ = MOI.add_constrained_variable(model, MOI.Integer())
-    # x_2, _ = MOI.add_constrained_variable(model, MOI.Integer())
+    fct = if fct_type == "single variable"
+        MOI.SingleVariable(x)
+    elseif fct_type == "scalar affine function"
+        MOI.ScalarAffineFunction(
+            [MOI.ScalarAffineTerm(one(T), x)], 
+            zero(T),
+        )
+    else
+        @assert false
+    end
+    c = MOI.add_constraint(model, fct, CP.DifferentFrom(zero(T)))
 
-    # fct = if fct_type == "vector of variables"
-    #     MOI.VectorOfVariables([x_1, x_2])
-    # elseif fct_type == "vector affine function"
-    #     MOIU.vectorize(MOI.SingleVariable.([x_1, x_2]))
-    # else
-    #     @assert false
-    # end
-    # c = MOI.add_constraint(model, fct, CP.Knapsack(weights, capacity))
+    @test MOI.is_valid(model, x)
+    @test MOI.is_valid(model, c)
 
-    # @test MOI.is_valid(model, x_1)
-    # @test MOI.is_valid(model, x_2)
-    # @test MOI.is_valid(model, c)
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, CP.DifferentFrom}(1)] # Why a 1 for this specific case? Usually, it's -1.
 
-    # bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Knapsack{T}}(-1)]
+    @testset "Bridge properties" begin
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Knapsack{T}) == typeof(bridge)
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
 
-    # @testset "Bridge properties" begin
-    #     @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Knapsack{T}) == typeof(bridge)
-    #     @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
-    #     @test MOIB.added_constraint_types(typeof(bridge)) == [(MOI.ScalarAffineFunction{T}, MOI.LessThan{T})]
+        if T == Int
+            @test MOIB.added_constraint_types(typeof(bridge)) == [
+                (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
+                (MOI.SingleVariable, MOI.GreaterThan{T}),
+            ]
+        elseif T == Bool
+            @test MOIB.added_constraint_types(typeof(bridge)) == [
+                (MOI.ScalarAffineFunction{Bool}, MOI.EqualTo{Bool}),
+            ]
+        elseif T == Float64
+            @test MOIB.added_constraint_types(typeof(bridge)) == [
+                (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
+                (MOI.SingleVariable, CP.Strictly{MOI.GreaterThan{T}}),
+            ]
+        else
+            @assert false
+        end
 
-    #     @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
-    #     @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfVariables()) == ((T == Bool) ? 0 : 1)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}()) == ((T == Bool) ? 0 : 1)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, CP.Strictly{MOI.GreaterThan{T}}}()) == ((T == Float64) ? 1 : 0)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == ((T == Int) ? 1 : 0)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == ((T == Bool) ? 1 : 0)
 
-    #     @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == [bridge.kp]
-    # end
+        if T != Bool
+            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}()) == [bridge.con_abs]
+        end
+        if T == Float64
+            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, CP.Strictly{MOI.GreaterThan{T}}}()) == [bridge.con_abs_strictly]
+        end
+        if T == Int
+            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == [bridge.con_abs_gt]
+        end
+        if T == Bool
+            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.con_eq]
+        end
+    end
 
-    # @testset "Relation between the integer and binary representation of bin assignment" begin
-    #     @test MOI.is_valid(model, bridge.kp)
-    #     f = MOI.get(model, MOI.ConstraintFunction(), bridge.kp)
-    #     @test length(f.terms) == n_items
-    #     @test MOI.get(model, MOI.ConstraintSet(), bridge.kp) == MOI.LessThan(capacity)
+    if T != Bool
+        @testset "Absolute value" begin
+            @test MOI.is_valid(model, bridge.con_abs)
+            f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_abs)
+            @test length(f.terms) == 2
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.con_abs) == CP.AbsoluteValue()
+            
+            t1 = f.terms[1]
+            @test t1.output_index == 1
+            @test t1.scalar_term.coefficient === one(T)
+            @test t1.scalar_term.variable_index == bridge.var_abs
+            
+            t1 = f.terms[2]
+            @test t1.output_index == 2
+            @test t1.scalar_term.coefficient === one(T)
+            @test t1.scalar_term.variable_index == x
+        end
+    end
+    
+    if T == Float64
+        @testset "Strictly greater than" begin
+            @test MOI.is_valid(model, bridge.con_abs)
+            f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_abs_strictly)
+            @test length(f.terms) == 1
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.con_abs_strictly) == CP.Strictly(MOI.GreaterThan(zero(T)))
+            
+            t1 = f.terms[1]
+            @test t1.coefficient === one(T)
+            @test t1.variable_index == bridge.var_abs
+        end
+    end
+    
+    if T == Int
+        @testset "Greater than" begin
+            @test MOI.is_valid(model, bridge.con_abs_gt)
+            f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_abs_gt)
+            @test f.variable == bridge.var_abs
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.con_abs_gt) == MOI.GreaterThan(one(T))
+        end
+    end
+    
+    if T == Bool
+        @testset "EqualTo" begin
+            @test MOI.is_valid(model, bridge.con_eq)
+            f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_eq)
+            @test length(f.terms) == 1
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.con_eq) == MOI.EqualTo(one(T))
+            
+            t1 = f.terms[1]
+            @test t1.coefficient === one(T)
+            @test t1.variable_index == x
+        end
+    end
 
-    #     for item in 1:n_items
-    #         t = f.terms[item]
-    #         @test t.coefficient === weights[item]
-    #         @test t.variable_index == ((item == 1) ? x_1 : x_2)
-    #     end
-    # end
+    # con_eq::Union{Nothing, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}, MOI.ConstraintIndex{MOI.SingleVariable, MOI.EqualTo{T}}}
 end

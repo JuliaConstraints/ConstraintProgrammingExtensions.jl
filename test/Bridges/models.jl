@@ -16,6 +16,7 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
+        CP.AbsoluteValue, 
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),
@@ -26,7 +27,10 @@ MOIU.@model(
 
 MOIU.@model(
     FloatPseudoMILPModel,
-    (CP.Strictly{MOI.GreaterThan{Float64}, Float64}, CP.Strictly{MOI.LessThan{Float64}, Float64}),
+    (
+        CP.Strictly{MOI.GreaterThan{Float64}, Float64}, 
+        CP.Strictly{MOI.LessThan{Float64}, Float64},
+    ),
     (MOI.EqualTo, MOI.GreaterThan, MOI.LessThan, MOI.Interval),
     (
         MOI.Zeros,
@@ -42,6 +46,7 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
+        CP.AbsoluteValue, 
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),
@@ -52,7 +57,10 @@ MOIU.@model(
 
 MOIU.@model(
     IntPseudoMILPModel,
-    (CP.Strictly{MOI.GreaterThan{Int}, Int}, CP.Strictly{MOI.LessThan{Int}, Int}),
+    (
+        CP.Strictly{MOI.GreaterThan{Int}, Int},
+        CP.Strictly{MOI.LessThan{Int}, Int},
+    ),
     (MOI.EqualTo, MOI.GreaterThan, MOI.LessThan, MOI.Interval),
     (
         MOI.Zeros,
@@ -68,6 +76,37 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
+        CP.AbsoluteValue, 
+    ),
+    (MOI.PowerCone, MOI.DualPowerCone),
+    (),
+    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.VectorOfVariables,),
+    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
+)
+
+MOIU.@model(
+    BoolPseudoMILPModel,
+    (
+        CP.Strictly{MOI.GreaterThan{Bool}, Bool}, 
+        CP.Strictly{MOI.LessThan{Bool}, Bool},
+    ),
+    (MOI.EqualTo, MOI.GreaterThan, MOI.LessThan, MOI.Interval),
+    (
+        MOI.Zeros,
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.GeometricMeanCone,
+        MOI.RelativeEntropyCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+        CP.AbsoluteValue, 
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),
