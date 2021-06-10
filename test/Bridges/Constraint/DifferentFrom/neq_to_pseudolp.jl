@@ -7,7 +7,7 @@
         @assert false
     end
     mock = MOIU.MockOptimizer(base)
-    model = COIB.DifferentFrom2PseudoMILP{T, T}(mock)
+    model = COIB.DifferentFrom2PseudoMILP{T}(mock)
 
     if T == Int
         @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)

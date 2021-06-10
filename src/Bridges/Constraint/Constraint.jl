@@ -47,5 +47,5 @@ const AbsoluteValue2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{AbsoluteValue2MILPBridge{T}, OT}
 
 include("DifferentFrom/neq_to_pseudolp.jl")
-const DifferentFrom2PseudoMILP{T, U, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{DifferentFrom2PseudoMILPBridge{T, U}, OT}
+const DifferentFrom2PseudoMILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{DifferentFrom2PseudoMILPBridge{T}, OT}
