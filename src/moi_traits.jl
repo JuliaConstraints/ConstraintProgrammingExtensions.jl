@@ -20,6 +20,10 @@ function has_lower_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
     return has_lower_bound(model, v.variable)
 end
 
+function has_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction)
+    return all(has_lower_bound(model, t.variable_index) for t in v.terms) 
+end
+
 function has_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     # TODO: not just Float64.
     c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{Float64}}(
@@ -30,6 +34,10 @@ end
 
 function has_upper_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
     return has_upper_bound(model, v.variable)
+end
+
+function has_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction)
+    return all(has_upper_bound(model, t.variable_index) for t in v.terms) 
 end
 
 function has_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
