@@ -5,6 +5,7 @@ Version 0.2.5
 -------------
 
 Added the `ValuedKnapsack` and `ValuedVariableCapacityKnapsack` sets.
+Added sets for functions: `AbsoluteValue`.
 
 Added bridges between high-level constraints, and also to MILP models.
 
