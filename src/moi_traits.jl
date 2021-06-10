@@ -24,8 +24,16 @@ function has_lower_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
     return has_lower_bound(model, v.variable)
 end
 
-function has_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction)
-    return all(has_lower_bound(model, t.variable_index) for t in v.terms) 
+function has_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) where {T <: Real}
+    for t in v.terms
+        if t.coefficient == zero(T)
+            continue
+        end
+        if has_lower_bound(model, t.variable_index)
+            return false
+        end
+    end
+    return true
 end
 
 function has_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
@@ -40,8 +48,16 @@ function has_upper_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
     return has_upper_bound(model, v.variable)
 end
 
-function has_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction)
-    return all(has_upper_bound(model, t.variable_index) for t in v.terms) 
+function has_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) where {T <: Real}
+    for t in v.terms
+        if t.coefficient == zero(T)
+            continue
+        end
+        if !has_upper_bound(model, t.variable_index)
+            return false
+        end
+    end
+    return true
 end
 
 function has_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
@@ -59,17 +75,17 @@ function get_lower_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
     return get_lower_bound(model, v.variable)
 end
 
-function get_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction)
-    lb = zero(Float64)
+function get_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) where {T <: Real}
+    lb = zero(T)
     for t in v.terms
         var_lb = get_lower_bound(model, t.variable_index)
         var_ub = get_upper_bound(model, t.variable_index)
 
-        if t.coefficient == 0
+        if t.coefficient == zero(T)
             continue
-        elseif t.coefficient > 0
+        elseif t.coefficient > zero(T)
             lb += t.coefficient + var_lb
-        else # t.coefficient < 0
+        else # t.coefficient < zero(T)
             lb += t.coefficient + var_ub
         end
     end
@@ -90,17 +106,17 @@ function get_upper_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
     return get_upper_bound(model, v.variable)
 end
 
-function get_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction)
-    ub = zero(Float64)
+function get_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) where {T <: Real}
+    ub = zero(T)
     for t in v.terms
         var_lb = get_lower_bound(model, t.variable_index)
         var_ub = get_upper_bound(model, t.variable_index)
 
-        if t.coefficient == 0
+        if t.coefficient == zero(T)
             continue
-        elseif t.coefficient > 0
+        elseif t.coefficient > zero(T)
             ub += t.coefficient + var_ub
-        else # t.coefficient < 0
+        else # t.coefficient < zero(T)
             ub += t.coefficient + var_lb
         end
     end
