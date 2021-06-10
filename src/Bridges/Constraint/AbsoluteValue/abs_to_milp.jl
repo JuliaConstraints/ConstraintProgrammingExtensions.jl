@@ -23,19 +23,19 @@ struct AbsoluteValue2MILPBridge{T} <: MOIBC.AbstractBridge
     con_neg_var_big_m::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}
 end
 
-function MOIBC.bridge_constraint(
-    ::Type{AbsoluteValue2MILPBridge{T}},
-    model,
-    f::MOI.VectorOfVariables,
-    s::CP.AbsoluteValue,
-) where {T}
-    return MOIBC.bridge_constraint(
-        AbsoluteValue2MILPBridge{T},
-        model,
-        MOI.VectorAffineFunction{T}(f),
-        s,
-    )
-end
+# function MOIBC.bridge_constraint(
+#     ::Type{AbsoluteValue2MILPBridge{T}},
+#     model,
+#     f::MOI.VectorOfVariables,
+#     s::CP.AbsoluteValue,
+# ) where {T}
+#     return MOIBC.bridge_constraint(
+#         AbsoluteValue2MILPBridge{T},
+#         model,
+#         MOI.VectorAffineFunction{T}(f),
+#         s,
+#     )
+# end
 
 function MOIBC.bridge_constraint(
     ::Type{AbsoluteValue2MILPBridge{T}},

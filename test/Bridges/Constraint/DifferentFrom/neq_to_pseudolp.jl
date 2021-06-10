@@ -53,7 +53,7 @@
     bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, CP.DifferentFrom}(1)] # Why a 1 for this specific case? Usually, it's -1.
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Knapsack{T}) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.DifferentFrom{T}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
 
         if T == Int
