@@ -35,7 +35,8 @@ function MOIBC.bridge_constraint(
     f_scalars = MOIU.scalarize(f)
     dim = MOI.output_dimension(f)
 
-    # Upper-triangular matrix of constraints: i >= j, i.e. d(d-1)/2 elements.
+    # Upper-triangular matrix of constraints: i >= j, i.e. d(d-1)/2 elements:
+    #     \sum_{i=2}^{d} (n - i + 1) = d (d - 1) / 2
     cons = Dict{
         Tuple{Int, Int},
         MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T}}, 
