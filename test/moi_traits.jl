@@ -57,6 +57,41 @@
         @test !CP.has_lower_bound(model, aff2)
     end
 
+    @testset "get_lower_bound{$(T)}" for T in [Float64, Int]
+        model = MOI.Utilities.Model{T}()
+        x = MOI.add_variable(model)
+        y = MOI.add_variable(model)
+        aff = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([one(T), zero(T)], [x, y]),
+            zero(T), 
+        )
+        aff2 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([one(T), one(T)], [x, y]),
+            zero(T), 
+        )
+
+        # So far, variables are unbounded.
+        @test CP.get_lower_bound(model, x) == typemin(T)
+        @test CP.get_lower_bound(model, MOI.SingleVariable(x)) == typemin(T)
+        @test CP.get_lower_bound(model, aff) == typemin(T)
+        @test CP.get_lower_bound(model, aff2) == typemin(T)
+
+        # One variable has a lower bound. 
+        MOI.add_constraint(model, x, MOI.GreaterThan(zero(T)))
+        @test CP.has_lower_bound(model, x)
+        @test CP.has_lower_bound(model, MOI.SingleVariable(x))
+        @test CP.has_lower_bound(model, aff) # The other variable has a zero coefficient.
+        @test !CP.has_lower_bound(model, aff2)
+
+        # The other variable now has an upper bound: this should not have any 
+        # impact on the results.
+        MOI.add_constraint(model, y, MOI.LessThan(zero(T)))
+        @test CP.has_lower_bound(model, x)
+        @test CP.has_lower_bound(model, MOI.SingleVariable(x))
+        @test CP.has_lower_bound(model, aff)
+        @test !CP.has_lower_bound(model, aff2)
+    end
+
     @testset "has_lower_bound{$(T)}" for T in [Float64, Int]
         model = MOI.Utilities.Model{T}()
         x = MOI.add_variable(model)

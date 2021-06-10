@@ -76,6 +76,13 @@ function get_lower_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
 end
 
 function get_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) where {T <: Real}
+    if !has_lower_bound(model, v)
+        # Return -Inf, cast to the right type. typemin(Float64) is exactly 
+        # -Inf, the right values are returned for Float32 and for Float16.
+        # No infinite available for other types than floats, though.
+        return typemin(T)
+    end
+
     lb = zero(T)
     for t in v.terms
         var_lb = get_lower_bound(model, t.variable_index)
@@ -98,8 +105,11 @@ function get_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{Float64}}(
         v.value,
     )
-    set = MOI.get(model, MOI.ConstraintSet(), c_idx)
-    return set.lower
+    try
+        return MOI.get(model, MOI.ConstraintSet(), c_idx).lower
+    catch
+        return typemin(Float64)
+    end
 end
 
 function get_upper_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
@@ -107,6 +117,13 @@ function get_upper_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
 end
 
 function get_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) where {T <: Real}
+    if !has_upper_bound(model, v)
+        # Return Inf, cast to the right type. typemax(Float64) is exactly 
+        # Inf, the right values are returned for Float32 and for Float16.
+        # No infinite available for other types than floats, though.
+        return typemax(T)
+    end
+
     ub = zero(T)
     for t in v.terms
         var_lb = get_lower_bound(model, t.variable_index)
@@ -128,6 +145,9 @@ function get_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     # TODO: not just Float64.
     c_idx =
         MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{Float64}}(v.value)
-    set = MOI.get(model, MOI.ConstraintSet(), c_idx)
-    return set.upper
+    try
+        return MOI.get(model, MOI.ConstraintSet(), c_idx).upper
+    catch
+        return typemax(Float64)
+    end
 end
