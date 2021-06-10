@@ -15,6 +15,10 @@
         include("Knapsack/varcapav_to_varcapa.jl")
     end
 
+    @testset "AbsoluteValue" begin
+        include("AbsoluteValue/abs_to_milp.jl")
+    end
+
     @testset "AllDifferent" begin
         include("AllDifferent/ad_to_neq.jl")
     end
