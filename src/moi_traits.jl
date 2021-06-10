@@ -1,3 +1,12 @@
+function _detect_variable_type(model::MOI.ModelLike, v::Union{MOI.SingleVariable, MOI.VariableIndex})
+    # TODO: is this enough? Or should the code rather try all the countless possibilities?
+    if is_integer(model, v) || is_binary(model, v)
+        return Int
+    else
+        return Float64
+    end
+end
+
 # -----------------------------------------------------------------------------
 # - Detect whether a variable or a function has some properties.
 # -----------------------------------------------------------------------------
@@ -91,9 +100,9 @@ function get_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) w
         if t.coefficient == zero(T)
             continue
         elseif t.coefficient > zero(T)
-            lb += t.coefficient + var_lb
+            lb += t.coefficient * var_lb
         else # t.coefficient < zero(T)
-            lb += t.coefficient + var_ub
+            lb += t.coefficient * var_ub
         end
     end
 
@@ -101,14 +110,15 @@ function get_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) w
 end
 
 function get_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
-    # TODO: not just Float64.
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{Float64}}(
+    T = _detect_variable_type(model, v)
+
+    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{T}}(
         v.value,
     )
     try
         return MOI.get(model, MOI.ConstraintSet(), c_idx).lower
     catch
-        return typemin(Float64)
+        return typemin(T)
     end
 end
 
@@ -132,9 +142,9 @@ function get_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) w
         if t.coefficient == zero(T)
             continue
         elseif t.coefficient > zero(T)
-            ub += t.coefficient + var_ub
+            ub += t.coefficient * var_ub
         else # t.coefficient < zero(T)
-            ub += t.coefficient + var_lb
+            ub += t.coefficient * var_lb
         end
     end
 
@@ -142,12 +152,12 @@ function get_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) w
 end
 
 function get_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
-    # TODO: not just Float64.
-    c_idx =
-        MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{Float64}}(v.value)
+    T = _detect_variable_type(model, v)
+
+    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{T}}(v.value)
     try
         return MOI.get(model, MOI.ConstraintSet(), c_idx).upper
     catch
-        return typemax(Float64)
+        return typemax(T)
     end
 end
