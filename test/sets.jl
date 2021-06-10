@@ -1,4 +1,19 @@
 @testset "Sets" begin
+    # No argument.
+    @testset "$(S)" for S in [
+        CP.AbsoluteValue,
+    ]
+        @test isbitstype(S)
+        
+        @test S() == S()
+
+        s = S()
+        @test typeof(copy(s)) <: S
+        @test copy(s) === s # Same object.
+        
+        @test MOI.dimension(S()) == 2
+    end
+
     # Just a dimension.
     @testset "$(S)" for S in [
         CP.AllDifferent,
