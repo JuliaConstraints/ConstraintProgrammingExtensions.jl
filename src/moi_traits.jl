@@ -29,7 +29,7 @@ function has_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) w
         if t.coefficient == zero(T)
             continue
         end
-        if has_lower_bound(model, t.variable_index)
+        if !has_lower_bound(model, t.variable_index)
             return false
         end
     end
