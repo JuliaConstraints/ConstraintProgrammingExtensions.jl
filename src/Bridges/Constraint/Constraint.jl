@@ -36,7 +36,7 @@ const ValuedKnapsack2Knapsack{T, OT <: MOI.ModelLike} =
 
 include("Knapsack/varcapav_to_varcapa.jl")
 const VariableCapacityValuedKnapsack2VariableCapacityKnapsack{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{VariableCapacityValuedKnapsack2VariableCapacityKnapsackBrige{T}, OT}
+    MOIBC.SingleBridgeOptimizer{VariableCapacityValuedKnapsack2VariableCapacityKnapsackBridge{T}, OT}
 
 include("AllDifferent/ad_to_neq.jl")
 const AllDifferent2DifferentFrom{T, OT <: MOI.ModelLike} =
@@ -45,3 +45,7 @@ const AllDifferent2DifferentFrom{T, OT <: MOI.ModelLike} =
 include("AbsoluteValue/abs_to_milp.jl")
 const AbsoluteValue2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{AbsoluteValue2MILPBridge{T}, OT}
+
+include("DifferentFrom/neq_to_pseudolp.jl")
+const DifferentFrom2PseudoMILP{T, U, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{DifferentFrom2PseudoMILPBridge{T, U}, OT}
