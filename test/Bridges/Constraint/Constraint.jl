@@ -26,4 +26,8 @@
         include("Knapsack/vkp_to_kp.jl")
         include("Knapsack/varcapav_to_varcapa.jl")
     end
+
+    @testset "Strictly" begin
+        include("Strictly/strictly_to_lp.jl")
+    end
 end
