@@ -15,6 +15,11 @@
         MOI.VectorAffineFunction{T},
         CP.AbsoluteValue,
     )
+    @test MOIB.supports_bridging_constraint(
+        model,
+        MOI.VectorOfVariables,
+        CP.AbsoluteValue,
+    )
 
     if T == Int
         x, _ = MOI.add_constrained_variable(model, MOI.Integer())
