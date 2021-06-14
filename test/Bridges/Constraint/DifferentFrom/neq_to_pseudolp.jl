@@ -1,4 +1,4 @@
-@testset "DifferentFrom2PseudoMILP: $(fct_type), $(T)" for fct_type in ["scalar affine function"], T in [Int, Bool, Float64]
+@testset "DifferentFrom2PseudoMILP: $(fct_type), $(T)" for fct_type in ["single variable", "scalar affine function"], T in [Int, Bool, Float64]
     base = if T == Int
         IntPseudoMILPModel{Int}()
     elseif T == Bool
