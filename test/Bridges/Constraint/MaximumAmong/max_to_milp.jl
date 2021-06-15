@@ -31,6 +31,13 @@
     else
         @assert false
     end
+
+    @test_throws AssertionError MOI.add_constraint(model, fct, CP.MaximumAmong(array_dim))
+
+    for i in 1:dim
+        MOI.add_constraint(model, x[i], MOI.GreaterThan(zero(T)))
+        MOI.add_constraint(model, x[i], MOI.LessThan(one(T)))
+    end
     c = MOI.add_constraint(model, fct, CP.MaximumAmong(array_dim))
 
     for i in 1:dim
@@ -42,34 +49,91 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.MaximumAmong) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
-        @test MOIB.added_constraint_types(typeof(bridge)) == [(MOI.ScalarAffineFunction{T}, MOI.EqualTo{T})]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
+        @test MOIB.added_constraint_types(typeof(bridge)) == [
+            (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
+            (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
+            (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
+        ]
 
-        @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
+        @test MOI.get(bridge, MOI.NumberOfVariables()) == array_dim
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == array_dim
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == array_dim
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == 1
 
+        @test MOI.get(bridge, MOI.ListOfVariableIndices()) == bridge.vars
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}())) == Set(bridge.cons_gt)
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}())) == Set(bridge.cons_lt)
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.con_choose_one]
     end
 
-    # @testset "Set of constraints" begin
-    #     @test length(bridge.cons) == dim - 1
-    #     for i in 1:(dim - 1)
-    #         @test MOI.is_valid(model, bridge.cons[i])
-    #         f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons[i])
-    #         @test length(f.terms) == 2
-    #         @test MOI.get(model, MOI.ConstraintSet(), bridge.cons[i]) == MOI.EqualTo(zero(T))
+    @testset "Binary variables" begin
+        @test length(bridge.vars) == array_dim
+        for i in 1:array_dim
+            @test MOI.is_valid(model, bridge.vars[i])
+        end
 
-    #         t1 = f.terms[1]
-    #         @test t1.coefficient === one(T)
-    #         @test t1.variable_index == x[1]
+        @test MOI.is_valid(model, bridge.con_choose_one)
+        s = MOI.get(model, MOI.ConstraintSet(), bridge.con_choose_one)
+        f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_choose_one)
 
-    #         t2 = f.terms[2]
-    #         @test t2.coefficient === -one(T)
-    #         @test t2.variable_index == x[i + 1]
-    #     end
-    # end
+        @test typeof(s) == MOI.EqualTo{T}
+        @test s.value == one(T)
+        @test length(f.terms) == array_dim
+        @test f.constant == zero(T)
+
+        for i in 1:array_dim
+            t = f.terms[i]
+            @test t.coefficient === one(T)
+            @test t.variable_index == bridge.vars[i]
+        end
+    end
+
+    @testset "Constraints: greater than" begin
+        @test length(bridge.cons_gt) == array_dim
+        for i in 1:array_dim
+            @test MOI.is_valid(model, bridge.cons_gt[i])
+            s = MOI.get(model, MOI.ConstraintSet(), bridge.cons_gt[i])
+            f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_gt[i])
+
+            @test typeof(s) == MOI.GreaterThan{T}
+            @test s.lower == zero(T)
+            @test length(f.terms) == 2
+            @test f.constant == zero(T)
+            
+            t1 = f.terms[1]
+            @test t1.coefficient === one(T)
+            @test t1.variable_index == x[1]
+            
+            t2 = f.terms[2]
+            @test t2.coefficient === -one(T)
+            @test t2.variable_index == x[i + 1]
+        end
+    end
+
+    @testset "Constraints: less than" begin
+        @test length(bridge.cons_lt) == array_dim
+        for i in 1:array_dim
+            @test MOI.is_valid(model, bridge.cons_lt[i])
+            s = MOI.get(model, MOI.ConstraintSet(), bridge.cons_lt[i])
+            f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_lt[i])
+
+            @test typeof(s) == MOI.LessThan{T}
+            @test s.upper == zero(T)
+            @test length(f.terms) == 3
+            @test f.constant == -one(T)
+            
+            t1 = f.terms[1]
+            @test t1.coefficient === one(T)
+            @test t1.variable_index == x[1]
+            
+            t2 = f.terms[2]
+            @test t2.coefficient === -one(T)
+            @test t2.variable_index == x[i + 1]
+            
+            t3 = f.terms[3]
+            @test t3.coefficient === one(T)
+            @test t3.variable_index == bridge.vars[i]
+        end
+    end
 end

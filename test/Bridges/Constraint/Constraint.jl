@@ -31,6 +31,10 @@
         include("Knapsack/varcapav_to_varcapa.jl")
     end
 
+    @testset "MaximumAmong" begin
+        include("MaximumAmong/max_to_milp.jl")
+    end
+
     @testset "Strictly" begin
         include("Strictly/strictly_to_lp.jl")
     end

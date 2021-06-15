@@ -34,6 +34,13 @@ function MOIBC.bridge_constraint(
     dim = MOI.output_dimension(f)
     n_array = dim - 1
 
+    # For this formulation work, both lower and upper bounds are required on
+    # the argument of the absolute value.
+    for i in 1:n_array
+        @assert CP.has_lower_bound(model, f_scalars[i + 1])
+        @assert CP.has_upper_bound(model, f_scalars[i + 1])
+    end
+
     # New variables.
     vars, vars_bin = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:n_array])
 
@@ -144,9 +151,52 @@ end
 
 function MOI.get(
     b::MaximumAmong2MILPBridge{T},
-    ::MOI.ListOfConstraintIndices{
-        MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T},
+    ::MOI.NumberOfConstraints{
+        MOI.SingleVariable, MOI.ZeroOne,
     },
 ) where {T}
-    return collect(values(b.cons))
+    return length(b.vars_bin)
+end
+
+function MOI.get(
+    b::MaximumAmong2MILPBridge{T},
+    ::MOI.ListOfVariableIndices,
+) where {T}
+    return b.vars
+end
+
+function MOI.get(
+    b::MaximumAmong2MILPBridge{T},
+    ::MOI.ListOfConstraintIndices{
+        MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
+    },
+) where {T}
+    return [b.con_choose_one]
+end
+
+function MOI.get(
+    b::MaximumAmong2MILPBridge{T},
+    ::MOI.ListOfConstraintIndices{
+        MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
+    },
+) where {T}
+    return b.cons_lt
+end
+
+function MOI.get(
+    b::MaximumAmong2MILPBridge{T},
+    ::MOI.ListOfConstraintIndices{
+        MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
+    },
+) where {T}
+    return b.cons_gt
+end
+
+function MOI.get(
+    b::MaximumAmong2MILPBridge{T},
+    ::MOI.ListOfConstraintIndices{
+        MOI.SingleVariable, MOI.ZeroOne,
+    },
+) where {T}
+    return b.vars_bin
 end
