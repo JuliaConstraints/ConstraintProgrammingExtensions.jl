@@ -7,6 +7,10 @@
         include("AllDifferent/ad_to_neq.jl")
     end
 
+    @testset "AllEqual" begin
+        include("AllEqual/alleq_to_eq.jl")
+    end
+
     @testset "BinPacking" begin
         include("BinPacking/bp_to_milp.jl")
         include("BinPacking/fixedcapa_to_bp.jl")
