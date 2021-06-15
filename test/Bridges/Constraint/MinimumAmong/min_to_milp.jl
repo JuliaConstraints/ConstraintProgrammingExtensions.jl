@@ -33,9 +33,9 @@
 
     @test_throws AssertionError MOI.add_constraint(model, fct, CP.MinimumAmong(array_dim))
 
-    for i in 1:dim
-        MOI.add_constraint(model, x[i], MOI.GreaterThan(zero(T)))
-        MOI.add_constraint(model, x[i], MOI.LessThan(one(T)))
+    for i in 1:array_dim
+        MOI.add_constraint(model, x[1 + i], MOI.GreaterThan(zero(T)))
+        MOI.add_constraint(model, x[1 + i], MOI.LessThan(one(T)))
     end
     c = MOI.add_constraint(model, fct, CP.MinimumAmong(array_dim))
 
@@ -50,6 +50,7 @@
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.MinimumAmong) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
+            (MOI.SingleVariable, MOI.ZeroOne),
             (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
             (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
             (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),

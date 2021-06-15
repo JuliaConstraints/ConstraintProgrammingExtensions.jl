@@ -65,3 +65,11 @@ const MaximumAmong2MILP{T, OT <: MOI.ModelLike} =
 include("MinimumAmong/min_to_milp.jl")
 const MinimumAmong2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{MinimumAmong2MILPBridge{T}, OT}
+
+include("ArgumentMaximumAmong/argmax_to_milp.jl")
+const ArgumentMaximumAmong2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ArgumentMaximumAmong2MILPBridge{T}, OT}
+
+include("ArgumentMinimumAmong/argmin_to_milp.jl")
+const ArgumentMinimumAmong2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ArgumentMinimumAmong2MILPBridge{T}, OT}

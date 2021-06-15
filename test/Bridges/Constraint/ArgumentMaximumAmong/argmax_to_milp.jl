@@ -1,7 +1,7 @@
-@testset "MaximumAmong2MILP: $(fct_type), dimension $(array_dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], array_dim in [2, 3], T in [Int, Float64]
+@testset "ArgumentMaximumAmong2MILP: $(fct_type), dimension $(array_dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], array_dim in [2, 3], T in [Int, Float64]
     dim = 1 + array_dim
     mock = MOIU.MockOptimizer(MILPModel{T}())
-    model = COIB.MaximumAmong2MILP{T}(mock)
+    model = COIB.ArgumentMaximumAmong2MILP{T}(mock)
 
     if T == Int
         @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -14,7 +14,7 @@
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.MaximumAmong,
+        CP.ArgumentMaximumAmong,
     )
 
     if T == Int
@@ -31,30 +31,43 @@
         @assert false
     end
 
-    @test_throws AssertionError MOI.add_constraint(model, fct, CP.MaximumAmong(array_dim))
+    @test_throws AssertionError MOI.add_constraint(model, fct, CP.ArgumentMaximumAmong(array_dim))
 
     for i in 1:array_dim
         MOI.add_constraint(model, x[1 + i], MOI.GreaterThan(zero(T)))
         MOI.add_constraint(model, x[1 + i], MOI.LessThan(one(T)))
     end
-    c = MOI.add_constraint(model, fct, CP.MaximumAmong(array_dim))
+    c = MOI.add_constraint(model, fct, CP.ArgumentMaximumAmong(array_dim))
 
     for i in 1:dim
         MOI.is_valid(model, x[i])
     end
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.MaximumAmong}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.ArgumentMaximumAmong}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.MaximumAmong) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
-        @test MOIB.added_constraint_types(typeof(bridge)) == [
-            (MOI.SingleVariable, MOI.ZeroOne),
-            (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
-            (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
-            (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
-        ]
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.ArgumentMaximumAmong) == typeof(bridge)
+        if T == Int
+            @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,), (MOI.Integer,)]
+            @test MOIB.added_constraint_types(typeof(bridge)) == [
+                (MOI.SingleVariable, MOI.ZeroOne),
+                (MOI.SingleVariable, MOI.Integer),
+                (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
+                (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
+                (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
+            ]
+        elseif T == Float64
+            @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
+            @test MOIB.added_constraint_types(typeof(bridge)) == [
+                (MOI.SingleVariable, MOI.ZeroOne),
+                (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
+                (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
+                (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
+            ]
+        else
+            @assert false
+        end
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == array_dim
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == array_dim
@@ -104,12 +117,12 @@
             @test f.constant == zero(T)
             
             t1 = f.terms[1]
-            @test t1.coefficient === one(T)
-            @test t1.variable_index == x[1]
+            @test t1.coefficient === -one(T)
+            @test t1.variable_index == x[i + 1]
             
             t2 = f.terms[2]
-            @test t2.coefficient === -one(T)
-            @test t2.variable_index == x[i + 1]
+            @test t2.coefficient === one(T)
+            @test t2.variable_index == bridge.var_max
         end
     end
 
@@ -126,16 +139,37 @@
             @test f.constant == -one(T)
             
             t1 = f.terms[1]
-            @test t1.coefficient === one(T)
-            @test t1.variable_index == x[1]
+            @test t1.coefficient === -one(T)
+            @test t1.variable_index == x[i + 1]
             
             t2 = f.terms[2]
-            @test t2.coefficient === -one(T)
-            @test t2.variable_index == x[i + 1]
+            @test t2.coefficient === one(T)
+            @test t2.variable_index == bridge.vars[i]
             
             t3 = f.terms[3]
             @test t3.coefficient === one(T)
-            @test t3.variable_index == bridge.vars[i]
+            @test t3.variable_index == bridge.var_max
+        end
+    end
+
+    @testset "Constraints: index" begin
+        @test MOI.is_valid(model, bridge.con_index)
+        s = MOI.get(model, MOI.ConstraintSet(), bridge.con_index)
+        f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_index)
+
+        @test typeof(s) == MOI.EqualTo{T}
+        @test s.value == zero(T)
+        @test length(f.terms) == 1 + array_dim
+        @test f.constant == zero(T)
+        
+        t1 = f.terms[1]
+        @test t1.coefficient === one(T)
+        @test t1.variable_index == x[1]
+
+        for i in 1:array_dim
+            t = f.terms[1 + i]
+            @test t.coefficient === -T(i)
+            @test t.variable_index == bridge.vars[i]
         end
     end
 end

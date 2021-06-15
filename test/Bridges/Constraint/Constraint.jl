@@ -11,6 +11,14 @@
         include("AllEqual/alleq_to_eq.jl")
     end
 
+    @testset "ArgumentMaximumAmong" begin
+        include("ArgumentMaximumAmong/argmax_to_milp.jl")
+    end
+
+    @testset "ArgumentMinimumAmong" begin
+        include("ArgumentMinimumAmong/argmin_to_milp.jl")
+    end
+
     @testset "BinPacking" begin
         include("BinPacking/bp_to_milp.jl")
         include("BinPacking/fixedcapa_to_bp.jl")
