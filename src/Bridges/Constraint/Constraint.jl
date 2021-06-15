@@ -53,3 +53,7 @@ const DifferentFrom2PseudoMILP{T, OT <: MOI.ModelLike} =
 include("Strictly/strictly_to_lp.jl")
 const Strictly2Linear{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Strictly2LinearBridge{T}, OT}
+
+include("AllEqual/alleq_to_eq.jl")
+const AllEqual2EqualTo{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{AllEqual2EqualToBridge{T}, OT}
