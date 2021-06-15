@@ -1,4 +1,21 @@
 """
+AllEqual(dimension::Int)
+
+The set corresponding to an all-equal constraint.
+
+All expressions of a vector-valued function are enforced to take the same value
+in the solution.
+
+## Example
+
+    [x, y, z] in AllEqual(3)
+    # enforces `x == y` AND `x == z`.
+"""
+struct AllEqual <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+"""
     AllDifferent(dimension::Int)
 
 The set corresponding to an all-different constraint.
@@ -322,7 +339,7 @@ MOI.dimension(set::Inverse) = 2 * set.dimension
 
 # isbits types, nothing to copy
 function copy(
-    set::Union{AllDifferent, Membership, CountCompare, CountDistinct, Inverse},
+    set::Union{AllEqual, AllDifferent, Membership, CountCompare, CountDistinct, Inverse},
 )
     return set
 end

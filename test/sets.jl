@@ -16,6 +16,7 @@
 
     # Just a dimension.
     @testset "$(S)" for S in [
+        CP.AllEqual,
         CP.AllDifferent,
         CP.Membership,
         CP.ElementVariableArray,
@@ -48,6 +49,7 @@
         @test copy(s) == s
 
         if S in [
+            CP.AllEqual,
             CP.AllDifferent,
             CP.Membership,
             CP.Contiguity,
