@@ -35,6 +35,10 @@
         include("MaximumAmong/max_to_milp.jl")
     end
 
+    @testset "MinimumAmong" begin
+        include("MinimumAmong/min_to_milp.jl")
+    end
+
     @testset "Strictly" begin
         include("Strictly/strictly_to_lp.jl")
     end

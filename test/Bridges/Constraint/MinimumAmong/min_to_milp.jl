@@ -1,7 +1,7 @@
-@testset "MaximumAmong2MILP: $(fct_type), dimension $(array_dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], array_dim in [2, 3], T in [Int, Float64]
+@testset "MinimumAmong2MILP: $(fct_type), dimension $(array_dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], array_dim in [2, 3], T in [Int, Float64]
     dim = 1 + array_dim
     mock = MOIU.MockOptimizer(MILPModel{T}())
-    model = COIB.MaximumAmong2MILP{T}(mock)
+    model = COIB.MinimumAmong2MILP{T}(mock)
 
     if T == Int
         @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -14,7 +14,7 @@
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.MaximumAmong,
+        CP.MinimumAmong,
     )
 
     if T == Int
@@ -31,23 +31,23 @@
         @assert false
     end
 
-    @test_throws AssertionError MOI.add_constraint(model, fct, CP.MaximumAmong(array_dim))
+    @test_throws AssertionError MOI.add_constraint(model, fct, CP.MinimumAmong(array_dim))
 
     for i in 1:dim
         MOI.add_constraint(model, x[i], MOI.GreaterThan(zero(T)))
         MOI.add_constraint(model, x[i], MOI.LessThan(one(T)))
     end
-    c = MOI.add_constraint(model, fct, CP.MaximumAmong(array_dim))
+    c = MOI.add_constraint(model, fct, CP.MinimumAmong(array_dim))
 
     for i in 1:dim
         MOI.is_valid(model, x[i])
     end
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.MaximumAmong}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.MinimumAmong}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.MaximumAmong) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.MinimumAmong) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
@@ -99,28 +99,6 @@
 
             @test typeof(s) == MOI.GreaterThan{T}
             @test s.lower == zero(T)
-            @test length(f.terms) == 2
-            @test f.constant == zero(T)
-            
-            t1 = f.terms[1]
-            @test t1.coefficient === one(T)
-            @test t1.variable_index == x[1]
-            
-            t2 = f.terms[2]
-            @test t2.coefficient === -one(T)
-            @test t2.variable_index == x[i + 1]
-        end
-    end
-
-    @testset "Constraints: less than" begin
-        @test length(bridge.cons_lt) == array_dim
-        for i in 1:array_dim
-            @test MOI.is_valid(model, bridge.cons_lt[i])
-            s = MOI.get(model, MOI.ConstraintSet(), bridge.cons_lt[i])
-            f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_lt[i])
-
-            @test typeof(s) == MOI.LessThan{T}
-            @test s.upper == zero(T)
             @test length(f.terms) == 3
             @test f.constant == -one(T)
             
@@ -135,6 +113,28 @@
             t3 = f.terms[3]
             @test t3.coefficient === one(T)
             @test t3.variable_index == bridge.vars[i]
+        end
+    end
+
+    @testset "Constraints: less than" begin
+        @test length(bridge.cons_lt) == array_dim
+        for i in 1:array_dim
+            @test MOI.is_valid(model, bridge.cons_lt[i])
+            s = MOI.get(model, MOI.ConstraintSet(), bridge.cons_lt[i])
+            f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_lt[i])
+
+            @test typeof(s) == MOI.LessThan{T}
+            @test s.upper == zero(T)
+            @test length(f.terms) == 2
+            @test f.constant == zero(T)
+            
+            t1 = f.terms[1]
+            @test t1.coefficient === one(T)
+            @test t1.variable_index == x[1]
+            
+            t2 = f.terms[2]
+            @test t2.coefficient === -one(T)
+            @test t2.variable_index == x[i + 1]
         end
     end
 end

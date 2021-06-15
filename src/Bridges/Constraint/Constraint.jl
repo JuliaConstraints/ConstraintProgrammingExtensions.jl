@@ -61,3 +61,7 @@ const AllEqual2EqualTo{T, OT <: MOI.ModelLike} =
 include("MaximumAmong/max_to_milp.jl")
 const MaximumAmong2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{MaximumAmong2MILPBridge{T}, OT}
+
+include("MinimumAmong/min_to_milp.jl")
+const MinimumAmong2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{MinimumAmong2MILPBridge{T}, OT}
