@@ -57,3 +57,7 @@ const Strictly2Linear{T, OT <: MOI.ModelLike} =
 include("AllEqual/alleq_to_eq.jl")
 const AllEqual2EqualTo{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{AllEqual2EqualToBridge{T}, OT}
+
+include("MaximumAmong/max_to_milp.jl")
+const MaximumAmong2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{MaximumAmong2MILPBridge{T}, OT}
