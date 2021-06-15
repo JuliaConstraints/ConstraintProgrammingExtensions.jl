@@ -151,18 +151,18 @@ end
 
 function MOI.get(
     b::MaximumAmong2MILPBridge{T},
-    ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
-    },
+    ::MOI.ListOfVariableIndices,
 ) where {T}
-    return length(b.vars_bin)
+    return b.vars
 end
 
 function MOI.get(
     b::MaximumAmong2MILPBridge{T},
-    ::MOI.ListOfVariableIndices,
+    ::MOI.ListOfConstraintIndices{
+        MOI.SingleVariable, MOI.ZeroOne,
+    },
 ) where {T}
-    return b.vars
+    return b.vars_bin
 end
 
 function MOI.get(
@@ -190,13 +190,4 @@ function MOI.get(
     },
 ) where {T}
     return b.cons_gt
-end
-
-function MOI.get(
-    b::MaximumAmong2MILPBridge{T},
-    ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
-    },
-) where {T}
-    return b.vars_bin
 end
