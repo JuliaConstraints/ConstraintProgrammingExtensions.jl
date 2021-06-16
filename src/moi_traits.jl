@@ -46,11 +46,20 @@ function has_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) w
 end
 
 function has_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
-    # TODO: not just Float64.
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{Float64}}(
-        v.value,
-    )
-    return MOI.is_valid(model, c_idx)
+    T = _detect_variable_type(model, v)
+
+    # Check if the variable has an explicit lower bound.
+    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{T}}(v.value)
+    if MOI.is_valid(model, c_idx)
+        return true
+    end
+
+    # Booleans have an implicit lower bound.
+    if is_binary(model, v)
+        return true
+    end
+
+    return false
 end
 
 function has_upper_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
@@ -70,10 +79,20 @@ function has_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) w
 end
 
 function has_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
-    # TODO: not just Float64.
-    c_idx =
-        MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{Float64}}(v.value)
-    return MOI.is_valid(model, c_idx)
+    T = _detect_variable_type(model, v)
+
+    # Check if the variable has an explicit upper bound.
+    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{T}}(v.value)
+    if MOI.is_valid(model, c_idx)
+        return true
+    end
+
+    # Booleans have an implicit upper bound.
+    if is_binary(model, v)
+        return true
+    end
+
+    return false
 end
 
 # -----------------------------------------------------------------------------
@@ -111,6 +130,10 @@ end
 
 function get_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     T = _detect_variable_type(model, v)
+
+    if is_binary(model, v)
+        return 0
+    end
 
     c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{T}}(
         v.value,
@@ -153,6 +176,10 @@ end
 
 function get_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     T = _detect_variable_type(model, v)
+
+    if is_binary(model, v)
+        return 1
+    end
 
     c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{T}}(v.value)
     try

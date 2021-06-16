@@ -119,3 +119,33 @@ function cpdot(y::Vector{T}, x::Vector{MOI.VariableIndex}) where {T <: Real}
     return MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.(y, x), zero(T))
 end
 cpdot(x, y) = LinearAlgebra.dot(x, y)
+
+# --- casting from Bool to Int
+
+# function MOI.ScalarAffineTerm{Int}(t::MOI.ScalarAffineTerm{Bool})
+#     return MOI.ScalarAffineTerm{Int}(
+#         Int(t.coefficient),
+#         t.variable_index,
+#     )
+# end
+
+# function MOI.VectorAffineTerm{Int}(t::MOI.VectorAffineTerm{Bool})
+#     return MOI.VectorAffineTerm{Int}(
+#         t.output_index,
+#         MOI.ScalarAffineTerm{Int}(t.scalar_term),
+#     )
+# end
+
+# function MOI.ScalarAffineFunction{Int}(f::MOI.ScalarAffineFunction{Bool})
+#     return MOI.ScalarAffineFunction{Int}(
+#         MOI.ScalarAffineTerm{Int}.(f.terms),
+#         Int(f.constant),
+#     )
+# end
+
+# function MOI.VectorAffineFunction{Int}(f::MOI.VectorAffineFunction{Bool})
+#     return MOI.VectorAffineFunction{Int}(
+#         MOI.VectorAffineTerm{Int}.(f.terms),
+#         Int.(f.constants),
+#     )
+# end

@@ -51,9 +51,9 @@ function MOIBC.bridge_constraint(
     # New variables.
     vars, vars_bin = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:n_array])
 
-    if T <: Bool
+    #= if T <: Bool
         var_max, var_max_con = MOI.add_constrained_variable(model, MOI.ZeroOne())
-    elseif T <: Integer
+    else =#if T <: Integer
         var_max, var_max_con = MOI.add_constrained_variable(model, MOI.Integer())
     elseif T <: Real
         var_max = MOI.add_variable(model)
