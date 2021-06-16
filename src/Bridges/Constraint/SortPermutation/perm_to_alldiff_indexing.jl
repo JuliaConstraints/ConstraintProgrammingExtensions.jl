@@ -3,8 +3,8 @@ Bridges `CP.SortPermutation` to `CP.AllDifferent` and `ElementVariableArray`.
 """
 struct SortPermutation2AllDifferentBridge{T} <: MOIBC.AbstractBridge
     con_alldiff::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.AllDifferent}
-    cons_value::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, CP.ElementVariableArray}}
-    cons_sort::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}
+    cons_value::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.ElementVariableArray}}
+    cons_sort::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}}
 end
 
 function MOIBC.bridge_constraint(
@@ -35,11 +35,11 @@ function MOIBC.bridge_constraint(
     indices = f_scalars[(2 * dim + 1):(3 * dim)]
 
     # The values must be sorted.
-    cons_sort = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}[
+    cons_sort = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}[
         MOI.add_constraint(
             model, 
-            sorted_array[i] - sorted_array[i - 1],
-            MOI.LessThan(zero(T))
+            sorted_array[i] - sorted_array[i + 1],
+            MOI.GreaterThan(zero(T))
         )
         for i in 1:(dim - 1)
     ]
@@ -47,15 +47,15 @@ function MOIBC.bridge_constraint(
     # The indices must take different values, one per index in the array.
     con_alldiff = MOI.add_constraint(
         model, 
-        MOI.vectorize(indices),
+        MOIU.vectorize(indices),
         CP.AllDifferent(dim)
     )
 
     # Relate the three sets of variables by indexing.
-    cons_value = [
+    cons_value = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.ElementVariableArray}[
         MOI.add_constraint(
             model, 
-            MOI.vectorize(
+            MOIU.vectorize(
                 [
                     sorted_array[i],
                     indices[i],
@@ -112,7 +112,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    ::SortPermutation2AllDifferentBridge{T},
+    b::SortPermutation2AllDifferentBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T}, CP.ElementVariableArray,
     },

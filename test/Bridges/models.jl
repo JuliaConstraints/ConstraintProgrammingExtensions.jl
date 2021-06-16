@@ -122,7 +122,13 @@ MOIU.@model(
 MOIU.@model(
     DifferentFromModel,
     (),
-    (MOI.EqualTo, MOI.GreaterThan, MOI.LessThan, MOI.Interval, CP.DifferentFrom),
+    (
+        MOI.EqualTo, 
+        MOI.GreaterThan, 
+        MOI.LessThan, 
+        MOI.Interval, 
+        CP.DifferentFrom,
+    ),
     (
         MOI.Zeros,
         MOI.Nonnegatives,
@@ -137,6 +143,39 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
+    ),
+    (MOI.PowerCone, MOI.DualPowerCone),
+    (),
+    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.VectorOfVariables,),
+    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
+)
+
+MOIU.@model(
+    AllDifferentIndexingModel,
+    (),
+    (
+        MOI.EqualTo, 
+        MOI.GreaterThan, 
+        MOI.LessThan, 
+        MOI.Interval, 
+    ),
+    (
+        MOI.Zeros,
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.GeometricMeanCone,
+        MOI.RelativeEntropyCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+        CP.AllDifferent,
+        CP.ElementVariableArray,
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),
