@@ -22,6 +22,28 @@
         @test CP.is_integer(model, MOI.SingleVariable(x))
     end
 
+    @testset "has_lower_bound{Bool}" begin
+        model = MOI.Utilities.Model{Bool}()
+
+        x, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
+        y, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
+
+        aff = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([true, false], [x, y]),
+            false, 
+        )
+        aff2 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([true, true], [x, y]),
+            false, 
+        )
+
+        # Booleans are implicitly bounded.
+        @test CP.has_lower_bound(model, x)
+        @test CP.has_lower_bound(model, MOI.SingleVariable(x))
+        @test CP.has_lower_bound(model, aff)
+        @test CP.has_lower_bound(model, aff2)
+    end
+
     @testset "has_lower_bound{$(T)}" for T in [Float64, Int]
         model = MOI.Utilities.Model{T}()
 
@@ -64,6 +86,28 @@
         @test CP.has_lower_bound(model, MOI.SingleVariable(x))
         @test CP.has_lower_bound(model, aff)
         @test !CP.has_lower_bound(model, aff2)
+    end
+
+    @testset "get_lower_bound{Bool}" begin
+        model = MOI.Utilities.Model{Bool}()
+
+        x, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
+        y, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
+
+        aff = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([true, false], [x, y]),
+            false, 
+        )
+        aff2 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([true, true], [x, y]),
+            false, 
+        )
+
+        # Booleans are implicitly bounded.
+        @test CP.get_lower_bound(model, x) == 0
+        @test CP.get_lower_bound(model, MOI.SingleVariable(x)) == 0
+        @test CP.get_lower_bound(model, aff) == 0
+        @test CP.get_lower_bound(model, aff2) == 0
     end
 
     @testset "get_lower_bound{$(T)}" for T in [Float64, Int]
@@ -110,6 +154,28 @@
         @test CP.get_lower_bound(model, aff2) == typemin(T)
     end
 
+    @testset "has_upper_bound{Bool}" begin
+        model = MOI.Utilities.Model{Bool}()
+
+        x, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
+        y, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
+
+        aff = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([true, false], [x, y]),
+            false, 
+        )
+        aff2 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([true, true], [x, y]),
+            false, 
+        )
+
+        # Booleans are implicitly bounded.
+        @test CP.has_upper_bound(model, x)
+        @test CP.has_upper_bound(model, MOI.SingleVariable(x))
+        @test CP.has_upper_bound(model, aff)
+        @test CP.has_upper_bound(model, aff2)
+    end
+
     @testset "has_upper_bound{$(T)}" for T in [Float64, Int]
         model = MOI.Utilities.Model{T}()
 
@@ -152,6 +218,28 @@
         @test CP.has_upper_bound(model, MOI.SingleVariable(x))
         @test CP.has_upper_bound(model, aff)
         @test !CP.has_upper_bound(model, aff2)
+    end
+
+    @testset "get_upper_bound{Bool}" begin
+        model = MOI.Utilities.Model{Bool}()
+
+        x, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
+        y, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
+
+        aff = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([true, false], [x, y]),
+            false, 
+        )
+        aff2 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([true, true], [x, y]),
+            false, 
+        )
+
+        # Booleans are implicitly bounded.
+        @test CP.get_upper_bound(model, x) == 1
+        @test CP.get_upper_bound(model, MOI.SingleVariable(x)) == 1
+        @test CP.get_upper_bound(model, aff) == 1
+        @test CP.get_upper_bound(model, aff2) == 2 # TODO: is this wanted? a ScalarAffineFunction cannot really be a Boolean formula (1+1=1), so it makes sense.
     end
 
     @testset "get_upper_bound{$(T)}" for T in [Float64, Int]
