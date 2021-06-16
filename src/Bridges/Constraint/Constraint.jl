@@ -73,3 +73,7 @@ const ArgumentMaximumAmong2MILP{T, OT <: MOI.ModelLike} =
 include("ArgumentMinimumAmong/argmin_to_milp.jl")
 const ArgumentMinimumAmong2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ArgumentMinimumAmong2MILPBridge{T}, OT}
+
+include("SortPermutation/perm_to_alldiff_indexing.jl")
+const SortPermutation2AllDifferent{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{SortPermutation2AllDifferentBridge{T}, OT}

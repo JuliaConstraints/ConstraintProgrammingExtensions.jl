@@ -37,3 +37,6 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
         * [`arg_max`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/arg_max.mzn): [complex mapping](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_arg_max_int.mzn) from [The ARGMAX Constraint, CP2020](https://research.monash.edu/en/publications/the-argmax-constraint).
         * [`arg_min`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/arg_min.mzn): [complex mapping](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_arg_min_int.mzn) from [The ARGMAX Constraint, CP2020](https://research.monash.edu/en/publications/the-argmax-constraint).
         * No reification available.
+    * Permutation to sort: `CP.SortPermutation`
+        * [`arg_sort`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/arg_sort.mzn): [alldifferent and array indexing](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_arg_sort_float.mzn).
+        * No reification available.

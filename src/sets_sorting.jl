@@ -60,7 +60,7 @@ MOI.dimension(set::Sort) = 2 * set.dimension
 """
     SortPermutation(dimension::Int)
 
-Ensures that the first `dimension` elements is a sorted copy of the second
+Ensures that the first `dimension` elements is a sorted copy of the next
 `dimension` elements.
 
 The last `dimension` elements give a permutation to get from the original array
