@@ -27,6 +27,7 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
 * Maximum/minimum: `CP.MaximumAmong` and `CP.MinimumAmong`
     * [`maximum`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/maximum.mzn): built-in, [except for linear solvers](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/linear/redefinitions.mzn)
     * [`minimum`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/minimum.mzn): built-in, [except for linear solvers](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/linear/redefinitions.mzn)
+    * No reification available.
 * Argument maximum/minimum: `CP.ArgumentMaximumAmong` and `CP.MinimumAmong`
     * [`arg_max`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/arg_max.mzn): [complex mapping](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_arg_max_int.mzn) from [The ARGMAX Constraint, CP2020](https://research.monash.edu/en/publications/the-argmax-constraint).
     * [`arg_min`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/arg_min.mzn): [complex mapping](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_arg_min_int.mzn) from [The ARGMAX Constraint, CP2020](https://research.monash.edu/en/publications/the-argmax-constraint).
