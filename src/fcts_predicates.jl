@@ -50,11 +50,11 @@ struct IsLexicographicallyGreaterThanFunction{F <: NL_SV_FCT, G <: NL_SV_FCT} <:
     f2::Vector{<:G}
 end
 
-struct IsSortedFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
+struct SortFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
     f::Vector{<:F}
 end
 
-struct IsPermutationSortedFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
+struct PermutationSortFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
     f::Vector{<:F}
 end
 
