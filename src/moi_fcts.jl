@@ -349,3 +349,122 @@ function NonlinearScalarAffineFunction(fct::MOI.ScalarQuadraticFunction{T}) wher
     terms = [NonlinearScalarAffineTerm(x) for x in vcat(fct.affine_terms, fct.quadratic_terms)]
     return NonlinearScalarAffineFunction(terms, fct.constant)
 end
+
+# -----------------------------------------------------------------------------
+# - Reification
+# -----------------------------------------------------------------------------
+
+struct EquivalenceFunction{F <: NL_SV_FCT, G <: NL_SV_FCT} <: AbstractNonlinearPredicate
+    f1::F
+    f2::G
+end
+
+struct IfThenElseFunction{F <: NL_SV_FCT, G <: NL_SV_FCT, H <: NL_SV_FCT} <: AbstractNonlinearPredicate
+    condition::F
+    true_constraint::G
+    false_constraint::H
+end
+
+struct ImplyFunction{F <: NL_SV_FCT, G <: NL_SV_FCT} <: AbstractNonlinearPredicate
+    antecedent::F
+    consequent::G
+end
+
+struct ConjunctionFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
+    conditions::Vector{<:F}
+end
+
+struct DisjunctionFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
+    conditions::Vector{<:F}
+end
+
+struct NegationFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
+    condition::F
+end
+
+struct TrueFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
+end
+
+struct FalseFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
+end
+
+# -----------------------------------------------------------------------------
+# - Sorting
+# -----------------------------------------------------------------------------
+
+struct LexicographicallyLessThanFunction{F <: NL_SV_FCT} <: AbstractNonlinearVectorFunction
+    f::Vector{<:F}
+end
+
+struct LexicographicallyGreaterThanFunction{F <: NL_SV_FCT} <: AbstractNonlinearVectorFunction
+    f::Vector{<:F}
+end
+
+struct SortFunction{F <: NL_SV_FCT} <: AbstractNonlinearVectorFunction
+    f::Vector{<:F}
+end
+
+struct PermutationSortFunction{F <: NL_SV_FCT} <: AbstractNonlinearVectorFunction
+    f::Vector{<:F}
+end
+
+struct MinimumAmongFunction{F <: NL_SV_FCT} <: AbstractNonlinearVectorFunction
+    f::Vector{<:F}
+end
+
+struct MaximumAmongFunction{F <: NL_SV_FCT} <: AbstractNonlinearVectorFunction
+    f::Vector{<:F}
+end
+
+struct IsArgumentMinimumAmongFunction{F <: NL_SV_FCT} <: AbstractNonlinearVectorFunction
+    f::Vector{<:F}
+end
+
+struct ArgumentMaximumAmongFunction{F <: NL_SV_FCT} <: AbstractNonlinearVectorFunction
+    f::Vector{<:F}
+end
+
+struct IsIncreasingFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
+    f::Vector{<:F}
+end
+
+struct IsDecreasingFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
+    f::Vector{<:F}
+end
+
+# -----------------------------------------------------------------------------
+# - Graphs
+# -----------------------------------------------------------------------------
+
+struct IsCircuitFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
+    f::Vector{<:F}
+end
+
+struct IsCircuitPathFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
+    f::Vector{<:F}
+end
+
+# -----------------------------------------------------------------------------
+# - Combinatorial
+# -----------------------------------------------------------------------------
+
+struct IsBinPackingFunction{F <: NL_SV_FCT} <: AbstractNonlinearPredicate
+    f::Vector{<:F}
+    n_bins::Int
+    n_items::Int
+end
+
+struct IsCapacitatedBinPackingFunction{F <: NL_SV_FCT, G <: Union{NL_SV_FCT, Real}, T <: Real} <: AbstractNonlinearPredicate
+    bins::Vector{<:F}
+    capacity::Vector{<:G}
+    n_bins::Int
+    n_items::Int
+    weights::Vector{T}
+end
+
+struct IsKnapsackFunction{F <: NL_SV_FCT, G <: Union{NL_SV_FCT, Real}, T <: Real} <: AbstractNonlinearPredicate
+    in_knapsack::Vector{<:F}
+    capacity::G
+    weights::Vector{T}
+end
+
