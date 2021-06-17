@@ -47,6 +47,10 @@
         include("MinimumAmong/min_to_milp.jl")
     end
 
+    @testset "Sort" begin
+        include("Sort/sort_to_perm.jl")
+    end
+
     @testset "SortPermutation" begin
         include("SortPermutation/perm_to_alldiff_indexing.jl")
     end

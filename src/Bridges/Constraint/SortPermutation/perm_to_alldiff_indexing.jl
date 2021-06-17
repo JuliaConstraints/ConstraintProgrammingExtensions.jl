@@ -1,5 +1,6 @@
 """
-Bridges `CP.SortPermutation` to `CP.AllDifferent` and `ElementVariableArray`.
+Bridges `CP.SortPermutation` to `CP.AllDifferent` and 
+`CP.ElementVariableArray`.
 """
 struct SortPermutation2AllDifferentBridge{T} <: MOIBC.AbstractBridge
     con_alldiff::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.AllDifferent}
@@ -35,6 +36,7 @@ function MOIBC.bridge_constraint(
     indices = f_scalars[(2 * dim + 1):(3 * dim)]
 
     # The values must be sorted.
+    # TODO: use CP.Increasing instead? 
     cons_sort = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}[
         MOI.add_constraint(
             model, 

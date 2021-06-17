@@ -1,5 +1,4 @@
-@testset "SortPermutation2AllDifferent: $(fct_type), dimension $(array_dim), $(T)" for fct_type in ["vector of variables"], array_dim in [2], T in [Int]
-        # fct_type in ["vector of variables", "vector affine function"], array_dim in [2, 3], T in [Int, Float64]
+@testset "SortPermutation2AllDifferent: $(fct_type), dimension $(array_dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], array_dim in [2, 3], T in [Int, Float64]
     dim = 3 * array_dim
     mock = MOIU.MockOptimizer(AllDifferentIndexingModel{T}())
     model = COIB.SortPermutation2AllDifferent{T}(mock)
@@ -85,7 +84,6 @@
     @testset "Constraints: greater than" begin
         @test length(bridge.cons_sort) == array_dim - 1
         for i in 1:(array_dim - 1)
-            @show i
             @test MOI.is_valid(model, bridge.cons_sort[i])
             s = MOI.get(model, MOI.ConstraintSet(), bridge.cons_sort[i])
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_sort[i])
