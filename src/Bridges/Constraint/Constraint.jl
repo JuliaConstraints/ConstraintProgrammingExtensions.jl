@@ -81,3 +81,7 @@ const SortPermutation2AllDifferent{T, OT <: MOI.ModelLike} =
 include("Sort/sort_to_perm.jl")
 const Sort2SortPermutation{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Sort2SortPermutationBridge{T}, OT}
+
+include("Sort/sort_to_milp.jl")
+const Sort2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Sort2MILPBridge{T}, OT}

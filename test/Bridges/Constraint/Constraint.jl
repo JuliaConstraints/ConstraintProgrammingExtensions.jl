@@ -49,6 +49,7 @@
 
     @testset "Sort" begin
         include("Sort/sort_to_perm.jl")
+        include("Sort/sort_to_milp.jl")
     end
 
     @testset "SortPermutation" begin
