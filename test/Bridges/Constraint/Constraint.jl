@@ -27,8 +27,16 @@
         include("BinPacking/varcapa_to_milp.jl")
     end
 
+    @testset "Decreasing" begin
+        include("Decreasing/dec_to_lp.jl")
+    end
+
     @testset "DifferentFrom" begin
         include("DifferentFrom/neq_to_pseudolp.jl")
+    end
+
+    @testset "Increasing" begin
+        include("Increasing/inc_to_lp.jl")
     end
 
     @testset "Knapsack" begin
