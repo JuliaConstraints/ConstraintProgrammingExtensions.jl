@@ -76,15 +76,6 @@ end
 function MOI.get(
     ::ReifiedEqualTo2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.AbsoluteValue,
-    },
-) where {T <: Real}
-    return 1
-end
-
-function MOI.get(
-    ::ReifiedEqualTo2IndicatorBridge{T},
-    ::MOI.NumberOfConstraints{
         MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}},
     },
 ) where {T <: Real}
