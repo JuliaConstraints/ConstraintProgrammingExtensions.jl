@@ -55,6 +55,10 @@
         include("MinimumAmong/min_to_milp.jl")
     end
 
+    @testset "Reified{MOI.EqualTo}" begin
+        include("EqualTo_Reify/reif_eqto_to_indic.jl")
+    end
+
     @testset "Sort" begin
         include("Sort/sort_to_perm.jl")
         include("Sort/sort_to_milp.jl")

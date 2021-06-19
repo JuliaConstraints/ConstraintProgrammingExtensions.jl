@@ -1,10 +1,10 @@
 @testset "DifferentFrom2PseudoMILP: $(fct_type), $(T)" for fct_type in ["single variable", "scalar affine function"], T in [Int, Bool, Float64]
     base = if T == Int
-        IntPseudoMILPModel{Int}()
+        IntAbsoluteValuePseudoMILPModel{Int}()
     elseif T == Bool
-        BoolPseudoMILPModel{Bool}()
+        BoolAbsoluteValuePseudoMILPModel{Bool}()
     elseif T == Float64
-        FloatPseudoMILPModel{Float64}()
+        FloatAbsoluteValuePseudoMILPModel{Float64}()
     else
         @assert false
     end

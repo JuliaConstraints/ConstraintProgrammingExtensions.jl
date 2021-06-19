@@ -16,7 +16,6 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
-        CP.AbsoluteValue, 
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),
@@ -26,7 +25,71 @@ MOIU.@model(
 )
 
 MOIU.@model(
-    FloatPseudoMILPModel,
+    FloatIndicatorMILPModel,
+    (),
+    (MOI.EqualTo, MOI.GreaterThan, MOI.LessThan, MOI.Interval),
+    (
+        MOI.Zeros,
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.GeometricMeanCone,
+        MOI.RelativeEntropyCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{Float64}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{Float64}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{Float64}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.EqualTo{Float64}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.LessThan{Float64}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.GreaterThan{Float64}},
+    ),
+    (MOI.PowerCone, MOI.DualPowerCone),
+    (),
+    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.VectorOfVariables,),
+    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
+)
+
+MOIU.@model(
+    IntIndicatorMILPModel,
+    (),
+    (MOI.EqualTo, MOI.GreaterThan, MOI.LessThan, MOI.Interval),
+    (
+        MOI.Zeros,
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.GeometricMeanCone,
+        MOI.RelativeEntropyCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{Int}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{Int}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{Int}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.EqualTo{Int}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.LessThan{Int}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.GreaterThan{Int}},
+    ),
+    (MOI.PowerCone, MOI.DualPowerCone),
+    (),
+    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.VectorOfVariables,),
+    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
+)
+
+MOIU.@model(
+    FloatAbsoluteValuePseudoMILPModel,
     (
         CP.Strictly{MOI.GreaterThan{Float64}, Float64}, 
         CP.Strictly{MOI.LessThan{Float64}, Float64},
@@ -56,7 +119,7 @@ MOIU.@model(
 )
 
 MOIU.@model(
-    IntPseudoMILPModel,
+    IntAbsoluteValuePseudoMILPModel,
     (
         CP.Strictly{MOI.GreaterThan{Int}, Int},
         CP.Strictly{MOI.LessThan{Int}, Int},
@@ -86,7 +149,7 @@ MOIU.@model(
 )
 
 MOIU.@model(
-    BoolPseudoMILPModel,
+    BoolAbsoluteValuePseudoMILPModel,
     (
         CP.Strictly{MOI.GreaterThan{Bool}, Bool}, 
         CP.Strictly{MOI.LessThan{Bool}, Bool},
@@ -143,6 +206,74 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
+    ),
+    (MOI.PowerCone, MOI.DualPowerCone),
+    (),
+    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.VectorOfVariables,),
+    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
+)
+
+MOIU.@model(
+    FloatDifferentFromIndicatorMILPModel,
+    (),
+    (MOI.EqualTo, MOI.GreaterThan, MOI.LessThan, MOI.Interval),
+    (
+        MOI.Zeros,
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.GeometricMeanCone,
+        MOI.RelativeEntropyCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{Float64}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{Float64}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{Float64}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, CP.DifferentFrom{Float64}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.EqualTo{Float64}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.LessThan{Float64}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.GreaterThan{Float64}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{Float64}},
+    ),
+    (MOI.PowerCone, MOI.DualPowerCone),
+    (),
+    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.VectorOfVariables,),
+    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
+)
+
+MOIU.@model(
+    IntDifferentFromIndicatorMILPModel,
+    (),
+    (MOI.EqualTo, MOI.GreaterThan, MOI.LessThan, MOI.Interval),
+    (
+        MOI.Zeros,
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.GeometricMeanCone,
+        MOI.RelativeEntropyCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{Int}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{Int}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{Int}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, CP.DifferentFrom{Int}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.EqualTo{Int}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.LessThan{Int}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.GreaterThan{Int}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{Int}},
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),

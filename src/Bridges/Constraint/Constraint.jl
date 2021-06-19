@@ -93,3 +93,7 @@ const Decreasing2LP{T, OT <: MOI.ModelLike} =
 include("Increasing/inc_to_lp.jl")
 const Increasing2LP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Increasing2LPBridge{T}, OT}
+
+include("EqualTo_Reify/reif_eqto_to_indic.jl")
+const ReifiedEqualTo2Indicator{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ReifiedEqualTo2IndicatorBridge{T}, OT}

@@ -10,13 +10,13 @@ end
 function MOIBC.bridge_constraint(
     ::Type{ReifiedEqualTo2IndicatorBridge{T}},
     model,
-    f::MOI.SingleVariable,
+    f::MOI.VectorOfVariables,
     s::CP.Reified{MOI.EqualTo{T}},
 ) where {T}
     return MOIBC.bridge_constraint(
         ReifiedEqualTo2IndicatorBridge{T},
         model,
-        MOI.ScalarAffineFunction{T}(f),
+        MOI.VectorAffineFunction{T}(f),
         s,
     )
 end
@@ -24,7 +24,7 @@ end
 function MOIBC.bridge_constraint(
     ::Type{ReifiedEqualTo2IndicatorBridge{T}},
     model,
-    f::MOI.ScalarAffineFunction{T},
+    f::MOI.VectorAffineFunction{T},
     s::CP.Reified{MOI.EqualTo{T}},
 ) where {T <: Real}
     indic_true = MOI.add_constraint(
@@ -32,7 +32,7 @@ function MOIBC.bridge_constraint(
         f,
         MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE}(s.set)
     )
-    indic_true = MOI.add_constraint(
+    indic_false = MOI.add_constraint(
         model, 
         f,
         MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO}(CP.DifferentFrom(s.set.value))
@@ -44,7 +44,7 @@ end
 
 function MOI.supports_constraint(
     ::Type{ReifiedEqualTo2IndicatorBridge{T}},
-    ::Union{Type{MOI.SingleVariable}, Type{MOI.ScalarAffineFunction{T}}},
+    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
     ::Type{CP.Reified{MOI.EqualTo{T}}},
 ) where {T <: Real}
     return true
