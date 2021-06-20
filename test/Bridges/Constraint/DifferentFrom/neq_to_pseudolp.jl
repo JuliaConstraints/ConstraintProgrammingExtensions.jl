@@ -38,10 +38,7 @@
     fct = if fct_type == "single variable"
         MOI.SingleVariable(x)
     elseif fct_type == "scalar affine function"
-        MOI.ScalarAffineFunction(
-            [MOI.ScalarAffineTerm(one(T), x)], 
-            zero(T),
-        )
+        one(T) * MOI.SingleVariable(x)
     else
         @assert false
     end
@@ -124,7 +121,7 @@
     
     if T == Float64
         @testset "Strictly greater than" begin
-            @test MOI.is_valid(model, bridge.con_abs)
+            @test MOI.is_valid(model, bridge.con_abs_strictly)
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_abs_strictly)
             @test length(f.terms) == 1
             @test MOI.get(model, MOI.ConstraintSet(), bridge.con_abs_strictly) == CP.Strictly(MOI.GreaterThan(zero(T)))
@@ -156,6 +153,4 @@
             @test t1.variable_index == x
         end
     end
-
-    # con_eq::Union{Nothing, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}, MOI.ConstraintIndex{MOI.SingleVariable, MOI.EqualTo{T}}}
 end

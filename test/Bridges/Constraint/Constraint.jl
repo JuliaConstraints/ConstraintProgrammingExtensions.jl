@@ -35,6 +35,15 @@
         include("DifferentFrom/neq_to_pseudolp.jl")
     end
 
+    @testset "IndicatorSet{DifferentFrom}" begin
+        include("DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl")
+    end
+
+    @testset "Reified{MOI.EqualTo}" begin
+        include("EqualTo_Reify/reif_eqto_to_indic.jl")
+        include("EqualTo_Reify/reif_eqto_to_milp.jl")
+    end
+
     @testset "Increasing" begin
         include("Increasing/inc_to_lp.jl")
     end
@@ -53,11 +62,6 @@
 
     @testset "MinimumAmong" begin
         include("MinimumAmong/min_to_milp.jl")
-    end
-
-    @testset "Reified{MOI.EqualTo}" begin
-        include("EqualTo_Reify/reif_eqto_to_indic.jl")
-        include("EqualTo_Reify/reif_eqto_to_milp.jl")
     end
 
     @testset "Sort" begin
