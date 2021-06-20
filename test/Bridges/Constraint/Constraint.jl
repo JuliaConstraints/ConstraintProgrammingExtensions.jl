@@ -57,6 +57,7 @@
 
     @testset "Reified{MOI.EqualTo}" begin
         include("EqualTo_Reify/reif_eqto_to_indic.jl")
+        include("EqualTo_Reify/reif_eqto_to_milp.jl")
     end
 
     @testset "Sort" begin

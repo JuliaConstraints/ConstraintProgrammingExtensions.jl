@@ -1,6 +1,5 @@
 using Base: Float64
-@testset "ReifiedEqualTo2Indicator: $(fct_type), dimension $(T)" for fct_type in ["vector of variables"], T in [Float64]
-        # fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
+@testset "ReifiedEqualTo2Indicator: $(fct_type), type $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
     base_model = if T == Int
         IntDifferentFromIndicatorMILPModel{Int}()
     elseif T == Float64
@@ -68,11 +67,28 @@ using Base: Float64
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{T}}}()) == [bridge.indic_false]
     end
 
-    @testset "Set of constraints" begin
+    @testset "Constraint: indicator if true" begin
         @test MOI.is_valid(model, bridge.indic_true)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.indic_true)
         @test length(f.terms) == 2
         @test MOI.get(model, MOI.ConstraintSet(), bridge.indic_true) == MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE}(MOI.EqualTo(zero(T)))
+
+        t1 = f.terms[1]
+        @test t1.output_index == 1
+        @test t1.scalar_term.coefficient === one(T)
+        @test t1.scalar_term.variable_index == x
+
+        t2 = f.terms[2]
+        @test t2.output_index == 2
+        @test t2.scalar_term.coefficient === one(T)
+        @test t2.scalar_term.variable_index == y
+    end
+
+    @testset "Constraint: indicator if false" begin
+        @test MOI.is_valid(model, bridge.indic_false)
+        f = MOI.get(model, MOI.ConstraintFunction(), bridge.indic_false)
+        @test length(f.terms) == 2
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.indic_false) == MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO}(CP.DifferentFrom(zero(T)))
 
         t1 = f.terms[1]
         @test t1.output_index == 1

@@ -29,6 +29,14 @@ function is_binary(model::MOI.ModelLike, v::MOI.VariableIndex)
     return MOI.is_valid(model, c_idx)
 end
 
+function is_binary(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) where {T <: Real}
+    if length(v.terms) > 1
+        return false
+    end
+    t = v.terms[1]
+    return t.coefficient === one(T) && is_binary(model, t.variable_index)
+end
+
 function has_lower_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
     return has_lower_bound(model, v.variable)
 end
