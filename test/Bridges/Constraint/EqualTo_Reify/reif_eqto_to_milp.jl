@@ -58,7 +58,7 @@ using Base: Float64
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Reified{MOI.EqualTo{T}}) == typeof(bridge)
         if T == Int
-            @test MOIB.added_constrained_variable_types(typeof(bridge)) == (MOI.Integer,)
+            @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.Integer,)]
             @test MOIB.added_constraint_types(typeof(bridge)) == [
                 (MOI.SingleVariable, MOI.Integer),
                 (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
@@ -80,7 +80,7 @@ using Base: Float64
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == 2
         
         if T == Int
-            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.Integer}()) == bridge.var_abs_int
+            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.Integer}()) == [bridge.var_abs_int]
         end
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}()) == [bridge.con_abs]
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}())) == Set([bridge.con_bigm, bridge.con_smallm])
@@ -129,7 +129,7 @@ using Base: Float64
         @test t1.variable_index == x
 
         smallm = if T == Int
-            1
+            -1
         elseif T == Float64
             -100_000.0
         else

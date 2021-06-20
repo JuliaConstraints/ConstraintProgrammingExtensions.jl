@@ -176,10 +176,10 @@ end
 function MOI.get(
     b::ReifiedEqualTo2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer},
+        MOI.SingleVariable, MOI.Integer,
     },
 ) where {T <: Integer}
-    return b.var_abs_int
+    return [b.var_abs_int]
 end
 
 function MOI.get(
