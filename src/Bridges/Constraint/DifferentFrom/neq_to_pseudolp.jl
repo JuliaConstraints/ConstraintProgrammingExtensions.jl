@@ -229,13 +229,18 @@ end
 
 function MOI.get(
     b::DifferentFrom2PseudoMILPBridge{T},
+    ::MOI.ListOfVariableIndices,
+) where {T <: Real}
+    return [b.var_abs]
+end
+
+function MOI.get(
+    b::DifferentFrom2PseudoMILPBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.VectorAffineFunction{T}, CP.AbsoluteValue,
     },
 ) where {T <: Real}
-    return b.con_abs === nothing ? 
-        Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}}[] :
-        [b.con_abs]
+    return [b.con_abs]
 end
 
 function MOI.get(
@@ -244,9 +249,7 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, CP.Strictly{MOI.GreaterThan{T}},
     },
 ) where {T <: Real}
-    return b.con_abs === nothing ? 
-        Vector{MOI.ConstraintIndex{MOI.SingleVariable, CP.Strictly{MOI.GreaterThan{T}}}}[] :
-        [b.con_abs_strictly]
+    return [b.con_abs_strictly]
 end
 
 function MOI.get(
@@ -255,9 +258,7 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
     },
 ) where {T <: Real}
-    return b.con_abs === nothing ? 
-        Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{T}}}[] :
-        [b.con_abs_gt]
+    return [b.con_abs_gt]
 end
 
 function MOI.get(
@@ -266,7 +267,5 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
     },
 ) where {T <: Real}
-    return b.con_eq === nothing ? 
-        Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}[] :
-        [b.con_eq]
+    return [b.con_eq]
 end

@@ -87,6 +87,9 @@
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == ((T == Bool) ? 1 : 0)
 
         if T != Bool
+            @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.var_abs]
+        end
+        if T != Bool
             @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}()) == [bridge.con_abs]
         end
         if T == Float64
