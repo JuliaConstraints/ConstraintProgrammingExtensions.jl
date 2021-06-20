@@ -21,6 +21,10 @@ const ArgumentMinimumAmong2MILP{T, OT <: MOI.ModelLike} =
 include("DifferentFrom/neq_to_pseudolp.jl")
 const DifferentFrom2PseudoMILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{DifferentFrom2PseudoMILPBridge{T}, OT}
+
+include("DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl")
+const IndicatorDifferentFrom2PseudoMILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{IndicatorDifferentFrom2PseudoMILPBridge{T}, OT}
     
 include("BinPacking/bp_to_milp.jl")
 const BinPacking2MILP{T, OT <: MOI.ModelLike} =
