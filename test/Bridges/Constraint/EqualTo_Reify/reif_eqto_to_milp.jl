@@ -79,6 +79,7 @@ using Base: Float64
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}()) == 1
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == 2
         
+        @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.var_abs]
         if T == Int
             @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.Integer}()) == [bridge.var_abs_int]
         end
