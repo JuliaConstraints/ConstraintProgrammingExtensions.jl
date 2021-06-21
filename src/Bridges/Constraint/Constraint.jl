@@ -18,7 +18,7 @@ include("ArgumentMinimumAmong/argmin_to_milp.jl")
 const ArgumentMinimumAmong2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ArgumentMinimumAmong2MILPBridge{T}, OT}
 
-include("Count/count_to_indic.jl")
+include("Count/count_to_reif.jl")
 const CountEqualTo2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Count2ReificationBridge{T, MOI.EqualTo{T}}, OT}
 const CountLessThan2Reification{T, OT <: MOI.ModelLike} =
