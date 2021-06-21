@@ -6,7 +6,7 @@ function count_vectorofvariables_test(
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.EqualTo{Int})
-    @test MOI.supports_constraint(model, MOI.VectorOfVariables, CP.Count{Int})
+    @test MOI.supports_constraint(model, MOI.VectorOfVariables, CP.Count{MOI.EqualTo{Int}})
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -56,7 +56,7 @@ function count_vectoraffinefunction_test(
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{Int},
-        CP.Count{Int},
+        CP.Count{MOI.EqualTo{Int}},
     )
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
