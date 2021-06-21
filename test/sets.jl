@@ -97,7 +97,6 @@
     # Two arguments: first a dimension, then a templated constant.
     @testset "$(S)" for S in [
         CP.AllDifferentExceptConstant,
-        CP.Count,
         CP.MinimumDistance,
         CP.MaximumDistance,
     ]
@@ -125,6 +124,49 @@
         else
             error("$(S) not implemented")
         end
+    end
+
+    @testset "Count{…}" begin
+        @test isbitstype(CP.Count{MOI.EqualTo{Int}})
+
+        # Default constructor: MOI.EqualTo.
+        @test CP.Count(2, 0) == CP.Count(2, 0)
+        @test CP.Count(2, 0) != CP.Count(2, 1)
+        @test CP.Count(2, 0) != CP.Count(3, 0)
+        @test CP.Count(3, 0) != CP.Count(2, 0)
+
+        s = CP.Count(2, 0)
+        @test typeof(copy(s)) <: CP.Count
+        @test copy(s) == s
+        
+        @test MOI.dimension(CP.Count(2, 0)) == 2 + 1
+        @test MOI.dimension(CP.Count(3, 4)) == 3 + 1
+
+        # Directly give a MOI.EqualTo object.
+        @test CP.Count(2, MOI.EqualTo(0)) == CP.Count(2, MOI.EqualTo(0))
+        @test CP.Count(2, MOI.EqualTo(0)) != CP.Count(2, MOI.EqualTo(1))
+        @test CP.Count(2, MOI.EqualTo(0)) != CP.Count(3, MOI.EqualTo(0))
+        @test CP.Count(3, MOI.EqualTo(0)) != CP.Count(2, MOI.EqualTo(0))
+
+        s = CP.Count(2, MOI.EqualTo(0))
+        @test typeof(copy(s)) <: CP.Count
+        @test copy(s) == s
+        
+        @test MOI.dimension(CP.Count(2, MOI.EqualTo(0))) == 2 + 1
+        @test MOI.dimension(CP.Count(3, MOI.EqualTo(4))) == 3 + 1
+    
+        # Other sets.
+        @test CP.Count(2, CP.DifferentFrom(0)) == CP.Count(2, CP.DifferentFrom(0))
+        @test CP.Count(2, CP.DifferentFrom(0)) != CP.Count(2, CP.DifferentFrom(1))
+        @test CP.Count(2, CP.DifferentFrom(0)) != CP.Count(3, CP.DifferentFrom(0))
+        @test CP.Count(3, CP.DifferentFrom(0)) != CP.Count(2, CP.DifferentFrom(0))
+
+        s = CP.Count(2, CP.DifferentFrom(0))
+        @test typeof(copy(s)) <: CP.Count
+        @test copy(s) == s
+        
+        @test MOI.dimension(CP.Count(2, CP.DifferentFrom(0))) == 2 + 1
+        @test MOI.dimension(CP.Count(3, CP.DifferentFrom(4))) == 3 + 1
     end
 
     @testset "CountCompare" begin
