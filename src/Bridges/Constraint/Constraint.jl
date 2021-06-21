@@ -18,6 +18,20 @@ include("ArgumentMinimumAmong/argmin_to_milp.jl")
 const ArgumentMinimumAmong2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ArgumentMinimumAmong2MILPBridge{T}, OT}
 
+include("Count/count_to_indic.jl")
+const CountEqualTo2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Count2ReificationBridge{T, MOI.EqualTo{T}}, OT}
+const CountLessThan2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Count2ReificationBridge{T, MOI.LessThan{T}}, OT}
+const CountGreaterThan2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Count2ReificationBridge{T, MOI.GreaterThan{T}}, OT}
+const CountStrictlyLessThan2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Count2ReificationBridge{T, CP.Strictly{MOI.LessThan{T}, T}}, OT}
+const CountStrictlyGreaterThan2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Count2ReificationBridge{T, CP.Strictly{MOI.GreaterThan{T}, T}}, OT}
+const CountDifferentFrom2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Count2ReificationBridge{T, CP.DifferentFrom{T}}, OT}
+
 include("DifferentFrom/neq_to_pseudolp.jl")
 const DifferentFrom2PseudoMILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{DifferentFrom2PseudoMILPBridge{T}, OT}
