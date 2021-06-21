@@ -28,26 +28,26 @@ function MOIBC.bridge_constraint(
     f::MOI.VectorAffineFunction{T},
     s::CP.Count{S},
 ) where {T, S <: MOI.AbstractScalarSet}
-    vars, vars_bin = MOI.add_constrained_variables(model, [MOI.ZeroOne for _ in 1:s.dim])
+    vars, vars_bin = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:s.dimension])
 
     f_scalars = MOIU.scalarize(f)
-    cons = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}[
+    cons = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{S}}[
         MOI.add_constraint(
             model,
             MOIU.vectorize(
-                MOI.ScalarAffineFunction[
-                    one(T) * vars[i], 
-                    f_scalars[1 + i]
+                MOI.ScalarAffineFunction{T}[
+                    one(T) * MOI.SingleVariable(vars[i]), 
+                    f_scalars[1 + i],
                 ]
             ),
-            CP.Reify(s.set)
+            CP.Reified(s.set)
         )
-        for i in 1:dim
+        for i in 1:s.dimension
     ]
 
     con_sum = MOI.add_constraint(
         model, 
-        sum(MOI.SingleVariable.(vars)) - f_scalars[1],
+        sum(one(T) .* MOI.SingleVariable.(vars)) - f_scalars[1],
         MOI.EqualTo(zero(T))
     )
 
@@ -70,6 +70,7 @@ function MOIB.added_constraint_types(::Type{Count2ReificationBridge{T, S}}) wher
     return [
         (MOI.SingleVariable, MOI.ZeroOne),
         (MOI.VectorAffineFunction{T}, CP.Reified{S}),
+        (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
     ]
 end
 

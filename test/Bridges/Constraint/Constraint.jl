@@ -27,6 +27,10 @@
         include("BinPacking/varcapa_to_milp.jl")
     end
 
+    @testset "Count" begin
+        include("Count/count_to_reif.jl")
+    end
+
     @testset "Decreasing" begin
         include("Decreasing/dec_to_lp.jl")
     end
