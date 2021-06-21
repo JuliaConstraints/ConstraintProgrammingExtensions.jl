@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.3.0
+-------------
+
+Generalise `Count` to any kind of comparison for items, not just equality. 
+(The user-facing interface is the same.)
+
+
 Version 0.2.5
 -------------
 
