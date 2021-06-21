@@ -149,29 +149,32 @@ function MOIU.shift_constant(set::DifferentFrom{T}, offset::T) where {T}
 end
 
 """
-    Count{T <: Real}(dimension::Int, value::T)
+    Count{S <: MOI.AbstractScalarSet}(dimension::Int, set::MOI.AbstractScalarSet)
 
-``\\{(y, x) \\in \\mathbb{N} \\times \\mathbb{T}^\\mathtt{dimension} : y = |\\{i | x_i = value\\}|\\}``
+``\\{(y, x) \\in \\mathbb{N} \\times \\mathbb{T}^\\mathtt{dimension} : y = |\\{i | x_i \\in S \\}|\\}``
 
-`dimension` is the number of variables that are checked against the `value`, 
-i.e. the result variable is not included.
+`dimension` is the number of variables that are checked against the `set`.
 
 Also called `among`.
 
 ## Example
 
-    [w, x, y, z] in Count(2.0, 3)
+    [w, x, y, z] in Count(2.0, MOI.EqualTo(3))
     # w == sum([x, y, z] .== 2.0)
 """
-struct Count{T <: Real} <: MOI.AbstractVectorSet
+struct Count{S <: MOI.AbstractScalarSet} <: MOI.AbstractVectorSet
     dimension::Int
-    value::T
+    set::S
 end
 
-MOI.dimension(set::Count{T}) where {T} = set.dimension + 1
-copy(set::Count{T}) where {T} = Count(set.dimension, copy(set.value))
-function Base.:(==)(x::Count{T}, y::Count{T}) where {T}
-    return x.dimension == y.dimension && x.value == y.value
+function Count(dimension::Int, value::Real)
+    return Count(dimension, MOI.EqualTo(value))
+end
+
+MOI.dimension(set::Count{S}) where {S} = set.dimension + 1
+copy(set::Count{S}) where {S} = Count(set.dimension, copy(set.set))
+function Base.:(==)(x::Count{S}, y::Count{S}) where {S}
+    return x.dimension == y.dimension && x.set == y.set
 end
 
 """
