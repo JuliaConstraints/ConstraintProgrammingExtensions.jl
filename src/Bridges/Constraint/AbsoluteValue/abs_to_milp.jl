@@ -8,6 +8,9 @@ checking this automatically would require access to the whole model.
 
 Based on Mosek's 
 [modelling cookbook](https://docs.mosek.com/modeling-cookbook/mio.html#exact-absolute-value).
+
+YALMIP implements [a similar formulation, with big-M and small-m values 
+computed based on the bounds for each variable](https://github.com/yalmip/YALMIP/blob/develop/operators/alldifferent.m).
 """
 struct AbsoluteValue2MILPBridge{T} <: MOIBC.AbstractBridge
     var_bin::MOI.VariableIndex
