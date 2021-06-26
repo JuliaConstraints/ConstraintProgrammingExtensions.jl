@@ -8,7 +8,8 @@ Generalise `Count` to any kind of comparison for items, not just equality.
 (The user-facing interface is the same.)
 
 Add `VectorDomain` and `VectorAntiDomain`. Add `AllDifferentExceptConstants`;
-`AllDifferentExceptConstant` becomes a constructor for the former.
+`AllDifferentExceptConstant` becomes a constructor for the former. Add 
+`NonOverlappingOrthotopes` and `ConditionallyNonOverlappingOrthotopes`.
 
 
 Version 0.2.5

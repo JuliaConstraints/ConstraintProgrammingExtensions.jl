@@ -124,6 +124,33 @@
         end
     end
 
+    # Two arguments: two dimensions.
+    @testset "$(S)" for S in [
+        CP.NonOverlappingOrthotopes,
+        CP.ConditionallyNonOverlappingOrthotopes,
+    ]
+        @test isbitstype(S)
+
+        @test S(2, 2) == S(2, 2)
+        @test S(2, 2) != S(2, 1)
+        @test S(2, 2) != S(3, 2)
+        @test S(3, 2) != S(2, 2)
+
+        s = S(2, 2)
+        @test typeof(copy(s)) <: S
+        @test copy(s) == s
+
+        if S == CP.NonOverlappingOrthotopes
+            @test MOI.dimension(S(2, 2)) == 3 * 2 * 2
+            @test MOI.dimension(S(3, 4)) == 3 * 3 * 4
+        elseif S == CP.ConditionallyNonOverlappingOrthotopes
+            @test MOI.dimension(S(2, 2)) == 3 * 2 * 2 + 2
+            @test MOI.dimension(S(3, 4)) == 3 * 3 * 4 + 3
+        else
+            error("$(S) not implemented")
+        end
+    end
+
     @testset "AllDifferentExceptConstants" begin
         # Convenience constructor for one value.
         @test CP.AllDifferentExceptConstant(2, 0) == CP.AllDifferentExceptConstant(2, 0)
