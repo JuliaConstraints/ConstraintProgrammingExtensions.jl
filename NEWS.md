@@ -7,6 +7,9 @@ Version 0.3.0
 Generalise `Count` to any kind of comparison for items, not just equality. 
 (The user-facing interface is the same.)
 
+Add `VectorDomain` and `VectorAntiDomain`. Add `AllDifferentExceptConstants`;
+`AllDifferentExceptConstant` becomes a constructor for the former.
+
 
 Version 0.2.5
 -------------
