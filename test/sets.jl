@@ -240,6 +240,21 @@
         @test MOI.dimension(S(set2)) == 1
     end
 
+    @testset "$(S)" for S in [CP.VectorDomain, CP.VectorAntiDomain]
+        set1 = Set([[1, 2, 3], [2, 3, 4]])
+        set2 = Set([[1, 2, 3], [3, 4, 5]])
+        @test S(3, set1) == S(3, set1)
+        @test S(3, set1) != S(3, set2)
+        @test S(3, set2) != S(3, set1)
+
+        s = S(3, set1)
+        @test typeof(copy(s)) <: S
+        @test copy(s) == s
+
+        @test MOI.dimension(S(3, set1)) == 3
+        @test MOI.dimension(S(3, set2)) == 3
+    end
+
     @testset "Strictly{$(Ssub)}" for Ssub in [MOI.LessThan, MOI.GreaterThan]
         @test CP.Strictly(Ssub(1)) == CP.Strictly(Ssub(1))
         @test CP.Strictly(Ssub(1)) != CP.Strictly(Ssub(2))

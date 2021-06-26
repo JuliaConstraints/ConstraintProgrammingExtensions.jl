@@ -96,6 +96,30 @@ copy(set::Domain{T}) where {T} = Domain(copy(set.values))
 Base.:(==)(x::Domain{T}, y::Domain{T}) where {T} = x.values == y.values
 
 """
+    VectorDomain{T <: Number}(dimension::Int, values::Set{Vector{T}})
+
+The set corresponding to an enumeration of constant values.
+
+The value of a vector function is enforced to take a value from this set of
+vector values.
+
+This constraint is sometimes called `in`, `member` or `allowed_assignments`.
+https://sofdem.github.io/gccat/gccat/Cdomain.html
+
+## Example
+
+    [x, y] in Domain(2, Set([[1, 2], [2, 3]]))
+    # enforces (`x == 1` AND `y == 2`) OR (`x == 2` AND `y == 3`).
+"""
+struct VectorDomain{T <: Number} <: MOI.AbstractVectorSet
+    dimension::Int
+    values::Set{Vector{T}}
+end
+
+copy(set::VectorDomain{T}) where {T} = VectorDomain(set.dimension, copy(set.values))
+Base.:(==)(x::VectorDomain{T}, y::VectorDomain{T}) where {T} = x.dimension == y.dimension && x.values == y.values
+
+"""
     AntiDomain{T <: Number}(values::Set{T})
 
 The set corresponding to an enumeration of constant values that are excluded.
@@ -117,6 +141,31 @@ end
 
 copy(set::AntiDomain{T}) where {T} = AntiDomain(copy(set.values))
 Base.:(==)(x::AntiDomain{T}, y::AntiDomain{T}) where {T} = x.values == y.values
+
+"""
+    VectorAntiDomain{T <: Number}(values::Set{T})
+
+The set corresponding to an enumeration of constant values that are excluded.
+
+The value of a vector function is enforced to take a value that is not from 
+this set of vector values.
+
+This constraint is sometimes called (`not_in`)[https://sofdem.github.io/gccat/gccat/Cnot_in.html#uid28032],
+`not_member`, `rel`, `forbidden_assignments`, or `no_good`.
+
+## Example
+
+    [x, y] in VectorAntiDomain(2, Set([[1, 2], [2, 3]]))
+    # enforces (`x != 1` AND `y != 2`) OR (`x != 2` AND `y != 3`).
+"""
+struct VectorAntiDomain{T <: Number} <: MOI.AbstractScalarSet
+    dimension::Int
+    values::Set{Vector{T}}
+end
+
+copy(set::VectorAntiDomain{T}) where {T} = VectorAntiDomain(set.dimension, copy(set.values))
+Base.:(==)(x::VectorAntiDomain{T}, y::VectorAntiDomain{T}) where {T} = x.values == y.values
+MOI.dimension(set::VectorAntiDomain{T}) where {T} = set.dimension # TODO: why is this needed?
 
 """
     Membership(dimension)
