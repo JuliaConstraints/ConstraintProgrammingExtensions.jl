@@ -13,7 +13,9 @@
     @testset "is_binary{$(T)}" for T in [Float64, Int]
         model = MOI.Utilities.Model{Float64}()
         x = MOI.add_variable(model)
+        y = MOI.add_variable(model)
         MOI.add_constraint(model, x, MOI.ZeroOne())
+        MOI.add_constraint(model, y, MOI.ZeroOne())
 
         aff = MOI.ScalarAffineFunction(
             MOI.ScalarAffineTerm.([one(T)], [x]),
@@ -32,7 +34,7 @@
             zero(T), 
         )
         aff5 = MOI.ScalarAffineFunction(
-            MOI.ScalarAffineTerm.([one(T) / 2, one(T) / 3], [x, x]),
+            MOI.ScalarAffineTerm.([one(T) / 2, one(T) / 3], [x, y]),
             zero(T) / 5, 
         )
 
@@ -58,7 +60,9 @@
     @testset "is_integer{$(T)}" for T in [Float64, Int]
         model = MOI.Utilities.Model{Float64}()
         x = MOI.add_variable(model)
+        y = MOI.add_variable(model)
         MOI.add_constraint(model, x, MOI.Integer())
+        MOI.add_constraint(model, y, MOI.Integer())
 
         aff = MOI.ScalarAffineFunction(
             MOI.ScalarAffineTerm.([one(T)], [x]),
@@ -77,7 +81,7 @@
             zero(T), 
         )
         aff5 = MOI.ScalarAffineFunction(
-            MOI.ScalarAffineTerm.([one(T) / 2, one(T) / 3], [x, x]),
+            MOI.ScalarAffineTerm.([one(T) / 2, one(T) / 3], [x, y]),
             zero(T) / 5, 
         )
 
