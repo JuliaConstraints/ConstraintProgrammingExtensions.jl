@@ -96,7 +96,6 @@
 
     # Two arguments: first a dimension, then a templated constant.
     @testset "$(S)" for S in [
-        CP.AllDifferentExceptConstant,
         CP.MinimumDistance,
         CP.MaximumDistance,
     ]
@@ -112,7 +111,6 @@
         @test copy(s) == s
 
         if S in [
-            CP.AllDifferentExceptConstant,
             CP.MaximumDistance,
             CP.MinimumDistance,
         ]
@@ -124,6 +122,34 @@
         else
             error("$(S) not implemented")
         end
+    end
+
+    @testset "AllDifferentExceptConstants" begin
+        # Convenience constructor for one value.
+        @test CP.AllDifferentExceptConstant(2, 0) == CP.AllDifferentExceptConstant(2, 0)
+        @test CP.AllDifferentExceptConstant(2, 0) != CP.AllDifferentExceptConstant(2, 1)
+        @test CP.AllDifferentExceptConstant(2, 0) != CP.AllDifferentExceptConstant(3, 0)
+        @test CP.AllDifferentExceptConstant(3, 0) != CP.AllDifferentExceptConstant(2, 0)
+
+        s = CP.AllDifferentExceptConstant(2, 0)
+        @test typeof(copy(s)) <: CP.AllDifferentExceptConstants
+        @test copy(s) == s
+        
+        @test MOI.dimension(CP.AllDifferentExceptConstant(2, 0)) == 2
+        @test MOI.dimension(CP.AllDifferentExceptConstant(3, 4)) == 3
+
+        # Usual constructor.
+        @test CP.AllDifferentExceptConstants(2, Set([0, 1])) == CP.AllDifferentExceptConstants(2, Set([0, 1]))
+        @test CP.AllDifferentExceptConstants(2, Set([0, 1])) != CP.AllDifferentExceptConstants(2, Set([2, 3]))
+        @test CP.AllDifferentExceptConstants(2, Set([0, 1])) != CP.AllDifferentExceptConstants(3, Set([0, 1]))
+        @test CP.AllDifferentExceptConstants(3, Set([0, 1])) != CP.AllDifferentExceptConstants(2, Set([0, 1]))
+
+        s = CP.AllDifferentExceptConstants(2, Set([0, 1]))
+        @test typeof(copy(s)) <: CP.AllDifferentExceptConstants
+        @test copy(s) == s
+        
+        @test MOI.dimension(CP.AllDifferentExceptConstants(2, Set([0, 1]))) == 2
+        @test MOI.dimension(CP.AllDifferentExceptConstants(3, Set([2, 3]))) == 3
     end
 
     @testset "Count{…}" begin

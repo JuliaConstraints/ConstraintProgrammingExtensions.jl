@@ -40,34 +40,37 @@ end
 # i.e. scalar affine expressions.
 
 """
-    AllDifferentExceptConstant{T <: Number}(dimension::Int, k::Number)
+    AllDifferentExceptConstants{T <: Number}(dimension::Int, k::Set{T})
 
 All expressions of a vector-valued function are enforced to take distinct
-values in the solution, but values equal to `k` are not considered: 
-for all pairs of expressions, either their values must differ or at least
-one of the two variables has the value `k`.
+values in the solution, but values equal to any value in `k` are not 
+considered: for all pairs of expressions, either their values must differ or
+at least one of the two variables has a value in `k`.
 
 This constraint is sometimes called `distinct`.
 
 ## Example
 
-    [x, y] in AllDifferent(2, 0)
+    [x, y] in AllDifferentExceptConstant(2, 0)
     # enforces `x != y` OR `x == 0` OR `y == 0`.
 """
-struct AllDifferentExceptConstant{T <: Number} <: MOI.AbstractVectorSet
+struct AllDifferentExceptConstants{T <: Number} <: MOI.AbstractVectorSet
     dimension::Int
-    k::T
+    k::Set{T}
 end
 
-function copy(set::AllDifferentExceptConstant{T}) where {T}
-    return AllDifferentExceptConstant(set.dimension, copy(set.k))
+function copy(set::AllDifferentExceptConstants{T}) where {T}
+    return AllDifferentExceptConstants(set.dimension, copy(set.k))
 end
 function Base.:(==)(
-    x::AllDifferentExceptConstant{T},
-    y::AllDifferentExceptConstant{T},
+    x::AllDifferentExceptConstants{T},
+    y::AllDifferentExceptConstants{T},
 ) where {T}
     return x.dimension == y.dimension && x.k == y.k
 end
+
+AllDifferentExceptConstant(dimension::Int, value::T) where {T <: Number} =
+    AllDifferentExceptConstants(dimension, Set(value))
 
 """
     Domain{T <: Number}(values::Set{T})
