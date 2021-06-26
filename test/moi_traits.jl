@@ -10,6 +10,28 @@
         @test CP.is_binary(model, MOI.SingleVariable(x))
     end
 
+    @testset "is_binary{$(T)}" for T in [Float64, Int]
+        model = MOI.Utilities.Model{Float64}()
+        x = MOI.add_variable(model)
+        c = MOI.add_constraint(model, x, MOI.ZeroOne())
+
+        aff = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([one(T)], [x]),
+            zero(T), 
+        )
+        aff2 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([2 * one(T)], [x]),
+            zero(T), 
+        )
+        aff3 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([one(T), zero(T)], [x, x]),
+            zero(T), 
+        )
+        @test CP.is_binary(model, aff)
+        @test !CP.is_binary(model, aff2)
+        @test CP.is_binary(model, aff3)
+    end
+
     @testset "is_integer" begin
         model = MOI.Utilities.Model{Float64}()
         x = MOI.add_variable(model)

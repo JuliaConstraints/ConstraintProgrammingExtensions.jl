@@ -29,7 +29,8 @@ function is_binary(model::MOI.ModelLike, v::MOI.VariableIndex)
     return MOI.is_valid(model, c_idx)
 end
 
-function is_binary(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) where {T <: Real}
+function is_binary(model::MOI.ModelLike, f::MOI.ScalarAffineFunction{T}) where {T <: Real}
+    v = MOIU.canonical(f)
     if length(v.terms) > 1
         return false
     end
