@@ -49,3 +49,7 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
         * [`sort`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/sort.mzn): [alldifferent, increasing and array indexing](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_sort.mzn), highly similar to `arg_sort`.
         * [`sort_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/sort.mzn): [equivalence, indicating whether a given array is a sorted copy of another](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_sort_reif.mzn).
         * [`sort_fn`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/sort_fn.mzn): returns the sorted array, based on `sort`.
+* Scheduling: 
+    * Rectangle overlapping: `CP.NonOverlappingOrthotope`
+        * [`diffn`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/diffn.mzn): [mapped to a disjunction of linear inequalities](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_diffn.mzn).
+        * No reification available, but [a similar mapping is available](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_diffn_reif.mzn).
