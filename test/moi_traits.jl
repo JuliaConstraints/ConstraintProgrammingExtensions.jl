@@ -5,7 +5,7 @@
         @test !CP.is_binary(model, x)
         @test !CP.is_binary(model, MOI.SingleVariable(x))
 
-        c = MOI.add_constraint(model, x, MOI.ZeroOne())
+        MOI.add_constraint(model, x, MOI.ZeroOne())
         @test CP.is_binary(model, x)
         @test CP.is_binary(model, MOI.SingleVariable(x))
     end
@@ -13,7 +13,7 @@
     @testset "is_binary{$(T)}" for T in [Float64, Int]
         model = MOI.Utilities.Model{Float64}()
         x = MOI.add_variable(model)
-        c = MOI.add_constraint(model, x, MOI.ZeroOne())
+        MOI.add_constraint(model, x, MOI.ZeroOne())
 
         aff = MOI.ScalarAffineFunction(
             MOI.ScalarAffineTerm.([one(T)], [x]),
@@ -27,9 +27,20 @@
             MOI.ScalarAffineTerm.([one(T), zero(T)], [x, x]),
             zero(T), 
         )
+        aff4 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([one(T), one(T)], [x, x]),
+            zero(T), 
+        )
+        aff5 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([one(T) / 2, one(T) / 3], [x, x]),
+            zero(T) / 5, 
+        )
+
         @test CP.is_binary(model, aff)
         @test !CP.is_binary(model, aff2)
         @test CP.is_binary(model, aff3)
+        @test !CP.is_binary(model, aff4)
+        @test !CP.is_binary(model, aff5)
     end
 
     @testset "is_integer" begin
@@ -39,9 +50,42 @@
         @test !CP.is_integer(model, x)
         @test !CP.is_integer(model, MOI.SingleVariable(x))
 
-        c = MOI.add_constraint(model, x, MOI.Integer())
+        MOI.add_constraint(model, x, MOI.Integer())
         @test CP.is_integer(model, x)
         @test CP.is_integer(model, MOI.SingleVariable(x))
+    end
+
+    @testset "is_integer{$(T)}" for T in [Float64, Int]
+        model = MOI.Utilities.Model{Float64}()
+        x = MOI.add_variable(model)
+        MOI.add_constraint(model, x, MOI.Integer())
+
+        aff = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([one(T)], [x]),
+            zero(T), 
+        )
+        aff2 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([2 * one(T)], [x]),
+            zero(T), 
+        )
+        aff3 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([one(T), zero(T)], [x, x]),
+            zero(T), 
+        )
+        aff4 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([one(T), one(T)], [x, x]),
+            zero(T), 
+        )
+        aff5 = MOI.ScalarAffineFunction(
+            MOI.ScalarAffineTerm.([one(T) / 2, one(T) / 3], [x, x]),
+            zero(T) / 5, 
+        )
+
+        @test CP.is_integer(model, aff)
+        @test CP.is_integer(model, aff2)
+        @test CP.is_integer(model, aff3)
+        @test CP.is_integer(model, aff4)
+        @test !CP.is_integer(model, aff5)
     end
 
     @testset "has_lower_bound{Bool}" begin

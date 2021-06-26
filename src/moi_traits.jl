@@ -20,6 +20,16 @@ function is_integer(model::MOI.ModelLike, v::MOI.VariableIndex)
     return MOI.is_valid(model, c_idx)
 end
 
+function is_integer(model::MOI.ModelLike, f::MOI.ScalarAffineFunction{T}) where {T <: Real}
+    v = MOIU.canonical(f)
+    for t in v.terms
+        if !isinteger(t.coefficient) || !is_integer(model, t.variable_index)
+            return false
+        end
+    end
+    return true
+end
+
 function is_binary(model::MOI.ModelLike, v::MOI.SingleVariable)
     return is_binary(model, v.variable)
 end
