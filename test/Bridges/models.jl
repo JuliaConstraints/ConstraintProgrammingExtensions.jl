@@ -1,3 +1,7 @@
+# -----------------------------------------------------------------------------
+# - MILP and direct generalisations (like strict inequalities or indicators)
+# -----------------------------------------------------------------------------
+
 MOIU.@model(
     MILPModel,
     (),
@@ -302,6 +306,43 @@ MOIU.@model(
 # - Generic CP constraints.
 # -----------------------------------------------------------------------------
 
+# All different.
+
+MOIU.@model(
+    AllDifferentIndexingModel,
+    (),
+    (
+        MOI.EqualTo, 
+        MOI.GreaterThan, 
+        MOI.LessThan, 
+        MOI.Interval, 
+    ),
+    (
+        MOI.Zeros,
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.GeometricMeanCone,
+        MOI.RelativeEntropyCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+        CP.AllDifferent,
+        CP.ElementVariableArray,
+    ),
+    (MOI.PowerCone, MOI.DualPowerCone),
+    (),
+    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.VectorOfVariables,),
+    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
+)
+
+# Different from.
+
 MOIU.@model(
     DifferentFromModel,
     (),
@@ -334,37 +375,7 @@ MOIU.@model(
     (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
 )
 
-MOIU.@model(
-    AbsoluteValueModel,
-    (),
-    (
-        MOI.EqualTo, 
-        MOI.GreaterThan, 
-        MOI.LessThan, 
-        MOI.Interval, 
-    ),
-    (
-        MOI.Zeros,
-        MOI.Nonnegatives,
-        MOI.Nonpositives,
-        MOI.NormInfinityCone,
-        MOI.NormOneCone,
-        MOI.SecondOrderCone,
-        MOI.RotatedSecondOrderCone,
-        MOI.GeometricMeanCone,
-        MOI.RelativeEntropyCone,
-        MOI.NormSpectralCone,
-        MOI.NormNuclearCone,
-        MOI.PositiveSemidefiniteConeTriangle,
-        MOI.ExponentialCone,
-        CP.AbsoluteValue
-    ),
-    (MOI.PowerCone, MOI.DualPowerCone),
-    (),
-    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
-    (MOI.VectorOfVariables,),
-    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
-)
+# Indicators about different from.
 
 MOIU.@model(
     FloatDifferentFromIndicatorMILPModel,
@@ -434,6 +445,8 @@ MOIU.@model(
     (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
 )
 
+# Reification of equal-to.
+
 MOIU.@model(
     FloatReifiedEqualToModel,
     (),
@@ -500,8 +513,14 @@ MOIU.@model(
     (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
 )
 
+# -----------------------------------------------------------------------------
+# - Higher-level CP functions.
+# -----------------------------------------------------------------------------
+
+# Absolute value.
+
 MOIU.@model(
-    AllDifferentIndexingModel,
+    AbsoluteValueModel,
     (),
     (
         MOI.EqualTo, 
@@ -523,8 +542,7 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
-        CP.AllDifferent,
-        CP.ElementVariableArray,
+        CP.AbsoluteValue
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),
@@ -536,6 +554,8 @@ MOIU.@model(
 # -----------------------------------------------------------------------------
 # - Higher-level CP constraints.
 # -----------------------------------------------------------------------------
+
+# Bin packing.
 
 MOIU.@model(
     BinPackingModel,
@@ -589,6 +609,8 @@ MOIU.@model(
     (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
 )
 
+# Knapsack.
+
 MOIU.@model(
     KnapsackModel,
     (),
@@ -640,6 +662,42 @@ MOIU.@model(
     (MOI.VectorOfVariables,),
     (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
 )
+
+# Non-overlapping orthotopes.
+
+MOIU.@model(
+    ConditionallyNonOverlappingOrthotopesModel,
+    (),
+    (
+        MOI.EqualTo, 
+        MOI.GreaterThan, 
+        MOI.LessThan, 
+        MOI.Interval, 
+    ),
+    (
+        MOI.Zeros,
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.GeometricMeanCone,
+        MOI.RelativeEntropyCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+        CP.ConditionallyNonOverlappingOrthotopes,
+    ),
+    (MOI.PowerCone, MOI.DualPowerCone),
+    (),
+    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.VectorOfVariables,),
+    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
+)
+
+# Sorting.
 
 MOIU.@model(
     SortPermutationModel,

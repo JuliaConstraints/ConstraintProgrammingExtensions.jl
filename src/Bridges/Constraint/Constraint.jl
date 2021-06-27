@@ -112,6 +112,10 @@ include("MinimumAmong/min_to_milp.jl")
 const MinimumAmong2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{MinimumAmong2MILPBridge{T}, OT}
 
+include("NonOverlappingOrthotopes/noov_to_noovcond.jl")
+const NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopes{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopesBridge{T}, OT}
+
 include("Sort/sort_to_milp.jl")
 const Sort2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Sort2MILPBridge{T}, OT}

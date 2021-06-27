@@ -68,6 +68,10 @@
         include("MinimumAmong/min_to_milp.jl")
     end
 
+    @testset "NonOverlappingOrthotopes" begin
+        include("NonOverlappingOrthotopes/noov_to_noovcond.jl")
+    end
+
     @testset "Sort" begin
         include("Sort/sort_to_perm.jl")
         include("Sort/sort_to_milp.jl")
