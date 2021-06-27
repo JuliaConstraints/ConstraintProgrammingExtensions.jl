@@ -138,13 +138,13 @@ function copy(set::Imply{S, T}) where {S, T}
 end
 
 """
-    Conjunction{Ts::Tuple}(constraints::Ts)
+    Conjunction{Ts}(constraints::Ts)
 
 The logical conjunction operator ∧ (AND).
 
 ``\\{(x, y\\dots) \\in \\mathbb{R}^a \\times \\mathbb{R}^b\\dots | x \\in \\mathbb{S_1} \\land y \\in \\mathbb{S_2} \\dots \\}``.
 """
-struct Conjunction{Ts <: Tuple} <: MOI.AbstractVectorSet
+struct Conjunction{Ts} <: MOI.AbstractVectorSet where {Ts <: Tuple}
     constraints::Ts
 end
 
@@ -160,13 +160,13 @@ function copy(set::Conjunction{Ts}) where {Ts}
 end
 
 """
-    Disjunction{Ts::Tuple}(constraints::Ts)
+    Disjunction{Ts}(constraints::Ts)
 
 The logical disjunction operator ∨ (AND).
 
 ``\\{(x, y\\dots) \\in \\mathbb{R}^a \\times \\mathbb{R}^b\\dots | x \\in \\mathbb{S_1} \\lor y \\in \\mathbb{S_2} \\dots \\}``.
 """
-struct Disjunction{Ts <: Tuple} <: MOI.AbstractVectorSet
+struct Disjunction{Ts} <: MOI.AbstractVectorSet where {Ts <: Tuple}
     constraints::Ts
 end
 
