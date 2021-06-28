@@ -70,6 +70,7 @@
 
     @testset "NonOverlappingOrthotopes" begin
         include("NonOverlappingOrthotopes/noov_to_noovcond.jl")
+        include("NonOverlappingOrthotopes/noov_to_disjunction_milp.jl")
     end
 
     @testset "Sort" begin
