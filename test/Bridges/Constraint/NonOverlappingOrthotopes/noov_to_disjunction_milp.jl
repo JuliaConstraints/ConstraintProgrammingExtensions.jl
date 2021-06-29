@@ -1,12 +1,18 @@
-@testset "NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopes: $(fct_type), orthotopes $(n_ortho), dimension $(dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], n_ortho in [2, 3], dim in [2, 3], T in [Int, Float64]
-    mock = MOIU.MockOptimizer(ConditionallyNonOverlappingOrthotopesModel{T}())
-    model = COIB.NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopes{T}(mock)
+@testset "NonOverlappingOrthotopes2DisjunctionLinearBridge: $(fct_type), orthotopes $(n_ortho), dimension $(dim), $(T)" for fct_type in ["vector of variables"], n_ortho in [2], dim in [2], T in [Int]
+    # for fct_type in ["vector of variables", "vector affine function"], n_ortho in [2, 3], dim in [2, 3], T in [Int, Float64]
+    mock = MOIU.MockOptimizer(DisjunctionModel{T}())
+    model = COIB.NonOverlappingOrthotopes2DisjunctionLinear{T}(mock)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.ConditionallyNonOverlappingOrthotopes,
+        CP.Disjunction{<: Tuple},
+    )
+    @test MOI.supports_constraint(
+        model,
+        MOI.VectorAffineFunction{T},
+        CP.Disjunction{NTuple{4, MOI.LessThan{T}}},
     )
     @test MOIB.supports_bridging_constraint(
         model,
@@ -14,16 +20,14 @@
         CP.NonOverlappingOrthotopes,
     )
 
-    n_vars_position = n_ortho * dim
-    n_vars_size = n_ortho * dim
     if T == Int
-        x_pos, _ = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:n_vars_position])
-        x_sze, _ = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:n_vars_size])
-        x_end, _ = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:n_vars_position])
+        x_pos, _ = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:(dim * n_ortho)])
+        x_sze, _ = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:(dim * n_ortho)])
+        x_end, _ = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:(dim * n_ortho)])
     elseif T == Float64
-        x_pos = MOI.add_variables(model, n_vars_position)
-        x_sze = MOI.add_variables(model, n_vars_size)
-        x_end = MOI.add_variables(model, n_vars_position)
+        x_pos = MOI.add_variables(model, dim * n_ortho)
+        x_sze = MOI.add_variables(model, dim * n_ortho)
+        x_end = MOI.add_variables(model, dim * n_ortho)
     end
     x_ortho = [
         [
@@ -59,6 +63,10 @@
     if n_ortho >= 4
         @assert false
     end
+    # @show x
+    # @show x_pos[1:2]
+    # @show x_sze[1:2]
+    # @show x_end[1:2]
 
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x)
@@ -77,64 +85,94 @@
 
     bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.NonOverlappingOrthotopes}(-1)]
 
-    @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.NonOverlappingOrthotopes) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.EqualTo{T},)]
-        @test MOIB.added_constraint_types(typeof(bridge)) == [
-            (MOI.SingleVariable, MOI.EqualTo{T}),
-            (MOI.VectorAffineFunction{T}, CP.ConditionallyNonOverlappingOrthotopes),
-        ]
+    # @testset "Bridge properties" begin
+    #     @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.NonOverlappingOrthotopes) == typeof(bridge)
+    #     @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+    #     @test MOIB.added_constraint_types(typeof(bridge)) == [
+    #         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
+    #         (MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}} where n}),
+    #     ]
 
-        @test MOI.get(bridge, MOI.NumberOfVariables()) == 1
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.EqualTo{T}}()) == 1
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.ConditionallyNonOverlappingOrthotopes}()) == 1
+    #     @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
+    #     @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == n_ortho * dim
+    #     @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}} where n}}()) == Int(n_ortho * (n_ortho - 1) / 2)
 
-        @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.var]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.EqualTo{T}}()) == [bridge.var_con]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.ConditionallyNonOverlappingOrthotopes}()) == [bridge.con]
+    #     @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == bridge.cons_ends
+    #     @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}} where n}}()) == bridge.cons_disjunction
+    # end
+
+    @testset "End-point constraints" begin
+        @test length(bridge.cons_ends) == n_ortho * dim
+        for i in 1:n_ortho
+            for d in 1:dim
+                @test MOI.is_valid(model, bridge.cons_ends[i, d])
+                @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_ends[i, d]) == MOI.EqualTo(zero(T))
+                f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_ends[i, d])
+
+                @test length(f.terms) == 3
+
+                t1 = f.terms[1]
+                @test t1.coefficient === one(T)
+                @test t1.variable_index === x_pos[(i - 1) * dim + d]
+
+                t2 = f.terms[2]
+                @test t2.coefficient === one(T)
+                @test t2.variable_index === x_sze[(i - 1) * dim + d]
+
+                t3 = f.terms[3]
+                @test t3.coefficient === -one(T)
+                @test t3.variable_index === x_end[(i - 1) * dim + d]
+            end
+        end
     end
 
-    @testset "New variable" begin
-        @test MOI.is_valid(model, bridge.var)
-        @test MOI.is_valid(model, bridge.var_con)
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.var_con) == MOI.EqualTo(one(T))
-        @test MOI.get(model, MOI.ConstraintFunction(), bridge.var_con) == MOI.SingleVariable(bridge.var)
-    end
+    @testset "Disjunction constraints" begin
+        @test length(bridge.cons_disjunction) == Int(n_ortho * (n_ortho - 1) / 2)
+        for i in 1:n_ortho
+            for j in 1:n_ortho
+                if i < j
+                    @test MOI.is_valid(model, bridge.cons_disjunction[i, j])
+                    @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_disjunction[i, j]) isa CP.Disjunction
+                    f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_disjunction[i, j])
 
-    @testset "New constraint" begin
-        @test MOI.is_valid(model, bridge.con)
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.con) == CP.ConditionallyNonOverlappingOrthotopes(n_ortho, dim)
-        f = MOI.get(model, MOI.ConstraintFunction(), bridge.con)
+                    @test length(f.terms) == 3 * 2 * dim
 
-        for i in 1:length(f.terms)
-            t = f.terms[i]
-            @test t.output_index === i
-            @test t.scalar_term.coefficient === one(T)
-        end
+                    k = 1
+                    for d in 1:dim
+                        t1 = f.terms[1]
+                        @test t1.output_index == k + 0
+                        @test t1.scalar_term.coefficient === one(T)
+                        @test t1.scalar_term.variable_index === x_pos[(i - 1) * dim + d]
 
-        f_vars = [t.scalar_term.variable_index for t in f.terms]
-        @test length(f_vars) == 3 * dim * n_ortho + n_ortho
+                        # t2 = f.terms[2]
+                        # @test t2.output_index == k + 1
+                        # @test t2.scalar_term.coefficient === one(T)
+                        # @test t2.scalar_term.variable_index === x_sze[(i - 1) * dim + d]
 
-        if n_ortho >= 1
-            @test f_vars[(0 * dim + 1):(1 * dim)] == x_pos[(0 * dim + 1):(1 * dim)]
-            @test f_vars[(1 * dim + 1):(2 * dim)] == x_sze[(0 * dim + 1):(1 * dim)]
-            @test f_vars[(2 * dim + 1):(3 * dim)] == x_end[(0 * dim + 1):(1 * dim)]
-            @test f_vars[3 * dim + 1] == bridge.var
-        end
-        if n_ortho >= 2
-            @test f_vars[(3 * dim + 2):(4 * dim + 1)] == x_pos[(1 * dim + 1):(2 * dim)]
-            @test f_vars[(4 * dim + 2):(5 * dim + 1)] == x_sze[(1 * dim + 1):(2 * dim)]
-            @test f_vars[(5 * dim + 2):(6 * dim + 1)] == x_end[(1 * dim + 1):(2 * dim)]
-            @test f_vars[6 * dim + 2] == bridge.var
-        end
-        if n_ortho >= 3
-            @test f_vars[(6 * dim + 3):(7 * dim + 2)] == x_pos[(2 * dim + 1):(3 * dim)]
-            @test f_vars[(7 * dim + 3):(8 * dim + 2)] == x_sze[(2 * dim + 1):(3 * dim)]
-            @test f_vars[(8 * dim + 3):(9 * dim + 2)] == x_end[(2 * dim + 1):(3 * dim)]
-            @test f_vars[9 * dim + 3] == bridge.var
-        end
-        if n_ortho >= 4
-            @assert false
+                        # t3 = f.terms[3]
+                        # @test t3.output_index == k + 2
+                        # @test t3.scalar_term.coefficient === -one(T)
+                        # @test t3.scalar_term.variable_index === x_end[(j - 1) * dim + d]
+
+                        # t4 = f.terms[4]
+                        # @test t4.output_index == k + 3
+                        # @test t4.scalar_term.coefficient === one(T)
+                        # @test t4.scalar_term.variable_index === x_pos[(j - 1) * dim + d]
+
+                        # t5 = f.terms[5]
+                        # @test t5.output_index == k + 4
+                        # @test t5.scalar_term.coefficient === one(T)
+                        # @test t5.scalar_term.variable_index === x_sze[(h - 1) * dim + d]
+
+                        # t6 = f.terms[6]
+                        # @test t6.output_index == k + 5
+                        # @test t6.scalar_term.coefficient === -one(T)
+                        # @test t6.scalar_term.variable_index === x_end[(i - 1) * dim + d]
+
+                        k += 6
+                    end
+                end
+            end
         end
     end
 end

@@ -5,8 +5,10 @@ inequations (`MOI.LessThan{T}`).
 Variable number of constraints in the disjunction (two per dimension).
 """
 struct NonOverlappingOrthotopes2DisjunctionLinearBridge{T} <: MOIBC.AbstractBridge
-    cons_disjunction::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Disjunction{<: Tuple}}}
-    cons_ends::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
+    cons_disjunction::Dict{NTuple{2, Int}, MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}}}}} where n
+    # Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}}}}} where n
+    cons_ends::Dict{NTuple{2, Int}, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
+    # Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
 end
 
 function MOIBC.bridge_constraint(
@@ -30,40 +32,64 @@ function MOIBC.bridge_constraint(
     s::CP.NonOverlappingOrthotopes
 ) where {T}
     f_scalars = MOIU.scalarize(f)
-    f_orthotopes = MOI.ScalarAffineFunction{T}[
-        f_scalars[((i - 1) * 3 * s.n_dimensions + 1) : (i * 3 * s.n_dimensions)]
+    f_pos = Vector{MOI.ScalarAffineFunction{T}}[
+        f_scalars[((1 + 3 * (i - 1)) * s.n_dimensions - s.n_dimensions + 1) : ((1 + 3 * (i - 1)) * s.n_dimensions)]
+        for i in 1:s.n_orthotopes
+    ]
+    f_sze = Vector{MOI.ScalarAffineFunction{T}}[
+        f_scalars[((2 + 3 * (i - 1)) * s.n_dimensions - s.n_dimensions + 1) : ((2 + 3 * (i - 1)) * s.n_dimensions)]
+        for i in 1:s.n_orthotopes
+    ]
+    f_end = Vector{MOI.ScalarAffineFunction{T}}[
+        f_scalars[((3 + 3 * (i - 1)) * s.n_dimensions - s.n_dimensions + 1) : ((3 + 3 * (i - 1)) * s.n_dimensions)]
         for i in 1:s.n_orthotopes
     ]
 
-    cons_disjunction = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Disjunction{<: Tuple}}[
-        MOI.add_constraint(
-            model, 
-            MOIU.vectorize(
-                vcat([
-                    [
-                        f_orthotopes[i][d] + f_orthotopes[i][s.n_dimensions + d] - f_orthotopes[j][d],
-                        f_orthotopes[j][d] + f_orthotopes[j][s.n_dimensions + d] - f_orthotopes[i][d],
-                    ]
-                    for d in 1:s.n_dimensions
-                ]...)
-            ),
-            CP.Disjunction(
-                tuple(
-                    (MOI.LessThan(zero(T)) for _ in 1:(2 * s.n_dimensions))
-                )
-            )
-        )
-        for i in 1:s.n_orthotopes, j in 1:s.n_orthotopes if i < j
-    ]
+    # @show f_pos
+    # @show f_sze
+    # @show f_end
+    # error(42)
 
-    cons_ends = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
-        MOI.add_constraint(
-            model, 
-            f_orthotopes[i][d] + f_orthotopes[i][s.n_dimensions + d] - f_orthotopes[i][2 * s.n_dimensions + d],
-            MOI.EqualTo(zero(T))
-        )
-        for i in 1:s.n_orthotopes, d in 1:s.n_dimensions
-    ]
+    # @show collect(((1 + 3 * (i - 1)) * s.n_dimensions - s.n_dimensions + 1) : ((1 + 3 * (i - 1)) * s.n_dimensions) for i in 1:s.n_orthotopes)
+    # @show collect(((2 + 3 * (i - 1)) * s.n_dimensions - s.n_dimensions + 1) : ((2 + 3 * (i - 1)) * s.n_dimensions) for i in 1:s.n_orthotopes)
+    # @show collect(((3 + 3 * (i - 1)) * s.n_dimensions - s.n_dimensions + 1) : ((3 + 3 * (i - 1)) * s.n_dimensions) for i in 1:s.n_orthotopes)
+    # error(42)
+
+    cons_disjunction = Dict{NTuple{2, Int}, MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{2 * s.n_dimensions, MOI.LessThan{T}}}}}()
+    for i in 1:s.n_orthotopes
+        for j in 1:s.n_orthotopes
+            if i < j
+                cons_disjunction[i, j] = MOI.add_constraint(
+                    model, 
+                    MOIU.vectorize(
+                        vcat([
+                            [
+                                f_pos[i][d] + f_sze[i][d] - f_pos[j][d],
+                                f_pos[j][d] + f_sze[j][d] - f_pos[i][d],
+                            ]
+                            for d in 1:s.n_dimensions
+                        ]...)
+                    ),
+                    CP.Disjunction(
+                        tuple(
+                            collect(MOI.LessThan(zero(T)) for _ in 1:(2 * s.n_dimensions))...
+                        )
+                    )
+                )
+            end
+        end
+    end
+
+    cons_ends = Dict{NTuple{2, Int}, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}()
+    for i in 1:s.n_orthotopes
+        for d in 1:s.n_dimensions
+            cons_ends[i, d] = MOI.add_constraint(
+                model, 
+                f_pos[i][d] + f_sze[i][d] - f_end[i][d],
+                MOI.EqualTo(zero(T))
+            )
+        end
+    end
 
     return NonOverlappingOrthotopes2DisjunctionLinearBridge(cons_disjunction, cons_ends)
 end
@@ -84,7 +110,8 @@ function MOIB.added_constraint_types(::Type{NonOverlappingOrthotopes2Disjunction
     return [
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
         # Not enough information in the type to qualify fully the disjunction.
-        (MOI.VectorAffineFunction{T}, CP.Disjunction{<: Tuple}),
+        # (No dimension available in the bridge or constraint type.)
+        (MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}} where n}),
     ]
 end
 
@@ -103,7 +130,7 @@ end
 function MOI.get(
     b::NonOverlappingOrthotopes2DisjunctionLinearBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.Disjunction{<: Tuple},
+        MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}} where n},
     },
 ) where {T}
     return length(b.cons_disjunction)
@@ -121,7 +148,7 @@ end
 function MOI.get(
     b::NonOverlappingOrthotopes2DisjunctionLinearBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.Disjunction{<: Tuple},
+        MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}} where n},
     },
 ) where {T}
     return b.cons_disjunction
