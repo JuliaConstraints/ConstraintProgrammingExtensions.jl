@@ -133,9 +133,12 @@
                 if i < j
                     @test MOI.is_valid(model, bridge.cons_disjunction[i, j])
                     @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_disjunction[i, j]) isa CP.Disjunction
-                    f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_disjunction[i, j])
 
+                    f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_disjunction[i, j])
                     @test length(f.terms) == 3 * 2 * dim
+
+                    f_scalars = MOIU.scalarize(f)
+                    @test length(f_scalars) == 2 * dim
 
                     k = 1
                     for d in 1:dim
