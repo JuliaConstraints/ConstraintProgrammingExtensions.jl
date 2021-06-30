@@ -54,7 +54,7 @@
 
     @testset "Reified{MOI.GreaterThan}" begin
         include("GreaterThan_Reify/reif_gt_to_indic.jl")
-        # include("GreaterThan_Reify/reif_gt_to_milp.jl")
+        include("GreaterThan_Reify/reif_gt_to_milp.jl")
     end
 
     @testset "Reified{MOI.LessThan}" begin

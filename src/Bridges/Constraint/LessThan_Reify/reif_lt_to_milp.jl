@@ -106,7 +106,6 @@ function MOI.get(
     return 1
 end
 
-
 function MOI.get(
     ::ReifiedLessThan2MILPBridge{T},
     ::MOI.NumberOfConstraints{

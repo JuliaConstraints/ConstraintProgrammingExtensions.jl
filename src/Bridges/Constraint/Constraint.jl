@@ -84,9 +84,9 @@ include("GreaterThan_Reify/reif_gt_to_indic.jl")
 const ReifiedGreaterThan2Indicator{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ReifiedGreaterThan2IndicatorBridge{T}, OT}
 
-# include("GreaterThan_Reify/reif_gt_to_milp.jl")
-# const ReifiedGreaterThan2MILP{T, OT <: MOI.ModelLike} =
-#     MOIBC.SingleBridgeOptimizer{ReifiedGreaterThan2MILPBridge{T}, OT}
+include("GreaterThan_Reify/reif_gt_to_milp.jl")
+const ReifiedGreaterThan2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ReifiedGreaterThan2MILPBridge{T}, OT}
 
 include("Increasing/inc_to_lp.jl")
 const Increasing2LP{T, OT <: MOI.ModelLike} =

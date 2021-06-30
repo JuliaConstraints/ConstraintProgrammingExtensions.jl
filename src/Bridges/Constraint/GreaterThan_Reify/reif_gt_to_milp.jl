@@ -4,18 +4,18 @@ _REIF_LT_FLOAT_EPSILON = 1.0e-5
 Bridges `CP.Reified{MOI.GreaterThan}` to MILP constraints.
 """
 struct ReifiedGreaterThan2MILPBridge{T <: Real} <: MOIBC.AbstractBridge
-    con_bigm::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}
+    con_bigm::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}
     con_smallm::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{ReifiedEqualTo2MILPBridge{T}},
+    ::Type{ReifiedGreaterThan2MILPBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.Reified{MOI.EqualTo{T}},
+    s::CP.Reified{MOI.GreaterThan{T}},
 ) where {T}
     return MOIBC.bridge_constraint(
-        ReifiedEqualTo2MILPBridge{T},
+        ReifiedGreaterThan2MILPBridge{T},
         model,
         MOI.VectorAffineFunction{T}(f),
         s,
@@ -23,10 +23,10 @@ function MOIBC.bridge_constraint(
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{ReifiedEqualTo2MILPBridge{T}},
+    ::Type{ReifiedGreaterThan2MILPBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.Reified{MOI.EqualTo{T}},
+    s::CP.Reified{MOI.GreaterThan{T}},
 ) where {T <: Real}
     f_scalars = MOIU.scalarize(f)
 
@@ -37,35 +37,17 @@ function MOIBC.bridge_constraint(
     @assert CP.has_lower_bound(model, f_scalars[2])
     @assert CP.has_upper_bound(model, f_scalars[2])
 
-    # If the reified expression is true/false, then the EqualTo constraint 
+    # If the reified expression is true/false, then the GreaterThan constraint 
     # must/cannot be satisfied. (If the constraint is satisfied, the reified 
     # expression is unconstrained.)
-    if T <: Integer
-        var_abs, var_abs_int = MOI.add_constrained_variable(model, MOI.Integer())
-    else
-        var_abs = MOI.add_variable(model)
-        var_abs_int = nothing
-    end
-
-    con_abs = MOI.add_constraint(
-        model, 
-        MOIU.vectorize(
-            MOI.ScalarAffineFunction{T}[
-                one(T) * MOI.SingleVariable(var_abs),
-                f_scalars[2] - s.set.value
-            ]
-        ), 
-        CP.AbsoluteValue()
-    )
-
     bigm = T(max(
         abs(CP.get_upper_bound(model, f_scalars[2])), 
         abs(CP.get_lower_bound(model, f_scalars[2]))
     ))
     con_bigm = MOI.add_constraint(
         model, 
-        MOI.SingleVariable(var_abs) - bigm * (one(T) - f_scalars[1]), 
-        MOI.LessThan(zero(T))
+        f_scalars[2] - bigm * (one(T) - f_scalars[1]), 
+        MOI.GreaterThan(s.set.lower)
     )
 
     # If the constraint is satisfied, constrain the reified. 
@@ -77,122 +59,76 @@ function MOIBC.bridge_constraint(
 
     con_smallm = MOI.add_constraint(
         model, 
-        f_scalars[1] - MOI.SingleVariable(var_abs) / smallm,
-        MOI.LessThan(zero(T))
+        f_scalars[2] - bigm * f_scalars[1],
+        MOI.LessThan(s.set.lower - smallm)
     )
 
-    return ReifiedEqualTo2MILPBridge{T}(var_abs, var_abs_int, con_abs, con_bigm, con_smallm)
+    return ReifiedGreaterThan2MILPBridge{T}(con_bigm, con_smallm)
 end
 
 function MOI.supports_constraint(
-    ::Type{ReifiedEqualTo2MILPBridge{T}},
+    ::Type{ReifiedGreaterThan2MILPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Reified{MOI.EqualTo{T}}},
+    ::Type{CP.Reified{MOI.GreaterThan{T}}},
 ) where {T <: Real}
     return true
 end
 
-function MOIB.added_constrained_variable_types(::Type{ReifiedEqualTo2MILPBridge{T}}) where {T <: Real}
+function MOIB.added_constrained_variable_types(::Type{ReifiedGreaterThan2MILPBridge{T}}) where {T}
     return Tuple{DataType}[]
 end
 
-function MOIB.added_constrained_variable_types(::Type{ReifiedEqualTo2MILPBridge{T}}) where {T <: Integer}
-    return [(MOI.Integer,)]
-end
-
-function MOIB.added_constraint_types(::Type{ReifiedEqualTo2MILPBridge{T}}) where {T <: Real}
+function MOIB.added_constraint_types(::Type{ReifiedGreaterThan2MILPBridge{T}}) where {T}
     return [
-        (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
-        (MOI.VectorAffineFunction{T}, MOI.LessThan{T}),
-    ]
-end
-
-function MOIB.added_constraint_types(::Type{ReifiedEqualTo2MILPBridge{T}}) where {T <: Integer}
-    return [
-        (MOI.SingleVariable, MOI.Integer),
-        (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
+        (MOI.VectorAffineFunction{T}, MOI.GreaterThan{T}),
         (MOI.VectorAffineFunction{T}, MOI.LessThan{T}),
     ]
 end
 
 function MOIBC.concrete_bridge_type(
-    ::Type{ReifiedEqualTo2MILPBridge{T}},
+    ::Type{ReifiedGreaterThan2MILPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Reified{MOI.EqualTo{T}}},
+    ::Type{CP.Reified{MOI.LessThan{T}}},
 ) where {T <: Real}
-    return ReifiedEqualTo2MILPBridge{T}
+    return ReifiedGreaterThan2MILPBridge{T}
 end
 
-function MOI.get(::ReifiedEqualTo2MILPBridge{T}, ::MOI.NumberOfVariables) where {T <: Real}
-    return 1
-end
-
-function MOI.get(
-    ::ReifiedEqualTo2MILPBridge{T},
-    ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.Integer,
-    },
-) where {T <: Real}
+function MOI.get(::ReifiedGreaterThan2MILPBridge{T}, ::MOI.NumberOfVariables) where {T <: Real}
     return 0
 end
 
 function MOI.get(
-    ::ReifiedEqualTo2MILPBridge{T},
+    ::ReifiedGreaterThan2MILPBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.Integer,
-    },
-) where {T <: Integer}
-    return 1
-end
-
-function MOI.get(
-    ::ReifiedEqualTo2MILPBridge{T},
-    ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.AbsoluteValue,
+        MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
 ) where {T <: Real}
     return 1
 end
 
 function MOI.get(
-    ::ReifiedEqualTo2MILPBridge{T},
+    ::ReifiedGreaterThan2MILPBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
+        MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
     },
 ) where {T <: Real}
-    return 2
+    return 1
 end
 
 function MOI.get(
-    b::ReifiedEqualTo2MILPBridge{T},
-    ::MOI.ListOfVariableIndices,
-) where {T <: Real}
-    return [b.var_abs]
-end
-
-function MOI.get(
-    b::ReifiedEqualTo2MILPBridge{T},
-    ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.Integer,
-    },
-) where {T <: Integer}
-    return [b.var_abs_int]
-end
-
-function MOI.get(
-    b::ReifiedEqualTo2MILPBridge{T},
-    ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.AbsoluteValue,
-    },
-) where {T <: Real}
-    return [b.con_abs]
-end
-
-function MOI.get(
-    b::ReifiedEqualTo2MILPBridge{T},
+    b::ReifiedGreaterThan2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
 ) where {T <: Real}
-    return [b.con_bigm, b.con_smallm]
+    return [b.con_smallm]
+end
+
+function MOI.get(
+    b::ReifiedGreaterThan2MILPBridge{T},
+    ::MOI.ListOfConstraintIndices{
+        MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
+    },
+) where {T <: Real}
+    return [b.con_bigm]
 end
