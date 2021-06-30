@@ -63,35 +63,10 @@ function MOI.supports_constraint(
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
     ::Type{CP.Disjunction{S}},
 ) where {T, S}
-    # julia> s = CP.Disjunction((MOI.EqualTo(0), MOI.EqualTo(1)))
-    # ConstraintProgrammingExtensions.Disjunction{Tuple{MathOptInterface.EqualTo{Int64}, MathOptInterface.EqualTo{Int64}}}((MathOptInterface.EqualTo{Int64}(0), MathOptInterface.EqualTo{Int64}(1)))
-
-    # julia> typeof(s).parameters
-    # svec(Tuple{MathOptInterface.EqualTo{Int64}, MathOptInterface.EqualTo{Int64}})
-
-    # julia> typeof(s).parameters[1]
-    # Tuple{MathOptInterface.EqualTo{Int64}, MathOptInterface.EqualTo{Int64}}
-
-
-
-    # julia> t = CP.Disjunction{NTuple{4, MOI.EqualTo{Int}}}
-    # ConstraintProgrammingExtensions.Disjunction{NTuple{4, MathOptInterface.EqualTo{Int64}}}
-
-    # julia> t.parameters
-    # svec(NTuple{4, MathOptInterface.EqualTo{Int64}})
-
-    if S <: NTuple
-        @show S.parameters
-        @show S.parameters[1]
-        # params = S.parameters[1]
-        # @assert length(params) == 2
-        println("NTuple")
-    elseif S <: Tuple
-        println("Tuple")
-    end
-
-    @show S
     return true
+    # Ideally, ensure that the underlying solver supports all the needed 
+    # reified constraints:
+    # return all(MOI.supports_constraint(model, type, CP.Reified{C}) for C in S.parameters)
 end
 
 function MOIB.added_constrained_variable_types(::Type{Disjunction2ReificationBridge{T}}) where {T}

@@ -1,5 +1,4 @@
-@testset "Disjunction2Reification: $(fct_type), $(array_size) items, $(T)" for fct_type in ["vector of variables"], array_size in [2, 4], T in [Float64]
-    # for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 4], T in [Int, Float64]
+@testset "Disjunction2Reification: $(fct_type), $(array_size) items, $(T)" for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 4], T in [Int, Float64]
     base_model = if T == Int
         IntReifiedEqualToModel{T}()
     elseif T == Float64
