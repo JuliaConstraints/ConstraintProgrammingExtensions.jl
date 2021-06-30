@@ -17,6 +17,26 @@ const ArgumentMaximumAmong2MILP{T, OT <: MOI.ModelLike} =
 include("ArgumentMinimumAmong/argmin_to_milp.jl")
 const ArgumentMinimumAmong2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ArgumentMinimumAmong2MILPBridge{T}, OT}
+    
+include("BinPacking/bp_to_milp.jl")
+const BinPacking2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{BinPacking2MILPBridge{T}, OT}
+
+include("BinPacking/fixedcapa_to_bp.jl")
+const FixedCapacityBinPacking2BinPacking{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{FixedCapacityBinPacking2BinPackingBridge{T}, OT}
+    
+include("BinPacking/fixedcapa_to_varcapa.jl")
+const FixedCapacityBinPacking2VariableCapacityBinPacking{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T}, OT}
+    
+include("BinPacking/varcapa_to_bp.jl")
+const VariableCapacityBinPacking2BinPacking{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{VariableCapacityBinPacking2BinPackingBridge{T}, OT}
+    
+include("BinPacking/varcapa_to_milp.jl")
+const VariableCapacityBinPacking2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{VariableCapacityBinPacking2MILPBridge{T}, OT}
 
 include("Count/count_to_reif.jl")
 const CountEqualTo2Reification{T, OT <: MOI.ModelLike} =
@@ -43,26 +63,6 @@ const Indicator0DifferentFrom2PseudoMILP{T, OT <: MOI.ModelLike} =
 include("DifferentFrom_Indicator/neq_indicator1_to_pseudolp.jl")
 const Indicator1DifferentFrom2PseudoMILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Indicator1DifferentFrom2PseudoMILPBridge{T}, OT}
-    
-include("BinPacking/bp_to_milp.jl")
-const BinPacking2MILP{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{BinPacking2MILPBridge{T}, OT}
-
-include("BinPacking/fixedcapa_to_bp.jl")
-const FixedCapacityBinPacking2BinPacking{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{FixedCapacityBinPacking2BinPackingBridge{T}, OT}
-    
-include("BinPacking/fixedcapa_to_varcapa.jl")
-const FixedCapacityBinPacking2VariableCapacityBinPacking{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T}, OT}
-    
-include("BinPacking/varcapa_to_bp.jl")
-const VariableCapacityBinPacking2BinPacking{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{VariableCapacityBinPacking2BinPackingBridge{T}, OT}
-    
-include("BinPacking/varcapa_to_milp.jl")
-const VariableCapacityBinPacking2MILP{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{VariableCapacityBinPacking2MILPBridge{T}, OT}
 
 include("Decreasing/dec_to_lp.jl")
 const Decreasing2LP{T, OT <: MOI.ModelLike} =
