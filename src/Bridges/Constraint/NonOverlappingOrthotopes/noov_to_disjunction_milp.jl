@@ -151,7 +151,7 @@ function MOI.get(
         MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}} where n},
     },
 ) where {T}
-    return b.cons_disjunction
+    return collect(values(b.cons_disjunction))
 end
 
 function MOI.get(
@@ -160,5 +160,5 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
     },
 ) where {T}
-    return b.cons_ends
+    return collect(values(b.cons_ends))
 end
