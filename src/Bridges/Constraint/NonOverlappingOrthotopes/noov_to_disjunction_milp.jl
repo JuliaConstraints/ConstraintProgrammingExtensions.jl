@@ -6,9 +6,7 @@ Variable number of constraints in the disjunction (two per dimension).
 """
 struct NonOverlappingOrthotopes2DisjunctionLinearBridge{T} <: MOIBC.AbstractBridge
     cons_disjunction::Dict{NTuple{2, Int}, MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}}}}} where n
-    # Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}}}}} where n
     cons_ends::Dict{NTuple{2, Int}, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
-    # Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
 end
 
 function MOIBC.bridge_constraint(
@@ -44,16 +42,6 @@ function MOIBC.bridge_constraint(
         f_scalars[((3 + 3 * (i - 1)) * s.n_dimensions - s.n_dimensions + 1) : ((3 + 3 * (i - 1)) * s.n_dimensions)]
         for i in 1:s.n_orthotopes
     ]
-
-    # @show f_pos
-    # @show f_sze
-    # @show f_end
-    # error(42)
-
-    # @show collect(((1 + 3 * (i - 1)) * s.n_dimensions - s.n_dimensions + 1) : ((1 + 3 * (i - 1)) * s.n_dimensions) for i in 1:s.n_orthotopes)
-    # @show collect(((2 + 3 * (i - 1)) * s.n_dimensions - s.n_dimensions + 1) : ((2 + 3 * (i - 1)) * s.n_dimensions) for i in 1:s.n_orthotopes)
-    # @show collect(((3 + 3 * (i - 1)) * s.n_dimensions - s.n_dimensions + 1) : ((3 + 3 * (i - 1)) * s.n_dimensions) for i in 1:s.n_orthotopes)
-    # error(42)
 
     cons_disjunction = Dict{NTuple{2, Int}, MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{2 * s.n_dimensions, MOI.LessThan{T}}}}}()
     for i in 1:s.n_orthotopes

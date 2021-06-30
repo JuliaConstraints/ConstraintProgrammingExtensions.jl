@@ -63,10 +63,6 @@
     if n_ortho >= 4
         @assert false
     end
-    # @show x
-    # @show x_pos[1:2]
-    # @show x_sze[1:2]
-    # @show x_end[1:2]
 
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x)
@@ -101,79 +97,79 @@
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}} where n}}()) == collect(values(bridge.cons_disjunction))
     end
 
-    # @testset "End-point constraints" begin
-    #     @test length(bridge.cons_ends) == n_ortho * dim
-    #     for i in 1:n_ortho
-    #         for d in 1:dim
-    #             @test MOI.is_valid(model, bridge.cons_ends[i, d])
-    #             @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_ends[i, d]) == MOI.EqualTo(zero(T))
-    #             f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_ends[i, d])
+    @testset "End-point constraints" begin
+        @test length(bridge.cons_ends) == n_ortho * dim
+        for i in 1:n_ortho
+            for d in 1:dim
+                @test MOI.is_valid(model, bridge.cons_ends[i, d])
+                @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_ends[i, d]) == MOI.EqualTo(zero(T))
+                f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_ends[i, d])
 
-    #             @test length(f.terms) == 3
+                @test length(f.terms) == 3
 
-    #             t1 = f.terms[1]
-    #             @test t1.coefficient === one(T)
-    #             @test t1.variable_index === x_pos[(i - 1) * dim + d]
+                t1 = f.terms[1]
+                @test t1.coefficient === one(T)
+                @test t1.variable_index === x_pos[(i - 1) * dim + d]
 
-    #             t2 = f.terms[2]
-    #             @test t2.coefficient === one(T)
-    #             @test t2.variable_index === x_sze[(i - 1) * dim + d]
+                t2 = f.terms[2]
+                @test t2.coefficient === one(T)
+                @test t2.variable_index === x_sze[(i - 1) * dim + d]
 
-    #             t3 = f.terms[3]
-    #             @test t3.coefficient === -one(T)
-    #             @test t3.variable_index === x_end[(i - 1) * dim + d]
-    #         end
-    #     end
-    # end
+                t3 = f.terms[3]
+                @test t3.coefficient === -one(T)
+                @test t3.variable_index === x_end[(i - 1) * dim + d]
+            end
+        end
+    end
 
-    # @testset "Disjunction constraints" begin
-    #     @test length(bridge.cons_disjunction) == Int(n_ortho * (n_ortho - 1) / 2)
-    #     for i in 1:n_ortho
-    #         for j in 1:n_ortho
-    #             if i < j
-    #                 @test MOI.is_valid(model, bridge.cons_disjunction[i, j])
-    #                 @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_disjunction[i, j]) isa CP.Disjunction
+    @testset "Disjunction constraints" begin
+        @test length(bridge.cons_disjunction) == Int(n_ortho * (n_ortho - 1) / 2)
+        for i in 1:n_ortho
+            for j in 1:n_ortho
+                if i < j
+                    @test MOI.is_valid(model, bridge.cons_disjunction[i, j])
+                    @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_disjunction[i, j]) isa CP.Disjunction
 
-    #                 f_vector = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_disjunction[i, j])
-    #                 @test length(f_vector.terms) == 3 * 2 * dim
+                    f_vector = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_disjunction[i, j])
+                    @test length(f_vector.terms) == 3 * 2 * dim
 
-    #                 f_scalars = MOIU.scalarize(f_vector)
-    #                 @test length(f_scalars) == 2 * dim
+                    f_scalars = MOIU.scalarize(f_vector)
+                    @test length(f_scalars) == 2 * dim
 
-    #                 for d in 1:dim
-    #                     f1 = f_scalars[(d - 1) * dim + 1]
-    #                     f2 = f_scalars[(d - 1) * dim + 2]
+                    for d in 1:dim
+                        f1 = f_scalars[(d - 1) * dim + 1]
+                        f2 = f_scalars[(d - 1) * dim + 2]
 
-    #                     # Doesn't work, because == requires that the order 
-    #                     # of the terms is the same.
-    #                     # @test f1 == one(T) * MOI.SingleVariable(x_pos[(i - 1) * dim + d]) + one(T) * MOI.SingleVariable(x_sze[(i - 1) * dim + d]) - one(T) * MOI.SingleVariable(x_pos[(j - 1) * dim + d])
+                        # Doesn't work, because == requires that the order 
+                        # of the terms is the same.
+                        # @test f1 == one(T) * MOI.SingleVariable(x_pos[(i - 1) * dim + d]) + one(T) * MOI.SingleVariable(x_sze[(i - 1) * dim + d]) - one(T) * MOI.SingleVariable(x_pos[(j - 1) * dim + d])
 
-    #                     t = f1.terms[1]
-    #                     @test t.coefficient === one(T)
-    #                     @test t.variable_index === x_pos[(i - 1) * dim + d]
+                        t = f1.terms[1]
+                        @test t.coefficient === one(T)
+                        @test t.variable_index === x_pos[(i - 1) * dim + d]
 
-    #                     t = f1.terms[2]
-    #                     @test t.coefficient === -one(T)
-    #                     @test t.variable_index === x_pos[(j - 1) * dim + d]
+                        t = f1.terms[2]
+                        @test t.coefficient === -one(T)
+                        @test t.variable_index === x_pos[(j - 1) * dim + d]
 
-    #                     t = f1.terms[3]
-    #                     @test t.coefficient === one(T)
-    #                     @test t.variable_index === x_sze[(i - 1) * dim + d]
+                        t = f1.terms[3]
+                        @test t.coefficient === one(T)
+                        @test t.variable_index === x_sze[(i - 1) * dim + d]
 
-    #                     t = f2.terms[1]
-    #                     @test t.coefficient === -one(T)
-    #                     @test t.variable_index === x_pos[(i - 1) * dim + d]
+                        t = f2.terms[1]
+                        @test t.coefficient === -one(T)
+                        @test t.variable_index === x_pos[(i - 1) * dim + d]
 
-    #                     t = f2.terms[2]
-    #                     @test t.coefficient === one(T)
-    #                     @test t.variable_index === x_pos[(j - 1) * dim + d]
+                        t = f2.terms[2]
+                        @test t.coefficient === one(T)
+                        @test t.variable_index === x_pos[(j - 1) * dim + d]
 
-    #                     t = f2.terms[3]
-    #                     @test t.coefficient === one(T)
-    #                     @test t.variable_index === x_sze[(j - 1) * dim + d]
-    #                 end
-    #             end
-    #         end
-    #     end
-    # end
+                        t = f2.terms[3]
+                        @test t.coefficient === one(T)
+                        @test t.variable_index === x_sze[(j - 1) * dim + d]
+                    end
+                end
+            end
+        end
+    end
 end
