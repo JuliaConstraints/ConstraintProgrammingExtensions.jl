@@ -52,6 +52,10 @@ const CountStrictlyGreaterThan2Reification{T, OT <: MOI.ModelLike} =
 const CountDifferentFrom2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Count2ReificationBridge{T, CP.DifferentFrom{T}}, OT}
 
+include("Decreasing/dec_to_lp.jl")
+const Decreasing2LP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Decreasing2LPBridge{T}, OT}
+
 include("DifferentFrom/neq_to_pseudolp.jl")
 const DifferentFrom2PseudoMILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{DifferentFrom2PseudoMILPBridge{T}, OT}
@@ -64,9 +68,9 @@ include("DifferentFrom_Indicator/neq_indicator1_to_pseudolp.jl")
 const Indicator1DifferentFrom2PseudoMILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Indicator1DifferentFrom2PseudoMILPBridge{T}, OT}
 
-include("Decreasing/dec_to_lp.jl")
-const Decreasing2LP{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{Decreasing2LPBridge{T}, OT}
+include("Disjunction/disjunction_to_reif.jl")
+const Disjunction2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Disjunction2ReificationBridge{T}, OT}
 
 include("EqualTo_Reify/reif_eqto_to_indic.jl")
 const ReifiedEqualTo2Indicator{T, OT <: MOI.ModelLike} =
