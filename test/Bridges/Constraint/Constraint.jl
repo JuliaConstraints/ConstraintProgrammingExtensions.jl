@@ -52,6 +52,16 @@
         include("EqualTo_Reify/reif_eqto_to_milp.jl")
     end
 
+    @testset "Reified{MOI.GreaterThan}" begin
+        include("GreaterThan_Reify/reif_gt_to_indic.jl")
+        # include("GreaterThan_Reify/reif_gt_to_milp.jl")
+    end
+
+    @testset "Reified{MOI.LessThan}" begin
+        include("LessThan_Reify/reif_lt_to_indic.jl")
+        # include("LessThan_Reify/reif_lt_to_milp.jl")
+    end
+
     @testset "Increasing" begin
         include("Increasing/inc_to_lp.jl")
     end
