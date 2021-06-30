@@ -1,5 +1,4 @@
-@testset "NonOverlappingOrthotopes2DisjunctionLinearBridge: $(fct_type), orthotopes $(n_ortho), dimension $(dim), $(T)" for fct_type in ["vector of variables"], n_ortho in [2], dim in [2], T in [Int]
-    # for fct_type in ["vector of variables", "vector affine function"], n_ortho in [2, 3], dim in [2, 3], T in [Int, Float64]
+@testset "NonOverlappingOrthotopes2DisjunctionLinearBridge: $(fct_type), orthotopes $(n_ortho), dimension $(dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], n_ortho in [2, 3], dim in [2, 3], T in [Int, Float64]
     mock = MOIU.MockOptimizer(DisjunctionModel{T}())
     model = COIB.NonOverlappingOrthotopes2DisjunctionLinear{T}(mock)
 
