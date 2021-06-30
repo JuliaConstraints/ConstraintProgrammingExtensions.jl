@@ -1,4 +1,3 @@
-using Base: Float64
 @testset "ReifiedEqualTo2MILP: $(fct_type), type $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
     mock = MOIU.MockOptimizer(AbsoluteValueModel{T}())
     model = COIB.ReifiedEqualTo2MILP{T}(mock)

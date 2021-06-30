@@ -1,4 +1,3 @@
-using Base: Float64
 @testset "ReifiedEqualTo2Indicator: $(fct_type), type $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
     base_model = if T == Int
         IntDifferentFromIndicatorMILPModel{Int}()
