@@ -59,7 +59,7 @@
 
     @testset "Reified{MOI.LessThan}" begin
         include("LessThan_Reify/reif_lt_to_indic.jl")
-        # include("LessThan_Reify/reif_lt_to_milp.jl")
+        include("LessThan_Reify/reif_lt_to_milp.jl")
     end
 
     @testset "Increasing" begin

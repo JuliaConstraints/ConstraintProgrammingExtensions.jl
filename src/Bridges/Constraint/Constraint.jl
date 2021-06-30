@@ -116,9 +116,9 @@ include("LessThan_Reify/reif_lt_to_indic.jl")
 const ReifiedLessThan2Indicator{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ReifiedLessThan2IndicatorBridge{T}, OT}
 
-# include("LessThan_Reify/reif_lt_to_milp.jl")
-# const ReifiedLessThan2MILP{T, OT <: MOI.ModelLike} =
-#     MOIBC.SingleBridgeOptimizer{ReifiedLessThan2MILPBridge{T}, OT}
+include("LessThan_Reify/reif_lt_to_milp.jl")
+const ReifiedLessThan2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ReifiedLessThan2MILPBridge{T}, OT}
 
 include("Strictly/strictly_to_lp.jl")
 const Strictly2Linear{T, OT <: MOI.ModelLike} =

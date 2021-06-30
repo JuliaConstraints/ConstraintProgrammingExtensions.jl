@@ -1,12 +1,9 @@
 _REIF_LT_FLOAT_EPSILON = 1.0e-5
 
 """
-Bridges `CP.Reified{MOI.LessThan}` to MILP constraints.
+Bridges `CP.Reified{MOI.GreaterThan}` to MILP constraints.
 """
-struct ReifiedLessThan2MILPBridge{T <: Real} <: MOIBC.AbstractBridge
-    var_abs::MOI.VariableIndex
-    var_abs_int::Union{Nothing, MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}}
-    con_abs::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}
+struct ReifiedGreaterThan2MILPBridge{T <: Real} <: MOIBC.AbstractBridge
     con_bigm::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}
     con_smallm::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}
 end
