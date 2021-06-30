@@ -88,7 +88,7 @@ end
 function MOIBC.concrete_bridge_type(
     ::Type{ReifiedGreaterThan2MILPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Reified{MOI.LessThan{T}}},
+    ::Type{CP.Reified{MOI.GreaterThan{T}}},
 ) where {T <: Real}
     return ReifiedGreaterThan2MILPBridge{T}
 end
