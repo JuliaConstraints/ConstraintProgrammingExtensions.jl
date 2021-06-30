@@ -39,6 +39,10 @@
         include("DifferentFrom/neq_to_pseudolp.jl")
     end
 
+    @testset "Disjunction" begin
+        include("Disjunction/disjunction_to_reif.jl")
+    end
+
     @testset "IndicatorSet{DifferentFrom}" begin
         include("DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl")
     end
