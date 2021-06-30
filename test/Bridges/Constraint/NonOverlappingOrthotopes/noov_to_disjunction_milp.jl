@@ -156,8 +156,8 @@
                     @test length(f_scalars) == 2 * dim
 
                     for d in 1:dim
-                        f1 = f_scalars[(d - 1) * dim + 1]
-                        f2 = f_scalars[(d - 1) * dim + 2]
+                        f1 = f_scalars[(d - 1) * 2 + 1]
+                        f2 = f_scalars[(d - 1) * 2 + 2]
 
                         # Doesn't work, because == requires that the order 
                         # of the terms is the same.
