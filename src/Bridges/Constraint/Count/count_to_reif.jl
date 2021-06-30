@@ -77,7 +77,7 @@ end
 function MOIBC.concrete_bridge_type(
     ::Type{Count2ReificationBridge{T, S}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Increasing},
+    ::Type{CP.Count{S}},
 ) where {T, S <: MOI.AbstractScalarSet}
     return Count2ReificationBridge{T, S}
 end
