@@ -1,5 +1,4 @@
-@testset "CountCompare2Count: $(fct_type), $(array_size) items, $(T)" for fct_type in ["vector of variables"], array_size in [2], T in [Int]
-    # for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 3], T in [Int, Float64]
+@testset "CountCompare2Count: $(fct_type), $(array_size) items, $(T)" for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 3], T in [Int, Float64]
     mock = MOIU.MockOptimizer(CountModel{T}())
     model = COIB.CountCompare2Count{T}(mock)
 
