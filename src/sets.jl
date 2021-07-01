@@ -323,7 +323,7 @@ MOI.dimension(set::Inverse) = 2 * set.dimension
 
 # isbits types, nothing to copy
 function copy(
-    set::Union{AllEqual, AllDifferent, Membership, CountCompare, CountDistinct, Inverse},
+    set::Union{AllEqual, AllDifferent, Membership, Inverse},
 )
     return set
 end

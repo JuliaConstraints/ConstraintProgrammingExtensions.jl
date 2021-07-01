@@ -489,6 +489,41 @@ MOIU.@model(
     (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
 )
 
+# Count.
+
+MOIU.@model(
+    CountModel,
+    (),
+    (
+        MOI.EqualTo, 
+        MOI.GreaterThan, 
+        MOI.LessThan, 
+        MOI.Interval, 
+    ),
+    (
+        MOI.Zeros,
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.GeometricMeanCone,
+        MOI.RelativeEntropyCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+        CP.Count{MOI.EqualTo{Int}},
+        CP.Count{MOI.EqualTo{Float64}},
+    ),
+    (MOI.PowerCone, MOI.DualPowerCone),
+    (),
+    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.VectorOfVariables,),
+    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
+)
+
 # Different from.
 
 MOIU.@model(

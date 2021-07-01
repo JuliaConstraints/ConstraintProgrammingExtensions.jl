@@ -52,6 +52,10 @@ const CountStrictlyGreaterThan2Reification{T, OT <: MOI.ModelLike} =
 const CountDifferentFrom2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Count2ReificationBridge{T, CP.DifferentFrom{T}}, OT}
 
+include("CountCompare/countcmp_to_count.jl")
+const CountCompare2Count{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{CountCompare2CountBridge{T}, OT}
+
 include("Decreasing/dec_to_lp.jl")
 const Decreasing2LP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Decreasing2LPBridge{T}, OT}

@@ -31,6 +31,10 @@
         include("Count/count_to_reif.jl")
     end
 
+    @testset "CountCompare" begin
+        include("CountCompare/countcmp_to_count.jl")
+    end
+
     @testset "Decreasing" begin
         include("Decreasing/dec_to_lp.jl")
     end
