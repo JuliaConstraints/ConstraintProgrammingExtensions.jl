@@ -49,6 +49,12 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
         * [`sort`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/sort.mzn): [alldifferent, increasing and array indexing](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_sort.mzn), highly similar to `arg_sort`.
         * [`sort_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/sort.mzn): [equivalence, indicating whether a given array is a sorted copy of another](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_sort_reif.mzn).
         * [`sort_fn`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/sort_fn.mzn): returns the sorted array, based on `sort`.
+    * Increasing and decreasing: `CP.Increasing`, `CP.Decreasing`, and `CP.Strictly`
+        * [`increasing`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/increasing.mzn): [sequence of inequalities](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_increasing_int.mzn).
+        * [`decreasing`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/decreasing.mzn): [sequence of inequalities](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_decreasing_int.mzn).
+        * [`strictly_increasing`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/strictly_increasing.mzn): [sequence of strict inequalities](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_increasing_int.mzn).
+        * [`strictly_decreasing`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/strictly_ecreasing.mzn): [sequence of strict inequalities](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_decreasing_int.mzn).
+        * No reification available.
 * Scheduling: 
     * Rectangle overlapping: `CP.NonOverlappingOrthotopes` and `CP.ConditionallyNonOverlappingOrthotopes`
         * [`diffn`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/diffn.mzn): [mapped to a disjunction of linear inequalities](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_diffn.mzn).
