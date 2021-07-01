@@ -98,5 +98,7 @@
 
     @testset "Strictly" begin
         include("Strictly/strictly_to_lp.jl")
+        include("Strictly/strictly_dec_to_lp.jl")
+        include("Strictly/strictly_inc_to_lp.jl")
     end
 end
