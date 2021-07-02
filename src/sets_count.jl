@@ -9,7 +9,7 @@ Also called `among`.
 
 ## Example
 
-    [w, x, y, z] in Count(2.0, MOI.EqualTo(3))
+    [w, x, y, z] in Count(3, MOI.EqualTo(2.0))
     # w == sum([x, y, z] .== 2.0)
 """
 struct Count{S <: MOI.AbstractScalarSet} <: MOI.AbstractVectorSet
@@ -26,6 +26,58 @@ copy(set::Count{S}) where {S} = Count(set.dimension, copy(set.set))
 function Base.:(==)(x::Count{S}, y::Count{S}) where {S}
     return x.dimension == y.dimension && x.set == y.set
 end
+
+"""
+    GlobalCardinality{T}(dimension::Int, values::Vector{T})
+
+``\\{(x, y) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{N}^d : y_i = |\\{ j | y_j = \\mathtt{values}_i, \\forall j \\}| \\}``
+
+The first `dimension` variables are an array, the last variables are the 
+number of times that each item of `values` is present in the first array.
+
+Also called [`gcc`](https://sofdem.github.io/gccat/gccat/Cglobal_cardinality.html)
+or `count`.
+
+## Example
+
+    [x, y, z, v, w] in GlobalCardinality(3, [2.0, 4.0])
+    # v == sum([x, y, z] .== 2.0)
+    # w == sum([x, y, z] .== 4.0)
+"""
+struct GlobalCardinality{T} <: MOI.AbstractVectorSet
+    dimension::Int
+    values::Vector{T}
+end
+
+MOI.dimension(set::GlobalCardinality) = set.dimension + length(set.values)
+copy(set::GlobalCardinality) = Count(set.dimension, copy(set.values))
+function Base.:(==)(x::GlobalCardinality, y::GlobalCardinality)
+    return x.dimension == y.dimension && x.values == y.values
+end
+
+"""
+    GlobalCardinalityVariable(dimension::Int, n_values::Int)
+
+``\\{(x, y, z) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{N}^\\mathtt{n\\_values} \\times \\mathbb{R}^\\mathtt{n\\_values} : y_i = |\\{ j | y_j = z_i, \\forall j \\}| \\}``
+
+The first `dimension` variables are an array, the next `n_values` variables 
+are the number of times that each item of the last `n_values` variables is 
+present in the first array.
+
+Also called `distribute`.
+
+## Example
+
+    [x, y, z, t, u, v, w] in GlobalCardinalityVariable(3, 2)
+    # t == sum([x, y, z] .== v)
+    # u == sum([x, y, z] .== w)
+"""
+struct GlobalCardinalityVariable <: MOI.AbstractVectorSet
+    dimension::Int
+    n_values::Int
+end
+
+MOI.dimension(set::GlobalCardinalityVariable) = set.dimension + length(set.values)
 
 """
 CountCompare(dimension::Int)
@@ -71,7 +123,7 @@ MOI.dimension(set::CountDistinct) = set.dimension + 1
 
 # isbits types, nothing to copy
 function copy(
-    set::Union{CountCompare, CountDistinct},
+    set::Union{CountCompare, CountDistinct, GlobalCardinalityVariable},
 )
     return set
 end
