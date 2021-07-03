@@ -80,7 +80,7 @@ end
 MOI.dimension(set::GlobalCardinalityVariable) = set.dimension + 2 * set.n_values
 
 """
-CountCompare(dimension::Int)
+    CountCompare(dimension::Int)
 
 ``\\{(z, x, y) \\in \\mathbb{N} \\times \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{R}^\\mathtt{dimension} : Z = |\\{i | x_i = y_i\\}|\\}``
 
