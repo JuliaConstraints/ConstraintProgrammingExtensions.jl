@@ -92,6 +92,10 @@ include("GreaterThan_Reify/reif_gt_to_milp.jl")
 const ReifiedGreaterThan2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ReifiedGreaterThan2MILPBridge{T}, OT}
 
+include("GlobalCardinality/gc_to_count.jl")
+const GlobalCardinality2Count{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{GlobalCardinality2CountBridge{T}, OT}
+
 include("GlobalCardinality/gc_to_gcv.jl")
 const GlobalCardinality2GlobalCardinalityVariable{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{GlobalCardinality2GlobalCardinalityVariableBridge{T}, OT}

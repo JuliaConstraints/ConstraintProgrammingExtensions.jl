@@ -52,6 +52,7 @@
     end
 
     @testset "GlobalCardinality" begin
+        include("GlobalCardinality/gc_to_count.jl")
         include("GlobalCardinality/gc_to_gcv.jl")
     end
 
