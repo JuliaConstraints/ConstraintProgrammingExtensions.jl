@@ -50,7 +50,7 @@ struct GlobalCardinality{T} <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::GlobalCardinality) = set.dimension + length(set.values)
-copy(set::GlobalCardinality) = Count(set.dimension, copy(set.values))
+copy(set::GlobalCardinality) = GlobalCardinality(set.dimension, copy(set.values))
 function Base.:(==)(x::GlobalCardinality, y::GlobalCardinality)
     return x.dimension == y.dimension && x.values == y.values
 end
@@ -77,7 +77,7 @@ struct GlobalCardinalityVariable <: MOI.AbstractVectorSet
     n_values::Int
 end
 
-MOI.dimension(set::GlobalCardinalityVariable) = set.dimension + length(set.values)
+MOI.dimension(set::GlobalCardinalityVariable) = set.dimension + 2 * set.n_values
 
 """
 CountCompare(dimension::Int)
