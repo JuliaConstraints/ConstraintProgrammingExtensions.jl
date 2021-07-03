@@ -51,6 +51,10 @@
         include("DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl")
     end
 
+    @testset "GlobalCardinality" begin
+        include("GlobalCardinality/gc_to_gcv.jl")
+    end
+
     @testset "Reified{MOI.EqualTo}" begin
         include("EqualTo_Reify/reif_eqto_to_indic.jl")
         include("EqualTo_Reify/reif_eqto_to_milp.jl")
