@@ -38,6 +38,10 @@ include("BinPacking/varcapa_to_milp.jl")
 const VariableCapacityBinPacking2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{VariableCapacityBinPacking2MILPBridge{T}, OT}
 
+include("Conjunction/conjunction_to_reif.jl")
+const Conjunction2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Conjunction2ReificationBridge{T}, OT}
+
 include("Count/count_to_reif.jl")
 const CountEqualTo2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Count2ReificationBridge{T, MOI.EqualTo{T}}, OT}

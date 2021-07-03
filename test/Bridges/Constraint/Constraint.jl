@@ -27,6 +27,10 @@
         include("BinPacking/varcapa_to_milp.jl")
     end
 
+    @testset "Conjunction" begin
+        include("Conjunction/conjunction_to_reif.jl")
+    end
+
     @testset "Count" begin
         include("Count/count_to_reif.jl")
     end
