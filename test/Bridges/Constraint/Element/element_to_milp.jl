@@ -1,5 +1,4 @@
-@testset "Element2MILP: $(fct_type), dimension $(dim), $(T)" for fct_type in ["vector of variables"], dim in [2], T in [Int]
-    # for fct_type in ["vector of variables", "vector affine function"], dim in [2, 3], T in [Int, Float64]
+@testset "Element2MILP: $(fct_type), dimension $(dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], dim in [2, 3], T in [Int, Float64]
     mock = MOIU.MockOptimizer(MILPModel{T}())
     model = COIB.Element2MILP{T}(mock)
 
@@ -50,6 +49,7 @@
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == dim
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == 3
 
+        @test MOI.get(bridge, MOI.ListOfVariableIndices()) == bridge.vars
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == bridge.vars_bin
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.con_unary, bridge.con_choose_one, bridge.con_value]
     end
