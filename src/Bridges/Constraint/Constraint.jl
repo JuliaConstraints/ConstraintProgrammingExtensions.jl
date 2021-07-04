@@ -84,6 +84,10 @@ include("Element/element_to_milp.jl")
 const Element2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Element2MILPBridge{T}, OT}
 
+include("ElementVariableArray/elementva_to_milp.jl")
+const ElementVariableArray2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ElementVariableArray2MILPBridge{T}, OT}
+
 include("EqualTo_Reify/reif_eqto_to_indic.jl")
 const ReifiedEqualTo2Indicator{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ReifiedEqualTo2IndicatorBridge{T}, OT}

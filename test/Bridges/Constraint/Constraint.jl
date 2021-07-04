@@ -55,6 +55,10 @@
         include("Element/element_to_milp.jl")
     end
 
+    @testset "ElementVariableArray" begin
+        include("ElementVariableArray/elementva_to_milp.jl")
+    end
+
     @testset "IndicatorSet{DifferentFrom}" begin
         include("DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl")
     end
