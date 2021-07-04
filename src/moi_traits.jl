@@ -67,8 +67,16 @@ end
 function has_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     T = _detect_variable_type(model, v)
 
+    # TODO: should infinite values be disregarded? 
+
     # Check if the variable has an explicit lower bound.
     c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{T}}(v.value)
+    if MOI.is_valid(model, c_idx)
+        return true
+    end
+
+    # Check if the variable has an interval.
+    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Interval{T}}(v.value)
     if MOI.is_valid(model, c_idx)
         return true
     end
@@ -100,8 +108,16 @@ end
 function has_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     T = _detect_variable_type(model, v)
 
+    # TODO: should infinite values be disregarded? 
+
     # Check if the variable has an explicit upper bound.
     c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{T}}(v.value)
+    if MOI.is_valid(model, c_idx)
+        return true
+    end
+
+    # Check if the variable has an interval.
+    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Interval{T}}(v.value)
     if MOI.is_valid(model, c_idx)
         return true
     end
@@ -150,18 +166,26 @@ end
 function get_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     T = _detect_variable_type(model, v)
 
+    # Booleans have an implicit lower bound.
     if is_binary(model, v)
         return 0
     end
 
+    # Check if the variable has an explicit lower bound.
     c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{T}}(
         v.value,
     )
-    try
+    if MOI.is_valid(model, c_idx)
         return MOI.get(model, MOI.ConstraintSet(), c_idx).lower
-    catch
-        return typemin(T)
     end
+
+    # Check if the variable has an interval.
+    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Interval{T}}(v.value)
+    if MOI.is_valid(model, c_idx)
+        return MOI.get(model, MOI.ConstraintSet(), c_idx).lower
+    end
+
+    return typemin(T)
 end
 
 function get_upper_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
@@ -196,14 +220,24 @@ end
 function get_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     T = _detect_variable_type(model, v)
 
+    # Booleans have an implicit upper bound.
     if is_binary(model, v)
         return 1
     end
 
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{T}}(v.value)
-    try
+    # Check if the variable has an explicit lower bound.
+    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{T}}(
+        v.value,
+    )
+    if MOI.is_valid(model, c_idx)
         return MOI.get(model, MOI.ConstraintSet(), c_idx).upper
-    catch
-        return typemax(T)
     end
+
+    # Check if the variable has an interval.
+    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Interval{T}}(v.value)
+    if MOI.is_valid(model, c_idx)
+        return MOI.get(model, MOI.ConstraintSet(), c_idx).upper
+    end
+
+    return typemax(T)
 end
