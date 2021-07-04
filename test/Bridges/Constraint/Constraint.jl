@@ -51,6 +51,10 @@
         include("Disjunction/disjunction_to_reif.jl")
     end
 
+    @testset "Element" begin
+        include("Element/element_to_milp.jl")
+    end
+
     @testset "IndicatorSet{DifferentFrom}" begin
         include("DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl")
     end

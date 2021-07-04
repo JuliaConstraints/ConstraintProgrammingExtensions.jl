@@ -208,6 +208,9 @@ end
 Less formally, the first element constrained in this set will take the value of
 `values` at the index given by the second element.
 
+Also called [`indexing`](https://sofdem.github.io/gccat/gccat/Celement.html) 
+or `nth`.
+
 ## Examples
 
     [x, 3] in Element([4, 5, 6])

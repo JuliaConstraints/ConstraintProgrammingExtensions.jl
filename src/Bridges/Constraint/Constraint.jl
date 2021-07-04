@@ -80,6 +80,10 @@ include("Disjunction/disjunction_to_reif.jl")
 const Disjunction2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Disjunction2ReificationBridge{T}, OT}
 
+include("Element/element_to_milp.jl")
+const Element2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Element2MILPBridge{T}, OT}
+
 include("EqualTo_Reify/reif_eqto_to_indic.jl")
 const ReifiedEqualTo2Indicator{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ReifiedEqualTo2IndicatorBridge{T}, OT}
