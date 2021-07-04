@@ -58,8 +58,6 @@ function MOIBC.bridge_constraint(
     elseif T <: Real
         var_max = MOI.add_variable(model)
         var_max_con = nothing
-    else
-        @assert false
     end
 
     # The minimum is at most every other value.
