@@ -63,6 +63,10 @@
         include("DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl")
     end
 
+    @testset "Imply" begin
+        include("Imply/imply_to_reif.jl")
+    end
+
     @testset "GlobalCardinality" begin
         include("GlobalCardinality/gc_to_count.jl")
         include("GlobalCardinality/gc_to_gcv.jl")

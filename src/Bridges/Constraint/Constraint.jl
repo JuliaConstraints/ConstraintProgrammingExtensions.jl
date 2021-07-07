@@ -116,6 +116,10 @@ include("GlobalCardinalityVariable/gcv_to_count.jl")
 const GlobalCardinalityVariable2Count{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{GlobalCardinalityVariable2CountBridge{T}, OT}
 
+include("Imply/imply_to_reif.jl")
+const Imply2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Imply2ReificationBridge{T}, OT}
+
 include("Increasing/inc_to_lp.jl")
 const Increasing2LP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Increasing2LPBridge{T}, OT}

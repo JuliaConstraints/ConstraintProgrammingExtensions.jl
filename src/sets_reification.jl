@@ -121,7 +121,7 @@ satisfied. Otherwise, nothing is implied on the truth value of `consequent`.
 
 ``\\{(x, y) \\in \\mathbb{R}^a \\times \\mathbb{R}^b | y \\in Consequent if x \\in Antecedent\\}``.
 
-Also called `if_then`.
+Also called `if_then` or material implication.
 """
 struct Imply{Antecedent <: MOI.AbstractSet, Consequent <: MOI.AbstractSet} <:
        MOI.AbstractVectorSet
