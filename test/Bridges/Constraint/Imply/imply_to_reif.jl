@@ -32,7 +32,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_1, x_2])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x_1, x_2))
+        MOIU.vectorize(MOI.SingleVariable.([x_1, x_2]))
     else
         @assert false
     end
@@ -61,7 +61,7 @@
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.var_antecedent, bridge.var_consequent]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == [bridge.var_antecedent_bin, bridge.var_consequent_bin]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reified}()) == [bridge.con_reif_antecedent, bridge.con_reif_consequent]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.EqualTo{T}}()) == [bridge.con_implication]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == [bridge.con_implication]
     end
 
     @testset "Set of variables" begin

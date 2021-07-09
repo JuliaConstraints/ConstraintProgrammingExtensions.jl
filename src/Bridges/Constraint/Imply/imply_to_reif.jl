@@ -160,7 +160,7 @@ end
 function MOI.get(
     b::Imply2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.EqualTo{T},
+        MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
     },
 ) where {T}
     return [b.con_implication]
