@@ -69,6 +69,7 @@
     end
 
     @testset "IfThenElse" begin
+        include("IfThenElse/ifthenelse_to_imply.jl")
         include("IfThenElse/ifthenelse_to_reif.jl")
     end
 

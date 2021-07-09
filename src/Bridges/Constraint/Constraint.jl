@@ -116,6 +116,10 @@ include("GlobalCardinalityVariable/gcv_to_count.jl")
 const GlobalCardinalityVariable2Count{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{GlobalCardinalityVariable2CountBridge{T}, OT}
 
+include("IfThenElse/ifthenelse_to_imply.jl")
+const IfThenElse2Imply{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{IfThenElse2ImplyBridge{T}, OT}
+
 include("IfThenElse/ifthenelse_to_reif.jl")
 const IfThenElse2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{IfThenElse2ReificationBridge{T}, OT}

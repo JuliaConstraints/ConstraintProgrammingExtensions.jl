@@ -42,6 +42,7 @@
 
     @test MOI.is_valid(model, x_1)
     @test MOI.is_valid(model, x_2)
+    @test MOI.is_valid(model, x_3)
     @test MOI.is_valid(model, c)
 
     bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.IfThenElse}(-1)]
