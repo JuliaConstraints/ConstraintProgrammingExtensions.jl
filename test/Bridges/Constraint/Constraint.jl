@@ -59,14 +59,6 @@
         include("ElementVariableArray/elementva_to_milp.jl")
     end
 
-    @testset "IndicatorSet{DifferentFrom}" begin
-        include("DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl")
-    end
-
-    @testset "Imply" begin
-        include("Imply/imply_to_reif.jl")
-    end
-
     @testset "GlobalCardinality" begin
         include("GlobalCardinality/gc_to_count.jl")
         include("GlobalCardinality/gc_to_gcv.jl")
@@ -76,23 +68,20 @@
         include("GlobalCardinalityVariable/gcv_to_count.jl")
     end
 
-    @testset "Reified{MOI.EqualTo}" begin
-        include("EqualTo_Reify/reif_eqto_to_indic.jl")
-        include("EqualTo_Reify/reif_eqto_to_milp.jl")
-    end
-
-    @testset "Reified{MOI.GreaterThan}" begin
-        include("GreaterThan_Reify/reif_gt_to_indic.jl")
-        include("GreaterThan_Reify/reif_gt_to_milp.jl")
-    end
-
-    @testset "Reified{MOI.LessThan}" begin
-        include("LessThan_Reify/reif_lt_to_indic.jl")
-        include("LessThan_Reify/reif_lt_to_milp.jl")
+    @testset "Increasing" begin
+        include("Increasing/inc_to_lp.jl")
     end
 
     @testset "Increasing" begin
         include("Increasing/inc_to_lp.jl")
+    end
+
+    @testset "IndicatorSet{DifferentFrom}" begin
+        include("DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl")
+    end
+
+    @testset "Imply" begin
+        include("Imply/imply_to_reif.jl")
     end
 
     @testset "Knapsack" begin
@@ -114,6 +103,21 @@
     @testset "NonOverlappingOrthotopes" begin
         include("NonOverlappingOrthotopes/noov_to_noovcond.jl")
         include("NonOverlappingOrthotopes/noov_to_disjunction_milp.jl")
+    end
+
+    @testset "Reified{MOI.EqualTo}" begin
+        include("EqualTo_Reify/reif_eqto_to_indic.jl")
+        include("EqualTo_Reify/reif_eqto_to_milp.jl")
+    end
+
+    @testset "Reified{MOI.GreaterThan}" begin
+        include("GreaterThan_Reify/reif_gt_to_indic.jl")
+        include("GreaterThan_Reify/reif_gt_to_milp.jl")
+    end
+
+    @testset "Reified{MOI.LessThan}" begin
+        include("LessThan_Reify/reif_lt_to_indic.jl")
+        include("LessThan_Reify/reif_lt_to_milp.jl")
     end
 
     @testset "Sort" begin
