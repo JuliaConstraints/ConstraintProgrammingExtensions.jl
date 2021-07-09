@@ -125,8 +125,8 @@ end
 function MOIBC.concrete_bridge_type(
     ::Type{IfThenElse2ReificationBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.IfThenElse{S1, S2}},
-) where {T, S1, S2}
+    ::Type{CP.IfThenElse{S1, S2, S3}},
+) where {T, S1, S2, S3}
     return IfThenElse2ReificationBridge{T}
 end
 
