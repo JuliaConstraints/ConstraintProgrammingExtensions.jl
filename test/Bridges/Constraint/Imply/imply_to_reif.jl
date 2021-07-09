@@ -1,5 +1,4 @@
-@testset "Imply2Reification: $(fct_type), $(T)" for fct_type in ["vector of variables"], T in [Int]
-    # for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
+@testset "Imply2Reification: $(fct_type), $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
     base_model = if T == Int
         IntReifiedEqualToModel{T}()
     elseif T == Float64
