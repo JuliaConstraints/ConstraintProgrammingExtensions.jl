@@ -68,6 +68,10 @@
         include("GlobalCardinalityVariable/gcv_to_count.jl")
     end
 
+    @testset "IfThenElse" begin
+        include("IfThenElse/ifthenelse_to_reif.jl")
+    end
+
     @testset "Increasing" begin
         include("Increasing/inc_to_lp.jl")
     end
