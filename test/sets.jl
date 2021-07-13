@@ -18,6 +18,7 @@
     @testset "$(S)" for S in [
         CP.AllEqual,
         CP.AllDifferent,
+        CP.SymmetricAllDifferent,
         CP.Membership,
         CP.ElementVariableArray,
         CP.CountDistinct,
@@ -51,6 +52,7 @@
         if S in [
             CP.AllEqual,
             CP.AllDifferent,
+            CP.SymmetricAllDifferent,
             CP.Membership,
             CP.Contiguity,
             CP.Circuit,

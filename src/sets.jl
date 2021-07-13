@@ -73,6 +73,29 @@ AllDifferentExceptConstant(dimension::Int, value::T) where {T <: Number} =
     AllDifferentExceptConstants(dimension, Set(value))
 
 """
+    SymmetricAllDifferent(dimension::Int)
+
+The set corresponding to an all-different constraint, with the additional 
+requirement that the array must be symmetric.
+
+All expressions of a vector-valued function are enforced to take distinct
+values in the solution: for all pairs of expressions, their values must
+differ. Symmetry means that, if ``x[i]=j``, then ``x[j]=i``.
+
+This constraint is sometimes called [`symmetric_alldifferent`](https://sofdem.github.io/gccat/gccat/Csymmetric_alldifferent.html).
+
+## Example
+
+    [x, y, z] in SymmetricAllDifferent(3)
+    # enforces `x != y` AND `x != z` AND `y != z` AND `(x == 2 => y == 1)` AND 
+    # `(x == 3 => z = 1)` AND `(y == 1 => x == 2)` AND `(y == 3 => z == 2)` AND 
+    # `(z == 1 => x == 3)` AND `(z == 2 => y == 3)`.
+"""
+struct SymmetricAllDifferent <: MOI.AbstractVectorSet
+    dimension::Int
+end
+
+"""
     Domain{T <: Number}(values::Set{T})
 
 The set corresponding to an enumeration of constant values.
@@ -327,7 +350,7 @@ MOI.dimension(set::Inverse) = 2 * set.dimension
 
 # isbits types, nothing to copy
 function copy(
-    set::Union{AllEqual, AllDifferent, Membership, Inverse},
+    set::Union{AllEqual, AllDifferent, SymmetricAllDifferent, Membership, Inverse},
 )
     return set
 end
