@@ -143,4 +143,8 @@
         include("Strictly/strictly_dec_to_lp.jl")
         include("Strictly/strictly_inc_to_lp.jl")
     end
+
+    @testset "SymmetricAllDifferent" begin
+        include("SymmetricAllDifferent/salldiff_to_alldiff_inverse.jl")
+    end
 end
