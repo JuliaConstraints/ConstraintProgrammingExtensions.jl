@@ -7,12 +7,18 @@ Version 0.3.0
 Generalise `Count` to any kind of comparison for items, not just equality. 
 (The user-facing interface is the same.)
 
-Add `VectorDomain` and `VectorAntiDomain`. Add `AllDifferentExceptConstants`;
-`AllDifferentExceptConstant` becomes a constructor for the former. Add 
-`NonOverlappingOrthotopes` and `ConditionallyNonOverlappingOrthotopes`.
-Add `GlobalCardinality` and `GlobalCardinalityVariable`. Add 
-`SymmetricAllDifferent`. Add `ClosedGlobalCardinality` and 
-`ClosedGlobalCardinalityVariable`.
+Add many new sets: 
+* `VectorDomain` 
+* `VectorAntiDomain`
+* `AllDifferentExceptConstants`; `AllDifferentExceptConstant` becomes a 
+  constructor for the former
+* `NonOverlappingOrthotopes` 
+* `ConditionallyNonOverlappingOrthotopes`
+* `GlobalCardinality`
+* `GlobalCardinalityVariable`
+* `SymmetricAllDifferent`
+* `ClosedGlobalCardinality`
+* `ClosedGlobalCardinalityVariable`
 
 
 Version 0.2.5
