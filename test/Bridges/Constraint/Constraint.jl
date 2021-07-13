@@ -73,6 +73,10 @@
         include("IfThenElse/ifthenelse_to_reif.jl")
     end
 
+    @testset "Imply" begin
+        include("Imply/imply_to_reif.jl")
+    end
+
     @testset "Increasing" begin
         include("Increasing/inc_to_lp.jl")
     end
@@ -85,8 +89,8 @@
         include("DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl")
     end
 
-    @testset "Imply" begin
-        include("Imply/imply_to_reif.jl")
+    @testset "Inverse" begin
+        include("Inverse/inverse_to_reif.jl")
     end
 
     @testset "Knapsack" begin

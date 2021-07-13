@@ -131,6 +131,10 @@ const Imply2Reification{T, OT <: MOI.ModelLike} =
 include("Increasing/inc_to_lp.jl")
 const Increasing2LP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Increasing2LPBridge{T}, OT}
+
+include("Inverse/inverse_to_reif.jl")
+const Inverse2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Inverse2ReificationBridge{T}, OT}
     
 include("Knapsack/kp_to_milp.jl")
 const Knapsack2MILP{T, OT <: MOI.ModelLike} =

@@ -58,7 +58,7 @@ function MOIBC.bridge_constraint(
                 model, 
                 MOIU.vectorize(
                     [
-                        one(T) * vars_first[i, j], 
+                        one(T) * MOI.SingleVariable(vars_first[i, j]), 
                         f_x[i] - T(j)
                     ]
                 ),
@@ -69,7 +69,7 @@ function MOIBC.bridge_constraint(
                 model, 
                 MOIU.vectorize(
                     [
-                        one(T) * vars_second[i, j], 
+                        one(T) * MOI.SingleVariable(vars_second[i, j]), 
                         f_y[j] - T(i)
                     ]
                 ),
@@ -78,7 +78,7 @@ function MOIBC.bridge_constraint(
 
             cons_equivalence[i, j] = MOI.add_constraint(
                 model, 
-                one(T) * vars_first[i, j] - one(T) * vars_second[i, j],
+                one(T) * MOI.SingleVariable(vars_first[i, j]) - one(T) * MOI.SingleVariable(vars_second[i, j]),
                 MOI.EqualTo(zero(T))
             )
         end
@@ -104,8 +104,8 @@ end
 function MOIB.added_constraint_types(::Type{Inverse2ReificationBridge{T}}) where {T}
     return [
         (MOI.SingleVariable, MOI.ZeroOne),
-        (MOI.VectorAffineFunction{T}, CP.Reified), # TODO: how to be more precise?
-        (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
+        (MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}),
+        (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
     ]
 end
 
@@ -117,42 +117,42 @@ function MOIBC.concrete_bridge_type(
     return Inverse2ReificationBridge{T}
 end
 
-function MOI.get(::Inverse2ReificationBridge{T}, ::MOI.NumberOfVariables) where {T}
-    return 2
+function MOI.get(b::Inverse2ReificationBridge{T}, ::MOI.NumberOfVariables) where {T}
+    return length(b.vars_first) + length(b.vars_second)
 end
 
 function MOI.get(
-    ::Inverse2ReificationBridge{T},
+    b::Inverse2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.SingleVariable, MOI.ZeroOne,
     },
 ) where {T}
-    return 2
+return length(b.vars_first_bin) + length(b.vars_second_bin)
 end
 
 function MOI.get(
-    ::Inverse2ReificationBridge{T},
+    b::Inverse2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.Reified,
+        MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}},
     },
 ) where {T}
-    return 2
+    return length(b.cons_first_reif) + length(b.cons_second_reif)
 end
 
 function MOI.get(
-    ::Inverse2ReificationBridge{T},
+    b::Inverse2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
+        MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
     },
 ) where {T}
-    return 1
+    return length(b.cons_equivalence)
 end
 
 function MOI.get(
     b::Inverse2ReificationBridge{T},
     ::MOI.ListOfVariableIndices,
 ) where {T}
-    return [b.var_antecedent, b.var_consequent]
+    return vcat(b.vars_first, b.vars_second)
 end
 
 function MOI.get(
@@ -161,23 +161,23 @@ function MOI.get(
         MOI.SingleVariable, MOI.ZeroOne,
     },
 ) where {T}
-    return [b.var_antecedent_bin, b.var_consequent_bin]
+    return vcat(b.vars_first_bin, b.vars_second_bin)
 end
 
 function MOI.get(
     b::Inverse2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.Reified,
+        MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}},
     },
 ) where {T}
-    return [b.con_reif_antecedent, b.con_reif_consequent]
+    return vcat(b.cons_first_reif, b.cons_second_reif)
 end
 
 function MOI.get(
     b::Inverse2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
+        MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
     },
 ) where {T}
-    return [b.con_implication]
+    return b.cons_equivalence
 end
