@@ -245,17 +245,17 @@
     end
 
     @testset "$(S)" for S in [CP.GlobalCardinality, CP.ClosedGlobalCardinality]
-        @test CP.S(2, [2, 4]) == CP.S(2, [2, 4])
-        @test CP.S(2, [2, 4]) != CP.S(3, [2, 4])
-        @test CP.S(3, [2, 4]) != CP.S(2, [2, 4])
-        @test CP.S(2, [2, 4]) != CP.S(2, [3, 5])
+        @test S(2, [2, 4]) == S(2, [2, 4])
+        @test S(2, [2, 4]) != S(3, [2, 4])
+        @test S(3, [2, 4]) != S(2, [2, 4])
+        @test S(2, [2, 4]) != S(2, [3, 5])
 
-        s = CP.S(2, [2, 4])
-        @test typeof(copy(s)) <: CP.S
+        s = S(2, [2, 4])
+        @test typeof(copy(s)) <: S
         @test copy(s) == s
 
-        @test MOI.dimension(CP.S(2, [2, 4])) == 2 + 2
-        @test MOI.dimension(CP.S(3, [2, 4, 6, 8])) == 3 + 4
+        @test MOI.dimension(S(2, [2, 4])) == 2 + 2
+        @test MOI.dimension(S(3, [2, 4, 6, 8])) == 3 + 4
     end
 
     @testset "Element" begin
