@@ -19,6 +19,11 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
         * [`count_neq_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/count_neq.mzn), [`count_lt_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/count_lt.mzn), [`count_le_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/count_le.mzn), [`count_gt_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/count_gt.mzn), [`count_ge_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/count_ge.mzn): similar, [with an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_count_neq_reif.mzn).
         * [`exactly`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/exactly.mzn): [simple variation of `count`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_exactly_int.mzn), not directly mapped in this package.
         * [`global_cardinality`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/global_cardinality.mzn): [simple variation of `count`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_global_cardinality.mzn).
+    * Inversion: `CP.Inverse`
+        * [`inverse`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse.mzn): [index computations](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_inverse.mzn).
+        * [`inverse_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse.mzn): similar, [wih an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_inverse_reif.mzn).
+        * Also available [as a function](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse_fn.mzn).
+        * [`inverse_in_range`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse_in_range.mzn): [?](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_inverse_in_range.mzn).
 * Combinatorial sets:
     * Bin packing: 
         * Raw: `CP.BinPacking` (with supplementary load variables)
