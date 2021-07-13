@@ -8,6 +8,7 @@ Generalise `Count` to any kind of comparison for items, not just equality.
 (The user-facing interface is the same.)
 
 Add many new sets: 
+
 * `VectorDomain` 
 * `VectorAntiDomain`
 * `AllDifferentExceptConstants`; `AllDifferentExceptConstant` becomes a 
@@ -19,6 +20,8 @@ Add many new sets:
 * `SymmetricAllDifferent`
 * `ClosedGlobalCardinality`
 * `ClosedGlobalCardinalityVariable`
+
+Add many new bridges between high-level constraints, and also to MILP models.
 
 
 Version 0.2.5
