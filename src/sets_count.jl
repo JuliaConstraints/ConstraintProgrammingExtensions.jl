@@ -30,10 +30,11 @@ end
 """
     GlobalCardinality{T}(dimension::Int, values::Vector{T})
 
-``\\{(x, y) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{N}^d : y_i = |\\{ j | y_j = \\mathtt{values}_i, \\forall j \\}| \\}``
+``\\{(x, y) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{N}^d : y_i = |\\{ j | x_j = \\mathtt{values}_i, \\forall j \\}| \\}``
 
 The first `dimension` variables are an array, the last variables are the 
 number of times that each item of `values` is present in the first array.
+Values that are not in `values` are ignored. 
 
 Also called [`gcc`](https://sofdem.github.io/gccat/gccat/Cglobal_cardinality.html)
 or `count`.
@@ -58,11 +59,12 @@ end
 """
     GlobalCardinalityVariable(dimension::Int, n_values::Int)
 
-``\\{(x, y, z) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{N}^\\mathtt{n\\_values} \\times \\mathbb{R}^\\mathtt{n\\_values} : y_i = |\\{ j | y_j = z_i, \\forall j \\}| \\}``
+``\\{(x, y, z) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{N}^\\mathtt{n\\_values} \\times \\mathbb{R}^\\mathtt{n\\_values} : y_i = |\\{ j | x_j = z_i, \\forall j \\}| \\}``
 
 The first `dimension` variables are an array, the next `n_values` variables 
 are the number of times that each item of the last `n_values` variables is 
-present in the first array.
+present in the first array. Values of the first array that are not in the 
+`n_values` are ignored. 
 
 Also called `distribute`.
 
@@ -78,6 +80,59 @@ struct GlobalCardinalityVariable <: MOI.AbstractVectorSet
 end
 
 MOI.dimension(set::GlobalCardinalityVariable) = set.dimension + 2 * set.n_values
+
+"""
+    ClosedGlobalCardinality{T}(dimension::Int, values::Vector{T})
+
+``\\{(x, y) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{N}^d : y_i = |\\{ j | x_j = \\mathtt{values}_i, \\forall j \\}| \\}``
+
+The first `dimension` variables are an array, the last variables are the 
+number of times that each item of `values` is present in the first array.
+Each value of the first array must be within `values`.
+
+## Example
+
+    [x, y, z, v, w] in ClosedGlobalCardinality(3, [2.0, 4.0])
+    # v == sum([x, y, z] .== 2.0)
+    # w == sum([x, y, z] .== 4.0)
+    # x ∈ [2.0, 4.0], y ∈ [2.0, 4.0], z ∈ [2.0, 4.0]
+"""
+struct ClosedGlobalCardinality{T} <: MOI.AbstractVectorSet
+    dimension::Int
+    values::Vector{T}
+end
+
+MOI.dimension(set::ClosedGlobalCardinality) = set.dimension + length(set.values)
+copy(set::ClosedGlobalCardinality) = ClosedGlobalCardinality(set.dimension, copy(set.values))
+function Base.:(==)(x::ClosedGlobalCardinality, y::ClosedGlobalCardinality)
+    return x.dimension == y.dimension && x.values == y.values
+end
+
+"""
+    ClosedGlobalCardinalityVariable(dimension::Int, n_values::Int)
+
+``\\{(x, y, z) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{N}^\\mathtt{n\\_values} \\times \\mathbb{R}^\\mathtt{n\\_values} : y_i = |\\{ j | x_j = z_i, \\forall j \\}| \\}``
+
+The first `dimension` variables are an array, the next `n_values` variables 
+are the number of times that each item of the last `n_values` variables is 
+present in the first array. Each value of the first array must be within the 
+next given `n_values`.
+
+Also called `distribute`.
+
+## Example
+
+    [x, y, z, t, u, v, w] in ClosedGlobalCardinalityVariable(3, 2)
+    # t == sum([x, y, z] .== v)
+    # u == sum([x, y, z] .== w)
+    # x ∈ [v, w], y ∈ [v, w], z ∈ [v, w]
+"""
+struct ClosedGlobalCardinalityVariable <: MOI.AbstractVectorSet
+    dimension::Int
+    n_values::Int
+end
+
+MOI.dimension(set::ClosedGlobalCardinalityVariable) = set.dimension + 2 * set.n_values
 
 """
     CountCompare(dimension::Int)
@@ -123,7 +178,7 @@ MOI.dimension(set::CountDistinct) = set.dimension + 1
 
 # isbits types, nothing to copy
 function copy(
-    set::Union{CountCompare, CountDistinct, GlobalCardinalityVariable},
+    set::Union{CountCompare, CountDistinct, GlobalCardinalityVariable, ClosedGlobalCardinalityVariable},
 )
     return set
 end

@@ -11,7 +11,8 @@ Add `VectorDomain` and `VectorAntiDomain`. Add `AllDifferentExceptConstants`;
 `AllDifferentExceptConstant` becomes a constructor for the former. Add 
 `NonOverlappingOrthotopes` and `ConditionallyNonOverlappingOrthotopes`.
 Add `GlobalCardinality` and `GlobalCardinalityVariable`. Add 
-`SymmetricAllDifferent`. 
+`SymmetricAllDifferent`. Add `ClosedGlobalCardinality` and 
+`ClosedGlobalCardinalityVariable`.
 
 
 Version 0.2.5
