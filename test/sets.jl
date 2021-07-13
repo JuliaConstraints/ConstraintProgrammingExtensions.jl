@@ -131,6 +131,7 @@
         CP.NonOverlappingOrthotopes,
         CP.ConditionallyNonOverlappingOrthotopes,
         CP.GlobalCardinalityVariable,
+        CP.ClosedGlobalCardinalityVariable,
     ]
         @test isbitstype(S)
 
@@ -149,7 +150,7 @@
         elseif S == CP.ConditionallyNonOverlappingOrthotopes
             @test MOI.dimension(S(2, 2)) == 3 * 2 * 2 + 2
             @test MOI.dimension(S(3, 4)) == 3 * 3 * 4 + 3
-        elseif S == CP.GlobalCardinalityVariable
+        elseif S == CP.GlobalCardinalityVariable || S == CP.ClosedGlobalCardinalityVariable
             @test MOI.dimension(S(2, 2)) == 2 + 2 * 2
             @test MOI.dimension(S(3, 4)) == 3 + 2 * 4
         else
@@ -243,18 +244,18 @@
         @test MOI.dimension(CP.CountCompare(3)) == 3 * 2 + 1
     end
 
-    @testset "GlobalCardinality" begin
-        @test CP.GlobalCardinality(2, [2, 4]) == CP.GlobalCardinality(2, [2, 4])
-        @test CP.GlobalCardinality(2, [2, 4]) != CP.GlobalCardinality(3, [2, 4])
-        @test CP.GlobalCardinality(3, [2, 4]) != CP.GlobalCardinality(2, [2, 4])
-        @test CP.GlobalCardinality(2, [2, 4]) != CP.GlobalCardinality(2, [3, 5])
+    @testset "$(S)" for S in [CP.GlobalCardinality, CP.ClosedGlobalCardinality]
+        @test CP.S(2, [2, 4]) == CP.S(2, [2, 4])
+        @test CP.S(2, [2, 4]) != CP.S(3, [2, 4])
+        @test CP.S(3, [2, 4]) != CP.S(2, [2, 4])
+        @test CP.S(2, [2, 4]) != CP.S(2, [3, 5])
 
-        s = CP.GlobalCardinality(2, [2, 4])
-        @test typeof(copy(s)) <: CP.GlobalCardinality
+        s = CP.S(2, [2, 4])
+        @test typeof(copy(s)) <: CP.S
         @test copy(s) == s
 
-        @test MOI.dimension(CP.GlobalCardinality(2, [2, 4])) == 2 + 2
-        @test MOI.dimension(CP.GlobalCardinality(3, [2, 4, 6, 8])) == 3 + 4
+        @test MOI.dimension(CP.S(2, [2, 4])) == 2 + 2
+        @test MOI.dimension(CP.S(3, [2, 4, 6, 8])) == 3 + 4
     end
 
     @testset "Element" begin
