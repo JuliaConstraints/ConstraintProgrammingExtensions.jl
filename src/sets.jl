@@ -309,7 +309,8 @@ one of the other.
 
 Indices start at 1, like Julia.
 
-Also called `channel`, `inverse_channeling`, or `assignment`.
+Also called [`channel`](https://sofdem.github.io/gccat/gccat/Cinverse.html), 
+`inverse_channeling`, or `assignment`.
 """
 struct Inverse <: MOI.AbstractVectorSet
     dimension::Int
