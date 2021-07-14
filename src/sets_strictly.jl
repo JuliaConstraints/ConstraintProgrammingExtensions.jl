@@ -15,6 +15,8 @@ struct Strictly{
         MOI.GreaterThan{T} where T,
         LexicographicallyLessThan,
         LexicographicallyGreaterThan,
+        DoublyLexicographicallyGreaterThan,
+        DoublyLexicographicallyLessThan,
         Increasing,
         Decreasing,
     },
@@ -23,10 +25,10 @@ struct Strictly{
     set::S
 end
 
-copy(set::Strictly{S}) where {S} = Strictly(copy(set.set))
-MOI.constant(set::Strictly{S}) where {S} = MOI.constant(set.set)
-MOI.dimension(set::Strictly{S}) where {S} = MOI.dimension(set.set)
-function MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T}
+copy(set::Strictly{S, T}) where {S, T} = Strictly{S, T}(copy(set.set))
+MOI.constant(set::Strictly{S, T}) where {S, T} = MOI.constant(set.set)
+MOI.dimension(set::Strictly{S, T}) where {S, T} = MOI.dimension(set.set)
+function MOIU.shift_constant(set::Strictly{S, T}, offset::T) where {S, T}
     return typeof(set)(MOIU.shift_constant(set.set, offset))
 end
 
@@ -35,6 +37,12 @@ function Strictly(set::LexicographicallyLessThan) # TODO: does this more harm th
 end
 function Strictly(set::LexicographicallyGreaterThan) # TODO: does this more harm than good, with an automatic value of Int? 
     return Strictly{LexicographicallyGreaterThan, Int}(set)
+end
+function Strictly(set::DoublyLexicographicallyLessThan) # TODO: does this more harm than good, with an automatic value of Int? 
+    return Strictly{DoublyLexicographicallyLessThan, Int}(set)
+end
+function Strictly(set::DoublyLexicographicallyGreaterThan) # TODO: does this more harm than good, with an automatic value of Int? 
+    return Strictly{DoublyLexicographicallyGreaterThan, Int}(set)
 end
 function Strictly(set::MOI.LessThan{T}) where {T}
     return Strictly{MOI.LessThan{T}, T}(set)
