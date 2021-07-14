@@ -88,6 +88,14 @@ include("Disjunction/disjunction_to_reif.jl")
 const Disjunction2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Disjunction2ReificationBridge{T}, OT}
 
+include("DoublyLexicographicallyLessThan/dllt_to_llt.jl")
+const DoublyLexicographicallyLessThan2LexicographicallyLessThan{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{DoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T}, OT}
+
+include("DoublyLexicographicallyGreaterThan/dlgt_to_lgt.jl")
+const DoublyLexicographicallyGreaterThan2LexicographicallyGreaterThan{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{DoublyLexicographicallyGreaterThan2LexicographicallyGreaterThanBridge{T}, OT}
+
 include("Element/element_to_milp.jl")
 const Element2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Element2MILPBridge{T}, OT}
