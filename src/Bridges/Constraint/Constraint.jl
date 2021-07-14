@@ -42,6 +42,10 @@ include("ClosedGlobalCardinality/cgc_to_gc.jl")
 const ClosedGlobalCardinality2GlobalCardinality{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ClosedGlobalCardinality2GlobalCardinalityBridge{T}, OT}
 
+include("ClosedGlobalCardinalityVariable/cgcv_to_gcv.jl")
+const ClosedGlobalCardinalityVariable2GlobalCardinalityVariable{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ClosedGlobalCardinalityVariable2GlobalCardinalityVariableBridge{T}, OT}
+
 include("Conjunction/conjunction_to_reif.jl")
 const Conjunction2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Conjunction2ReificationBridge{T}, OT}

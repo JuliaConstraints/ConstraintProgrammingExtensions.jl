@@ -31,6 +31,10 @@
         include("ClosedGlobalCardinality/cgc_to_gc.jl")
     end
 
+    @testset "ClosedGlobalCardinalityVariable" begin
+        include("ClosedGlobalCardinalityVariable/cgcv_to_gcv.jl")
+    end
+
     @testset "Conjunction" begin
         include("Conjunction/conjunction_to_reif.jl")
     end

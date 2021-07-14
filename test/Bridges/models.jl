@@ -617,6 +617,7 @@ MOIU.@model(
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
         CP.GlobalCardinalityVariable,
+        CP.Membership,
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),
