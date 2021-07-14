@@ -216,6 +216,8 @@ function copy(
     set::Union{
         LexicographicallyLessThan,
         LexicographicallyGreaterThan,
+        ChainedLexicographicallyLessThan,
+        ChainedLexicographicallyGreaterThan,
         Sort,
         SortPermutation,
         MinimumAmong,
