@@ -38,6 +38,10 @@ include("BinPacking/varcapa_to_milp.jl")
 const VariableCapacityBinPacking2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{VariableCapacityBinPacking2MILPBridge{T}, OT}
 
+include("ClosedGlobalCardinality/cgc_to_gc.jl")
+const ClosedGlobalCardinality2GlobalCardinality{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ClosedGlobalCardinality2GlobalCardinalityBridge{T}, OT}
+
 include("Conjunction/conjunction_to_reif.jl")
 const Conjunction2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Conjunction2ReificationBridge{T}, OT}

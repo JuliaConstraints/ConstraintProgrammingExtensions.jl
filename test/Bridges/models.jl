@@ -625,6 +625,40 @@ MOIU.@model(
     (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
 )
 
+# Global cardinality.
+
+MOIU.@model(
+    GlobalCardinalityModel,
+    (),
+    (
+        MOI.EqualTo, 
+        MOI.GreaterThan, 
+        MOI.LessThan, 
+        MOI.Interval, 
+        CP.Domain, 
+    ),
+    (
+        MOI.Zeros,
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.GeometricMeanCone,
+        MOI.RelativeEntropyCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+    ),
+    (MOI.PowerCone, MOI.DualPowerCone, CP.GlobalCardinality),
+    (),
+    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.VectorOfVariables,),
+    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
+)
+
 # Imply.
 
 MOIU.@model(

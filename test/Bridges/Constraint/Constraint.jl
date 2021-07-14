@@ -27,6 +27,10 @@
         include("BinPacking/varcapa_to_milp.jl")
     end
 
+    @testset "ClosedGlobalCardinality" begin
+        include("ClosedGlobalCardinality/cgc_to_gc.jl")
+    end
+
     @testset "Conjunction" begin
         include("Conjunction/conjunction_to_reif.jl")
     end
