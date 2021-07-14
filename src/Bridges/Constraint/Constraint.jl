@@ -180,6 +180,14 @@ include("LessThan_Reify/reif_lt_to_milp.jl")
 const ReifiedLessThan2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ReifiedLessThan2MILPBridge{T}, OT}
 
+include("LexicographicallyGreaterThan/lgt_to_indic.jl")
+const LexicographicallyGreaterThan2Indicator{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{LexicographicallyGreaterThan2IndicatorBridge{T}, OT}
+
+# include("LexicographicallyLessThan/llt_to_indic.jl")
+# const LexicographicallyLessThan2Indicator{T, OT <: MOI.ModelLike} =
+#     MOIBC.SingleBridgeOptimizer{LexicographicallyLessThan2IndicatorBridge{T}, OT}
+
 include("Strictly/strictly_to_lp.jl")
 const Strictly2Linear{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Strictly2LinearBridge{T}, OT}
