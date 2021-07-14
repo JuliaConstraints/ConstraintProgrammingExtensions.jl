@@ -37,6 +37,38 @@ MOI.dimension(set::LexicographicallyGreaterThan) = 2 * set.dimension
 # TODO: bridge to LexicographicallyLessThan.
 
 """
+    ChainedLexicographicallyLessThan(row_dim::Int, column_dim::Int)
+
+Ensures that each column of the matrix is lexicographically less than 
+the next column. 
+
+The matrix is encoded by stacking the columns, matching the behaviour of
+Julia's `vec` function.
+"""
+struct ChainedLexicographicallyLessThan <: MOI.AbstractVectorSet
+    row_dim::Int
+    column_dim::Int
+end
+
+MOI.dimension(set::ChainedLexicographicallyLessThan) = set.row_dim * set.column_dim
+
+"""
+    ChainedLexicographicallyGreaterThan(row_dim::Int, column_dim::Int)
+
+Ensures that each column of the matrix is lexicographically greater than 
+the next column. 
+
+The matrix is encoded by stacking the columns, matching the behaviour of
+Julia's `vec` function.
+"""
+struct ChainedLexicographicallyGreaterThan <: MOI.AbstractVectorSet
+    row_dim::Int
+    column_dim::Int
+end
+
+MOI.dimension(set::ChainedLexicographicallyGreaterThan) = set.row_dim * set.column_dim
+
+"""
     Sort(dimension::Int)
 
 Ensures that the first `dimension` elements is a sorted copy of the next
