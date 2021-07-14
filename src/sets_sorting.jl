@@ -1,72 +1,58 @@
 """
     LexicographicallyLessThan(dimension::Int)
 
-Ensures that the first array of variables of size `dimension` is 
-lexicographically less than the second one. 
+Ensures that each column of the matrix is lexicographically less than 
+the next column. 
 
-``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | \exists j \\in \\{1, 2 \\dots dimension\\}: x_j < y_j, \\forall i < j, x_i = y_i \\}``.
+Formally, for two columns:
 
-Also called [`lex2`](https://sofdem.github.io/gccat/gccat/Clex2.html) or 
-[`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html#uid25647).
+``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{column\\_dim}} | \exists j \\in \\{1, 2 \\dots column\\_dim\\}: x_j < y_j, \\forall i < j, x_i = y_i \\}``.
+
+Also called [`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html#uid25647).
+
+The matrix is encoded by stacking the columns, matching the behaviour of
+Julia's `vec` function.
 """
 struct LexicographicallyLessThan <: MOI.AbstractVectorSet
-    dimension::Int
+    row_dim::Int
+    column_dim::Int
 end
 
-# TODO: Implement this like Strictly, based on the existing LessThan/GreaterThan sets? Major difference: LessThan/Greater than are with respect to a constant, not LexicographicallyLessThan.
+function LexicographicallyLessThan(column_dim::Int)
+    # By default, only two columns.
+    return LexicographicallyLessThan(2, column_dim)
+end
 
-MOI.dimension(set::LexicographicallyLessThan) = 2 * set.dimension
+MOI.dimension(set::LexicographicallyLessThan) = set.row_dim * set.column_dim
 
 """
     LexicographicallyGreaterThan(dimension::Int)
 
-Ensures that the first array of variables of size `dimension` is 
-lexicographically greater than the second one. 
-
-``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | \exists j \\in \\{1, 2 \\dots dimension\\}: x_j > y_j, \\forall i < j, x_i = y_i \\}``.
-
-Also called [`lex2`](https://sofdem.github.io/gccat/gccat/Clex2.html) or 
-[`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html#uid25647).
-"""
-struct LexicographicallyGreaterThan <: MOI.AbstractVectorSet
-    dimension::Int
-end
-
-MOI.dimension(set::LexicographicallyGreaterThan) = 2 * set.dimension
-
-# TODO: bridge to LexicographicallyLessThan.
-
-"""
-    ChainedLexicographicallyLessThan(row_dim::Int, column_dim::Int)
-
-Ensures that each column of the matrix is lexicographically less than 
-the next column. 
-
-The matrix is encoded by stacking the columns, matching the behaviour of
-Julia's `vec` function.
-"""
-struct ChainedLexicographicallyLessThan <: MOI.AbstractVectorSet
-    row_dim::Int
-    column_dim::Int
-end
-
-MOI.dimension(set::ChainedLexicographicallyLessThan) = set.row_dim * set.column_dim
-
-"""
-    ChainedLexicographicallyGreaterThan(row_dim::Int, column_dim::Int)
-
 Ensures that each column of the matrix is lexicographically greater than 
 the next column. 
 
+Formally, for two columns:
+
+``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | \exists j \\in \\{1, 2 \\dots dimension\\}: x_j > y_j, \\forall i < j, x_i = y_i \\}``.
+
+Also called [`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html#uid25647).
+
 The matrix is encoded by stacking the columns, matching the behaviour of
 Julia's `vec` function.
 """
-struct ChainedLexicographicallyGreaterThan <: MOI.AbstractVectorSet
+struct LexicographicallyGreaterThan <: MOI.AbstractVectorSet
     row_dim::Int
     column_dim::Int
 end
 
-MOI.dimension(set::ChainedLexicographicallyGreaterThan) = set.row_dim * set.column_dim
+function LexicographicallyGreaterThan(column_dim::Int)
+    # By default, only two columns.
+    return LexicographicallyGreaterThan(2, column_dim)
+end
+
+MOI.dimension(set::LexicographicallyGreaterThan) = set.row_dim * set.column_dim
+
+# TODO: bridge to LexicographicallyLessThan.
 
 """
     Sort(dimension::Int)
@@ -216,8 +202,6 @@ function copy(
     set::Union{
         LexicographicallyLessThan,
         LexicographicallyGreaterThan,
-        ChainedLexicographicallyLessThan,
-        ChainedLexicographicallyGreaterThan,
         Sort,
         SortPermutation,
         MinimumAmong,

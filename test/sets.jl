@@ -132,8 +132,8 @@
         CP.ConditionallyNonOverlappingOrthotopes,
         CP.GlobalCardinalityVariable,
         CP.ClosedGlobalCardinalityVariable,
-        CP.ChainedLexicographicallyLessThan,
-        CP.ChainedLexicographicallyGreaterThan,
+        CP.LexicographicallyLessThan,
+        CP.LexicographicallyGreaterThan,
     ]
         @test isbitstype(S)
 
@@ -155,7 +155,7 @@
         elseif S == CP.GlobalCardinalityVariable || S == CP.ClosedGlobalCardinalityVariable
             @test MOI.dimension(S(2, 2)) == 2 + 2 * 2
             @test MOI.dimension(S(3, 4)) == 3 + 2 * 4
-        elseif S == CP.ChainedLexicographicallyLessThan || S == CP.ChainedLexicographicallyGreaterThan
+        elseif S == CP.LexicographicallyLessThan || S == CP.LexicographicallyGreaterThan
             @test MOI.dimension(S(2, 2)) == 2 * 2
             @test MOI.dimension(S(3, 4)) == 3 * 4
         else
