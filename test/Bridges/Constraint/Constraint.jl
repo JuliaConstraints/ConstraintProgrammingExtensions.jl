@@ -167,9 +167,11 @@
     end
 
     @testset "Strictly" begin
-        include("Strictly/strictly_to_lp.jl")
         include("Strictly/strictly_dec_to_lp.jl")
         include("Strictly/strictly_inc_to_lp.jl")
+        include("Strictly/strictly_lgt_to_indic.jl")
+        include("Strictly/strictly_llt_to_indic.jl")
+        include("Strictly/strictly_to_lp.jl")
     end
 
     @testset "SymmetricAllDifferent" begin

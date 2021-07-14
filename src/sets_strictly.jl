@@ -30,10 +30,10 @@ function MOIU.shift_constant(set::Strictly{S}, offset::T) where {S, T}
     return typeof(set)(MOIU.shift_constant(set.set, offset))
 end
 
-function Strictly(set::LexicographicallyLessThan)
+function Strictly(set::LexicographicallyLessThan) # TODO: does this more harm than good, with an automatic value of Int? 
     return Strictly{LexicographicallyLessThan, Int}(set)
 end
-function Strictly(set::LexicographicallyGreaterThan)
+function Strictly(set::LexicographicallyGreaterThan) # TODO: does this more harm than good, with an automatic value of Int? 
     return Strictly{LexicographicallyGreaterThan, Int}(set)
 end
 function Strictly(set::MOI.LessThan{T}) where {T}
