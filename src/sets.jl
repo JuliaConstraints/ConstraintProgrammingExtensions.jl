@@ -345,7 +345,7 @@ end
 Ensures that the sum of all sequences of size `length` have a value between
 `low` and `high`. 
 
-``\\{x \\in \\mathbb{R}^{dimension}} | \\mathtt{low} \\leq \\sum_{j=i}^{i+\mathtt{length}-1} x_i \\leq \\mathtt{high}, \\forall i \\in \\{ 0, 1 \\dots \\mathtt{dimension} - \\mathtt{length} \\} \\}``.
+``\\{x \\in \\mathbb{R}^{dimension}} | \\mathtt{low} \\leq \\sum_{j=i}^{i+\\mathtt{length}-1} x_i \\leq \\mathtt{high}, \\forall i \\in \\{ 0, 1 \\dots \\mathtt{dimension} - \\mathtt{length} \\} \\}``.
 
 https://sofdem.github.io/gccat/gccat/Csliding_sum.html
 """
