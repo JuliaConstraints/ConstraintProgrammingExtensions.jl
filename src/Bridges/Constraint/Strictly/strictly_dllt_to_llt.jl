@@ -2,19 +2,19 @@
 Bridges `CP.Strictly{CP.DoublyLexicographicallyLessThan}` to 
 `CP.Strictly{CP.LexicographicallyLessThan}`.
 """
-struct StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T} <: MOIBC.AbstractBridge
+struct DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T} <: MOIBC.AbstractBridge
     con::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Strictly{CP.LexicographicallyLessThan, T}} # Columns are lexicographically sorted.
     con_transposed::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Strictly{CP.LexicographicallyLessThan, T}} # Rows are lexicographically sorted.
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T}},
+    ::Type{DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T}},
     model,
     f::MOI.VectorOfVariables,
     s::CP.Strictly{CP.DoublyLexicographicallyLessThan, T},
 ) where {T}
     return MOIBC.bridge_constraint(
-        StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T},
+        DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T},
         model,
         MOI.VectorAffineFunction{T}(f),
         s,
@@ -22,7 +22,7 @@ function MOIBC.bridge_constraint(
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T}},
+    ::Type{DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
     s::CP.Strictly{CP.DoublyLexicographicallyLessThan, T},
@@ -45,41 +45,41 @@ function MOIBC.bridge_constraint(
         CP.Strictly{CP.LexicographicallyLessThan, T}(CP.LexicographicallyLessThan(s.set.column_dim, s.set.row_dim))
     )
 
-    return StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge(con, con_transposed)
+    return DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge(con, con_transposed)
 end
 
 function MOI.supports_constraint(
-    ::Type{StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T}},
+    ::Type{DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
     ::Type{CP.Strictly{CP.DoublyLexicographicallyLessThan, T}},
 ) where {T}
     return true
 end
 
-function MOIB.added_constrained_variable_types(::Type{StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T}}) where {T}
+function MOIB.added_constrained_variable_types(::Type{DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T}}) where {T}
     return Tuple{DataType}[]
 end
 
-function MOIB.added_constraint_types(::Type{StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T}}) where {T}
+function MOIB.added_constraint_types(::Type{DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T}}) where {T}
     return [
         (MOI.VectorAffineFunction{T}, CP.Strictly{CP.LexicographicallyLessThan, T}),
     ]
 end
 
 function MOIBC.concrete_bridge_type(
-    ::Type{StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T}},
+    ::Type{DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
     ::Type{CP.Strictly{CP.DoublyLexicographicallyLessThan, T}},
 ) where {T}
-    return StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T}
+    return DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T}
 end
 
-function MOI.get(::StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T}, ::MOI.NumberOfVariables) where {T}
+function MOI.get(::DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T}, ::MOI.NumberOfVariables) where {T}
     return 0
 end
 
 function MOI.get(
-    ::StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T},
+    ::DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.VectorAffineFunction{T}, CP.Strictly{CP.LexicographicallyLessThan, T},
     },
@@ -88,7 +88,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T},
+    b::DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.VectorAffineFunction{T}, CP.Strictly{CP.LexicographicallyLessThan, T},
     },

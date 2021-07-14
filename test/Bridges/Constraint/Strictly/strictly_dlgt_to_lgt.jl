@@ -1,4 +1,4 @@
-@testset "StrictlyDoublyLexicographicallyGreaterThan2LexicographicallyGreaterThan: $(fct_type), $(x_size) × $(y_size), $(T)" for fct_type in ["vector of variables", "vector affine function"], x_size in [2, 4], y_size in [2, 4], T in [Int, Float64]
+@testset "DoublyStrictlyLexicographicallyGreaterThan2LexicographicallyGreaterThan: $(fct_type), $(x_size) × $(y_size), $(T)" for fct_type in ["vector of variables", "vector affine function"], x_size in [2, 4], y_size in [2, 4], T in [Int, Float64]
     base_model = if T == Int
         IntStrictlyLexicographicallyGreaterThanModel{T}()
     elseif T == Float64
@@ -7,7 +7,7 @@
         @assert false
     end
     mock = MOIU.MockOptimizer(base_model)
-    model = COIB.StrictlyDoublyLexicographicallyGreaterThan2LexicographicallyGreaterThan{T}(mock)
+    model = COIB.DoublyStrictlyLexicographicallyGreaterThan2LexicographicallyGreaterThan{T}(mock)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
     @test MOI.supports_constraint(

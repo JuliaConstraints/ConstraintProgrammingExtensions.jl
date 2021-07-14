@@ -193,12 +193,12 @@ const StrictlyDecreasing2LP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{StrictlyDecreasing2LPBridge{T}, OT}
 
 include("Strictly/strictly_dlgt_to_lgt.jl")
-const StrictlyDoublyLexicographicallyGreaterThan2LexicographicallyGreaterThan{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{StrictlyDoublyLexicographicallyGreaterThan2LexicographicallyGreaterThanBridge{T}, OT}
+const DoublyStrictlyLexicographicallyGreaterThan2LexicographicallyGreaterThan{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyGreaterThanBridge{T}, OT}
 
 include("Strictly/strictly_dllt_to_llt.jl")
-const StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThan{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{StrictlyDoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T}, OT}
+const DoublyStrictlyLexicographicallyLessThan2LexicographicallyLessThan{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T}, OT}
 
 include("Strictly/strictly_inc_to_lp.jl")
 const StrictlyIncreasing2LP{T, OT <: MOI.ModelLike} =
