@@ -339,6 +339,23 @@ struct Inverse <: MOI.AbstractVectorSet
     dimension::Int
 end
 
+"""
+    SlidingSum{T}(low::T, high::T, length::Int, dimension::Int)
+
+Ensures that the sum of all sequences of size `length` have a value between
+`low` and `high`. 
+
+``\\{x \\in \\mathbb{R}^{dimension}} | \\mathtt{low} \\leq \\sum_{j=i}^{i+\mathtt{length}-1} x_i \\leq \\mathtt{high}, \\forall i \\in \\{ 0, 1 \\dots \\mathtt{dimension} - \\mathtt{length} \\} \\}``.
+
+https://sofdem.github.io/gccat/gccat/Csliding_sum.html
+"""
+struct SlidingSum{T <: Real} <: MOI.AbstractVectorSet
+    low::T
+    high::T
+    length::Int
+    dimension::Int
+end
+
 # Solvers tend not to agree on the name of this one... "Inverse" is the most common one, though.
 #     https://sofdem.github.io/gccat/gccat/Cinverse.html
 # - inverse: CPLEX, MiniZinc, GCC, CHIP
@@ -350,7 +367,7 @@ MOI.dimension(set::Inverse) = 2 * set.dimension
 
 # isbits types, nothing to copy
 function copy(
-    set::Union{AllEqual, AllDifferent, SymmetricAllDifferent, Membership, Inverse},
+    set::Union{AllEqual, AllDifferent, SymmetricAllDifferent, Membership, Inverse, SlidingSum,},
 )
     return set
 end

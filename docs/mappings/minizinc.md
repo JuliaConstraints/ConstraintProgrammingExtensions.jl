@@ -25,11 +25,17 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
         * [`global_cardinality_fn`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/global_cardinality_fn.mzn): function, [simple variation of `count`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/global_cardinality_fn.mzn).
         * [`global_cardinality_closed`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/global_cardinality_closed.mzn): [simple variation of `count` with domains](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_global_cardinality_closed.mzn).
         * [`global_cardinality_closed_fn`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/global_cardinality_closed_fn.mzn): function, [simple variation of `count`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/global_cardinality_closed_fn.mzn).
+        * [`nvalue`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/nvalue.mzn): [simple variation of reified comparisons](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_nvalue.mzn).
+        * [`nvalue_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/nvalue.mzn): similar, [with an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_nvalue_reif.mzn).
+        * [`nvalue_fn`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/nvalue_fn.mzn): function.
     * Inversion: `CP.Inverse`
         * [`inverse`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse.mzn): [index computations](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_inverse.mzn).
         * [`inverse_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse.mzn): similar, [wih an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_inverse_reif.mzn).
         * Also available [as a function](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse_fn.mzn).
         * [`inverse_in_range`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse_in_range.mzn): [?](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_inverse_in_range.mzn).
+    * Sliding sum: `CP.SlidingSum`
+        * [`sliding_sum`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/sliding_sum.mzn): [quite complex mapping](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_sliding_sum.mzn)
+        * [`sliding_sum_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/sliding_sum.mzn): similar, [with an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_sliding_sum_reif.mzn)
 * Combinatorial sets:
     * Bin packing: 
         * Raw: `CP.BinPacking` (with supplementary load variables)

@@ -265,6 +265,20 @@
         @test MOI.dimension(S(3, [2, 4, 6, 8])) == 3 + 4
     end
 
+    @testset "SlidingSum" begin
+        @test S(1, 2, 3, 4) == S(1, 2, 3, 4)
+        @test S(1, 2, 3, 4) != S(0, 2, 3, 4)
+        @test S(1, 2, 3, 4) != S(1, 4, 2, 4)
+        @test S(1, 2, 3, 4) != S(1, 2, 3, 5)
+
+        s = S(1, 2, 3, 4)
+        @test typeof(copy(s)) <: S
+        @test copy(s) == s
+
+        @test MOI.dimension(S(1, 2, 3, 4)) == 4
+        @test MOI.dimension(S(1, 2, 3, 40)) == 40
+    end
+
     @testset "Element" begin
         set1 = [1, 2, 3]
         set2 = [1, 2, 3, 4]

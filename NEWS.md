@@ -22,6 +22,7 @@ Add many new sets:
 * `ClosedGlobalCardinalityVariable`
 * `DoublyLexicographicallyGreaterThan`
 * `DoublyLexicographicallyLessThan`
+* `SlidingSum`
 
 Add many new bridges between high-level constraints, and also to MILP models.
 
