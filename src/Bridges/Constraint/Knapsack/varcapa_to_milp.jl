@@ -51,7 +51,7 @@ function MOI.get(::VariableCapacityKnapsack2MILPBridge, ::MOI.NumberOfVariables)
 end
 
 function MOI.get(
-    b::VariableCapacityKnapsack2MILPBridge{T},
+    ::VariableCapacityKnapsack2MILPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T},
         MOI.LessThan{T},
