@@ -329,19 +329,19 @@
               CP.Strictly(Ssub(4))
     end
 
-    @testset "Strictly{$(Ssub)}" for Ssub in [
+    @testset "Strictly{$(Ssub), $(T)}, one argument" for Ssub in [
         CP.LexicographicallyLessThan,
         CP.LexicographicallyGreaterThan,
         CP.Increasing,
         CP.Decreasing,
-    ]
-        @test CP.Strictly(Ssub(1)) == CP.Strictly(Ssub(1))
-        @test CP.Strictly(Ssub(1)) != CP.Strictly(Ssub(2))
-        @test CP.Strictly(Ssub(2)) == CP.Strictly(Ssub(2))
-        @test CP.Strictly(Ssub(2)) != CP.Strictly(Ssub(1))
+    ], T in [Int, Float64]
+        @test CP.Strictly{Ssub, T}(Ssub(1)) == CP.Strictly{Ssub, T}(Ssub(1))
+        @test CP.Strictly{Ssub, T}(Ssub(1)) != CP.Strictly{Ssub, T}(Ssub(2))
+        @test CP.Strictly{Ssub, T}(Ssub(2)) == CP.Strictly{Ssub, T}(Ssub(2))
+        @test CP.Strictly{Ssub, T}(Ssub(2)) != CP.Strictly{Ssub, T}(Ssub(1))
 
-        s = CP.Strictly(Ssub(1))
-        @test typeof(copy(s)) <: CP.Strictly{Ssub}
+        s = CP.Strictly{Ssub, T}(Ssub(1))
+        @test typeof(copy(s)) <: CP.Strictly{Ssub, T}
         @test copy(s) == s
 
         if Ssub in
@@ -352,13 +352,39 @@
             @test MOI.dimension(CP.Strictly(Ssub(3))) == 3
             @test MOI.dimension(CP.Strictly(Ssub(1))) == 1
         else
-            error("$(S) not implemented")
+            error("$(Ssub) not implemented")
         end
 
         if Ssub in [MOI.LessThan, MOI.GreaterThan]
             @test MOI.constant(CP.Strictly(Ssub(3))) == 3
             @test MOIU.shift_constant(CP.Strictly(Ssub(3)), 1) ==
                   CP.Strictly(Ssub(4))
+        end
+    end
+
+    @testset "Strictly{$(Ssub), $(T)}, two arguments" for Ssub in [
+        CP.LexicographicallyLessThan,
+        CP.LexicographicallyGreaterThan,
+        CP.DoublyLexicographicallyLessThan,
+        CP.DoublyLexicographicallyGreaterThan,
+    ], T in [Int, Float64]
+        @test CP.Strictly{Ssub, T}(Ssub(1, 4)) == CP.Strictly{Ssub, T}(Ssub(1, 4))
+        @test CP.Strictly{Ssub, T}(Ssub(1, 4)) != CP.Strictly{Ssub, T}(Ssub(2, 4))
+        @test CP.Strictly{Ssub, T}(Ssub(2, 4)) == CP.Strictly{Ssub, T}(Ssub(2, 4))
+        @test CP.Strictly{Ssub, T}(Ssub(2, 4)) != CP.Strictly{Ssub, T}(Ssub(1, 4))
+
+        s = CP.Strictly{Ssub, T}(Ssub(1, 4))
+        @test typeof(copy(s)) <: CP.Strictly{Ssub, T}
+        @test copy(s) == s
+
+        if Ssub in
+           [CP.LexicographicallyLessThan, CP.LexicographicallyGreaterThan,
+           CP.DoublyLexicographicallyLessThan,
+           CP.DoublyLexicographicallyGreaterThan,]
+            @test MOI.dimension(CP.Strictly(Ssub(3, 4))) == 3 * 4
+            @test MOI.dimension(CP.Strictly(Ssub(1, 4))) == 1 * 4
+        else
+            error("$(Ssub) not implemented")
         end
     end
 
