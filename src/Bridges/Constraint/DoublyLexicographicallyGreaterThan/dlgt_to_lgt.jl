@@ -37,7 +37,6 @@ function MOIBC.bridge_constraint(
     f_scalars = MOIU.scalarize(f)
     f_matrix = reshape(f_scalars, s.row_dim, s.column_dim)
     f_transposed = MOIU.vectorize(vec(f_matrix)) # vec() does the transposition.
-    println(map((t) -> t.scalar_term.variable_index.value, f_transposed.terms))
 
     con_transposed = MOI.add_constraint(
         model, 
