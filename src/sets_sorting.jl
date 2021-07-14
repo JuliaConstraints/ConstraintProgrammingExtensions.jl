@@ -8,7 +8,7 @@ Formally, for two columns:
 
 ``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{column\\_dim}} | \exists j \\in \\{1, 2 \\dots column\\_dim\\}: x_j < y_j, \\forall i < j, x_i = y_i \\}``.
 
-Also called [`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html#uid25647).
+Also called [`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html).
 
 The matrix is encoded by stacking the columns, matching the behaviour of
 Julia's `vec` function.
@@ -35,7 +35,7 @@ Formally, for two columns:
 
 ``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | \exists j \\in \\{1, 2 \\dots dimension\\}: x_j > y_j, \\forall i < j, x_i = y_i \\}``.
 
-Also called [`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html#uid25647).
+Also called [`lex_greater`](https://sofdem.github.io/gccat/gccat/Clex_greater.html).
 
 The matrix is encoded by stacking the columns, matching the behaviour of
 Julia's `vec` function.
