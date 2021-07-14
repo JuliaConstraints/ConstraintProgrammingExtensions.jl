@@ -5,27 +5,27 @@
 # dedicated set for just two vectors).
 
 """
-Bridges `CP.LexicographicallyGreaterThan` to indicators.
+Bridges `CP.LexicographicallyLessThan` to indicators.
 """
-struct LexicographicallyGreaterThan2IndicatorBridge{T} <: MOIBC.AbstractBridge
+struct LexicographicallyLessThan2IndicatorBridge{T} <: MOIBC.AbstractBridge
     vars_eq::Matrix{MOI.VariableIndex}
-    vars_gt::Matrix{MOI.VariableIndex}
+    vars_lt::Matrix{MOI.VariableIndex}
     vars_eq_bin::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
-    vars_gt_bin::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
-    cons_one_gt::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}
+    vars_lt_bin::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    cons_one_lt::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}
     cons_move::Matrix{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
     cons_indic_eq::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}}
-    cons_indic_gt::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}}}
+    cons_indic_lt::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}}}
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{LexicographicallyGreaterThan2IndicatorBridge{T}},
+    ::Type{LexicographicallyLessThan2IndicatorBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.LexicographicallyGreaterThan,
+    s::CP.LexicographicallyLessThan,
 ) where {T}
     return MOIBC.bridge_constraint(
-        LexicographicallyGreaterThan2IndicatorBridge{T},
+        LexicographicallyLessThan2IndicatorBridge{T},
         model,
         MOI.VectorAffineFunction{T}(f),
         s,
@@ -33,22 +33,22 @@ function MOIBC.bridge_constraint(
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{LexicographicallyGreaterThan2IndicatorBridge{T}},
+    ::Type{LexicographicallyLessThan2IndicatorBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.LexicographicallyGreaterThan,
+    s::CP.LexicographicallyLessThan,
 ) where {T}
     @assert s.row_dim >= 1
     @assert s.column_dim >= 2
 
     vars_eq = Matrix{MOI.VariableIndex}(undef, s.column_dim - 1, s.row_dim)
-    vars_gt = Matrix{MOI.VariableIndex}(undef, s.column_dim - 1, s.row_dim)
+    vars_lt = Matrix{MOI.VariableIndex}(undef, s.column_dim - 1, s.row_dim)
     vars_eq_bin = Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}(undef, s.column_dim - 1, s.row_dim)
-    vars_gt_bin = Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}(undef, s.column_dim - 1, s.row_dim)
-    cons_one_gt = Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}(undef, s.column_dim - 1)
+    vars_lt_bin = Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}(undef, s.column_dim - 1, s.row_dim)
+    cons_one_lt = Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}(undef, s.column_dim - 1)
     cons_move = Matrix{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}(undef, s.column_dim - 1, s.row_dim - 1)
     cons_indic_eq = Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}}(undef, s.column_dim - 1, s.row_dim)
-    cons_indic_gt = Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}}}(undef, s.column_dim - 1, s.row_dim)
+    cons_indic_lt = Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}}}(undef, s.column_dim - 1, s.row_dim)
 
     f_scalars = MOIU.scalarize(f)
     f_matrix = reshape(f_scalars, s.column_dim, s.row_dim) 
@@ -58,18 +58,18 @@ function MOIBC.bridge_constraint(
     # Add the constraint between the columns i and i+1.
     for i in 1:(s.column_dim - 1)
         vars_eq[i, :], vars_eq_bin[i, :] = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:s.row_dim])
-        vars_gt[i, :], vars_gt_bin[i, :] = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:s.row_dim])
+        vars_lt[i, :], vars_lt_bin[i, :] = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:s.row_dim])
 
-        cons_one_gt[i] = MOI.add_constraint(
+        cons_one_lt[i] = MOI.add_constraint(
             model,
-            sum(one(T) .* MOI.SingleVariable.(vars_gt[i, :])),
+            sum(one(T) .* MOI.SingleVariable.(vars_lt[i, :])),
             MOI.LessThan(one(T)),
         )
 
         cons_move[i, :] = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
             MOI.add_constraint(
                 model,
-                one(T) * MOI.SingleVariable(vars_eq[i, j - 1]) - one(T) * MOI.SingleVariable(vars_eq[i, j]) - one(T) * MOI.SingleVariable(vars_gt[i, j]),
+                one(T) * MOI.SingleVariable(vars_eq[i, j - 1]) - one(T) * MOI.SingleVariable(vars_eq[i, j]) - one(T) * MOI.SingleVariable(vars_lt[i, j]),
                 MOI.EqualTo(zero(T)),
             )            
             for j in 2:s.row_dim
@@ -89,78 +89,78 @@ function MOIBC.bridge_constraint(
             for j in 1:s.row_dim
         ]
 
-        cons_indic_gt[i, :] = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}}[
+        cons_indic_lt[i, :] = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}}[
             MOI.add_constraint(
                 model,
                 MOIU.vectorize(
                     [
-                        one(T) * MOI.SingleVariable(vars_gt[i, j]),
+                        one(T) * MOI.SingleVariable(vars_lt[i, j]),
                         f_matrix[i, j] - f_matrix[i + 1, j],
                     ]
                 ),
-                MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE}(MOI.GreaterThan(zero(T))),
+                MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE}(MOI.LessThan(zero(T))),
             )            
             for j in 1:s.row_dim
         ]
     end
 
-    return LexicographicallyGreaterThan2IndicatorBridge(vars_eq, vars_gt, vars_eq_bin, vars_gt_bin, cons_one_gt, cons_move, cons_indic_eq, cons_indic_gt)
+    return LexicographicallyLessThan2IndicatorBridge(vars_eq, vars_lt, vars_eq_bin, vars_lt_bin, cons_one_lt, cons_move, cons_indic_eq, cons_indic_lt)
 end
 
 function MOI.supports_constraint(
-    ::Type{LexicographicallyGreaterThan2IndicatorBridge{T}},
+    ::Type{LexicographicallyLessThan2IndicatorBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.LexicographicallyGreaterThan},
+    ::Type{CP.LexicographicallyLessThan},
 ) where {T}
     return true
 end
 
-function MOIB.added_constrained_variable_types(::Type{LexicographicallyGreaterThan2IndicatorBridge{T}}) where {T}
+function MOIB.added_constrained_variable_types(::Type{LexicographicallyLessThan2IndicatorBridge{T}}) where {T}
     return [(MOI.ZeroOne,)]
 end
 
-function MOIB.added_constraint_types(::Type{LexicographicallyGreaterThan2IndicatorBridge{T}}) where {T}
+function MOIB.added_constraint_types(::Type{LexicographicallyLessThan2IndicatorBridge{T}}) where {T}
     return [
         (MOI.SingleVariable, MOI.ZeroOne),
         (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
         (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}),
-        (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}),
+        (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}),
     ]
 end
 
 function MOIBC.concrete_bridge_type(
-    ::Type{LexicographicallyGreaterThan2IndicatorBridge{T}},
+    ::Type{LexicographicallyLessThan2IndicatorBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.LexicographicallyGreaterThan},
+    ::Type{CP.LexicographicallyLessThan},
 ) where {T}
-    return LexicographicallyGreaterThan2IndicatorBridge{T}
+    return LexicographicallyLessThan2IndicatorBridge{T}
 end
 
-function MOI.get(b::LexicographicallyGreaterThan2IndicatorBridge{T}, ::MOI.NumberOfVariables) where {T}
-    return length(b.vars_eq) + length(b.vars_gt)
+function MOI.get(b::LexicographicallyLessThan2IndicatorBridge{T}, ::MOI.NumberOfVariables) where {T}
+    return length(b.vars_eq) + length(b.vars_lt)
 end
 
 function MOI.get(
-    b::LexicographicallyGreaterThan2IndicatorBridge{T},
+    b::LexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.SingleVariable, MOI.ZeroOne,
     },
 ) where {T}
-    return length(b.vars_eq_bin) + length(b.vars_gt_bin)
+    return length(b.vars_eq_bin) + length(b.vars_lt_bin)
 end
 
 function MOI.get(
-    b::LexicographicallyGreaterThan2IndicatorBridge{T},
+    b::LexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
 ) where {T}
-    return length(b.cons_one_gt)
+    return length(b.cons_one_lt)
 end
 
 function MOI.get(
-    b::LexicographicallyGreaterThan2IndicatorBridge{T},
+    b::LexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
     },
@@ -169,7 +169,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::LexicographicallyGreaterThan2IndicatorBridge{T},
+    b::LexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}},
     },
@@ -178,38 +178,38 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::LexicographicallyGreaterThan2IndicatorBridge{T},
+    b::LexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}},
+        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}},
     },
 ) where {T}
-    return length(b.cons_indic_gt)
+    return length(b.cons_indic_lt)
 end
 
-function MOI.get(b::LexicographicallyGreaterThan2IndicatorBridge{T}, ::MOI.ListOfVariableIndices) where {T}
-    return vcat(vec(b.vars_eq), vec(b.vars_gt))
+function MOI.get(b::LexicographicallyLessThan2IndicatorBridge{T}, ::MOI.ListOfVariableIndices) where {T}
+    return vcat(vec(b.vars_eq), vec(b.vars_lt))
 end
 
 function MOI.get(
-    b::LexicographicallyGreaterThan2IndicatorBridge{T},
+    b::LexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.SingleVariable, MOI.ZeroOne,
     },
 ) where {T}
-    return vcat(vec(b.vars_eq_bin), vec(b.vars_gt_bin))
+    return vcat(vec(b.vars_eq_bin), vec(b.vars_lt_bin))
 end
 
 function MOI.get(
-    b::LexicographicallyGreaterThan2IndicatorBridge{T},
+    b::LexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
 ) where {T}
-    return b.cons_one_gt
+    return b.cons_one_lt
 end
 
 function MOI.get(
-    b::LexicographicallyGreaterThan2IndicatorBridge{T},
+    b::LexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
     },
@@ -218,7 +218,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::LexicographicallyGreaterThan2IndicatorBridge{T},
+    b::LexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}},
     },
@@ -227,10 +227,10 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::LexicographicallyGreaterThan2IndicatorBridge{T},
+    b::LexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}},
+        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}},
     },
 ) where {T}
-    return vec(b.cons_indic_gt)
+    return vec(b.cons_indic_lt)
 end

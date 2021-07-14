@@ -184,9 +184,9 @@ include("LexicographicallyGreaterThan/lgt_to_indic.jl")
 const LexicographicallyGreaterThan2Indicator{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{LexicographicallyGreaterThan2IndicatorBridge{T}, OT}
 
-# include("LexicographicallyLessThan/llt_to_indic.jl")
-# const LexicographicallyLessThan2Indicator{T, OT <: MOI.ModelLike} =
-#     MOIBC.SingleBridgeOptimizer{LexicographicallyLessThan2IndicatorBridge{T}, OT}
+include("LexicographicallyLessThan/llt_to_indic.jl")
+const LexicographicallyLessThan2Indicator{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{LexicographicallyLessThan2IndicatorBridge{T}, OT}
 
 include("Strictly/strictly_to_lp.jl")
 const Strictly2Linear{T, OT <: MOI.ModelLike} =

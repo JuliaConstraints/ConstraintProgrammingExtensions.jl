@@ -125,6 +125,10 @@
         include("LexicographicallyLessThan/llt_to_indic.jl")
     end
 
+    @testset "LexicographicallyLessThan" begin
+        include("LexicographicallyLessThan/llt_to_indic.jl")
+    end
+
     @testset "MaximumAmong" begin
         include("MaximumAmong/max_to_milp.jl")
     end

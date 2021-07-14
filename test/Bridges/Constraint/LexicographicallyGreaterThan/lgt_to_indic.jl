@@ -18,7 +18,7 @@
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}},
+        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}},
     )
     @test MOIB.supports_bridging_constraint(
         model,
@@ -57,7 +57,7 @@
             (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
             (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
             (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}),
-            (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}),
+            (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 2 * (x_size - 1) * y_size
@@ -65,56 +65,56 @@
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == x_size - 1
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == (x_size - 1) * (y_size - 1)
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}()) == (x_size - 1) * y_size
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}}()) == (x_size - 1) * y_size
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}}()) == (x_size - 1) * y_size
 
-        @test Set(MOI.get(bridge, MOI.ListOfVariableIndices())) == Set([bridge.vars_eq..., bridge.vars_lt...])
-        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}())) == Set([bridge.vars_eq_bin..., bridge.vars_lt_bin...])
-        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}())) == Set(bridge.cons_one_lt)
+        @test Set(MOI.get(bridge, MOI.ListOfVariableIndices())) == Set([bridge.vars_eq..., bridge.vars_gt...])
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}())) == Set([bridge.vars_eq_bin..., bridge.vars_gt_bin...])
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}())) == Set(bridge.cons_one_gt)
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}())) == Set(bridge.cons_move)
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}())) == Set(bridge.cons_indic_eq)
-        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}}())) == Set(bridge.cons_indic_lt)
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}}())) == Set(bridge.cons_indic_gt)
     end
 
     @testset "Sets of variables" begin
         @test length(bridge.vars_eq) == (x_size - 1) * y_size
-        @test length(bridge.vars_lt) == (x_size - 1) * y_size
+        @test length(bridge.vars_gt) == (x_size - 1) * y_size
 
         for i in 1:(x_size - 1)
             # For each pair of columns (i, i+1)...
             @test length(bridge.vars_eq[i, :]) == y_size
-            @test length(bridge.vars_lt[i, :]) == y_size
+            @test length(bridge.vars_gt[i, :]) == y_size
 
             for j in 1:y_size
                 # For each pair of elements in the columns...
                 @test MOI.is_valid(model, bridge.vars_eq[i, j])
-                @test MOI.is_valid(model, bridge.vars_lt[i, j])
+                @test MOI.is_valid(model, bridge.vars_gt[i, j])
                 @test MOI.is_valid(model, bridge.vars_eq_bin[i, j])
-                @test MOI.is_valid(model, bridge.vars_lt_bin[i, j])
+                @test MOI.is_valid(model, bridge.vars_gt_bin[i, j])
                 
                 @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_eq_bin[i, j]) == MOI.ZeroOne()
-                @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_lt_bin[i, j]) == MOI.ZeroOne()
+                @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_gt_bin[i, j]) == MOI.ZeroOne()
                 @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_eq_bin[i, j]) == MOI.SingleVariable(bridge.vars_eq[i, j])
-                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_lt_bin[i, j]) == MOI.SingleVariable(bridge.vars_lt[i, j])
+                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_gt_bin[i, j]) == MOI.SingleVariable(bridge.vars_gt[i, j])
             end
         end
     end
 
     @testset "Constraint: at most one less-than pair of values per pair of columns" begin
-        @test length(bridge.cons_one_lt) == (x_size - 1)
+        @test length(bridge.cons_one_gt) == (x_size - 1)
 
         for i in 1:(x_size - 1)
             # For each pair of columns (i, i+1)...
-            @test MOI.is_valid(model, bridge.cons_one_lt[i])
-            @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_one_lt[i]) == MOI.LessThan(one(T))
+            @test MOI.is_valid(model, bridge.cons_one_gt[i])
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_one_gt[i]) == MOI.LessThan(one(T))
 
-            f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_one_lt[i])
+            f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_one_gt[i])
             @test length(f.terms) == y_size
             @test f.constant == zero(T)
 
             for j in 1:y_size
                 t = f.terms[j]
                 @test t.coefficient === one(T)
-                @test t.variable_index == bridge.vars_lt[i, j]
+                @test t.variable_index == bridge.vars_gt[i, j]
             end
         end
     end
@@ -145,7 +145,7 @@
 
                 t3 = f.terms[3]
                 @test t3.coefficient === -one(T)
-                @test t3.variable_index == bridge.vars_lt[i, j + 1]
+                @test t3.variable_index == bridge.vars_gt[i, j + 1]
             end
         end
     end
@@ -185,25 +185,25 @@
     end
 
     @testset "Constraint: indicator for inequality" begin
-        @test length(bridge.cons_indic_lt) == (x_size - 1) * y_size
+        @test length(bridge.cons_indic_gt) == (x_size - 1) * y_size
 
         for i in 1:(x_size - 1)
             # For each pair of columns (i, i+1)...
-            @test length(bridge.cons_indic_lt[i, :]) == y_size
+            @test length(bridge.cons_indic_gt[i, :]) == y_size
 
             for j in 1:y_size
                 # For each pair of elements in the columns...
-                @test MOI.is_valid(model, bridge.cons_indic_lt[i, j])
-                @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_indic_lt[i, j]) == MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE}(MOI.LessThan(zero(T)))
+                @test MOI.is_valid(model, bridge.cons_indic_gt[i, j])
+                @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_indic_gt[i, j]) == MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE}(MOI.GreaterThan(zero(T)))
 
-                f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_indic_lt[i, j])
+                f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_indic_gt[i, j])
                 @test length(f.terms) == 3
                 @test f.constants == zeros(T, 2)
 
                 t1 = f.terms[1]
                 @test t1.output_index == 1
                 @test t1.scalar_term.coefficient === one(T)
-                @test t1.scalar_term.variable_index == bridge.vars_lt[i, j]
+                @test t1.scalar_term.variable_index == bridge.vars_gt[i, j]
 
                 t2 = f.terms[2]
                 @test t2.output_index == 2
