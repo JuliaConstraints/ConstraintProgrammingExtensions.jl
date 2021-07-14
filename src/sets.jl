@@ -150,7 +150,7 @@ The set corresponding to an enumeration of constant values that are excluded.
 The value of a scalar function is enforced to take a value that is not from 
 this set of values.
 
-This constraint is sometimes called (`not_in`)[https://sofdem.github.io/gccat/gccat/Cnot_in.html#uid28032],
+This constraint is sometimes called (`not_in`)[https://sofdem.github.io/gccat/gccat/Cnot_in.html],
 `not_member`, `rel`, `forbidden_assignments`, or `no_good`.
 
 ## Example
@@ -173,7 +173,7 @@ The set corresponding to an enumeration of constant values that are excluded.
 The value of a vector function is enforced to take a value that is not from 
 this set of vector values.
 
-This constraint is sometimes called (`not_in`)[https://sofdem.github.io/gccat/gccat/Cnot_in.html#uid28032],
+This constraint is sometimes called (`not_in`)[https://sofdem.github.io/gccat/gccat/Cnot_in.html],
 `not_member`, `rel`, `forbidden_assignments`, or `no_good`.
 
 ## Example
