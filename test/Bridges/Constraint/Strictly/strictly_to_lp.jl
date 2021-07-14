@@ -1,6 +1,6 @@
-@testset "Strictly2Linear: $(set_type), $(fct_type), $(T)" for set_type in [MOI.GreaterThan, MOI.LessThan], fct_type in ["single variable", "scalar affine function"], T in [Int, Float64]
+@testset "Strictly2LP: $(set_type), $(fct_type), $(T)" for set_type in [MOI.GreaterThan, MOI.LessThan], fct_type in ["single variable", "scalar affine function"], T in [Int, Float64]
     mock = MOIU.MockOptimizer(DifferentFromModel{T}())
-    model = COIB.Strictly2Linear{T}(mock)
+    model = COIB.Strictly2LP{T}(mock)
 
     if T == Int
         @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)

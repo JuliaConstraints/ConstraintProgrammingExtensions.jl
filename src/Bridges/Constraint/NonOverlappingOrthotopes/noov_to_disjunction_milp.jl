@@ -4,19 +4,19 @@ inequations (`MOI.LessThan{T}`).
 
 Variable number of constraints in the disjunction (two per dimension).
 """
-struct NonOverlappingOrthotopes2DisjunctionLinearBridge{T} <: MOIBC.AbstractBridge
+struct NonOverlappingOrthotopes2DisjunctionLPBridge{T} <: MOIBC.AbstractBridge
     cons_disjunction::Dict{NTuple{2, Int}, MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}}}}} where n
     cons_ends::Dict{NTuple{2, Int}, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{NonOverlappingOrthotopes2DisjunctionLinearBridge{T}},
+    ::Type{NonOverlappingOrthotopes2DisjunctionLPBridge{T}},
     model,
     f::MOI.VectorOfVariables,
     s::CP.NonOverlappingOrthotopes
 ) where {T}
     return MOIBC.bridge_constraint(
-        NonOverlappingOrthotopes2DisjunctionLinearBridge{T},
+        NonOverlappingOrthotopes2DisjunctionLPBridge{T},
         model,
         MOI.VectorAffineFunction{T}(f),
         s,
@@ -24,7 +24,7 @@ function MOIBC.bridge_constraint(
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{NonOverlappingOrthotopes2DisjunctionLinearBridge{T}},
+    ::Type{NonOverlappingOrthotopes2DisjunctionLPBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
     s::CP.NonOverlappingOrthotopes
@@ -79,22 +79,22 @@ function MOIBC.bridge_constraint(
         end
     end
 
-    return NonOverlappingOrthotopes2DisjunctionLinearBridge(cons_disjunction, cons_ends)
+    return NonOverlappingOrthotopes2DisjunctionLPBridge(cons_disjunction, cons_ends)
 end
 
 function MOI.supports_constraint(
-    ::Type{NonOverlappingOrthotopes2DisjunctionLinearBridge{T}},
+    ::Type{NonOverlappingOrthotopes2DisjunctionLPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
     ::Type{CP.NonOverlappingOrthotopes},
 ) where {T}
     return true
 end
 
-function MOIB.added_constrained_variable_types(::Type{NonOverlappingOrthotopes2DisjunctionLinearBridge{T}}) where {T}
+function MOIB.added_constrained_variable_types(::Type{NonOverlappingOrthotopes2DisjunctionLPBridge{T}}) where {T}
     return Tuple{DataType}[]
 end
 
-function MOIB.added_constraint_types(::Type{NonOverlappingOrthotopes2DisjunctionLinearBridge{T}}) where {T}
+function MOIB.added_constraint_types(::Type{NonOverlappingOrthotopes2DisjunctionLPBridge{T}}) where {T}
     return [
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
         # Not enough information in the type to qualify fully the disjunction.
@@ -104,19 +104,19 @@ function MOIB.added_constraint_types(::Type{NonOverlappingOrthotopes2Disjunction
 end
 
 function MOIBC.concrete_bridge_type(
-    ::Type{NonOverlappingOrthotopes2DisjunctionLinearBridge{T}},
+    ::Type{NonOverlappingOrthotopes2DisjunctionLPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
     ::Type{CP.NonOverlappingOrthotopes},
 ) where {T}
-    return NonOverlappingOrthotopes2DisjunctionLinearBridge{T}
+    return NonOverlappingOrthotopes2DisjunctionLPBridge{T}
 end
 
-function MOI.get(::NonOverlappingOrthotopes2DisjunctionLinearBridge, ::MOI.NumberOfVariables)
+function MOI.get(::NonOverlappingOrthotopes2DisjunctionLPBridge, ::MOI.NumberOfVariables)
     return 0
 end
 
 function MOI.get(
-    b::NonOverlappingOrthotopes2DisjunctionLinearBridge{T},
+    b::NonOverlappingOrthotopes2DisjunctionLPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}} where n},
     },
@@ -125,7 +125,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::NonOverlappingOrthotopes2DisjunctionLinearBridge{T},
+    b::NonOverlappingOrthotopes2DisjunctionLPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
     },
@@ -134,7 +134,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::NonOverlappingOrthotopes2DisjunctionLinearBridge{T},
+    b::NonOverlappingOrthotopes2DisjunctionLPBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}} where n},
     },
@@ -143,7 +143,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::NonOverlappingOrthotopes2DisjunctionLinearBridge{T},
+    b::NonOverlappingOrthotopes2DisjunctionLPBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
     },

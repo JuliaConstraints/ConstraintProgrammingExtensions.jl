@@ -4,7 +4,7 @@ _STRICTLY_FLOAT_EPSILON = 1.0e-9
 """
 Bridges `CP.Strictly` to linear constraints.
 """
-struct Strictly2LinearBridge{T} <: MOIBC.AbstractBridge
+struct Strictly2LPBridge{T} <: MOIBC.AbstractBridge
     con::Union{
         MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}},
         MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}},
@@ -12,13 +12,13 @@ struct Strictly2LinearBridge{T} <: MOIBC.AbstractBridge
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{Strictly2LinearBridge{T}},
+    ::Type{Strictly2LPBridge{T}},
     model,
     f::MOI.SingleVariable,
     s::Union{CP.Strictly{MOI.LessThan{T}, T}, CP.Strictly{MOI.GreaterThan{T}, T}},
 ) where {T}
     return MOIBC.bridge_constraint(
-        Strictly2LinearBridge{T},
+        Strictly2LPBridge{T},
         model,
         MOI.ScalarAffineFunction{T}(f),
         s,
@@ -26,7 +26,7 @@ function MOIBC.bridge_constraint(
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{Strictly2LinearBridge{T}},
+    ::Type{Strictly2LPBridge{T}},
     model,
     f::MOI.ScalarAffineFunction{T},
     s::CP.Strictly{MOI.LessThan{T}, T},
@@ -37,11 +37,11 @@ function MOIBC.bridge_constraint(
         MOI.LessThan(s.set.upper - _STRICTLY_FLOAT_EPSILON)
     )
 
-    return Strictly2LinearBridge(con)
+    return Strictly2LPBridge(con)
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{Strictly2LinearBridge{T}},
+    ::Type{Strictly2LPBridge{T}},
     model,
     f::MOI.ScalarAffineFunction{T},
     s::CP.Strictly{MOI.LessThan{T}, T},
@@ -52,11 +52,11 @@ function MOIBC.bridge_constraint(
         MOI.LessThan(s.set.upper - one(T))
     )
 
-    return Strictly2LinearBridge(con)
+    return Strictly2LPBridge(con)
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{Strictly2LinearBridge{T}},
+    ::Type{Strictly2LPBridge{T}},
     model,
     f::MOI.ScalarAffineFunction{T},
     s::CP.Strictly{MOI.GreaterThan{T}, T},
@@ -67,11 +67,11 @@ function MOIBC.bridge_constraint(
         MOI.GreaterThan(s.set.lower + _STRICTLY_FLOAT_EPSILON)
     )
 
-    return Strictly2LinearBridge(con)
+    return Strictly2LPBridge(con)
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{Strictly2LinearBridge{T}},
+    ::Type{Strictly2LPBridge{T}},
     model,
     f::MOI.ScalarAffineFunction{T},
     s::CP.Strictly{MOI.GreaterThan{T}, T},
@@ -82,22 +82,22 @@ function MOIBC.bridge_constraint(
         MOI.GreaterThan(s.set.lower + one(T))
     )
 
-    return Strictly2LinearBridge(con)
+    return Strictly2LPBridge(con)
 end
 
 function MOI.supports_constraint(
-    ::Type{Strictly2LinearBridge{T}},
+    ::Type{Strictly2LPBridge{T}},
     ::Union{Type{MOI.SingleVariable}, Type{MOI.ScalarAffineFunction{T}}},
     ::Union{Type{CP.Strictly{MOI.LessThan{T}, T}}, Type{CP.Strictly{MOI.GreaterThan{T}, T}}},
 ) where {T}
     return true
 end
 
-function MOIB.added_constrained_variable_types(::Type{Strictly2LinearBridge{T}}) where {T}
+function MOIB.added_constrained_variable_types(::Type{Strictly2LPBridge{T}}) where {T}
     return Tuple{DataType}[]
 end
 
-function MOIB.added_constraint_types(::Type{Strictly2LinearBridge{T}}) where {T}
+function MOIB.added_constraint_types(::Type{Strictly2LPBridge{T}}) where {T}
     return [
         (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
         (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
@@ -105,19 +105,19 @@ function MOIB.added_constraint_types(::Type{Strictly2LinearBridge{T}}) where {T}
 end
 
 function MOIBC.concrete_bridge_type(
-    ::Type{Strictly2LinearBridge{T}},
+    ::Type{Strictly2LPBridge{T}},
     ::Union{Type{MOI.SingleVariable}, Type{MOI.ScalarAffineFunction{T}}},
     ::Union{Type{CP.Strictly{MOI.LessThan{T}, T}}, Type{CP.Strictly{MOI.GreaterThan{T}, T}}},
 ) where {T}
-    return Strictly2LinearBridge{T}
+    return Strictly2LPBridge{T}
 end
 
-function MOI.get(::Strictly2LinearBridge, ::MOI.NumberOfVariables)
+function MOI.get(::Strictly2LPBridge, ::MOI.NumberOfVariables)
     return 0
 end
 
 function MOI.get(
-    b::Strictly2LinearBridge{T},
+    b::Strictly2LPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
     },
@@ -126,7 +126,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::Strictly2LinearBridge{T},
+    b::Strictly2LPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
@@ -135,7 +135,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::Strictly2LinearBridge{T},
+    b::Strictly2LPBridge{T},
     ::Union{
         MOI.ListOfConstraintIndices{
             MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},

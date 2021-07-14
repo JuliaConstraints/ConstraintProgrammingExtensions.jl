@@ -213,9 +213,8 @@ const StrictlyLexicographicallyLessThan2Indicator{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{StrictlyLexicographicallyLessThan2IndicatorBridge{T}, OT}
 
 include("Strictly/strictly_to_lp.jl")
-const Strictly2Linear{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{Strictly2LinearBridge{T}, OT}
-    # TODO: LP instead of linear.
+const Strictly2LP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Strictly2LPBridge{T}, OT}
 
 include("MaximumAmong/max_to_milp.jl")
 const MaximumAmong2MILP{T, OT <: MOI.ModelLike} =
@@ -226,9 +225,8 @@ const MinimumAmong2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{MinimumAmong2MILPBridge{T}, OT}
 
 include("NonOverlappingOrthotopes/noov_to_disjunction_milp.jl")
-const NonOverlappingOrthotopes2DisjunctionLinear{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{NonOverlappingOrthotopes2DisjunctionLinearBridge{T}, OT}
-    # TODO: LP instead of linear.
+const NonOverlappingOrthotopes2DisjunctionLP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{NonOverlappingOrthotopes2DisjunctionLPBridge{T}, OT}
 
 include("NonOverlappingOrthotopes/noov_to_noovcond.jl")
 const NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopes{T, OT <: MOI.ModelLike} =

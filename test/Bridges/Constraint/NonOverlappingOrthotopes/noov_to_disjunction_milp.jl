@@ -1,6 +1,6 @@
-@testset "NonOverlappingOrthotopes2DisjunctionLinear: $(fct_type), orthotopes $(n_ortho), dimension $(dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], n_ortho in [2, 3], dim in [2, 3], T in [Int, Float64]
+@testset "NonOverlappingOrthotopes2DisjunctionLP: $(fct_type), orthotopes $(n_ortho), dimension $(dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], n_ortho in [2, 3], dim in [2, 3], T in [Int, Float64]
     mock = MOIU.MockOptimizer(DisjunctionModel{T}())
-    model = COIB.NonOverlappingOrthotopes2DisjunctionLinear{T}(mock)
+    model = COIB.NonOverlappingOrthotopes2DisjunctionLP{T}(mock)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
     if fct_type == "vector of variables"
