@@ -134,6 +134,8 @@
         CP.ClosedGlobalCardinalityVariable,
         CP.LexicographicallyLessThan,
         CP.LexicographicallyGreaterThan,
+        CP.DoublyLexicographicallyLessThan,
+        CP.DoublyLexicographicallyGreaterThan,
     ]
         @test isbitstype(S)
 
@@ -155,7 +157,7 @@
         elseif S == CP.GlobalCardinalityVariable || S == CP.ClosedGlobalCardinalityVariable
             @test MOI.dimension(S(2, 2)) == 2 + 2 * 2
             @test MOI.dimension(S(3, 4)) == 3 + 2 * 4
-        elseif S == CP.LexicographicallyLessThan || S == CP.LexicographicallyGreaterThan
+        elseif S == CP.LexicographicallyLessThan || S == CP.LexicographicallyGreaterThan || S == CP.DoublyLexicographicallyLessThan || S == CP.DoublyLexicographicallyGreaterThan
             @test MOI.dimension(S(2, 2)) == 2 * 2
             @test MOI.dimension(S(3, 4)) == 3 * 4
         else

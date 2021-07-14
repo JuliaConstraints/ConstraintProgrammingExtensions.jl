@@ -20,6 +20,8 @@ Add many new sets:
 * `SymmetricAllDifferent`
 * `ClosedGlobalCardinality`
 * `ClosedGlobalCardinalityVariable`
+* `DoublyLexicographicallyGreaterThan`
+* `DoublyLexicographicallyLessThan`
 
 Add many new bridges between high-level constraints, and also to MILP models.
 

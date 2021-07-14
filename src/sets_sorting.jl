@@ -55,6 +55,44 @@ MOI.dimension(set::LexicographicallyGreaterThan) = set.row_dim * set.column_dim
 # TODO: bridge to LexicographicallyLessThan.
 
 """
+    DoublyLexicographicallyLessThan(dimension::Int)
+
+Ensures that each column of the matrix is lexicographically less than 
+the next column, and that each row of the matrix is lexicographically less 
+than the next row. 
+
+Also called [`lex2`](https://sofdem.github.io/gccat/gccat/Clex2.html).
+
+The matrix is encoded by stacking the columns, matching the behaviour of
+Julia's `vec` function.
+"""
+struct DoublyLexicographicallyLessThan <: MOI.AbstractVectorSet
+    row_dim::Int
+    column_dim::Int
+end
+
+MOI.dimension(set::DoublyLexicographicallyLessThan) = set.row_dim * set.column_dim
+
+"""
+    DoublyLexicographicallyGreaterThan(dimension::Int)
+
+Ensures that each column of the matrix is lexicographically greater than 
+the next column, and that each row of the matrix is lexicographically greater 
+than the next row. 
+
+The matrix is encoded by stacking the columns, matching the behaviour of
+Julia's `vec` function.
+"""
+struct DoublyLexicographicallyGreaterThan <: MOI.AbstractVectorSet
+    row_dim::Int
+    column_dim::Int
+end
+
+MOI.dimension(set::DoublyLexicographicallyGreaterThan) = set.row_dim * set.column_dim
+
+# TODO: bridge to LexicographicallyLessThan.
+
+"""
     Sort(dimension::Int)
 
 Ensures that the first `dimension` elements is a sorted copy of the next
@@ -202,6 +240,8 @@ function copy(
     set::Union{
         LexicographicallyLessThan,
         LexicographicallyGreaterThan,
+        DoublyLexicographicallyLessThan,
+        DoublyLexicographicallyGreaterThan,
         Sort,
         SortPermutation,
         MinimumAmong,
