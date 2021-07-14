@@ -62,7 +62,7 @@ end
 
 function MOIB.added_constraint_types(::Type{DoublyLexicographicallyGreaterThan2LexicographicallyGreaterThanBridge{T}}) where {T}
     return [
-        MOI.VectorAffineFunction{T}, CP.LexicographicallyGreaterThan,
+        (MOI.VectorAffineFunction{T}, CP.LexicographicallyGreaterThan),
     ]
 end
 
