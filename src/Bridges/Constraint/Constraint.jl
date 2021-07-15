@@ -88,6 +88,10 @@ include("Disjunction/disjunction_to_reif.jl")
 const Disjunction2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Disjunction2ReificationBridge{T}, OT}
 
+include("Domain/domain_to_milp.jl")
+const Domain2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Domain2MILPBridge{T}, OT}
+
 include("DoublyLexicographicallyLessThan/dllt_to_llt.jl")
 const DoublyLexicographicallyLessThan2LexicographicallyLessThan{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{DoublyLexicographicallyLessThan2LexicographicallyLessThanBridge{T}, OT}
