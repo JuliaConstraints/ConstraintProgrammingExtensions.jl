@@ -1,6 +1,11 @@
 MiniZinc has a similar goal to this project: a common modelling interface for many underlying solvers. It is based on a similar concept to that of bridges, but with much less flexibility: each high-level constraint is mapped in a fixed way onto lower-level constraints.
 
 * Basic CP constraints: 
+    * Domain: 
+        * Fixed: `CP.Domain`
+        * Variable: `CP.Membership`
+        * Multivalued: `CP.VectorDomain`
+            * [`table`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/table.mzn)
     * All different: 
         * Base: `CP.AllDifferent`
             * [`all_different`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/all_different.mzn): mapped onto [a MILP-like model](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_all_different_int.mzn).
