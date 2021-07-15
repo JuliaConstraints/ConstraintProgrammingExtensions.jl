@@ -266,17 +266,17 @@
     end
 
     @testset "SlidingSum" begin
-        @test SlidingSum(1, 2, 3, 4) == SlidingSum(1, 2, 3, 4)
-        @test SlidingSum(1, 2, 3, 4) != SlidingSum(0, 2, 3, 4)
-        @test SlidingSum(1, 2, 3, 4) != SlidingSum(1, 4, 2, 4)
-        @test SlidingSum(1, 2, 3, 4) != SlidingSum(1, 2, 3, 5)
+        @test CP.SlidingSum(1, 2, 3, 4) == CP.SlidingSum(1, 2, 3, 4)
+        @test CP.SlidingSum(1, 2, 3, 4) != CP.SlidingSum(0, 2, 3, 4)
+        @test CP.SlidingSum(1, 2, 3, 4) != CP.SlidingSum(1, 4, 2, 4)
+        @test CP.SlidingSum(1, 2, 3, 4) != CP.SlidingSum(1, 2, 3, 5)
 
-        s = SlidingSum(1, 2, 3, 4)
-        @test typeof(copy(s)) <: SlidingSum
+        s = CP.SlidingSum(1, 2, 3, 4)
+        @test typeof(copy(s)) <: CP.SlidingSum
         @test copy(s) == s
 
-        @test MOI.dimension(SlidingSum(1, 2, 3, 4)) == 4
-        @test MOI.dimension(SlidingSum(1, 2, 3, 40)) == 40
+        @test MOI.dimension(CP.SlidingSum(1, 2, 3, 4)) == 4
+        @test MOI.dimension(CP.SlidingSum(1, 2, 3, 40)) == 40
     end
 
     @testset "Element" begin
