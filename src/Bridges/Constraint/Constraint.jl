@@ -244,6 +244,10 @@ include("SortPermutation/perm_to_alldiff_indexing.jl")
 const SortPermutation2AllDifferent{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{SortPermutation2AllDifferentBridge{T}, OT}
 
+include("SlidingSum/ss_to_lp.jl")
+const SlidingSum2LP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{SlidingSum2LPBridge{T}, OT}
+
 include("SymmetricAllDifferent/salldiff_to_alldiff_inverse.jl")
 const SymmetricAllDifferent2AllDifferentInverse{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{SymmetricAllDifferent2AllDifferentInverseBridge{T}, OT}

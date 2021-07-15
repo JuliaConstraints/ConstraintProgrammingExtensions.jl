@@ -157,6 +157,10 @@
         include("LessThan_Reify/reif_lt_to_milp.jl")
     end
 
+    @testset "SlidingSum" begin
+        include("SlidingSum/ss_to_lp.jl")
+    end
+
     @testset "Sort" begin
         include("Sort/sort_to_perm.jl")
         include("Sort/sort_to_milp.jl")
