@@ -39,10 +39,10 @@
 
     c = MOI.add_constraint(model, fct, CP.ElementVariableArray(dim))
 
-    MOI.is_valid(model, x_value)
-    MOI.is_valid(model, x_index)
+    @test MOI.is_valid(model, x_value)
+    @test MOI.is_valid(model, x_index)
     for i in 1:dim
-        MOI.is_valid(model, x_array[i])
+        @test MOI.is_valid(model, x_array[i])
     end
     @test MOI.is_valid(model, c)
 

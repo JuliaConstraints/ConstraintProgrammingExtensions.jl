@@ -34,7 +34,7 @@
     end
     c = MOI.add_constraint(model, fct, CP.Strictly(set_type(zero(T))))
 
-    MOI.is_valid(model, x)
+    @test MOI.is_valid(model, x)
     @test MOI.is_valid(model, c)
 
     bridge = first(MOIBC.bridges(model))[2]

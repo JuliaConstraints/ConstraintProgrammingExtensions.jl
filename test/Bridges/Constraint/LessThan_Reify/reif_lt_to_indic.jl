@@ -44,8 +44,8 @@
     end
     c = MOI.add_constraint(model, fct, CP.Reified(MOI.LessThan(one(T))))
 
-    MOI.is_valid(model, x)
-    MOI.is_valid(model, y)
+    @test MOI.is_valid(model, x)
+    @test MOI.is_valid(model, y)
     @test MOI.is_valid(model, c)
 
     bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Reified{MOI.LessThan{T}}}(-1)]

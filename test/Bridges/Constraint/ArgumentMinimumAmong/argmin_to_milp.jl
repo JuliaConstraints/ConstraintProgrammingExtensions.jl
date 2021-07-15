@@ -40,7 +40,7 @@
     c = MOI.add_constraint(model, fct, CP.ArgumentMinimumAmong(array_dim))
 
     for i in 1:dim
-        MOI.is_valid(model, x[i])
+        @test MOI.is_valid(model, x[i])
     end
     @test MOI.is_valid(model, c)
 

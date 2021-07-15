@@ -44,8 +44,8 @@
 
     c = MOI.add_constraint(model, fct, CP.AbsoluteValue())
 
-    MOI.is_valid(model, x)
-    MOI.is_valid(model, x_abs)
+    @test MOI.is_valid(model, x)
+    @test MOI.is_valid(model, x_abs)
     @test MOI.is_valid(model, c)
 
     bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.AbsoluteValue}(-1)]

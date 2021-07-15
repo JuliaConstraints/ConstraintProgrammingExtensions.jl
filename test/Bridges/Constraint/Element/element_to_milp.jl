@@ -31,8 +31,8 @@
     end
     c = MOI.add_constraint(model, fct, CP.Element(values))
 
-    MOI.is_valid(model, x_value)
-    MOI.is_valid(model, x_index)
+    @test MOI.is_valid(model, x_value)
+    @test MOI.is_valid(model, x_index)
     @test MOI.is_valid(model, c)
 
     bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Element}(-1)]
