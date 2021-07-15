@@ -183,4 +183,8 @@
     @testset "SymmetricAllDifferent" begin
         include("SymmetricAllDifferent/salldiff_to_alldiff_inverse.jl")
     end
+
+    @testset "VectorDomain" begin
+        include("VectorDomain/vd_to_milp.jl")
+    end
 end

@@ -5,7 +5,7 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
         * Fixed: `CP.Domain`
         * Variable: `CP.Membership`
         * Multivalued: `CP.VectorDomain`
-            * [`table`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/table.mzn)
+            * [`table`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/table.mzn): [one binary variable per possible combination](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/linear/fzn_table_int.mzn)
     * All different: 
         * Base: `CP.AllDifferent`
             * [`all_different`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/all_different.mzn): mapped onto [a MILP-like model](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_all_different_int.mzn).
