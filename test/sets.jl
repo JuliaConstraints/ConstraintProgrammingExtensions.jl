@@ -688,4 +688,19 @@
 
         @test MOI.dimension(S()) == 0
     end
+
+    @testset "ValuePrecedence" begin
+        @test CP.ValuePrecedence(1, 4, 20) == CP.ValuePrecedence(1, 4, 20)
+        @test CP.ValuePrecedence(1, 4, 20) != CP.ValuePrecedence(1, 4, 25)
+        @test CP.ValuePrecedence(1, 4, 20) != CP.ValuePrecedence(1, 5, 20)
+        @test CP.ValuePrecedence(1, 4, 20) != CP.ValuePrecedence(2, 4, 20)
+
+        s = CP.ValuePrecedence(1, 4, 20)
+        @test typeof(copy(s)) <: CP.ValuePrecedence
+        @test copy(s) == s
+
+        @test MOI.dimension(CP.ValuePrecedence(1, 4, 20)) == 20
+        @test MOI.dimension(CP.ValuePrecedence(1, 5, 20)) == 20
+        @test MOI.dimension(CP.ValuePrecedence(2, 4, 20)) == 20
+    end
 end

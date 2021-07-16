@@ -356,6 +356,31 @@ struct SlidingSum{T <: Real} <: MOI.AbstractVectorSet
     dimension::Int
 end
 
+"""
+    ValuePrecedence(before::T, value::T, dimension::Int)
+
+Ensures that the value `before` happens before `value` in the array of size 
+`dimension`. 
+
+``\\{x \\in \\mathbb{R}^{dimension} | \\exists i < j: x_i = \\mathtt{before}, x_j = \\mathtt{value} \\}``.
+
+Also called `precede` or `value_precede`.
+
+https://sofdem.github.io/gccat/gccat/Cint_value_precede.html
+"""
+struct ValuePrecedence{T <: Real} <: MOI.AbstractVectorSet
+    before::T
+    value::T
+    dimension::Int
+end
+
+function copy(set::ValuePrecedence{T}) where {T}
+    return ValuePrecedence(copy(set.before), copy(set.value), set.dimension)
+end
+function Base.:(==)(x::ValuePrecedence{T}, y::ValuePrecedence{T}) where {T}
+    return x.dimension == y.dimension && x.before == y.before && x.value == y.value
+end
+
 # Solvers tend not to agree on the name of this one... "Inverse" is the most common one, though.
 #     https://sofdem.github.io/gccat/gccat/Cinverse.html
 # - inverse: CPLEX, MiniZinc, GCC, CHIP

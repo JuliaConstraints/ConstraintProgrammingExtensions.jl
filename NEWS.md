@@ -23,6 +23,7 @@ Add many new sets:
 * `DoublyLexicographicallyGreaterThan`
 * `DoublyLexicographicallyLessThan`
 * `SlidingSum`
+* `ValuePrecedence`
 
 Add many new bridges between high-level constraints, and also to MILP models.
 
