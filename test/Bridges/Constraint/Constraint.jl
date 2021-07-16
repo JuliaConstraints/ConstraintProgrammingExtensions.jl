@@ -59,6 +59,10 @@
         include("Disjunction/disjunction_to_reif.jl")
     end
 
+    @testset "Domain" begin
+        include("Domain/domain_to_milp.jl")
+    end
+
     @testset "DoublyLexicographicallyGreaterThan" begin
         include("DoublyLexicographicallyGreaterThan/dlgt_to_lgt.jl")
     end

@@ -591,6 +591,40 @@ MOIU.@model(
     (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
 )
 
+# Domain.
+
+MOIU.@model(
+    DomainModel,
+    (),
+    (
+        MOI.EqualTo, 
+        MOI.GreaterThan, 
+        MOI.LessThan, 
+        MOI.Interval, 
+        CP.Domain,
+    ),
+    (
+        MOI.Zeros,
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.GeometricMeanCone,
+        MOI.RelativeEntropyCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+    ),
+    (MOI.PowerCone, MOI.DualPowerCone),
+    (),
+    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.VectorOfVariables,),
+    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
+)
+
 # Lexicographically greater than.
 
 MOIU.@model(

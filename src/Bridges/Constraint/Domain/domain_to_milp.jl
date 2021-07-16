@@ -39,18 +39,18 @@ function MOIBC.bridge_constraint(
     
     values = collect(s.values)
 
-    con_values = MOI.add_constraint(
+    con_value = MOI.add_constraint(
         model,
         f - sum(one(T) * MOI.SingleVariable(vars[i]) * values[i] for i in 1:length(s.values)),
         MOI.EqualTo(zero(T))
     )
 
-    return Domain2MILPBridge(vars, vars_bin, con_choose_one, con_values)
+    return Domain2MILPBridge(vars, vars_bin, con_choose_one, con_value)
 end
 
 function MOI.supports_constraint(
     ::Type{Domain2MILPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.ScalarAffineFunction{T}}},
+    ::Union{Type{MOI.SingleVariable}, Type{MOI.ScalarAffineFunction{T}}},
     ::Type{CP.Domain{T}},
 ) where {T}
     return true
@@ -119,5 +119,5 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
     },
 ) where {T}
-    return [b.con_choose_one, b.con_values]
+    return [b.con_choose_one, b.con_value]
 end

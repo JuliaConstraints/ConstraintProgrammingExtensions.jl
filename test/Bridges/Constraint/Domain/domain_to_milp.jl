@@ -17,6 +17,11 @@
         MOI.ScalarAffineFunction{T},
         CP.Domain{T},
     )
+    @test MOIB.supports_bridging_constraint(
+        model,
+        MOI.SingleVariable,
+        CP.Domain{T},
+    )
 
     if T == Int
         x, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -56,7 +61,7 @@
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == 2
 
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == bridge.vars_bin
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.con_choose_one, bridge.con_values]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.con_choose_one, bridge.con_value]
     end
 
     @testset "New variables" begin
@@ -86,26 +91,22 @@
         end
     end
 
-    # @testset "Values" begin
-    #     @test length(bridge.cons_values) == dim
+    @testset "Value" begin
+        @test MOI.is_valid(model, bridge.con_value)
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_value) == MOI.EqualTo(zero(T))
 
-    #     for i in 1:dim
-    #         @test MOI.is_valid(model, bridge.cons_values[i])
-    #         @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_values[i]) == MOI.EqualTo(zero(T))
+        f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_value)
+        @test length(f.terms) == 1 + n_values
+        @test f.constant === zero(T)
 
-    #         f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_values[i])
-    #         @test length(f.terms) == 1 + n_values
-    #         @test f.constant === zero(T)
+        t1 = f.terms[1]
+        @test t1.coefficient === one(T)
+        @test t1.variable_index == x
 
-    #         t1 = f.terms[1]
-    #         @test t1.coefficient === one(T)
-    #         @test t1.variable_index == x[i]
-
-    #         for j in 1:n_values
-    #             t = f.terms[1 + j]
-    #             @test t.coefficient === -x_vector[j][i]
-    #             @test t.variable_index == bridge.vars[j]
-    #         end
-    #     end
-    # end
+        for j in 1:n_values
+            t = f.terms[1 + j]
+            @test t.coefficient === -x_vector[j]
+            @test t.variable_index == bridge.vars[j]
+        end
+    end
 end
