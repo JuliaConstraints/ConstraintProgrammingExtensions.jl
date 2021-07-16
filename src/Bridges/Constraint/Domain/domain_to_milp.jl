@@ -69,7 +69,7 @@ end
 
 function MOIBC.concrete_bridge_type(
     ::Type{Domain2MILPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.ScalarAffineFunction{T}}},
+    ::Union{Type{MOI.SingleVariable}, Type{MOI.ScalarAffineFunction{T}}},
     ::Type{CP.Domain{T}},
 ) where {T}
     return Domain2MILPBridge{T}
