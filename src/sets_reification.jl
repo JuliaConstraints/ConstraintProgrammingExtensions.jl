@@ -68,6 +68,10 @@ function copy(set::EquivalenceNot{S, T}) where {S, T}
     return EquivalenceNot(copy(set.set1), copy(set.set2))
 end
 
+function Base.:(==)(x::EquivalenceNot{S, T}, y::EquivalenceNot{S, T}) where {S, T}
+    return x.set1 == y.set1 && x.set2 == y.set2
+end
+
 """
     IfThenElse{
         Condition <: MOI.AbstractSet, 
@@ -108,6 +112,10 @@ function copy(set::IfThenElse{S, T, U}) where {S, T, U}
     )
 end
 
+function Base.:(==)(x::IfThenElse{S, T, U}, y::IfThenElse{S, T, U}) where {S, T, U}
+    return x.condition == y.condition && x.true_constraint == y.true_constraint && x.false_constraint == y.false_constraint
+end
+
 """
     Imply{
         Antecedent <: MOI.AbstractSet,
@@ -137,6 +145,10 @@ function copy(set::Imply{S, T}) where {S, T}
     return Imply(copy(set.antecedent), copy(set.consequent))
 end
 
+function Base.:(==)(x::Imply{S, T}, y::Imply{S, T}) where {S, T}
+    return x.antecedent == y.antecedent && x.consequent == y.consequent
+end
+
 """
     Conjunction{Ts}(constraints::Ts)
 
@@ -159,6 +171,10 @@ function copy(set::Conjunction{Ts}) where {Ts}
     return Conjunction(deepcopy(set.constraints))
 end
 
+function Base.:(==)(x::Conjunction{Ts}, y::Conjunction{Ts}) where {Ts}
+    return x.constraints == y.constraints
+end
+
 """
     Disjunction{Ts}(constraints::Ts)
 
@@ -179,6 +195,10 @@ end
 
 function copy(set::Disjunction{Ts}) where {Ts}
     return Disjunction(deepcopy(set.constraints))
+end
+
+function Base.:(==)(x::Disjunction{Ts}, y::Disjunction{Ts}) where {Ts}
+    return x.constraints == y.constraints
 end
 
 """
@@ -206,6 +226,7 @@ It is only useful with reification-like constraints.
 struct True <: MOI.AbstractVectorSet end
 
 MOI.dimension(set::True) = 0
+Base.:(==)(::True, ::True) = true
 
 """
     False()
@@ -217,6 +238,7 @@ It is only useful with reification-like constraints.
 struct False <: MOI.AbstractVectorSet end
 
 MOI.dimension(set::False) = 0
+Base.:(==)(::False, ::False) = true
 
 # isbits types, nothing to copy
 function copy(set::Union{True, False})

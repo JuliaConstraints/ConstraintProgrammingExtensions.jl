@@ -300,6 +300,8 @@
         @test S(set1) == S(set1)
         @test S(set1) != S(set2)
         @test S(set2) != S(set1)
+        @test S(Set([0, 1])) == S(Set([0, 1]))
+        @test S(Set([0, 1])) != S(Set([0, 2]))
 
         s = S(set1)
         @test typeof(copy(s)) <: S
@@ -654,6 +656,22 @@
     end
 
     @testset "$(S)" for S in [CP.Conjunction, CP.Disjunction]
+        # Ensure that tuples can be compared.
+        @test (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) ==
+            (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+                (MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test (MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+                (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test (MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+                (MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test (MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+                (MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test (MOI.EqualTo(1), MOI.EqualTo(0), MOI.EqualTo(0)) !=
+                (MOI.GreaterThan(0), MOI.EqualTo(0), MOI.EqualTo(0))
+        @test (CP.Domain(Set([0, 1])),) == (CP.Domain(Set([0, 1])),)
+
+        # Then, wrap the tuples in conjunctions and disjunctions.
         @test S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) ==
               S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
         @test S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) !=
@@ -664,6 +682,11 @@
               S((MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
         @test S((MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) !=
               S((MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
+        @test S((MOI.EqualTo(1), MOI.EqualTo(0), MOI.EqualTo(0))) !=
+              S((MOI.GreaterThan(0), MOI.EqualTo(0), MOI.EqualTo(0)))
+        @test S((CP.Domain(Set([0, 1])), MOI.EqualTo(0))) ==
+              S((CP.Domain(Set([0, 1])), MOI.EqualTo(0)))
+        @test S((CP.Domain(Set([0, 1])),)) == S((CP.Domain(Set([0, 1])),))
 
         s = S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
         @test typeof(copy(s)) <: S
