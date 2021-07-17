@@ -53,6 +53,9 @@ This constraint is sometimes called `distinct`.
 
     [x, y] in AllDifferentExceptConstant(2, 0)
     # enforces `x != y` OR `x == 0` OR `y == 0`.
+
+    [x, y] in AllDifferentExceptConstant(2, Set([0, 1]))
+    # enforces `x != y` OR `x == 0` OR `y == 0` OR `x == 1` OR `y == 1`.
 """
 struct AllDifferentExceptConstants{T <: Number} <: MOI.AbstractVectorSet
     dimension::Int
