@@ -142,7 +142,7 @@ function MOI.get(
         MOI.VectorAffineFunction{T}, CP.Reification,
     },
 ) where {T}
-    return b.cons_reif
+    return copy(b.cons_reif)
 end
 
 function MOI.get(

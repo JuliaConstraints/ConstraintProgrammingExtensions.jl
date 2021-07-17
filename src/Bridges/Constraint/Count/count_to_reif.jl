@@ -117,7 +117,7 @@ function MOI.get(
     b::Count2ReificationBridge{T, S},
     ::MOI.ListOfVariableIndices,
 ) where {T, S <: MOI.AbstractScalarSet}
-    return b.vars
+    return copy(b.vars)
 end
 
 function MOI.get(
@@ -126,7 +126,7 @@ function MOI.get(
         MOI.SingleVariable, MOI.ZeroOne,
     },
 ) where {T, S <: MOI.AbstractScalarSet}
-    return b.vars_bin
+    return copy(b.vars_bin)
 end
 
 function MOI.get(
@@ -135,7 +135,7 @@ function MOI.get(
         MOI.VectorAffineFunction{T}, CP.Reification{S},
     },
 ) where {T, S <: MOI.AbstractScalarSet}
-    return b.cons
+    return copy(b.cons)
 end
 
 function MOI.get(

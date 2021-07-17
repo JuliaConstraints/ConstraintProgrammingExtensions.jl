@@ -101,5 +101,5 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, CP.Strictly{MOI.GreaterThan{T}, T},
     },
 ) where {T}
-    return b.cons
+    return copy(b.cons)
 end

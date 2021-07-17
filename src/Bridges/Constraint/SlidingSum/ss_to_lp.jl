@@ -83,5 +83,5 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.Interval{T},
     },
 ) where {T}
-    return b.cons
+    return copy(b.cons)
 end

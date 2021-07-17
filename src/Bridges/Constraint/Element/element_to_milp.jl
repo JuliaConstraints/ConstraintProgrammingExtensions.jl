@@ -110,7 +110,7 @@ function MOI.get(
     b::Element2MILPBridge{T},
     ::MOI.ListOfVariableIndices,
 ) where {T}
-    return b.vars
+    return copy(b.vars)
 end
 
 function MOI.get(
@@ -119,7 +119,7 @@ function MOI.get(
         MOI.SingleVariable, MOI.ZeroOne,
     },
 ) where {T}
-    return b.vars_bin
+    return copy(b.vars_bin)
 end
 
 function MOI.get(

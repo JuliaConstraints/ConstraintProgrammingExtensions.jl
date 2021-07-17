@@ -103,7 +103,7 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, CP.Domain{T},
     },
 ) where {T}
-    return b.cons_domain
+    return copy(b.cons_domain)
 end
 
 function MOI.get(

@@ -107,7 +107,7 @@ function MOI.get(
         MOI.VectorAffineFunction{T}, CP.Membership,
     },
 ) where {T}
-    return b.cons_domain
+    return copy(b.cons_domain)
 end
 
 function MOI.get(

@@ -104,7 +104,7 @@ function MOI.get(
     b::Sort2SortPermutationBridge{T},
     ::MOI.ListOfVariableIndices,
 ) where {T}
-    return b.vars
+    return copy(b.vars)
 end
 
 function MOI.get(
@@ -113,7 +113,7 @@ function MOI.get(
         MOI.SingleVariable, MOI.Integer,
     },
 ) where {T}
-    return b.vars_int
+    return copy(b.vars_int)
 end
 
 function MOI.get(

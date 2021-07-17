@@ -156,7 +156,7 @@ function MOI.get(
     b::FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T},
     ::MOI.ListOfVariableIndices,
 ) where {T}
-    return b.capa_var
+    return copy(b.capa_var)
 end
 
 function MOI.get(
@@ -176,7 +176,7 @@ function MOI.get(
         MOI.Integer,
     },
 ) where {T}
-    return b.capa_con
+    return copy(b.capa_con)
 end
 
 function MOI.get(
@@ -186,5 +186,5 @@ function MOI.get(
         MOI.LessThan{T},
     },
 ) where {T}
-    return b.capa_bound
+    return copy(b.capa_bound)
 end

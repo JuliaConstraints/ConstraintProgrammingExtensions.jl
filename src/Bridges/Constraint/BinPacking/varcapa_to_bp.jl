@@ -109,5 +109,5 @@ function MOI.get(
         MOI.LessThan{T},
     },
 ) where {T}
-    return b.capa
+    return copy(b.capa)
 end

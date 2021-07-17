@@ -191,7 +191,7 @@ function MOI.get(
     b::ArgumentMinimumAmong2MILPBridge{T},
     ::MOI.ListOfVariableIndices,
 ) where {T}
-    return b.vars
+    return copy(b.vars)
 end
 
 function MOI.get(
@@ -200,7 +200,7 @@ function MOI.get(
         MOI.SingleVariable, MOI.ZeroOne,
     },
 ) where {T}
-    return b.vars_bin
+    return copy(b.vars_bin)
 end
 
 function MOI.get(
@@ -218,7 +218,7 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
 ) where {T}
-    return b.cons_lt
+    return copy(b.cons_lt)
 end
 
 function MOI.get(
@@ -227,5 +227,5 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
     },
 ) where {T}
-    return b.cons_gt
+    return copy(b.cons_gt)
 end

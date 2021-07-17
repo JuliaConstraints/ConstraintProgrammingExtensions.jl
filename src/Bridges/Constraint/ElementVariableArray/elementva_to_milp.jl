@@ -213,7 +213,7 @@ function MOI.get(
         MOI.SingleVariable, MOI.ZeroOne,
     },
 ) where {T}
-    return b.vars_unary_bin
+    return copy(b.vars_unary_bin)
 end
 
 function MOI.get(
@@ -222,7 +222,7 @@ function MOI.get(
         MOI.SingleVariable, MOI.Integer,
     },
 ) where {T}
-    return b.vars_product_int
+    return copy(b.vars_product_int)
 end
 
 function MOI.get(
@@ -240,7 +240,7 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
 ) where {T}
-    return b.con_product_lt
+    return copy(b.con_product_lt)
 end
 
 function MOI.get(
@@ -249,5 +249,5 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
     },
 ) where {T}
-    return b.con_product_gt
+    return copy(b.con_product_gt)
 end

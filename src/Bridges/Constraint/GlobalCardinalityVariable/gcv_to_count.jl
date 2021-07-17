@@ -92,5 +92,5 @@ function MOI.get(
         MOI.VectorAffineFunction{T}, CP.Count{MOI.EqualTo{T}},
     },
 ) where {T}
-    return b.cons_count
+    return copy(b.cons_count)
 end

@@ -139,7 +139,7 @@ function MOI.get(
     b::GlobalCardinality2GlobalCardinalityVariableBridge{T},
     ::MOI.ListOfVariableIndices,
 ) where {T}
-    return b.vars
+    return copy(b.vars)
 end
 
 function MOI.get(
@@ -148,7 +148,7 @@ function MOI.get(
         MOI.SingleVariable, MOI.Integer,
     },
 ) where {T}
-    return b.vars_int
+    return copy(b.vars_int)
 end
 
 function MOI.get(
@@ -157,7 +157,7 @@ function MOI.get(
         MOI.SingleVariable, MOI.EqualTo{T},
     },
 ) where {T}
-    return b.cons_eq
+    return copy(b.cons_eq)
 end
 
 function MOI.get(

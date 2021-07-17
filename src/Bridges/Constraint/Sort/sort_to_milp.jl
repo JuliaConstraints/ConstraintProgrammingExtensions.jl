@@ -220,7 +220,7 @@ function MOI.get(
         MOI.SingleVariable, MOI.ZeroOne,
     },
 ) where {T}
-    return b.vars_unicity_bin
+    return copy(b.vars_unicity_bin)
 end
 
 function MOI.get(

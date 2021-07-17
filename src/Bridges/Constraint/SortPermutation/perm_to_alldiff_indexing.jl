@@ -146,7 +146,7 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, CP.ElementVariableArray,
     },
 ) where {T}
-    return b.cons_value
+    return copy(b.cons_value)
 end
 
 function MOI.get(
@@ -155,5 +155,5 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
 ) where {T}
-    return b.cons_sort
+    return copy(b.cons_sort)
 end

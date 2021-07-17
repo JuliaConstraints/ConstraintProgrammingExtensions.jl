@@ -179,5 +179,5 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
     },
 ) where {T}
-    return b.cons_equivalence
+    return copy(b.cons_equivalence)
 end

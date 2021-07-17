@@ -162,7 +162,7 @@ function MOI.get(
         MOI.LessThan{T},
     },
 ) where {T}
-    return b.load_capacity
+    return copy(b.load_capacity)
 end
 
 function MOI.get(
@@ -172,5 +172,5 @@ function MOI.get(
         MOI.ZeroOne,
     },
 ) where {T}
-    return b.assign_con
+    return copy(b.assign_con)
 end

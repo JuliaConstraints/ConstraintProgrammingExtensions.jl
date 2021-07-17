@@ -205,7 +205,7 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
 ) where {T}
-    return b.cons_one_gt
+    return copy(b.cons_one_gt)
 end
 
 function MOI.get(

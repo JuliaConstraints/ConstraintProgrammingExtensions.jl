@@ -85,5 +85,5 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
 ) where {T}
-    return b.cons
+    return copy(b.cons)
 end
