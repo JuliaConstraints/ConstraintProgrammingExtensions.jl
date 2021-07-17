@@ -13,7 +13,7 @@
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
     @test MOI.supports_constraint(
         model,
-        MOI.ScalarAffineFunction{T},
+        MOI.VectorAffineFunction{T},
         CP.Reification{MOI.EqualTo{T}},
     )
     @test MOIB.supports_bridging_constraint(

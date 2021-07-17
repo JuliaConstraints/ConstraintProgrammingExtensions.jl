@@ -52,7 +52,7 @@ function MOIBC.bridge_constraint(
     vars_compare = Matrix{MOI.VariableIndex}(undef, s.dimension, length(values))
     vars_compare_bin = Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}(undef, s.dimension, length(values))
     for i in 1:s.dimension
-        vars_compare[i, :], vars_compare_bin[i, :] = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:s.length(values)])
+        vars_compare[i, :], vars_compare_bin[i, :] = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:length(values)])
     end
 
     # Upper-triangular matrix of constraints: i >= j, i.e. d(d-1)/2 elements:
