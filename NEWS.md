@@ -27,6 +27,8 @@ Add many new sets:
 
 Add many new bridges between high-level constraints, and also to MILP models.
 
+`Reified` has been renamed to `Reification` for consistency.
+
 
 Version 0.2.5
 -------------
