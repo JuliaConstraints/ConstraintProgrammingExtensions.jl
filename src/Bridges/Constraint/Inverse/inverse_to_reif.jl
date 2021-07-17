@@ -6,8 +6,8 @@ struct Inverse2ReificationBridge{T} <: MOIBC.AbstractBridge
     vars_first_bin::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
     vars_second::Matrix{MOI.VariableIndex}
     vars_second_bin::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
-    cons_first_reif::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}}}
-    cons_second_reif::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}}}
+    cons_first_reif::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}}
+    cons_second_reif::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}}
     cons_equivalence::Matrix{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
 end
 
@@ -48,8 +48,8 @@ function MOIBC.bridge_constraint(
     #     x_i    =    j     ⟺    y_j    =    i
     # \___ vars1[i, j] ___/    \___ vars2[i, j] ___/
 
-    cons_first_reif = Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}}}(undef, s.dimension, s.dimension)
-    cons_second_reif = Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}}}(undef, s.dimension, s.dimension)
+    cons_first_reif = Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}}(undef, s.dimension, s.dimension)
+    cons_second_reif = Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}}(undef, s.dimension, s.dimension)
     cons_equivalence = Matrix{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}(undef, s.dimension, s.dimension)
     
     for i in 1:s.dimension
@@ -62,7 +62,7 @@ function MOIBC.bridge_constraint(
                         f_x[i] - T(j)
                     ]
                 ),
-                CP.Reified(MOI.EqualTo(zero(T)))
+                CP.Reification(MOI.EqualTo(zero(T)))
             )
 
             cons_second_reif[i, j] = MOI.add_constraint(
@@ -73,7 +73,7 @@ function MOIBC.bridge_constraint(
                         f_y[j] - T(i)
                     ]
                 ),
-                CP.Reified(MOI.EqualTo(zero(T)))
+                CP.Reification(MOI.EqualTo(zero(T)))
             )
 
             cons_equivalence[i, j] = MOI.add_constraint(
@@ -104,7 +104,7 @@ end
 function MOIB.added_constraint_types(::Type{Inverse2ReificationBridge{T}}) where {T}
     return [
         (MOI.SingleVariable, MOI.ZeroOne),
-        (MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}),
+        (MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}),
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
     ]
 end
@@ -133,7 +133,7 @@ end
 function MOI.get(
     b::Inverse2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}},
+        MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}},
     },
 ) where {T}
     return length(b.cons_first_reif) + length(b.cons_second_reif)
@@ -167,7 +167,7 @@ end
 function MOI.get(
     b::Inverse2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}},
+        MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}},
     },
 ) where {T}
     return vcat(b.cons_first_reif, b.cons_second_reif)

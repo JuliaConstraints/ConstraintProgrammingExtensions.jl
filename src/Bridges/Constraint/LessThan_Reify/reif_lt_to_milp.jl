@@ -1,21 +1,21 @@
 _REIF_LT_FLOAT_EPSILON = 1.0e-5
 
 """
-Bridges `CP.Reified{MOI.LessThan}` to MILP constraints.
+Bridges `CP.Reification{MOI.LessThan}` to MILP constraints.
 """
-struct ReifiedLessThan2MILPBridge{T <: Real} <: MOIBC.AbstractBridge
+struct ReificationLessThan2MILPBridge{T <: Real} <: MOIBC.AbstractBridge
     con_bigm::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}
     con_smallm::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{ReifiedLessThan2MILPBridge{T}},
+    ::Type{ReificationLessThan2MILPBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.Reified{MOI.LessThan{T}},
+    s::CP.Reification{MOI.LessThan{T}},
 ) where {T}
     return MOIBC.bridge_constraint(
-        ReifiedLessThan2MILPBridge{T},
+        ReificationLessThan2MILPBridge{T},
         model,
         MOI.VectorAffineFunction{T}(f),
         s,
@@ -23,10 +23,10 @@ function MOIBC.bridge_constraint(
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{ReifiedLessThan2MILPBridge{T}},
+    ::Type{ReificationLessThan2MILPBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.Reified{MOI.LessThan{T}},
+    s::CP.Reification{MOI.LessThan{T}},
 ) where {T <: Real}
     f_scalars = MOIU.scalarize(f)
 
@@ -63,22 +63,22 @@ function MOIBC.bridge_constraint(
         MOI.GreaterThan(s.set.upper + smallm)
     )
 
-    return ReifiedLessThan2MILPBridge{T}(con_bigm, con_smallm)
+    return ReificationLessThan2MILPBridge{T}(con_bigm, con_smallm)
 end
 
 function MOI.supports_constraint(
-    ::Type{ReifiedLessThan2MILPBridge{T}},
+    ::Type{ReificationLessThan2MILPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Reified{MOI.LessThan{T}}},
+    ::Type{CP.Reification{MOI.LessThan{T}}},
 ) where {T <: Real}
     return true
 end
 
-function MOIB.added_constrained_variable_types(::Type{ReifiedLessThan2MILPBridge{T}}) where {T}
+function MOIB.added_constrained_variable_types(::Type{ReificationLessThan2MILPBridge{T}}) where {T}
     return Tuple{DataType}[]
 end
 
-function MOIB.added_constraint_types(::Type{ReifiedLessThan2MILPBridge{T}}) where {T}
+function MOIB.added_constraint_types(::Type{ReificationLessThan2MILPBridge{T}}) where {T}
     return [
         (MOI.VectorAffineFunction{T}, MOI.GreaterThan{T}),
         (MOI.VectorAffineFunction{T}, MOI.LessThan{T}),
@@ -86,19 +86,19 @@ function MOIB.added_constraint_types(::Type{ReifiedLessThan2MILPBridge{T}}) wher
 end
 
 function MOIBC.concrete_bridge_type(
-    ::Type{ReifiedLessThan2MILPBridge{T}},
+    ::Type{ReificationLessThan2MILPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Reified{MOI.LessThan{T}}},
+    ::Type{CP.Reification{MOI.LessThan{T}}},
 ) where {T <: Real}
-    return ReifiedLessThan2MILPBridge{T}
+    return ReificationLessThan2MILPBridge{T}
 end
 
-function MOI.get(::ReifiedLessThan2MILPBridge{T}, ::MOI.NumberOfVariables) where {T <: Real}
+function MOI.get(::ReificationLessThan2MILPBridge{T}, ::MOI.NumberOfVariables) where {T <: Real}
     return 0
 end
 
 function MOI.get(
-    ::ReifiedLessThan2MILPBridge{T},
+    ::ReificationLessThan2MILPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
@@ -107,7 +107,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    ::ReifiedLessThan2MILPBridge{T},
+    ::ReificationLessThan2MILPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
     },
@@ -116,7 +116,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::ReifiedLessThan2MILPBridge{T},
+    b::ReificationLessThan2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
@@ -125,7 +125,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::ReifiedLessThan2MILPBridge{T},
+    b::ReificationLessThan2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
     },

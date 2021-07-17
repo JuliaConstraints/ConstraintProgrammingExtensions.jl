@@ -146,17 +146,17 @@
         include("NonOverlappingOrthotopes/noov_to_disjunction_milp.jl")
     end
 
-    @testset "Reified{MOI.EqualTo}" begin
+    @testset "Reification{MOI.EqualTo}" begin
         include("EqualTo_Reify/reif_eqto_to_indic.jl")
         include("EqualTo_Reify/reif_eqto_to_milp.jl")
     end
 
-    @testset "Reified{MOI.GreaterThan}" begin
+    @testset "Reification{MOI.GreaterThan}" begin
         include("GreaterThan_Reify/reif_gt_to_indic.jl")
         include("GreaterThan_Reify/reif_gt_to_milp.jl")
     end
 
-    @testset "Reified{MOI.LessThan}" begin
+    @testset "Reification{MOI.LessThan}" begin
         include("LessThan_Reify/reif_lt_to_indic.jl")
         include("LessThan_Reify/reif_lt_to_milp.jl")
     end

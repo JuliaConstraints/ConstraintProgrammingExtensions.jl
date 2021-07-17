@@ -1,8 +1,8 @@
 @testset "Imply2Reification: $(fct_type), $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
     base_model = if T == Int
-        IntReifiedEqualToModel{T}()
+        IntReificationEqualToModel{T}()
     elseif T == Float64
-        FloatReifiedEqualToModel{T}()
+        FloatReificationEqualToModel{T}()
     else
         @assert false
     end
@@ -13,7 +13,7 @@
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.Reified{MOI.EqualTo{T}},
+        CP.Reification{MOI.EqualTo{T}},
     )
     @test MOIB.supports_bridging_constraint(
         model,
@@ -45,22 +45,22 @@
     bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Imply}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Reified) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Reification) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.SingleVariable, MOI.ZeroOne),
-            (MOI.VectorAffineFunction{T}, CP.Reified),
+            (MOI.VectorAffineFunction{T}, CP.Reification),
             (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 2
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == 2
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reified}()) == 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reification}()) == 2
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == 1
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.var_antecedent, bridge.var_consequent]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == [bridge.var_antecedent_bin, bridge.var_consequent_bin]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reified}()) == [bridge.con_reif_antecedent, bridge.con_reif_consequent]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reification}()) == [bridge.con_reif_antecedent, bridge.con_reif_consequent]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == [bridge.con_implication]
     end
 
@@ -80,7 +80,7 @@
         @test MOI.is_valid(model, bridge.con_reif_antecedent)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_reif_antecedent)
         @test length(f.terms) == 2
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_reif_antecedent) == CP.Reified(MOI.LessThan(one(T)))
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_reif_antecedent) == CP.Reification(MOI.LessThan(one(T)))
 
         t1 = f.terms[1]
         @test t1.output_index == 1
@@ -97,7 +97,7 @@
         @test MOI.is_valid(model, bridge.con_reif_consequent)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_reif_consequent)
         @test length(f.terms) == 2
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_reif_consequent) == CP.Reified(MOI.LessThan(zero(T)))
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_reif_consequent) == CP.Reification(MOI.LessThan(zero(T)))
 
         t1 = f.terms[1]
         @test t1.output_index == 1

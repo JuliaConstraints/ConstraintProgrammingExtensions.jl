@@ -1,6 +1,6 @@
-@testset "ReifiedLessThan2MILP: $(fct_type), type $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
+@testset "ReificationLessThan2MILP: $(fct_type), type $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
     mock = MOIU.MockOptimizer(MILPModel{T}())
-    model = COIB.ReifiedLessThan2MILP{T}(mock)
+    model = COIB.ReificationLessThan2MILP{T}(mock)
 
     if T == Int
         @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
@@ -13,12 +13,12 @@
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.Reified{MOI.LessThan{T}},
+        CP.Reification{MOI.LessThan{T}},
     )
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorOfVariables,
-        CP.Reified{MOI.LessThan{T}},
+        CP.Reification{MOI.LessThan{T}},
     )
 
     x, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
@@ -36,21 +36,21 @@
         @assert false
     end
 
-    @test_throws AssertionError MOI.add_constraint(model, fct, CP.Reified(MOI.LessThan(zero(T))))
+    @test_throws AssertionError MOI.add_constraint(model, fct, CP.Reification(MOI.LessThan(zero(T))))
     
     MOI.add_constraint(model, y, MOI.LessThan(5 * one(T)))
     MOI.add_constraint(model, y, MOI.GreaterThan(2 * one(T)))
 
-    c = MOI.add_constraint(model, fct, CP.Reified(MOI.LessThan(zero(T))))
+    c = MOI.add_constraint(model, fct, CP.Reification(MOI.LessThan(zero(T))))
 
     @test MOI.is_valid(model, x)
     @test MOI.is_valid(model, y)
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Reified{MOI.LessThan{T}}}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Reification{MOI.LessThan{T}}}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Reified{MOI.LessThan{T}}) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Reification{MOI.LessThan{T}}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.VectorAffineFunction{T}, MOI.GreaterThan{T}),

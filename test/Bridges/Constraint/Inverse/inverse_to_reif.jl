@@ -1,8 +1,8 @@
 @testset "Inverse2Reification: $(fct_type), dimension $(dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], dim in [2, 3], T in [Int, Float64]
     base_model = if T == Int
-        IntReifiedEqualToModel{T}()
+        IntReificationEqualToModel{T}()
     elseif T == Float64
-        FloatReifiedEqualToModel{T}()
+        FloatReificationEqualToModel{T}()
     else
         @assert false
     end
@@ -13,7 +13,7 @@
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.Reified{MOI.EqualTo{T}},
+        CP.Reification{MOI.EqualTo{T}},
     )
     @test MOIB.supports_bridging_constraint(
         model,
@@ -51,18 +51,18 @@
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.SingleVariable, MOI.ZeroOne),
-            (MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}),
+            (MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}),
             (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 2 * dim ^ 2
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == 2 * dim ^ 2
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}}()) == 2 * dim ^ 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}()) == 2 * dim ^ 2
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == dim ^ 2
 
         @test Set(MOI.get(bridge, MOI.ListOfVariableIndices())) == Set([bridge.vars_first..., bridge.vars_second...])
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}())) == Set([bridge.vars_first_bin..., bridge.vars_second_bin...])
-        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}}())) == Set([bridge.cons_first_reif..., bridge.cons_second_reif...])
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}())) == Set([bridge.cons_first_reif..., bridge.cons_second_reif...])
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == bridge.cons_equivalence
     end
 
@@ -99,7 +99,7 @@
                 f1 = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_first_reif[i, j])
                 @test length(f1.terms) == 2
                 @test f1.constants == T[zero(T), -T(j)]
-                @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_first_reif[i, j]) == CP.Reified(MOI.EqualTo(zero(T)))
+                @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_first_reif[i, j]) == CP.Reification(MOI.EqualTo(zero(T)))
 
                 t1 = f1.terms[1]
                 @test t1.output_index == 1
@@ -114,7 +114,7 @@
                 f2 = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_second_reif[i, j])
                 @test length(f2.terms) == 2
                 @test f2.constants == T[zero(T), -T(i)]
-                @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_second_reif[i, j]) == CP.Reified(MOI.EqualTo(zero(T)))
+                @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_second_reif[i, j]) == CP.Reification(MOI.EqualTo(zero(T)))
 
                 t1 = f2.terms[1]
                 @test t1.output_index == 1

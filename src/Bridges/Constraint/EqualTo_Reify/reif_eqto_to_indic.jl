@@ -1,20 +1,20 @@
 """
-Bridges `CP.Reified{MOI.EqualTo}` to indicator constraints, both with equality
+Bridges `CP.Reification{MOI.EqualTo}` to indicator constraints, both with equality
 and inequalities (CP.DifferentFrom).
 """
-struct ReifiedEqualTo2IndicatorBridge{T <: Real} <: MOIBC.AbstractBridge
+struct ReificationEqualTo2IndicatorBridge{T <: Real} <: MOIBC.AbstractBridge
     indic_true::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}
     indic_false::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{T}}}
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{ReifiedEqualTo2IndicatorBridge{T}},
+    ::Type{ReificationEqualTo2IndicatorBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.Reified{MOI.EqualTo{T}},
+    s::CP.Reification{MOI.EqualTo{T}},
 ) where {T}
     return MOIBC.bridge_constraint(
-        ReifiedEqualTo2IndicatorBridge{T},
+        ReificationEqualTo2IndicatorBridge{T},
         model,
         MOI.VectorAffineFunction{T}(f),
         s,
@@ -22,10 +22,10 @@ function MOIBC.bridge_constraint(
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{ReifiedEqualTo2IndicatorBridge{T}},
+    ::Type{ReificationEqualTo2IndicatorBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.Reified{MOI.EqualTo{T}},
+    s::CP.Reification{MOI.EqualTo{T}},
 ) where {T <: Real}
     indic_true = MOI.add_constraint(
         model, 
@@ -39,22 +39,22 @@ function MOIBC.bridge_constraint(
         # TODO: helper to build CP.\neq from MOI.EqTo, CP.Strictly from inequalities, like `!()`? 
     )
 
-    return ReifiedEqualTo2IndicatorBridge{T}(indic_true, indic_false)
+    return ReificationEqualTo2IndicatorBridge{T}(indic_true, indic_false)
 end
 
 function MOI.supports_constraint(
-    ::Type{ReifiedEqualTo2IndicatorBridge{T}},
+    ::Type{ReificationEqualTo2IndicatorBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Reified{MOI.EqualTo{T}}},
+    ::Type{CP.Reification{MOI.EqualTo{T}}},
 ) where {T <: Real}
     return true
 end
 
-function MOIB.added_constrained_variable_types(::Type{ReifiedEqualTo2IndicatorBridge{T}}) where {T <: Real}
+function MOIB.added_constrained_variable_types(::Type{ReificationEqualTo2IndicatorBridge{T}}) where {T <: Real}
     return Tuple{DataType}[]
 end
 
-function MOIB.added_constraint_types(::Type{ReifiedEqualTo2IndicatorBridge{T}}) where {T <: Real}
+function MOIB.added_constraint_types(::Type{ReificationEqualTo2IndicatorBridge{T}}) where {T <: Real}
     return [
         (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}),
         (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{T}}),
@@ -62,19 +62,19 @@ function MOIB.added_constraint_types(::Type{ReifiedEqualTo2IndicatorBridge{T}}) 
 end
 
 function MOIBC.concrete_bridge_type(
-    ::Type{ReifiedEqualTo2IndicatorBridge{T}},
+    ::Type{ReificationEqualTo2IndicatorBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Reified{MOI.EqualTo{T}}},
+    ::Type{CP.Reification{MOI.EqualTo{T}}},
 ) where {T <: Real}
-    return ReifiedEqualTo2IndicatorBridge{T}
+    return ReificationEqualTo2IndicatorBridge{T}
 end
 
-function MOI.get(::ReifiedEqualTo2IndicatorBridge{T}, ::MOI.NumberOfVariables) where {T <: Real}
+function MOI.get(::ReificationEqualTo2IndicatorBridge{T}, ::MOI.NumberOfVariables) where {T <: Real}
     return 0
 end
 
 function MOI.get(
-    ::ReifiedEqualTo2IndicatorBridge{T},
+    ::ReificationEqualTo2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}},
     },
@@ -83,7 +83,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    ::ReifiedEqualTo2IndicatorBridge{T},
+    ::ReificationEqualTo2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{T}},
     },
@@ -92,7 +92,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::ReifiedEqualTo2IndicatorBridge{T},
+    b::ReificationEqualTo2IndicatorBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}},
     },
@@ -101,7 +101,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::ReifiedEqualTo2IndicatorBridge{T},
+    b::ReificationEqualTo2IndicatorBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{T}},
     },

@@ -6,8 +6,8 @@ struct ValuePrecedence2ReificationBridge{T} <: MOIBC.AbstractBridge
     vars_reif_precv::Vector{MOI.VariableIndex}
     vars_reif_value_bin::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
     vars_reif_precv_bin::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
-    cons_reif_value::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}}} # Compare values from 2 to end.
-    cons_reif_precv::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}}} # Compare values from 1 to end-1.
+    cons_reif_value::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}} # Compare values from 2 to end.
+    cons_reif_precv::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}} # Compare values from 1 to end-1.
     cons_imply::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}
 end
 
@@ -36,7 +36,7 @@ function MOIBC.bridge_constraint(
     vars_reif_value, vars_reif_value_bin = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:(s.dimension - 1)])
     vars_reif_precv, vars_reif_precv_bin = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:(s.dimension - 1)])
 
-    cons_reif_value = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}}[
+    cons_reif_value = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}[
         MOI.add_constraint(
             model, 
             MOIU.vectorize(
@@ -45,12 +45,12 @@ function MOIBC.bridge_constraint(
                     f_scalars[i] - T(s.value),
                 ]
             ),
-            CP.Reified(MOI.EqualTo(zero(T)))
+            CP.Reification(MOI.EqualTo(zero(T)))
         )
         for i in 2:s.dimension
     ]
 
-    cons_reif_precv = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}}[
+    cons_reif_precv = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}[
         MOI.add_constraint(
             model, 
             MOIU.vectorize(
@@ -59,7 +59,7 @@ function MOIBC.bridge_constraint(
                     f_scalars[i] - T(s.before)
                 ]
             ),
-            CP.Reified(MOI.EqualTo(zero(T)))
+            CP.Reification(MOI.EqualTo(zero(T)))
         )
         for i in 1:(s.dimension - 1)
     ]
@@ -92,7 +92,7 @@ end
 function MOIB.added_constraint_types(::Type{ValuePrecedence2ReificationBridge{T}}) where {T}
     return [
         (MOI.SingleVariable, MOI.ZeroOne),
-        (MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}}),
+        (MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}),
         (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
     ]
 end
@@ -121,7 +121,7 @@ end
 function MOI.get(
     b::ValuePrecedence2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}},
+        MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}},
     },
 ) where {T}
     return length(b.cons_reif_value) + length(b.cons_reif_precv)
@@ -155,7 +155,7 @@ end
 function MOI.get(
     b::ValuePrecedence2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.Reified{MOI.EqualTo{T}},
+        MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}},
     },
 ) where {T}
     return vcat(b.cons_reif_value, b.cons_reif_precv)

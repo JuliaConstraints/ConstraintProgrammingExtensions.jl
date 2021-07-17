@@ -1,5 +1,5 @@
 """
-    Reified{S <: MOI.AbstractSet}(set::S)
+    Reification{S <: MOI.AbstractSet}(set::S)
 
 ``\\{(y, x) \\in \\{0, 1\\} \\times \\mathbb{R}^n | y = 1 \\iff x \\in set, y = 0 otherwise\\}``.
 
@@ -7,13 +7,13 @@ This set serves to find out whether a given constraint is satisfied.
 
 The only possible values are 0 and 1 for the first variable of the set.
 """
-struct Reified{S <: MOI.AbstractSet} <: MOI.AbstractVectorSet
+struct Reification{S <: MOI.AbstractSet} <: MOI.AbstractVectorSet
     set::S
 end
 
-MOI.dimension(set::Reified{S}) where {S} = 1 + MOI.dimension(set.set)
-copy(set::Reified{S}) where {S} = Reified(copy(set.set))
-Base.:(==)(x::Reified{S}, y::Reified{S}) where {S} = x.set == y.set
+MOI.dimension(set::Reification{S}) where {S} = 1 + MOI.dimension(set.set)
+copy(set::Reification{S}) where {S} = Reification(copy(set.set))
+Base.:(==)(x::Reification{S}, y::Reification{S}) where {S} = x.set == y.set
 
 """
     Equivalence{S1 <: MOI.AbstractSet, S2 <: MOI.AbstractSet}(set1::S1, 

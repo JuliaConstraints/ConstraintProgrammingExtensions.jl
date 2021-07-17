@@ -763,7 +763,7 @@
             end
         end
 
-        @testset "Constraints: CP.Reified{MOI.VectorOfVariables of integers in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
+        @testset "Constraints: CP.Reification{MOI.VectorOfVariables of integers in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
 
@@ -781,14 +781,14 @@
             # generating the model.
 
             # Add constraints. 
-            c1 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.EqualTo(2)))
-            c2 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.LessThan(2)))
+            c1 = MOI.add_constraint(m, [x, y], CP.Reification(MOI.EqualTo(2)))
+            c2 = MOI.add_constraint(m, [x, y], CP.Reification(MOI.LessThan(2)))
             c3 = MOI.add_constraint(
                 m,
                 [x, y],
-                CP.Reified(CP.Strictly(MOI.LessThan(2))),
+                CP.Reification(CP.Strictly(MOI.LessThan(2))),
             )
-            c4 = MOI.add_constraint(m, [x, y], CP.Reified(CP.DifferentFrom(2)))
+            c4 = MOI.add_constraint(m, [x, y], CP.Reification(CP.DifferentFrom(2)))
 
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
@@ -823,7 +823,7 @@
             end
         end
 
-        @testset "Constraints: CP.Reified{MOI.VectorOfVariables of floats in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
+        @testset "Constraints: CP.Reification{MOI.VectorOfVariables of floats in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
 
@@ -840,15 +840,15 @@
             # generating the model.
 
             # Add constraints. 
-            c1 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.EqualTo(2.0)))
-            c2 = MOI.add_constraint(m, [x, y], CP.Reified(MOI.LessThan(2.0)))
+            c1 = MOI.add_constraint(m, [x, y], CP.Reification(MOI.EqualTo(2.0)))
+            c2 = MOI.add_constraint(m, [x, y], CP.Reification(MOI.LessThan(2.0)))
             c3 = MOI.add_constraint(
                 m,
                 [x, y],
-                CP.Reified(CP.Strictly(MOI.LessThan(2.0))),
+                CP.Reification(CP.Strictly(MOI.LessThan(2.0))),
             )
             c4 =
-                MOI.add_constraint(m, [x, y], CP.Reified(CP.DifferentFrom(2.0)))
+                MOI.add_constraint(m, [x, y], CP.Reification(CP.DifferentFrom(2.0)))
 
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
@@ -883,7 +883,7 @@
             end
         end
 
-        @testset "Constraints: CP.Reified{MOI.VectorAffineFunction of integers in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
+        @testset "Constraints: CP.Reification{MOI.VectorAffineFunction of integers in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
 
@@ -915,14 +915,14 @@
                 [0, 0],
             )
 
-            c1 = MOI.add_constraint(m, vaf, CP.Reified(MOI.EqualTo(2)))
-            c2 = MOI.add_constraint(m, vaf, CP.Reified(MOI.LessThan(2)))
+            c1 = MOI.add_constraint(m, vaf, CP.Reification(MOI.EqualTo(2)))
+            c2 = MOI.add_constraint(m, vaf, CP.Reification(MOI.LessThan(2)))
             c3 = MOI.add_constraint(
                 m,
                 vaf,
-                CP.Reified(CP.Strictly(MOI.LessThan(2))),
+                CP.Reification(CP.Strictly(MOI.LessThan(2))),
             )
-            c4 = MOI.add_constraint(m, vaf, CP.Reified(CP.DifferentFrom(2)))
+            c4 = MOI.add_constraint(m, vaf, CP.Reification(CP.DifferentFrom(2)))
 
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
@@ -959,7 +959,7 @@
             end
         end
 
-        @testset "Constraints: CP.Reified{MOI.VectorAffineFunction of floats in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
+        @testset "Constraints: CP.Reification{MOI.VectorAffineFunction of floats in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
             m = CP.FlatZinc.Optimizer()
             @test MOI.is_empty(m)
 
@@ -990,14 +990,14 @@
                 [0.0, 0.0],
             )
 
-            c1 = MOI.add_constraint(m, vaf, CP.Reified(MOI.EqualTo(2.0)))
-            c2 = MOI.add_constraint(m, vaf, CP.Reified(MOI.LessThan(2.0)))
+            c1 = MOI.add_constraint(m, vaf, CP.Reification(MOI.EqualTo(2.0)))
+            c2 = MOI.add_constraint(m, vaf, CP.Reification(MOI.LessThan(2.0)))
             c3 = MOI.add_constraint(
                 m,
                 vaf,
-                CP.Reified(CP.Strictly(MOI.LessThan(2.0))),
+                CP.Reification(CP.Strictly(MOI.LessThan(2.0))),
             )
-            c4 = MOI.add_constraint(m, vaf, CP.Reified(CP.DifferentFrom(2.0)))
+            c4 = MOI.add_constraint(m, vaf, CP.Reification(CP.DifferentFrom(2.0)))
 
             @test MOI.is_valid(m, c1)
             @test MOI.is_valid(m, c2)
@@ -2072,7 +2072,7 @@
                       -1
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(0))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_eq_reif(3, x4, x1);",
@@ -2094,7 +2094,7 @@
                       1
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(3))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(3))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_eq_reif(x3, 4, x1);",
@@ -2116,7 +2116,7 @@
                       1
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x3
-                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(4))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(4))
 
                 CP.FlatZinc.parse_constraint!("constraint int_le(x3, x4);", m)
                 nc += 1
@@ -2178,7 +2178,7 @@
                       -1
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(0))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_le_reif(3, x4, x1);",
@@ -2200,7 +2200,7 @@
                       -1
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(-3))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(-3))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_le_reif(x3, 4, x1);",
@@ -2222,7 +2222,7 @@
                       1
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x3
-                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(4))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(4))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_lin_eq([2, 3], [x1, x2], 5);",
@@ -2265,7 +2265,7 @@
                       3
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x2
-                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(5))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(5))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_lin_le([2, 3], [x1, x2], 5);",
@@ -2308,7 +2308,7 @@
                       3
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x2
-                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(5))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(5))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_lin_ne([2, 3], [x1, x2], 5);",
@@ -2351,7 +2351,7 @@
                       3
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x2
-                @test m.constraint_info[nc].s == CP.Reified(CP.DifferentFrom(5))
+                @test m.constraint_info[nc].s == CP.Reification(CP.DifferentFrom(5))
 
                 CP.FlatZinc.parse_constraint!("constraint int_lt(x3, x4);", m)
                 nc += 1
@@ -2414,7 +2414,7 @@
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x4
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.Strictly(MOI.LessThan(0)))
+                      CP.Reification(CP.Strictly(MOI.LessThan(0)))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_lt_reif(3, x4, x1);",
@@ -2437,7 +2437,7 @@
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x4
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.Strictly(MOI.LessThan(-3)))
+                      CP.Reification(CP.Strictly(MOI.LessThan(-3)))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_lt_reif(x3, 4, x1);",
@@ -2460,7 +2460,7 @@
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x3
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.Strictly(MOI.LessThan(4)))
+                      CP.Reification(CP.Strictly(MOI.LessThan(4)))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_max(x1, x2, x3);",
@@ -2544,7 +2544,7 @@
                       -1
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(CP.DifferentFrom(0))
+                @test m.constraint_info[nc].s == CP.Reification(CP.DifferentFrom(0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_ne_reif(3, x4, x1);",
@@ -2566,7 +2566,7 @@
                       1
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(CP.DifferentFrom(3))
+                @test m.constraint_info[nc].s == CP.Reification(CP.DifferentFrom(3))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_ne_reif(x3, 4, x1);",
@@ -2588,7 +2588,7 @@
                       1
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x3
-                @test m.constraint_info[nc].s == CP.Reified(CP.DifferentFrom(4))
+                @test m.constraint_info[nc].s == CP.Reification(CP.DifferentFrom(4))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint int_plus(x1, x2, x3);",
@@ -2698,7 +2698,7 @@
                       -1
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(0))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint bool_eq_reif(3, x4, x1);",
@@ -2720,7 +2720,7 @@
                       1
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(3))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(3))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint bool_eq_reif(x3, 4, x1);",
@@ -2742,7 +2742,7 @@
                       1
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x3
-                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(4))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(4))
 
                 CP.FlatZinc.parse_constraint!("constraint bool_le(x3, x4);", m)
                 nc += 1
@@ -2804,7 +2804,7 @@
                       -1
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(0))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint bool_le_reif(3, x4, x1);",
@@ -2826,7 +2826,7 @@
                       -1
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(-3))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(-3))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint bool_le_reif(x3, 4, x1);",
@@ -2848,7 +2848,7 @@
                       1
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x3
-                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(4))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(4))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint bool_lin_eq([2, 3], [x1, x2], 5);",
@@ -2943,7 +2943,7 @@
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x4
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.Strictly(MOI.LessThan(0)))
+                      CP.Reification(CP.Strictly(MOI.LessThan(0)))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint bool_lt_reif(3, x4, x1);",
@@ -2966,7 +2966,7 @@
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x4
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.Strictly(MOI.LessThan(-3)))
+                      CP.Reification(CP.Strictly(MOI.LessThan(-3)))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint bool_lt_reif(x3, 4, x1);",
@@ -2989,7 +2989,7 @@
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x3
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.Strictly(MOI.LessThan(4)))
+                      CP.Reification(CP.Strictly(MOI.LessThan(4)))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint array_float_element(x3, [1.0, 2.0, 3.0], x5);",
@@ -3122,7 +3122,7 @@
                       -1.0
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(0.0))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(0.0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_eq_reif(3, x4, x1);",
@@ -3144,7 +3144,7 @@
                       1.0
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(3.0))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(3.0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_eq_reif(x3, 4, x1);",
@@ -3166,7 +3166,7 @@
                       1.0
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x3
-                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(4.0))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(4.0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_in(x5, 1.0, 2.0);",
@@ -3185,7 +3185,7 @@
                 @test length(m.constraint_info) == nc
                 @test m.constraint_info[nc].f == MOI.VectorOfVariables([x1, x5])
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(MOI.Interval(1.0, 2.0))
+                      CP.Reification(MOI.Interval(1.0, 2.0))
 
                 CP.FlatZinc.parse_constraint!("constraint float_le(x3, x4);", m)
                 nc += 1
@@ -3247,7 +3247,7 @@
                       -1.0
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(0.0))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(0.0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_le_reif(3.0, x4, x1);",
@@ -3269,7 +3269,7 @@
                       -1.0
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x4
-                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(-3.0))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(-3.0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_le_reif(x3, 4.0, x1);",
@@ -3291,7 +3291,7 @@
                       1.0
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x3
-                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(4.0))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(4.0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_lin_eq([2.0, 3.0], [x1, x2], 5.0);",
@@ -3334,7 +3334,7 @@
                       3.0
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x2
-                @test m.constraint_info[nc].s == CP.Reified(MOI.EqualTo(5.0))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(5.0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_lin_le([2.0, 3.0], [x1, x2], 5.0);",
@@ -3377,7 +3377,7 @@
                       3.0
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x2
-                @test m.constraint_info[nc].s == CP.Reified(MOI.LessThan(5.0))
+                @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(5.0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_lin_lt([2.0, 3.0], [x1, x2], 5.0);",
@@ -3421,7 +3421,7 @@
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x2
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.Strictly(MOI.LessThan(5.0)))
+                      CP.Reification(CP.Strictly(MOI.LessThan(5.0)))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_lin_ne([2.0, 3.0], [x1, x2], 5.0);",
@@ -3465,7 +3465,7 @@
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x2
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.DifferentFrom(5.0))
+                      CP.Reification(CP.DifferentFrom(5.0))
 
                 CP.FlatZinc.parse_constraint!("constraint float_lt(x3, x4);", m)
                 nc += 1
@@ -3534,7 +3534,7 @@
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x4
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.Strictly(MOI.LessThan(0.0)))
+                      CP.Reification(CP.Strictly(MOI.LessThan(0.0)))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_lt_reif(3.0, x4, x1);",
@@ -3557,7 +3557,7 @@
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x4
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.Strictly(MOI.LessThan(-3.0)))
+                      CP.Reification(CP.Strictly(MOI.LessThan(-3.0)))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_lt_reif(x3, 4.0, x1);",
@@ -3580,7 +3580,7 @@
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x3
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.Strictly(MOI.LessThan(4.0)))
+                      CP.Reification(CP.Strictly(MOI.LessThan(4.0)))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_max(x1, x2, x3);",
@@ -3671,7 +3671,7 @@
                 @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
                       x4
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.DifferentFrom(0.0))
+                      CP.Reification(CP.DifferentFrom(0.0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_ne_reif(3.0, x4, x1);",
@@ -3694,7 +3694,7 @@
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x4
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.DifferentFrom(3.0))
+                      CP.Reification(CP.DifferentFrom(3.0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_ne_reif(x3, 4.0, x1);",
@@ -3717,7 +3717,7 @@
                 @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
                       x3
                 @test m.constraint_info[nc].s ==
-                      CP.Reified(CP.DifferentFrom(4.0))
+                      CP.Reification(CP.DifferentFrom(4.0))
 
                 CP.FlatZinc.parse_constraint!(
                     "constraint float_plus(x1, x2, x3);",

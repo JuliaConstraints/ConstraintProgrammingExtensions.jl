@@ -8,7 +8,7 @@ struct Imply2ReificationBridge{T} <: MOIBC.AbstractBridge
     var_consequent_bin::MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}
     con_reif_antecedent::MOI.ConstraintIndex
     con_reif_consequent::MOI.ConstraintIndex
-    # Ideally, Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{<: MOI.AbstractSet}}}, 
+    # Ideally, Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{<: MOI.AbstractSet}}}, 
     # but Julia has no notion of type erasure.
     con_implication::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}
 end
@@ -45,7 +45,7 @@ function MOIBC.bridge_constraint(
                 f_scalars[1 : MOI.dimension(s.antecedent)]...,
             ]
         ),
-        CP.Reified(s.antecedent)
+        CP.Reification(s.antecedent)
     )
 
     con_reif_consequent = MOI.add_constraint(
@@ -56,7 +56,7 @@ function MOIBC.bridge_constraint(
                 f_scalars[(MOI.dimension(s.antecedent) + 1) : (MOI.dimension(s.antecedent) + MOI.dimension(s.consequent))]...,
             ]
         ),
-        CP.Reified(s.consequent)
+        CP.Reification(s.consequent)
     )
 
     # x ⟹ y is equivalent to ¬x ∨ y: 
@@ -88,7 +88,7 @@ end
 function MOIB.added_constraint_types(::Type{Imply2ReificationBridge{T}}) where {T}
     return [
         (MOI.SingleVariable, MOI.ZeroOne),
-        (MOI.VectorAffineFunction{T}, CP.Reified), # TODO: how to be more precise?
+        (MOI.VectorAffineFunction{T}, CP.Reification), # TODO: how to be more precise?
         (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
     ]
 end
@@ -117,7 +117,7 @@ end
 function MOI.get(
     ::Imply2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.Reified,
+        MOI.VectorAffineFunction{T}, CP.Reification,
     },
 ) where {T}
     return 2
@@ -151,7 +151,7 @@ end
 function MOI.get(
     b::Imply2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.Reified,
+        MOI.VectorAffineFunction{T}, CP.Reification,
     },
 ) where {T}
     return [b.con_reif_antecedent, b.con_reif_consequent]

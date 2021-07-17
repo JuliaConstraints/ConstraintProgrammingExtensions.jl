@@ -1,4 +1,4 @@
-@testset "Reified" begin
+@testset "Reification" begin
     mock = MOIU.MockOptimizer(MOIU.UniversalFallback(MOIU.Model{Int}()))
     config = MOIT.TestConfig()
 
@@ -7,5 +7,5 @@
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [0, 1])),
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [0, 1])),
     )
-    COIT.reifiedtest(mock, config)
+    COIT.reificationtest(mock, config)
 end

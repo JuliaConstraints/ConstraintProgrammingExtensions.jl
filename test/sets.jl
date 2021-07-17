@@ -581,7 +581,7 @@
         end
     end
 
-    @testset "$(S)" for S in [CP.Reified, CP.Negation]
+    @testset "$(S)" for S in [CP.Reification, CP.Negation]
         @test S(MOI.EqualTo(0.0)) == S(MOI.EqualTo(0.0))
         @test S(MOI.EqualTo(0.0)) != S(MOI.EqualTo(1.0))
         @test S(MOI.EqualTo(1.0)) != S(MOI.EqualTo(0.0))
@@ -592,7 +592,7 @@
         @test typeof(copy(s)) <: S
         @test copy(s) == s
 
-        if S == CP.Reified
+        if S == CP.Reification
             @test MOI.dimension(S(MOI.EqualTo(0.0))) ==
                   1 + MOI.dimension(MOI.EqualTo(0.0))
             @test MOI.dimension(S(MOI.GreaterThan(0.0))) ==

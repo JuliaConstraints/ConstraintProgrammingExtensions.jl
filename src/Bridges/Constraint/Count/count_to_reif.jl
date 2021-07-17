@@ -4,7 +4,7 @@ Bridges `CP.Count` to reification.
 struct Count2ReificationBridge{T, S <: MOI.AbstractScalarSet} <: MOIBC.AbstractBridge
     vars::Vector{MOI.VariableIndex}
     vars_bin::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
-    cons::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{S}}}
+    cons::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{S}}}
     con_sum::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
 end
 
@@ -31,7 +31,7 @@ function MOIBC.bridge_constraint(
     vars, vars_bin = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:s.dimension])
 
     f_scalars = MOIU.scalarize(f)
-    cons = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{S}}[
+    cons = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{S}}[
         MOI.add_constraint(
             model,
             MOIU.vectorize(
@@ -40,7 +40,7 @@ function MOIBC.bridge_constraint(
                     f_scalars[1 + i],
                 ]
             ),
-            CP.Reified(s.set)
+            CP.Reification(s.set)
         )
         for i in 1:s.dimension
     ]
@@ -69,7 +69,7 @@ end
 function MOIB.added_constraint_types(::Type{Count2ReificationBridge{T, S}}) where {T, S <: MOI.AbstractScalarSet}
     return [
         (MOI.SingleVariable, MOI.ZeroOne),
-        (MOI.VectorAffineFunction{T}, CP.Reified{S}),
+        (MOI.VectorAffineFunction{T}, CP.Reification{S}),
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
     ]
 end
@@ -98,7 +98,7 @@ end
 function MOI.get(
     b::Count2ReificationBridge{T, S},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.Reified{S},
+        MOI.VectorAffineFunction{T}, CP.Reification{S},
     },
 ) where {T, S <: MOI.AbstractScalarSet}
     return length(b.cons)
@@ -132,7 +132,7 @@ end
 function MOI.get(
     b::Count2ReificationBridge{T, S},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.Reified{S},
+        MOI.VectorAffineFunction{T}, CP.Reification{S},
     },
 ) where {T, S <: MOI.AbstractScalarSet}
     return b.cons

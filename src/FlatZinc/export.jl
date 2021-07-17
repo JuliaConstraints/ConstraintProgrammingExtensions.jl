@@ -308,10 +308,10 @@ function write_constraint(
     index::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
     s::Union{
-        CP.Reified{MOI.EqualTo{T}},
-        CP.Reified{MOI.LessThan{T}},
-        CP.Reified{CP.Strictly{MOI.LessThan{T}, T}},
-        CP.Reified{CP.DifferentFrom{T}},
+        CP.Reification{MOI.EqualTo{T}},
+        CP.Reification{MOI.LessThan{T}},
+        CP.Reification{CP.Strictly{MOI.LessThan{T}, T}},
+        CP.Reification{CP.DifferentFrom{T}},
     },
 ) where {T}
     # *_eq_reif, *_le_reif, *_lt_reif, *_ne_reif
@@ -332,10 +332,10 @@ function write_constraint(
     index::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction{T},
     s::Union{
-        CP.Reified{MOI.EqualTo{U}},
-        CP.Reified{MOI.LessThan{U}},
-        CP.Reified{CP.Strictly{MOI.LessThan{U}, U}},
-        CP.Reified{CP.DifferentFrom{T}},
+        CP.Reification{MOI.EqualTo{U}},
+        CP.Reification{MOI.LessThan{U}},
+        CP.Reification{CP.Strictly{MOI.LessThan{U}, U}},
+        CP.Reification{CP.DifferentFrom{T}},
     },
 ) where {T, U}
     # *_lin_eq_reif, *_lin_le_reif, *_lin_lt_reif, *_lin_ne_reif
@@ -461,7 +461,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::CP.Reified{MOI.LessThan{Int}},
+    s::CP.Reification{MOI.LessThan{Int}},
     ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
@@ -511,7 +511,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::CP.Reified{MOI.EqualTo{Int}},
+    s::CP.Reification{MOI.EqualTo{Int}},
     ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
@@ -529,7 +529,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
-    s::CP.Reified{MOI.EqualTo{Int}},
+    s::CP.Reification{MOI.EqualTo{Int}},
     ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
@@ -638,7 +638,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::CP.Reified{CP.DifferentFrom{Int}},
+    s::CP.Reification{CP.DifferentFrom{Int}},
     ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
@@ -657,7 +657,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
-    s::CP.Reified{CP.DifferentFrom{Int}},
+    s::CP.Reification{CP.DifferentFrom{Int}},
     ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
@@ -709,7 +709,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::CP.Reified{CP.Strictly{MOI.LessThan{Int}, Int}},
+    s::CP.Reification{CP.Strictly{MOI.LessThan{Int}, Int}},
     ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
@@ -728,7 +728,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
-    s::CP.Reified{CP.Strictly{MOI.LessThan{Int}, Int}},
+    s::CP.Reification{CP.Strictly{MOI.LessThan{Int}, Int}},
     ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
@@ -949,7 +949,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::CP.Reified{MOI.EqualTo{Float64}},
+    s::CP.Reification{MOI.EqualTo{Float64}},
     ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
@@ -1002,7 +1002,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
-    s::CP.Reified{MOI.EqualTo{Float64}},
+    s::CP.Reification{MOI.EqualTo{Float64}},
     ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
@@ -1067,7 +1067,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::CP.Reified{MOI.LessThan{Float64}},
+    s::CP.Reification{MOI.LessThan{Float64}},
     ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
@@ -1085,7 +1085,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
-    s::CP.Reified{MOI.LessThan{Int}},
+    s::CP.Reification{MOI.LessThan{Int}},
     ::Val{:int},
 )
     @assert MOI.output_dimension(f) == 2
@@ -1113,7 +1113,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
-    s::CP.Reified{MOI.LessThan{Float64}},
+    s::CP.Reification{MOI.LessThan{Float64}},
     ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
@@ -1154,7 +1154,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::CP.Reified{CP.Strictly{MOI.LessThan{Float64}, Float64}},
+    s::CP.Reification{CP.Strictly{MOI.LessThan{Float64}, Float64}},
     ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
@@ -1172,7 +1172,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
-    s::CP.Reified{CP.Strictly{MOI.LessThan{Float64}, Float64}},
+    s::CP.Reification{CP.Strictly{MOI.LessThan{Float64}, Float64}},
     ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
@@ -1224,7 +1224,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorOfVariables,
-    s::CP.Reified{CP.DifferentFrom{Float64}},
+    s::CP.Reification{CP.DifferentFrom{Float64}},
     ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2
@@ -1242,7 +1242,7 @@ function write_constraint(
     model::Optimizer,
     ::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction,
-    s::CP.Reified{CP.DifferentFrom{Float64}},
+    s::CP.Reification{CP.DifferentFrom{Float64}},
     ::Val{:float},
 )
     @assert MOI.output_dimension(f) == 2

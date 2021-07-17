@@ -11,7 +11,7 @@ struct IfThenElse2ReificationBridge{T} <: MOIBC.AbstractBridge
     con_reif_condition::MOI.ConstraintIndex
     con_reif_true::MOI.ConstraintIndex
     con_reif_false::MOI.ConstraintIndex
-    # Ideally, Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{<: MOI.AbstractSet}}}, 
+    # Ideally, Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{<: MOI.AbstractSet}}}, 
     # but Julia has no notion of type erasure.
     con_if::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}
     con_else::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}
@@ -52,7 +52,7 @@ function MOIBC.bridge_constraint(
                 f_scalars[idx_beg : idx_end]...,
             ]
         ),
-        CP.Reified(s.condition)
+        CP.Reification(s.condition)
     )
 
     idx_beg = idx_end + 1
@@ -65,7 +65,7 @@ function MOIBC.bridge_constraint(
                 f_scalars[idx_beg : idx_end]...,
             ]
         ),
-        CP.Reified(s.true_constraint)
+        CP.Reification(s.true_constraint)
     )
 
     idx_beg = idx_end + 1
@@ -78,7 +78,7 @@ function MOIBC.bridge_constraint(
                 f_scalars[idx_beg : idx_end]...,
             ]
         ),
-        CP.Reified(s.false_constraint)
+        CP.Reification(s.false_constraint)
     )
 
     # (x ⟹ y) ∧ (¬x ⟹ z) is equivalent to (¬x ∨ y) ∧ (x ∨ z): 
@@ -117,7 +117,7 @@ end
 function MOIB.added_constraint_types(::Type{IfThenElse2ReificationBridge{T}}) where {T}
     return [
         (MOI.SingleVariable, MOI.ZeroOne),
-        (MOI.VectorAffineFunction{T}, CP.Reified), # TODO: how to be more precise?
+        (MOI.VectorAffineFunction{T}, CP.Reification), # TODO: how to be more precise?
         (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
     ]
 end
@@ -146,7 +146,7 @@ end
 function MOI.get(
     ::IfThenElse2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.Reified,
+        MOI.VectorAffineFunction{T}, CP.Reification,
     },
 ) where {T}
     return 3
@@ -180,7 +180,7 @@ end
 function MOI.get(
     b::IfThenElse2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.Reified,
+        MOI.VectorAffineFunction{T}, CP.Reification,
     },
 ) where {T}
     return [b.con_reif_condition, b.con_reif_true, b.con_reif_false]

@@ -4,5 +4,5 @@ All the constraints that are currently supported by [ConstraintSolver.jl](https:
 - `TableSetInternal`: 
 - `NotEqualTo`: `DifferentFrom`
 - `Strictly`: `Strictly`
-- `ReifiedSet`: `Reified`
+- `ReifiedSet`: `Reification`
 - `BoolSet`: not yet (Boolean functions)

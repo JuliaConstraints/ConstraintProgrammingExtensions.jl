@@ -737,18 +737,18 @@ function add_constraint_to_model(
             if cons_verb == Val(FznIntEqReif) ||
                cons_verb == Val(FznBoolEqReif) ||
                cons_verb == Val(FznFloatEqReif)
-                CP.Reified(MOI.EqualTo(zero(type)))
+                CP.Reification(MOI.EqualTo(zero(type)))
             elseif cons_verb == Val(FznIntLeReif) ||
                    cons_verb == Val(FznBoolLeReif) ||
                    cons_verb == Val(FznFloatLeReif)
-                CP.Reified(MOI.LessThan(zero(type)))
+                CP.Reification(MOI.LessThan(zero(type)))
             elseif cons_verb == Val(FznIntLtReif) ||
                    cons_verb == Val(FznBoolLtReif) ||
                    cons_verb == Val(FznFloatLtReif)
-                CP.Reified(CP.Strictly(MOI.LessThan(zero(type))))
+                CP.Reification(CP.Strictly(MOI.LessThan(zero(type))))
             elseif cons_verb == Val(FznIntNeReif) ||
                    cons_verb == Val(FznFloatNeReif)
-                CP.Reified(CP.DifferentFrom(zero(type)))
+                CP.Reification(CP.DifferentFrom(zero(type)))
             end
 
         return MOI.add_constraint(
@@ -798,18 +798,18 @@ function add_constraint_to_model(
         if cons_verb == Val(FznIntEqReif) ||
            cons_verb == Val(FznBoolEqReif) ||
            cons_verb == Val(FznFloatEqReif)
-            CP.Reified(MOI.EqualTo(rhs_coeff * moi_rhs))
+            CP.Reification(MOI.EqualTo(rhs_coeff * moi_rhs))
         elseif cons_verb == Val(FznIntLeReif) ||
                cons_verb == Val(FznBoolLeReif) ||
                cons_verb == Val(FznFloatLeReif)
-            CP.Reified(MOI.LessThan(rhs_coeff * moi_rhs))
+            CP.Reification(MOI.LessThan(rhs_coeff * moi_rhs))
         elseif cons_verb == Val(FznIntLtReif) ||
                cons_verb == Val(FznBoolLtReif) ||
                cons_verb == Val(FznFloatLtReif)
-            CP.Reified(CP.Strictly(MOI.LessThan(rhs_coeff * moi_rhs)))
+            CP.Reification(CP.Strictly(MOI.LessThan(rhs_coeff * moi_rhs)))
         elseif cons_verb == Val(FznIntNeReif) ||
                cons_verb == Val(FznFloatNeReif)
-            CP.Reified(CP.DifferentFrom(rhs_coeff * moi_rhs))
+            CP.Reification(CP.DifferentFrom(rhs_coeff * moi_rhs))
         end
 
     return MOI.add_constraint(
@@ -995,15 +995,15 @@ function add_constraint_to_model(
         moi_set =
             if cons_verb == Val(FznIntLinEqReif) ||
                cons_verb == Val(FznFloatLinEqReif)
-                CP.Reified(MOI.EqualTo(cst))
+                CP.Reification(MOI.EqualTo(cst))
             elseif cons_verb == Val(FznIntLinLeReif) ||
                    cons_verb == Val(FznFloatLinLeReif)
-                CP.Reified(MOI.LessThan(cst))
+                CP.Reification(MOI.LessThan(cst))
             elseif cons_verb == Val(FznFloatLinLtReif)
-                CP.Reified(CP.Strictly(MOI.LessThan(cst)))
+                CP.Reification(CP.Strictly(MOI.LessThan(cst)))
             elseif cons_verb == Val(FznIntLinNeReif) ||
                    cons_verb == Val(FznFloatLinNeReif)
-                CP.Reified(CP.DifferentFrom(cst))
+                CP.Reification(CP.DifferentFrom(cst))
             end
 
         return MOI.add_constraint(model, moi_fct, moi_set)
@@ -1199,7 +1199,7 @@ function add_constraint_to_model(::Val{FznFloatInReif}, args, model::Optimizer)
     return MOI.add_constraint(
         model,
         MOI.VectorOfVariables([moi_bool_var, moi_var]),
-        CP.Reified(MOI.Interval(bound_min, bound_max)),
+        CP.Reification(MOI.Interval(bound_min, bound_max)),
     )
 end
 

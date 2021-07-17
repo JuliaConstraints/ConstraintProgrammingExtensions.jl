@@ -1,8 +1,8 @@
 @testset "IfThenElse2Reification: $(fct_type), $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
     base_model = if T == Int
-        IntReifiedEqualToModel{T}()
+        IntReificationEqualToModel{T}()
     elseif T == Float64
-        FloatReifiedEqualToModel{T}()
+        FloatReificationEqualToModel{T}()
     else
         @assert false
     end
@@ -13,7 +13,7 @@
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.Reified{MOI.EqualTo{T}},
+        CP.Reification{MOI.EqualTo{T}},
     )
     @test MOIB.supports_bridging_constraint(
         model,
@@ -52,18 +52,18 @@
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.SingleVariable, MOI.ZeroOne),
-            (MOI.VectorAffineFunction{T}, CP.Reified),
+            (MOI.VectorAffineFunction{T}, CP.Reification),
             (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 3
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == 3
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reified}()) == 3
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reification}()) == 3
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == 2
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.var_condition, bridge.var_true, bridge.var_false]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == [bridge.var_condition_bin, bridge.var_true_bin, bridge.var_false_bin]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reified}()) == [bridge.con_reif_condition, bridge.con_reif_true, bridge.con_reif_false]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reification}()) == [bridge.con_reif_condition, bridge.con_reif_true, bridge.con_reif_false]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == [bridge.con_if, bridge.con_else]
     end
 
@@ -88,7 +88,7 @@
         @test MOI.is_valid(model, bridge.con_reif_condition)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_reif_condition)
         @test length(f.terms) == 2
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_reif_condition) == CP.Reified(MOI.LessThan(one(T)))
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_reif_condition) == CP.Reification(MOI.LessThan(one(T)))
 
         t1 = f.terms[1]
         @test t1.output_index == 1
@@ -105,7 +105,7 @@
         @test MOI.is_valid(model, bridge.con_reif_true)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_reif_true)
         @test length(f.terms) == 2
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_reif_true) == CP.Reified(MOI.LessThan(zero(T)))
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_reif_true) == CP.Reification(MOI.LessThan(zero(T)))
 
         t1 = f.terms[1]
         @test t1.output_index == 1
@@ -122,7 +122,7 @@
         @test MOI.is_valid(model, bridge.con_reif_false)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_reif_false)
         @test length(f.terms) == 2
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_reif_false) == CP.Reified(MOI.LessThan(zero(T)))
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_reif_false) == CP.Reification(MOI.LessThan(zero(T)))
 
         t1 = f.terms[1]
         @test t1.output_index == 1

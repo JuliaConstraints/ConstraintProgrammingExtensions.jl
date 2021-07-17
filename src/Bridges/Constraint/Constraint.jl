@@ -109,20 +109,20 @@ const ElementVariableArray2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ElementVariableArray2MILPBridge{T}, OT}
 
 include("EqualTo_Reify/reif_eqto_to_indic.jl")
-const ReifiedEqualTo2Indicator{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{ReifiedEqualTo2IndicatorBridge{T}, OT}
+const ReificationEqualTo2Indicator{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ReificationEqualTo2IndicatorBridge{T}, OT}
 
 include("EqualTo_Reify/reif_eqto_to_milp.jl")
-const ReifiedEqualTo2MILP{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{ReifiedEqualTo2MILPBridge{T}, OT}
+const ReificationEqualTo2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ReificationEqualTo2MILPBridge{T}, OT}
 
 include("GreaterThan_Reify/reif_gt_to_indic.jl")
-const ReifiedGreaterThan2Indicator{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{ReifiedGreaterThan2IndicatorBridge{T}, OT}
+const ReificationGreaterThan2Indicator{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ReificationGreaterThan2IndicatorBridge{T}, OT}
 
 include("GreaterThan_Reify/reif_gt_to_milp.jl")
-const ReifiedGreaterThan2MILP{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{ReifiedGreaterThan2MILPBridge{T}, OT}
+const ReificationGreaterThan2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ReificationGreaterThan2MILPBridge{T}, OT}
 
 include("GlobalCardinality/gc_to_count.jl")
 const GlobalCardinality2Count{T, OT <: MOI.ModelLike} =
@@ -177,12 +177,12 @@ const VariableCapacityValuedKnapsack2VariableCapacityKnapsack{T, OT <: MOI.Model
     MOIBC.SingleBridgeOptimizer{VariableCapacityValuedKnapsack2VariableCapacityKnapsackBridge{T}, OT}
 
 include("LessThan_Reify/reif_lt_to_indic.jl")
-const ReifiedLessThan2Indicator{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{ReifiedLessThan2IndicatorBridge{T}, OT}
+const ReificationLessThan2Indicator{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ReificationLessThan2IndicatorBridge{T}, OT}
 
 include("LessThan_Reify/reif_lt_to_milp.jl")
-const ReifiedLessThan2MILP{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{ReifiedLessThan2MILPBridge{T}, OT}
+const ReificationLessThan2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ReificationLessThan2MILPBridge{T}, OT}
 
 include("LexicographicallyGreaterThan/lgt_to_indic.jl")
 const LexicographicallyGreaterThan2Indicator{T, OT <: MOI.ModelLike} =

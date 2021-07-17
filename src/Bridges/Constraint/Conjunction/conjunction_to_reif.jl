@@ -5,7 +5,7 @@ struct Conjunction2ReificationBridge{T} <: MOIBC.AbstractBridge
     var::MOI.VariableIndex
     var_bin::MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}
     cons_reif::Vector{MOI.ConstraintIndex}
-    # Ideally, Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reified{<: MOI.AbstractSet}}}, 
+    # Ideally, Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{<: MOI.AbstractSet}}}, 
     # but Julia has no notion of type erasure.
     con_conjunction::MOI.ConstraintIndex{MOI.SingleVariable, MOI.EqualTo{T}}
 end
@@ -44,7 +44,7 @@ function MOIBC.bridge_constraint(
                     f_scalars[cur_dim : (cur_dim + MOI.dimension(s.constraints[i]) - 1)]...,
                 ]
             ),
-            CP.Reified(s.constraints[i])
+            CP.Reification(s.constraints[i])
         )
         cur_dim += MOI.dimension(s.constraints[i])
     end
@@ -66,7 +66,7 @@ function MOI.supports_constraint(
     return true
     # Ideally, ensure that the underlying solver supports all the needed 
     # reified constraints:
-    # return all(MOI.supports_constraint(model, type, CP.Reified{C}) for C in S.parameters)
+    # return all(MOI.supports_constraint(model, type, CP.Reification{C}) for C in S.parameters)
 end
 
 function MOIB.added_constrained_variable_types(::Type{Conjunction2ReificationBridge{T}}) where {T}
@@ -76,7 +76,7 @@ end
 function MOIB.added_constraint_types(::Type{Conjunction2ReificationBridge{T}}) where {T}
     return [
         (MOI.SingleVariable, MOI.ZeroOne),
-        (MOI.VectorAffineFunction{T}, CP.Reified), # TODO: how to be more precise?
+        (MOI.VectorAffineFunction{T}, CP.Reification), # TODO: how to be more precise?
         (MOI.SingleVariable, MOI.EqualTo{T}),
     ]
 end
@@ -105,7 +105,7 @@ end
 function MOI.get(
     b::Conjunction2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.Reified,
+        MOI.VectorAffineFunction{T}, CP.Reification,
     },
 ) where {T}
     return length(b.cons_reif)
@@ -139,7 +139,7 @@ end
 function MOI.get(
     b::Conjunction2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.Reified,
+        MOI.VectorAffineFunction{T}, CP.Reification,
     },
 ) where {T}
     return b.cons_reif

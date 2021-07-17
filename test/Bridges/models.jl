@@ -998,7 +998,7 @@ MOIU.@model(
 # Reification of equal-to.
 
 MOIU.@model(
-    FloatReifiedEqualToModel,
+    FloatReificationEqualToModel,
     (),
     (
         MOI.EqualTo, 
@@ -1021,8 +1021,8 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
-        CP.Reified{MOI.EqualTo{Float64}},
-        CP.Reified{MOI.LessThan{Float64}},
+        CP.Reification{MOI.EqualTo{Float64}},
+        CP.Reification{MOI.LessThan{Float64}},
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),
@@ -1032,7 +1032,7 @@ MOIU.@model(
 )
 
 MOIU.@model(
-    IntReifiedEqualToModel,
+    IntReificationEqualToModel,
     (),
     (
         MOI.EqualTo, 
@@ -1055,8 +1055,8 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
-        CP.Reified{MOI.EqualTo{Int}},
-        CP.Reified{MOI.LessThan{Int}},
+        CP.Reification{MOI.EqualTo{Int}},
+        CP.Reification{MOI.LessThan{Int}},
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),
