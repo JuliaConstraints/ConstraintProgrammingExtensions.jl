@@ -35,7 +35,8 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, CP.AllDifferentExceptConstants(dim, Set([zero(T), one(T)])))
+    values_set = Set([zero(T), one(T)])
+    c = MOI.add_constraint(model, fct, CP.AllDifferentExceptConstants(dim, values_set))
 
     for i in 1:dim
         @test MOI.is_valid(model, x[i])
@@ -44,16 +45,28 @@
 
     bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.AllDifferentExceptConstants}(-1)]
 
-    # @testset "Bridge properties" begin
-    #     @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.AllDifferentExceptConstants) == typeof(bridge)
-    #     @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
-    #     @test MOIB.added_constraint_types(typeof(bridge)) == [(MOI.VectorAffineFunction{T}, CP.Disjunction)]
+    @testset "Bridge properties" begin
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.AllDifferentExceptConstants) == typeof(bridge)
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
+        @test MOIB.added_constraint_types(typeof(bridge)) == [
+            (MOI.SingleVariable, MOI.ZeroOne),
+            (MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}),
+            (MOI.ScalarAffineFunction{T}, CP.Reification{CP.DifferentFrom{T}}),
+            (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
+        ]
 
-    #     @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
-    #     @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Disjunction}()) == dim * (dim - 1) / 2
+        @test MOI.get(bridge, MOI.NumberOfVariables()) == dim * length(values_set) + dim * (dim - 1) / 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == dim * length(values_set) + dim * (dim - 1) / 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}()) == dim * length(values_set)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, CP.Reification{CP.DifferentFrom{T}}}()) == dim * (dim - 1) / 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == dim * (dim - 1) / 2
 
-    #     @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Disjunction}())) == Set(collect(values(bridge.cons)))
-    # end
+        @test Set(MOI.get(bridge, MOI.ListOfVariableIndices())) == Set([vec(collect(values(bridge.vars_compare)))..., vec(collect(values(bridge.vars_different)))...])
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}())) == Set([vec(collect(values(bridge.vars_compare_bin)))..., vec(collect(values(bridge.vars_different_bin)))...])
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}())) == Set(vec(bridge.cons_compare_reif))
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, CP.Reification{CP.DifferentFrom{T}}}())) == Set(collect(values(bridge.cons_different_reif)))
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}())) == Set(collect(values(bridge.cons)))
+    end
 
     # @testset "Set of constraints" begin
     #     @test length(bridge.cons) == dim * (dim - 1) / 2
