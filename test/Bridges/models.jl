@@ -1100,6 +1100,8 @@ MOIU.@model(
         CP.Disjunction{NTuple{4, MOI.EqualTo{Float64}}},
         CP.Disjunction{NTuple{6, MOI.EqualTo{Int}}},
         CP.Disjunction{NTuple{6, MOI.EqualTo{Float64}}},
+        CP.Disjunction{Tuple{CP.Domain{Int}, CP.Domain{Int}, CP.DifferentFrom{Int}}},
+        CP.Disjunction{Tuple{CP.Domain{Float64}, CP.Domain{Float64}, CP.DifferentFrom{Float64}}},
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),

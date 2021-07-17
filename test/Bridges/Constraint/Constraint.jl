@@ -7,6 +7,10 @@
         include("AllDifferent/ad_to_neq.jl")
     end
 
+    @testset "AllDifferentExceptConstants" begin
+        include("AllDifferentExceptConstants/adec_to_disjunction.jl")
+    end
+
     @testset "AllEqual" begin
         include("AllEqual/alleq_to_eq.jl")
     end
