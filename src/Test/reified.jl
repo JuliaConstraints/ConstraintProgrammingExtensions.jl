@@ -79,4 +79,4 @@ const reificationtests = Dict(
     "reification_scalaraffinefunction" => reification_scalaraffinefunction_test,
 )
 
-MOIT.@moitestset reificationtests
+MOIT.@moitestset reification
