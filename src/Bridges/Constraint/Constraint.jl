@@ -10,6 +10,10 @@ include("AllDifferentExceptConstants/adec_to_disjunction.jl")
 const AllDifferentExceptConstants2ConjunctionDisjunction{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{AllDifferentExceptConstants2ConjunctionDisjunctionBridge{T}, OT}
 
+include("AllDifferentExceptConstants/adec_to_reif.jl")
+const AllDifferentExceptConstants2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{AllDifferentExceptConstants2ReificationBridge{T}, OT}
+
 include("AllEqual/alleq_to_eq.jl")
 const AllEqual2EqualTo{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{AllEqual2EqualToBridge{T}, OT}
