@@ -256,6 +256,10 @@ include("SymmetricAllDifferent/salldiff_to_alldiff_inverse.jl")
 const SymmetricAllDifferent2AllDifferentInverse{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{SymmetricAllDifferent2AllDifferentInverseBridge{T}, OT}
 
+include("ValuePrecedence/vprec_to_reif.jl")
+const ValuePrecedence2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ValuePrecedence2ReificationBridge{T}, OT}
+
 include("VectorDomain/vd_to_milp.jl")
 const VectorDomain2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{VectorDomain2MILPBridge{T}, OT}
