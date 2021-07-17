@@ -34,6 +34,6 @@ include("FlatZinc/FlatZinc.jl")
 include("XCSP/XCSP.jl")
 
 # Compatibility layer.
-@deprecate Reified Reification ex=false
+@deprecate Reified Reification false
 
 end
