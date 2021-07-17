@@ -39,8 +39,11 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
         * Also available [as a function](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse_fn.mzn).
         * [`inverse_in_range`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse_in_range.mzn): [?](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_inverse_in_range.mzn).
     * Sliding sum: `CP.SlidingSum`
-        * [`sliding_sum`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/sliding_sum.mzn): [quite complex mapping](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_sliding_sum.mzn)
-        * [`sliding_sum_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/sliding_sum.mzn): similar, [with an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_sliding_sum_reif.mzn)
+        * [`sliding_sum`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/sliding_sum.mzn): [quite complex mapping](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_sliding_sum.mzn).
+        * [`sliding_sum_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/sliding_sum.mzn): similar, [with an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_sliding_sum_reif.mzn).
+    * Precedence: `CP.ValuePrecedence`
+        * [`value_precede`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/value_precede.mzn): [several reifications)(https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_value_precede_int.mzn).
+        * [No reified variant)(https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_value_precede_int_reif.mzn).
 * Combinatorial sets:
     * Bin packing: 
         * Raw: `CP.BinPacking` (with supplementary load variables)
