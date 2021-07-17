@@ -68,35 +68,112 @@
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}())) == Set(collect(values(bridge.cons)))
     end
 
-    # @testset "Set of constraints" begin
-    #     @test length(bridge.cons) == dim * (dim - 1) / 2
-    #     for i in 1:dim
-    #         for j in (i+1):dim
-    #             @test MOI.is_valid(model, bridge.cons[i, j])
-    #             @test MOI.get(model, MOI.ConstraintSet(), bridge.cons[i, j]) == CP.Disjunction((CP.Domain(Set([zero(T), one(T)])), CP.Domain(Set([zero(T), one(T)])), CP.DifferentFrom(zero(T))))
-    #             f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons[i, j])
-    #             @test length(f.terms) == 4
+    @testset "Set of variables" begin
+        @test length(bridge.vars_compare) == dim * length(values_set)
+        @test length(bridge.vars_compare_bin) == dim * length(values_set)
 
-    #             t1 = f.terms[1]
-    #             @test t1.output_index == 1
-    #             @test t1.scalar_term.coefficient === one(T)
-    #             @test t1.scalar_term.variable_index == x[i]
+        for i in 1:dim
+            for j in 1:2
+                @test MOI.is_valid(model, bridge.vars_compare[i, j])
+                @test MOI.is_valid(model, bridge.vars_compare_bin[i, j])
+            end
+            for j in 3:dim
+                @test (i, j) ∉ keys(bridge.vars_compare)
+                @test (i, j) ∉ keys(bridge.vars_compare_bin)
+            end
+        end
 
-    #             t2 = f.terms[2]
-    #             @test t2.output_index == 2
-    #             @test t2.scalar_term.coefficient === one(T)
-    #             @test t2.scalar_term.variable_index == x[j]
+        @test length(bridge.vars_different) == dim * (dim - 1) / 2
+        @test length(bridge.vars_different_bin) == dim * (dim - 1) / 2
 
-    #             t3 = f.terms[3]
-    #             @test t3.output_index == 3
-    #             @test t3.scalar_term.coefficient === one(T)
-    #             @test t3.scalar_term.variable_index == x[i]
+        for i in 1:dim
+            for j in 1:i
+                @test (i, j) ∉ keys(bridge.vars_different)
+                @test (i, j) ∉ keys(bridge.vars_different_bin)
+            end
+            for j in (i + 1):dim
+                @test MOI.is_valid(model, bridge.vars_different[i, j])
+                @test MOI.is_valid(model, bridge.vars_different_bin[i, j])
+            end
+        end
+    end
 
-    #             t4 = f.terms[4]
-    #             @test t4.output_index == 3
-    #             @test t4.scalar_term.coefficient === -one(T)
-    #             @test t4.scalar_term.variable_index == x[j]
-    #         end
-    #     end
-    # end
+    @testset "Compare array values to excluded values" begin
+        @test length(bridge.cons_compare_reif) == dim * length(values_set)
+
+        for i in 1:dim
+            for j in 1:length(values_set)
+                @test MOI.is_valid(model, bridge.cons_compare_reif[i, j])
+                @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_compare_reif[i, j]) == CP.Reification(MOI.EqualTo(zero(T)))
+                f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_compare_reif[i, j])
+                @test length(f.terms) == 2
+                @test f.constants == [zero(T), -T(j - 1)]
+                
+                t1 = f.terms[1]
+                @test t1.output_index == 1
+                @test t1.scalar_term.coefficient === one(T)
+                @test t1.scalar_term.variable_index == bridge.vars_compare[i, j]
+
+                t2 = f.terms[2]
+                @test t2.output_index == 2
+                @test t2.scalar_term.coefficient === one(T)
+                @test t2.scalar_term.variable_index == x[i]
+            end
+        end
+    end
+
+    @testset "Compare array variables" begin
+        @test length(bridge.cons_different_reif) == dim * (dim - 1) / 2
+
+        for i in 1:dim
+            for j in (i+1):dim
+                @test MOI.is_valid(model, bridge.cons_different_reif[i, j])
+                @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_different_reif[i, j]) == CP.Reification(CP.DifferentFrom(zero(T)))
+                f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_different_reif[i, j])
+                @test length(f.terms) == 3
+
+                t1 = f.terms[1]
+                @test t1.output_index == 1
+                @test t1.scalar_term.coefficient === one(T)
+                @test t1.scalar_term.variable_index == bridge.vars_different[i, j]
+
+                t2 = f.terms[2]
+                @test t2.output_index == 2
+                @test t2.scalar_term.coefficient === one(T)
+                @test t2.scalar_term.variable_index == x[i]
+
+                t3 = f.terms[3]
+                @test t3.output_index == 2
+                @test t3.scalar_term.coefficient === -one(T)
+                @test t3.scalar_term.variable_index == x[j]
+            end
+        end
+    end
+
+    @testset "Disjunction" begin
+        @test length(bridge.cons) == dim * (dim - 1) / 2
+
+        for i in 1:dim
+            for j in (i+1):dim
+                @test MOI.is_valid(model, bridge.cons[i, j])
+                @test MOI.get(model, MOI.ConstraintSet(), bridge.cons[i, j]) == MOI.GreaterThan(one(T))
+                f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons[i, j])
+                @test length(f.terms) == 1 + 2 * length(values_set)
+
+                for k in 1:length(values_set)
+                    t1 = f.terms[k]
+                    @test t1.coefficient === one(T)
+                    @test t1.variable_index == bridge.vars_compare[i, k]
+
+                    t2 = f.terms[length(values_set) + k]
+                    @test t2.coefficient === one(T)
+                    @test t2.variable_index == bridge.vars_compare[j, k]
+                end
+
+                t = f.terms[2 * length(values_set) + 1]
+                @test t.coefficient === one(T)
+                @test t.variable_index == bridge.vars_different[i, j]
+            end
+        end
+    end
 end
