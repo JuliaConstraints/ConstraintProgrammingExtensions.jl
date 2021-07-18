@@ -92,6 +92,10 @@ include("DifferentFrom_Indicator/neq_indicator1_to_pseudolp.jl")
 const Indicator1DifferentFrom2PseudoMILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Indicator1DifferentFrom2PseudoMILPBridge{T}, OT}
 
+include("DifferentFrom_Reify/reif_neq_to_indic.jl")
+const ReificationDifferentFrom2Indicator{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ReificationDifferentFrom2IndicatorBridge{T}, OT}
+
 include("Disjunction/disjunction_to_reif.jl")
 const Disjunction2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Disjunction2ReificationBridge{T}, OT}

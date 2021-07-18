@@ -1,5 +1,4 @@
-@testset "Domain2MILP: $(fct_type), dimension $(dim), $(n_values) values, $(T)" for fct_type in ["single variable"], dim in [2], n_values in [3], T in [Int]
-    # for fct_type in ["single variable", "scalar affine function"], dim in [2, 3], n_values in [2, 3], T in [Int, Float64]
+@testset "Domain2MILP: $(fct_type), dimension $(dim), $(n_values) values, $(T)" for fct_type in ["single variable", "scalar affine function"], dim in [2, 3], n_values in [2, 3], T in [Int, Float64]
     mock = MOIU.MockOptimizer(MILPModel{T}())
     model = COIB.Domain2MILP{T}(mock)
 

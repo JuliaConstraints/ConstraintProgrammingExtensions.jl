@@ -114,6 +114,10 @@
         include("DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl")
     end
 
+    @testset "Reification{DifferentFrom}" begin
+        include("DifferentFrom_Reify/reif_neq_to_indic.jl")
+    end
+
     @testset "Inverse" begin
         include("Inverse/inverse_to_reif.jl")
     end

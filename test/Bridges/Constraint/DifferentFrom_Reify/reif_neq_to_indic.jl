@@ -1,4 +1,4 @@
-@testset "ReificationEqualTo2Indicator: $(fct_type), type $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
+@testset "ReificationDifferentFrom2Indicator: $(fct_type), type $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
     base_model = if T == Int
         IntDifferentFromIndicatorMILPModel{Int}()
     elseif T == Float64
@@ -7,7 +7,7 @@
         @assert false
     end
     mock = MOIU.MockOptimizer(base_model)
-    model = COIB.ReificationEqualTo2Indicator{T}(mock)
+    model = COIB.ReificationDifferentFrom2Indicator{T}(mock)
 
     if T == Int
         @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -20,12 +20,12 @@
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.Reification{MOI.EqualTo{T}},
+        CP.Reification{CP.DifferentFrom{T}},
     )
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorOfVariables,
-        CP.Reification{MOI.EqualTo{T}},
+        CP.Reification{CP.DifferentFrom{T}},
     )
 
     x, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
@@ -42,16 +42,16 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, CP.Reification(MOI.EqualTo(zero(T))))
+    c = MOI.add_constraint(model, fct, CP.Reification(CP.DifferentFrom(zero(T))))
 
     @test MOI.is_valid(model, x)
     @test MOI.is_valid(model, y)
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Reification{MOI.EqualTo{T}}}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Reification{CP.DifferentFrom{T}}}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Reification{MOI.EqualTo{T}}) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Reification{CP.DifferentFrom{T}}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}),
@@ -71,11 +71,11 @@
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.indic_true)
         @test length(f.terms) == 2
         @test MOI.get(model, MOI.ConstraintSet(), bridge.indic_true) == MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE}(MOI.EqualTo(zero(T)))
-        @test f.constants == [zero(T), zero(T)]
+        @test f.constants == [one(T), zero(T)]
 
         t1 = f.terms[1]
         @test t1.output_index == 1
-        @test t1.scalar_term.coefficient === one(T)
+        @test t1.scalar_term.coefficient === -one(T)
         @test t1.scalar_term.variable_index == x
 
         t2 = f.terms[2]
@@ -89,11 +89,11 @@
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.indic_false)
         @test length(f.terms) == 2
         @test MOI.get(model, MOI.ConstraintSet(), bridge.indic_false) == MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO}(CP.DifferentFrom(zero(T)))
-        @test f.constants == [zero(T), zero(T)]
+        @test f.constants == [one(T), zero(T)]
 
         t1 = f.terms[1]
         @test t1.output_index == 1
-        @test t1.scalar_term.coefficient === one(T)
+        @test t1.scalar_term.coefficient === -one(T)
         @test t1.scalar_term.variable_index == x
 
         t2 = f.terms[2]

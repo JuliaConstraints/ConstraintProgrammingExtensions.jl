@@ -1,5 +1,4 @@
-@testset "AllDifferentExceptConstants2Reification: $(fct_type), dimension $(dim), $(T)" for fct_type in ["vector of variables"], dim in [2], T in [Int]
-    # for fct_type in ["vector of variables", "vector affine function"], dim in [2, 3], T in [Int, Float64]
+@testset "AllDifferentExceptConstants2Reification: $(fct_type), dimension $(dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], dim in [2, 3], T in [Int, Float64]
     base_model = if T == Int
         IntReificationEqualToModel{T}()
     elseif T == Float64
