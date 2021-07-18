@@ -116,6 +116,7 @@
 
     @testset "Reification{DifferentFrom}" begin
         include("DifferentFrom_Reify/reif_neq_to_indic.jl")
+        include("DifferentFrom_Reify/reif_neq_to_milp.jl")
     end
 
     @testset "Inverse" begin
