@@ -37,12 +37,17 @@
             MOI.ScalarAffineTerm.([one(T) / 2, one(T) / 3], [x, y]),
             zero(T) / 5, 
         )
+        aff6 = MOI.ScalarAffineFunction(
+            [MOI.ScalarAffineTerm(-one(T), x)],
+            one(T), 
+        )
 
         @test CP.is_binary(model, aff)
         @test !CP.is_binary(model, aff2)
         @test CP.is_binary(model, aff3)
         @test !CP.is_binary(model, aff4)
         @test !CP.is_binary(model, aff5)
+        @test CP.is_binary(model, aff6)
     end
 
     @testset "is_integer" begin
@@ -84,12 +89,17 @@
             MOI.ScalarAffineTerm.([one(T) / 2, one(T) / 3], [x, y]),
             zero(T) / 5, 
         )
+        aff6 = MOI.ScalarAffineFunction(
+            [MOI.ScalarAffineTerm(-one(T), x)],
+            one(T), 
+        )
 
         @test CP.is_integer(model, aff)
         @test CP.is_integer(model, aff2)
         @test CP.is_integer(model, aff3)
         @test CP.is_integer(model, aff4)
         @test !CP.is_integer(model, aff5)
+        @test CP.is_integer(model, aff6)
     end
 
     @testset "has_lower_bound{Bool}" begin

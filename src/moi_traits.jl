@@ -41,11 +41,22 @@ end
 
 function is_binary(model::MOI.ModelLike, f::MOI.ScalarAffineFunction{T}) where {T <: Real}
     v = MOIU.canonical(f)
+
+    # The sum of two variables cannot be ensured to be binary (at least, by 
+    # simple bound checking).
     if length(v.terms) > 1
         return false
     end
+    
+    # Two cases: either just a binary variable, or its complement.
     t = v.terms[1]
-    return t.coefficient === one(T) && is_binary(model, t.variable_index)
+    if t.coefficient === one(T)
+        return f.constant == zero(T) && is_binary(model, t.variable_index)
+    elseif t.coefficient === -one(T)
+        return f.constant == one(T) && is_binary(model, t.variable_index)
+    else
+        return false
+    end
 end
 
 function has_lower_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
