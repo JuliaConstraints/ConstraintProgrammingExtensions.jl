@@ -1,4 +1,4 @@
-@testset "SlidingSum2LP: $(fct_type), $(array_size) items, $(slide_length) length, $(T)" for fct_type in ["vector of variables", "vector affine function"], array_size in [3, 4], length in [1, 2], T in [Int, Float64]
+@testset "SlidingSum2LP: $(fct_type), $(array_size) items, $(slide_length) length, $(T)" for fct_type in ["vector of variables", "vector affine function"], array_size in [3, 4], slide_length in [1, 2], T in [Int, Float64]
     mock = MOIU.MockOptimizer(MILPModel{T}())
     model = COIB.SlidingSum2LP{T}(mock)
 

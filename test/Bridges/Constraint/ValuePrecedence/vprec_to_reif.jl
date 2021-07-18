@@ -142,7 +142,7 @@
             @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_imply[i - 1]) == MOI.LessThan(zero(T))
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_imply[i - 1])
             @test length(f.terms) == i
-            @test f.constant === zero(T)
+            @test abs(f.constant) === zero(T)
 
             t1 = f.terms[1]
             t1.coefficient === one(T)
