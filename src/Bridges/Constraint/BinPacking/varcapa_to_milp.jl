@@ -96,14 +96,6 @@ function MOIB.added_constraint_types(::Type{VariableCapacityBinPacking2MILPBridg
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{VariableCapacityBinPacking2MILPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.BinPacking{T}},
-) where {T}
-    return VariableCapacityBinPacking2MILPBridge{T}
-end
-
 function MOI.get(b::VariableCapacityBinPacking2MILPBridge, ::MOI.NumberOfVariables)
     return length(b.assign_var)
 end

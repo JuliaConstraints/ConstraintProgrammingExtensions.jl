@@ -56,18 +56,6 @@ function MOIB.added_constraint_types(::Type{SlidingSum2LPBridge{T}}) where {T}
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{SlidingSum2LPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.SlidingSum{T}},
-) where {T}
-    return SlidingSum2LPBridge{T}
-end
-
-function MOI.get(::SlidingSum2LPBridge{T}, ::MOI.NumberOfVariables) where {T}
-    return 0
-end
-
 function MOI.get(
     b::SlidingSum2LPBridge{T},
     ::MOI.NumberOfConstraints{

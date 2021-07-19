@@ -139,14 +139,6 @@ function MOIB.added_constraint_types(::Type{ArgumentMinimumAmong2MILPBridge{T}})
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{ArgumentMinimumAmong2MILPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.ArgumentMinimumAmong},
-) where {T}
-    return ArgumentMinimumAmong2MILPBridge{T}
-end
-
 function MOI.get(b::ArgumentMinimumAmong2MILPBridge, ::MOI.NumberOfVariables)
     return length(b.vars)
 end

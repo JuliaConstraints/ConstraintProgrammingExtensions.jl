@@ -74,18 +74,6 @@ function MOIB.added_constraint_types(::Type{AllDifferent2DifferentFromBridge{T}}
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{AllDifferent2DifferentFromBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.AllDifferent},
-) where {T}
-    return AllDifferent2DifferentFromBridge{T}
-end
-
-function MOI.get(::AllDifferent2DifferentFromBridge, ::MOI.NumberOfVariables)
-    return 0
-end
-
 function MOI.get(
     b::AllDifferent2DifferentFromBridge{T},
     ::MOI.NumberOfConstraints{

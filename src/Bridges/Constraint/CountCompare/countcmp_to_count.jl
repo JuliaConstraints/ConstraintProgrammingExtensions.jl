@@ -61,18 +61,6 @@ function MOIB.added_constraint_types(::Type{CountCompare2CountBridge{T}}) where 
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{CountCompare2CountBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.CountCompare},
-) where {T}
-    return CountCompare2CountBridge{T}
-end
-
-function MOI.get(::CountCompare2CountBridge{T}, ::MOI.NumberOfVariables) where {T}
-    return 0
-end
-
 function MOI.get(
     ::CountCompare2CountBridge{T},
     ::MOI.NumberOfConstraints{

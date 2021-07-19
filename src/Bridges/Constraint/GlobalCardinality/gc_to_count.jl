@@ -63,18 +63,6 @@ function MOIB.added_constraint_types(::Type{GlobalCardinality2CountBridge{T}}) w
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{GlobalCardinality2CountBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.GlobalCardinality{T}},
-) where {T}
-    return GlobalCardinality2CountBridge{T}
-end
-
-function MOI.get(::GlobalCardinality2CountBridge{T}, ::MOI.NumberOfVariables) where {T}
-    return 0
-end
-
 function MOI.get(
     b::GlobalCardinality2CountBridge{T},
     ::MOI.NumberOfConstraints{

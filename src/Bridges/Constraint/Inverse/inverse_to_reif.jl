@@ -109,14 +109,6 @@ function MOIB.added_constraint_types(::Type{Inverse2ReificationBridge{T}}) where
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{Inverse2ReificationBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Inverse},
-) where {T}
-    return Inverse2ReificationBridge{T}
-end
-
 function MOI.get(b::Inverse2ReificationBridge{T}, ::MOI.NumberOfVariables) where {T}
     return length(b.vars_first) + length(b.vars_second)
 end

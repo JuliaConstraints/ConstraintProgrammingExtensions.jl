@@ -92,18 +92,6 @@ function MOIB.added_constraint_types(::Type{SortPermutation2AllDifferentBridge{T
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{SortPermutation2AllDifferentBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.SortPermutation},
-) where {T}
-    return SortPermutation2AllDifferentBridge{T}
-end
-
-function MOI.get(::SortPermutation2AllDifferentBridge, ::MOI.NumberOfVariables)
-    return 0
-end
-
 function MOI.get(
     ::SortPermutation2AllDifferentBridge{T},
     ::MOI.NumberOfConstraints{

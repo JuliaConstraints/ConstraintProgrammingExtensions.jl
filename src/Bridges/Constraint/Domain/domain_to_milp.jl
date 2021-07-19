@@ -67,14 +67,6 @@ function MOIB.added_constraint_types(::Type{Domain2MILPBridge{T}}) where {T}
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{Domain2MILPBridge{T}},
-    ::Union{Type{MOI.SingleVariable}, Type{MOI.ScalarAffineFunction{T}}},
-    ::Type{CP.Domain{T}},
-) where {T}
-    return Domain2MILPBridge{T}
-end
-
 function MOI.get(b::Domain2MILPBridge, ::MOI.NumberOfVariables)
     return length(b.vars)
 end

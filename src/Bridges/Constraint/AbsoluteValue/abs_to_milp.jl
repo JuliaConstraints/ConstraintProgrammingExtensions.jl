@@ -115,14 +115,6 @@ function MOIB.added_constraint_types(::Type{AbsoluteValue2MILPBridge{T}}) where 
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{AbsoluteValue2MILPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.AbsoluteValue},
-) where {T}
-    return AbsoluteValue2MILPBridge{T}
-end
-
 function MOI.get(::AbsoluteValue2MILPBridge, ::MOI.NumberOfVariables)
     return 3
 end

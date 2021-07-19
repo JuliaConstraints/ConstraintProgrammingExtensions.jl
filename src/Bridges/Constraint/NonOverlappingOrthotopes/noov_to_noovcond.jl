@@ -74,14 +74,6 @@ function MOIB.added_constraint_types(::Type{NonOverlappingOrthotopes2Conditional
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopesBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.NonOverlappingOrthotopes},
-) where {T}
-    return NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopesBridge{T}
-end
-
 function MOI.get(::NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopesBridge, ::MOI.NumberOfVariables)
     return 1
 end

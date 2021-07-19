@@ -84,18 +84,6 @@ function MOIB.added_constraint_types(::Type{AllDifferentExceptConstants2Conjunct
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{AllDifferentExceptConstants2ConjunctionDisjunctionBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.AllDifferentExceptConstants{T}},
-) where {T}
-    return AllDifferentExceptConstants2ConjunctionDisjunctionBridge{T}
-end
-
-function MOI.get(::AllDifferentExceptConstants2ConjunctionDisjunctionBridge, ::MOI.NumberOfVariables)
-    return 0
-end
-
 function MOI.get(
     b::AllDifferentExceptConstants2ConjunctionDisjunctionBridge{T},
     ::MOI.NumberOfConstraints{

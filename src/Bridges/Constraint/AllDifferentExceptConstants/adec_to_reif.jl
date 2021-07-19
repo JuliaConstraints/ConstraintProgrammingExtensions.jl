@@ -130,14 +130,6 @@ function MOIB.added_constraint_types(::Type{AllDifferentExceptConstants2Reificat
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{AllDifferentExceptConstants2ReificationBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.AllDifferentExceptConstants{T}},
-) where {T}
-    return AllDifferentExceptConstants2ReificationBridge{T}
-end
-
 function MOI.get(b::AllDifferentExceptConstants2ReificationBridge, ::MOI.NumberOfVariables)
     return length(b.vars_compare) + length(b.vars_different)
 end

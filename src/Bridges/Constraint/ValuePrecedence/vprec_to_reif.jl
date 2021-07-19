@@ -97,14 +97,6 @@ function MOIB.added_constraint_types(::Type{ValuePrecedence2ReificationBridge{T}
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{ValuePrecedence2ReificationBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.ValuePrecedence{T}},
-) where {T}
-    return ValuePrecedence2ReificationBridge{T}
-end
-
 function MOI.get(b::ValuePrecedence2ReificationBridge, ::MOI.NumberOfVariables)
     return length(b.vars_reif_precv) + length(b.vars_reif_value)
 end

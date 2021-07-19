@@ -81,14 +81,6 @@ function MOIB.added_constraint_types(::Type{Conjunction2ReificationBridge{T}}) w
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{Conjunction2ReificationBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Conjunction{S}},
-) where {T, S}
-    return Conjunction2ReificationBridge{T}
-end
-
 function MOI.get(::Conjunction2ReificationBridge{T}, ::MOI.NumberOfVariables) where {T}
     return 1
 end

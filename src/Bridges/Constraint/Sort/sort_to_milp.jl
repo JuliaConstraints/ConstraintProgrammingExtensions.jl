@@ -159,14 +159,6 @@ function MOIB.added_constraint_types(::Type{Sort2MILPBridge{T}}) where {T}
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{Sort2MILPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Sort},
-) where {T}
-    return Sort2MILPBridge{T}
-end
-
 function MOI.get(b::Sort2MILPBridge, ::MOI.NumberOfVariables)
     return length(b.vars_flow) + length(b.vars_unicity)
 end

@@ -102,14 +102,6 @@ function MOIB.added_constraint_types(::Type{MaximumAmong2MILPBridge{T}}) where {
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{MaximumAmong2MILPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.MaximumAmong},
-) where {T}
-    return MaximumAmong2MILPBridge{T}
-end
-
 function MOI.get(b::MaximumAmong2MILPBridge, ::MOI.NumberOfVariables)
     return length(b.vars)
 end

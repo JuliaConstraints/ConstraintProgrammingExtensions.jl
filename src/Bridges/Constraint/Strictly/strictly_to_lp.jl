@@ -104,18 +104,6 @@ function MOIB.added_constraint_types(::Type{Strictly2LPBridge{T}}) where {T}
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{Strictly2LPBridge{T}},
-    ::Union{Type{MOI.SingleVariable}, Type{MOI.ScalarAffineFunction{T}}},
-    ::Union{Type{CP.Strictly{MOI.LessThan{T}, T}}, Type{CP.Strictly{MOI.GreaterThan{T}, T}}},
-) where {T}
-    return Strictly2LPBridge{T}
-end
-
-function MOI.get(::Strictly2LPBridge, ::MOI.NumberOfVariables)
-    return 0
-end
-
 function MOI.get(
     b::Strictly2LPBridge{T},
     ::MOI.NumberOfConstraints{

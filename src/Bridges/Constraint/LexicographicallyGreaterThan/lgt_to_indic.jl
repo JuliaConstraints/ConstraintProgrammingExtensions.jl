@@ -129,14 +129,6 @@ function MOIB.added_constraint_types(::Type{LexicographicallyGreaterThan2Indicat
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{LexicographicallyGreaterThan2IndicatorBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.LexicographicallyGreaterThan},
-) where {T}
-    return LexicographicallyGreaterThan2IndicatorBridge{T}
-end
-
 function MOI.get(b::LexicographicallyGreaterThan2IndicatorBridge{T}, ::MOI.NumberOfVariables) where {T}
     return length(b.vars_eq) + length(b.vars_gt)
 end

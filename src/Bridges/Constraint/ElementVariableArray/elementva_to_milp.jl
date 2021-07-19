@@ -143,14 +143,6 @@ function MOIB.added_constraint_types(::Type{ElementVariableArray2MILPBridge{T}})
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{ElementVariableArray2MILPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.ElementVariableArray},
-) where {T}
-    return ElementVariableArray2MILPBridge{T}
-end
-
 function MOI.get(b::ElementVariableArray2MILPBridge{T}, ::MOI.NumberOfVariables) where {T}
     return length(b.vars_unary) + length(b.vars_product)
 end

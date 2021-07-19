@@ -70,14 +70,6 @@ function MOIB.added_constraint_types(::Type{Sort2SortPermutationBridge{T}}) wher
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{Sort2SortPermutationBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Sort},
-) where {T}
-    return Sort2SortPermutationBridge{T}
-end
-
 function MOI.get(b::Sort2SortPermutationBridge, ::MOI.NumberOfVariables)
     return length(b.vars)
 end

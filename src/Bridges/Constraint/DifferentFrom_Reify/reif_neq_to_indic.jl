@@ -71,18 +71,6 @@ function MOIB.added_constraint_types(::Type{ReificationDifferentFrom2IndicatorBr
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{ReificationDifferentFrom2IndicatorBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Reification{CP.DifferentFrom{T}}},
-) where {T <: Real}
-    return ReificationDifferentFrom2IndicatorBridge{T}
-end
-
-function MOI.get(::ReificationDifferentFrom2IndicatorBridge{T}, ::MOI.NumberOfVariables) where {T <: Real}
-    return 0
-end
-
 function MOI.get(
     ::ReificationDifferentFrom2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{

@@ -38,18 +38,6 @@ function MOIB.added_constraint_types(::Type{VariableCapacityKnapsack2MILPBridge{
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{VariableCapacityKnapsack2MILPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.VariableCapacityKnapsack{T}},
-) where {T}
-    return VariableCapacityKnapsack2MILPBridge{T}
-end
-
-function MOI.get(::VariableCapacityKnapsack2MILPBridge, ::MOI.NumberOfVariables)
-    return 0
-end
-
 function MOI.get(
     ::VariableCapacityKnapsack2MILPBridge{T},
     ::MOI.NumberOfConstraints{

@@ -66,18 +66,6 @@ function MOIB.added_constraint_types(::Type{DoublyStrictlyLexicographicallyLessT
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Strictly{CP.DoublyLexicographicallyLessThan, T}},
-) where {T}
-    return DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T}
-end
-
-function MOI.get(::DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T}, ::MOI.NumberOfVariables) where {T}
-    return 0
-end
-
 function MOI.get(
     ::DoublyStrictlyLexicographicallyLessThan2StrictlyLexicographicallyLessThanBridge{T},
     ::MOI.NumberOfConstraints{

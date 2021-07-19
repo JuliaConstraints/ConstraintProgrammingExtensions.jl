@@ -60,18 +60,6 @@ function MOIB.added_constraint_types(::Type{AllEqual2EqualToBridge{T}}) where {T
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{AllEqual2EqualToBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.AllEqual},
-) where {T}
-    return AllEqual2EqualToBridge{T}
-end
-
-function MOI.get(::AllEqual2EqualToBridge, ::MOI.NumberOfVariables)
-    return 0
-end
-
 function MOI.get(
     b::AllEqual2EqualToBridge{T},
     ::MOI.NumberOfConstraints{

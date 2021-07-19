@@ -70,22 +70,6 @@ function MOIB.added_constraint_types(::Type{StrictlyDecreasing2LPBridge{T}}) whe
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{StrictlyDecreasing2LPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Union{
-        Type{CP.Strictly{CP.Decreasing, T}},
-        Type{CP.Strictly{CP.Decreasing, S}},
-        Type{CP.Strictly{CP.Decreasing}},
-    }
-) where {T, S}
-    return StrictlyDecreasing2LPBridge{T}
-end
-
-function MOI.get(::StrictlyDecreasing2LPBridge, ::MOI.NumberOfVariables)
-    return 0
-end
-
 function MOI.get(
     b::StrictlyDecreasing2LPBridge{T},
     ::MOI.NumberOfConstraints{

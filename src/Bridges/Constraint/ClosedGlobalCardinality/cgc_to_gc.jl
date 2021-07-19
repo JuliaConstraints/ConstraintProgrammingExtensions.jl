@@ -67,18 +67,6 @@ function MOIB.added_constraint_types(::Type{ClosedGlobalCardinality2GlobalCardin
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{ClosedGlobalCardinality2GlobalCardinalityBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.ClosedGlobalCardinality{T}},
-) where {T}
-    return ClosedGlobalCardinality2GlobalCardinalityBridge{T}
-end
-
-function MOI.get(::ClosedGlobalCardinality2GlobalCardinalityBridge{T}, ::MOI.NumberOfVariables) where {T}
-    return 0
-end
-
 function MOI.get(
     b::ClosedGlobalCardinality2GlobalCardinalityBridge{T},
     ::MOI.NumberOfConstraints{

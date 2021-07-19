@@ -59,16 +59,6 @@ function MOIB.added_constraint_types(::Type{ValuedKnapsack2KnapsackBridge{T}}) w
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{ValuedKnapsack2KnapsackBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.ValuedKnapsack{T}},
-) where {T}
-    return ValuedKnapsack2KnapsackBridge{T}
-end
-
-MOI.get(b::ValuedKnapsack2KnapsackBridge, ::MOI.NumberOfVariables) = 0
-
 function MOI.get(
     ::ValuedKnapsack2KnapsackBridge{T},
     ::MOI.NumberOfConstraints{

@@ -60,16 +60,6 @@ function MOIB.added_constraint_types(::Type{FixedCapacityBinPacking2BinPackingBr
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{FixedCapacityBinPacking2BinPackingBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.FixedCapacityBinPacking{T}},
-) where {T}
-    return FixedCapacityBinPacking2BinPackingBridge{T}
-end
-
-MOI.get(b::FixedCapacityBinPacking2BinPackingBridge, ::MOI.NumberOfVariables) = 0
-
 function MOI.get(
     ::FixedCapacityBinPacking2BinPackingBridge{T},
     ::MOI.NumberOfConstraints{

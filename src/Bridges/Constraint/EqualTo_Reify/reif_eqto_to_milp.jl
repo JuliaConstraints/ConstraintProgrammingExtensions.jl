@@ -118,14 +118,6 @@ function MOIB.added_constraint_types(::Type{ReificationEqualTo2MILPBridge{T}}) w
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{ReificationEqualTo2MILPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Reification{MOI.EqualTo{T}}},
-) where {T <: Real}
-    return ReificationEqualTo2MILPBridge{T}
-end
-
 function MOI.get(::ReificationEqualTo2MILPBridge{T}, ::MOI.NumberOfVariables) where {T <: Real}
     return 1
 end

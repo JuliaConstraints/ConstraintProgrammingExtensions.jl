@@ -63,18 +63,6 @@ function MOIB.added_constraint_types(::Type{SymmetricAllDifferent2AllDifferentIn
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{SymmetricAllDifferent2AllDifferentInverseBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.SymmetricAllDifferent},
-) where {T}
-    return SymmetricAllDifferent2AllDifferentInverseBridge{T}
-end
-
-function MOI.get(::SymmetricAllDifferent2AllDifferentInverseBridge, ::MOI.NumberOfVariables)
-    return 0
-end
-
 function MOI.get(
     ::SymmetricAllDifferent2AllDifferentInverseBridge{T},
     ::MOI.NumberOfConstraints{

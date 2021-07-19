@@ -74,14 +74,6 @@ function MOIB.added_constraint_types(::Type{Count2ReificationBridge{T, S}}) wher
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{Count2ReificationBridge{T, S}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Count{S}},
-) where {T, S <: MOI.AbstractScalarSet}
-    return Count2ReificationBridge{T, S}
-end
-
 function MOI.get(b::Count2ReificationBridge{T, S}, ::MOI.NumberOfVariables) where {T, S <: MOI.AbstractScalarSet}
     return length(b.vars)
 end

@@ -103,18 +103,6 @@ function MOIB.added_constraint_types(::Type{NonOverlappingOrthotopes2Disjunction
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{NonOverlappingOrthotopes2DisjunctionLPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.NonOverlappingOrthotopes},
-) where {T}
-    return NonOverlappingOrthotopes2DisjunctionLPBridge{T}
-end
-
-function MOI.get(::NonOverlappingOrthotopes2DisjunctionLPBridge, ::MOI.NumberOfVariables)
-    return 0
-end
-
 function MOI.get(
     b::NonOverlappingOrthotopes2DisjunctionLPBridge{T},
     ::MOI.NumberOfConstraints{

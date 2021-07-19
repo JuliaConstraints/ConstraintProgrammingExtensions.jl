@@ -150,14 +150,6 @@ function MOIB.added_constraint_types(::Type{Indicator1DifferentFrom2PseudoMILPBr
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{Indicator1DifferentFrom2PseudoMILPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.DifferentFrom{T}},
-) where {T <: Real}
-    return Indicator1DifferentFrom2PseudoMILPBridge{T}
-end
-
 function MOI.get(::Indicator1DifferentFrom2PseudoMILPBridge{T}, ::MOI.NumberOfVariables) where {T <: Real}
     return 1
 end

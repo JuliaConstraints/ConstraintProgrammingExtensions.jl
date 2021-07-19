@@ -71,14 +71,6 @@ function MOIB.added_constraint_types(::Type{VectorDomain2MILPBridge{T}}) where {
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{VectorDomain2MILPBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.VectorDomain{T}},
-) where {T}
-    return VectorDomain2MILPBridge{T}
-end
-
 function MOI.get(b::VectorDomain2MILPBridge, ::MOI.NumberOfVariables)
     return length(b.vars)
 end

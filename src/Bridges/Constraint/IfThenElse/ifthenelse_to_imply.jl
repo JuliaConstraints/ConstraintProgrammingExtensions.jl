@@ -82,18 +82,6 @@ function MOIB.added_constraint_types(::Type{IfThenElse2ImplyBridge{T}}) where {T
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{IfThenElse2ImplyBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.IfThenElse{S1, S2, S3}},
-) where {T, S1, S2, S3}
-    return IfThenElse2ImplyBridge{T}
-end
-
-function MOI.get(::IfThenElse2ImplyBridge{T}, ::MOI.NumberOfVariables) where {T}
-    return 0
-end
-
 function MOI.get(
     ::IfThenElse2ImplyBridge{T},
     ::MOI.NumberOfConstraints{
