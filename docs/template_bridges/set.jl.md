@@ -54,19 +54,10 @@ function MOIB.added_constraint_types(::Type{Origin2DestBridge{T}}) where {T}
     ]
 end
 
-function MOIBC.concrete_bridge_type(
-    ::Type{Origin2DestBridge{T}},
-    ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.BinPacking{T}},
-) where {T}
-    return Origin2DestBridge{T}
-end
-
 function MOI.get(b::Origin2DestBridge, ::MOI.NumberOfVariables)
     # The bridge creates variables:
     return length(b.assign_var)
-    # The bridges does not create variables: 
-    return 0
+    # The bridges does not create variables: no need for this function
 end
 
 # For each type of F-in-S constraint: 
