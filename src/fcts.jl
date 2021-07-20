@@ -2,9 +2,13 @@
 # - Function version of some sets that imply returning a value
 # -----------------------------------------------------------------------------
 
-struct CountFunction{F <: NL_SV_FCT, G <: NL_SV_FCT} <: AbstractNonlinearScalarFunction
+struct CountFunction{F <: NL_SV_FCT, S <: MOI.AbstractScalarSet} <: AbstractNonlinearScalarFunction
     array::Vector{<:F}
-    target::G
+    comparison::S
+end
+
+function CountFunction(array::Vector{<:F}, value::T)
+    return CountFunction(array, MOI.EqualTo{T}(value))
 end
 
 struct CountCompareFunction{F <: NL_SV_FCT, G <: NL_SV_FCT} <: AbstractNonlinearScalarFunction
