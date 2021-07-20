@@ -1,5 +1,5 @@
 function _detect_variable_type(model::MOI.ModelLike, v::Union{MOI.SingleVariable, MOI.VariableIndex})
-    # TODO: is this enough? Or should the code rather try all the countless possibilities?
+    # TODO: is this enough? Or should the code rather try all the countless possibilities for T in the calling functions (based on the constraint types that are used in the model)?
     if is_integer(model, v) || is_binary(model, v)
         return Int
     else
