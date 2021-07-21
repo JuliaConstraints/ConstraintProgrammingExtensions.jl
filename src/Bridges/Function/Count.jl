@@ -4,13 +4,7 @@ Bridges `Count{F, S}`-in-`VectorAffineFunction`.
 struct CountFunctionBridge{T <: Real, F <: NL_SV_FCT, S <: MOI.AbstractScalarSet} <: MOIBC.AbstractBridge
     var::MOI.VariableIndex
     var_int::MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}
-    var_nl::Vector{MOI.VariableIndex}
-    var_nl_dom::Union{
-        Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}},
-        Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}},
-    }
-    var_nl_dom::Vector{MOI.ConstraintIndex}
-    con_nl::Vector{MOI.ConstraintIndex} # (Nonlinear function) - single variable = 0
+    nl::_NonlinearVectorFunction2VectorAffineFunction
     con::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Count{S}}
 end
 
@@ -22,51 +16,20 @@ function MOIBC.bridge_constraint(
 ) where {T, F, S}
     var, var_int = MOI.add_constrained_variable(model, MOI.Integer())
 
-    fs = MOI.ScalarAffineFunction{T}[]
-    size_hint!(fs, length(f.array))
-
-    var_nl = MOI.VariableIndex[]
-    var_nl_dom = MOI.ConstraintIndex[]
-    var_nl_con = MOI.ConstraintIndex[]
-
-    for fa in f.array
-        if CP.is_affine(model, fa)
-            push!(fs, MOI.ScalarAffineFunction{T}(fa))
-        else
-            @static if T == Bool
-                v, c = MOI.add_constrained_variable(model, MOI.ZeroOne())
-                push!(var_nl, v)
-                push!(var_nl_dom, c)
-            elseif T <: Integer
-                v, c = MOI.add_constrained_variable(model, MOI.Integer())
-                push!(var_nl, v)
-                push!(var_nl_dom, c)
-            else
-                v = MOI.add_constrained_variable(model)
-                push!(var_nl, v)
-            end
-
-            c = MOI.add_constraint(
-                model, 
-                MOI.SingleVariable(v) - fa,
-                MOI.EqualTo(zero(T))
-            )
-            push!(var_nl_con, c)
-        end
-    end
+    fs, nl = _nl_vector_to_vaf{T}(f.array)
 
     con = MOI.add_constraint(
         model, 
         MOIU.vectorize(
             [
                 MOI.SingleVariable(var),
-                f.array...
+                MOIU.scalarize(fs)...
             ]
         ),
         CP.Count(length(f.array), f.set)
     )
 
-    return CountFunctionBridge(var, var_int, var_nl, var_nl_con, var_nl_con, con)
+    return CountFunctionBridge(var, var_int, nl, con)
 end
 
 function MOI.supports_constraint(
