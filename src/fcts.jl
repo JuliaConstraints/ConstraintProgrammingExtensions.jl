@@ -7,7 +7,7 @@ struct CountFunction{F <: NL_SV_FCT, S <: MOI.AbstractScalarSet} <: AbstractNonl
     comparison::S
 end
 
-function CountFunction(array::Vector{<:F}, value::T)
+function CountFunction(array::Vector{<:F}, value::T) where {F <: NL_SV_FCT, T <: Number}
     return CountFunction(array, MOI.EqualTo{T}(value))
 end
 
