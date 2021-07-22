@@ -29,6 +29,8 @@ Add many new bridges between high-level constraints, and also to MILP models.
 
 `Reified` has been renamed to `Reification` for consistency.
 
+There are still no compatibility guarantees for nonlinear functions.
+
 
 Version 0.2.5
 -------------
