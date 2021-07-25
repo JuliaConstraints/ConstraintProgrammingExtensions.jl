@@ -13,7 +13,7 @@ struct _NonlinearVectorFunction2VectorAffineFunction
     cons::Vector{MOI.ConstraintIndex} # (Nonlinear function) - single variable = 0
 end
 
-function _nl_vector_to_vaf{T}(lf::Vector{F}) where {F <: MOI.AbstractScalarFunction, T <: Number}
+function _nl_vector_to_vaf(lf::Vector{F}, ::T) where {F <: MOI.AbstractScalarFunction, T <: Number}
     fs = MOI.ScalarAffineFunction{T}[]
     size_hint!(fs, length(lf))
 
@@ -25,7 +25,7 @@ function _nl_vector_to_vaf{T}(lf::Vector{F}) where {F <: MOI.AbstractScalarFunct
         if CP.is_affine(model, f)
             push!(fs, MOI.ScalarAffineFunction{T}(f))
         else
-            @static if T == Bool
+            if T == Bool
                 v, c = MOI.add_constrained_variable(model, MOI.ZeroOne())
                 push!(vars, v)
                 push!(doms, c)
@@ -37,7 +37,7 @@ function _nl_vector_to_vaf{T}(lf::Vector{F}) where {F <: MOI.AbstractScalarFunct
                 v = MOI.add_constrained_variable(model)
                 push!(vars, v)
             end
-            push!(fs, MOI.ScalarAffineFunction{T}(f))
+            push!(fs, MOI.ScalarAffineFunction{T}(v))
 
             c = MOI.add_constraint(
                 model, 

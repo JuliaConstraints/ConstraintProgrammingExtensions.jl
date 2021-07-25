@@ -1,7 +1,7 @@
 """
 Bridges `Count{F, S}`-in-`VectorAffineFunction`.
 """
-struct CountFunctionBridge{T <: Real, F <: NL_SV_FCT, S <: MOI.AbstractScalarSet} <: MOIBC.AbstractBridge
+struct CountFunctionBridge{T <: Real, F <: MOI.AbstractScalarFunction, S <: MOI.AbstractScalarSet} <: MOIBC.AbstractBridge
     var::MOI.VariableIndex
     var_int::MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}
     nl::_NonlinearVectorFunction2VectorAffineFunction
