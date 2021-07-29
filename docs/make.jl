@@ -11,6 +11,6 @@ makedocs(
         collapselevel = 1,
     ),
     strict = true,
-    modules = [MathOptInterface],
+    modules = [ConstraintProgrammingExtensions],
     checkdocs = :exports,
 )
