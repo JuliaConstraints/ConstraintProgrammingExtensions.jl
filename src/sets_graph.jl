@@ -38,7 +38,7 @@ A Hamiltonian circuit. If the vector `x` and the scalar `c` are constrained
 within a `WeightedCircuit(n, cost_matrix)`, each `x[i]` denotes the next node 
 in the graph, for `i ∈ [1, n]`. `c` is the total cost of the circuit, defined as: 
 
-``c = \\sum_{i=1}^n \\mathtt{cost_matrix}_{i, x[i]}``
+``c = \\sum_{i=1}^n \\mathtt{cost\\_matrix}_{i, x[i]}``
 
 The considered graph is an undirected complete graph with `n` nodes.
 """
@@ -64,7 +64,7 @@ constrained within a `CircuitPath(n)`, each `x[i]` denotes the next node in the 
 visited, i.e. `y[1]` is the first visited node (1 by convention), `y[2]` is 
 the next node in the path, etc. `c` is the total cost of the circuit, defined as: 
 
-``c = \\sum_{i=1}^n \\mathtt{cost_matrix}_{i, x[i]}``
+``c = \\sum_{i=1}^n \\mathtt{cost\\_matrix}_{i, x[i]}``
 
 The considered graph is an undirected complete graph with `n` nodes.
 """

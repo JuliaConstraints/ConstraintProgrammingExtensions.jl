@@ -13,4 +13,10 @@ makedocs(
     strict = true,
     modules = [ConstraintProgrammingExtensions],
     checkdocs = :exports,
+    pages = [
+        "Introduction" => "index.md",
+        "Reference" => [
+            "reference/sets.md",
+        ]
+    ],
 )

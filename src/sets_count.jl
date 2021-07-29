@@ -30,7 +30,7 @@ end
 """
     GlobalCardinality{T}(dimension::Int, values::Vector{T})
 
-``\\{(x, y) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{N}^d : y_i = |\\{ j | x_j = \\mathtt{values}_i, \\forall j \\}| \\}``
+``\\{(x, y) \\in \\mathbb{T}^\\mathtt{dimension} \\times \\mathbb{N}^d : y_i = |\\{ j | x_j = \\mathtt{values}_i, \\forall j \\}| \\}``
 
 The first `dimension` variables are an array, the last variables are the 
 number of times that each item of `values` is present in the first array.
@@ -59,7 +59,7 @@ end
 """
     GlobalCardinalityVariable(dimension::Int, n_values::Int)
 
-``\\{(x, y, z) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{N}^\\mathtt{n\\_values} \\times \\mathbb{R}^\\mathtt{n\\_values} : y_i = |\\{ j | x_j = z_i, \\forall j \\}| \\}``
+``\\{(x, y, z) \\in \\mathbb{T}^\\mathtt{dimension} \\times \\mathbb{N}^\\mathtt{n\\_values} \\times \\mathbb{T}^\\mathtt{n\\_values} : y_i = |\\{ j | x_j = z_i, \\forall j \\}| \\}``
 
 The first `dimension` variables are an array, the next `n_values` variables 
 are the number of times that each item of the last `n_values` variables is 
@@ -84,7 +84,7 @@ MOI.dimension(set::GlobalCardinalityVariable) = set.dimension + 2 * set.n_values
 """
     ClosedGlobalCardinality{T}(dimension::Int, values::Vector{T})
 
-``\\{(x, y) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{N}^d : y_i = |\\{ j | x_j = \\mathtt{values}_i, \\forall j \\}| \\}``
+``\\{(x, y) \\in \\mathbb{T}^\\mathtt{dimension} \\times \\mathbb{N}^d : y_i = |\\{ j | x_j = \\mathtt{values}_i, \\forall j \\}| \\}``
 
 The first `dimension` variables are an array, the last variables are the 
 number of times that each item of `values` is present in the first array.
@@ -111,7 +111,7 @@ end
 """
     ClosedGlobalCardinalityVariable(dimension::Int, n_values::Int)
 
-``\\{(x, y, z) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{N}^\\mathtt{n\\_values} \\times \\mathbb{R}^\\mathtt{n\\_values} : y_i = |\\{ j | x_j = z_i, \\forall j \\}| \\}``
+``\\{(x, y, z) \\in \\mathbb{T}^\\mathtt{dimension} \\times \\mathbb{N}^\\mathtt{n\\_values} \\times \\mathbb{T}^\\mathtt{n\\_values} : y_i = |\\{ j | x_j = z_i, \\forall j \\}| \\}``
 
 The first `dimension` variables are an array, the next `n_values` variables 
 are the number of times that each item of the last `n_values` variables is 

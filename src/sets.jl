@@ -72,8 +72,13 @@ function Base.:(==)(
     return x.dimension == y.dimension && x.k == y.k
 end
 
-AllDifferentExceptConstant(dimension::Int, value::T) where {T <: Number} =
-    AllDifferentExceptConstants(dimension, Set(value))
+"""
+Special case of [`AllDifferentExceptConstants`](@ref) where only one value is 
+ignored.
+"""
+function AllDifferentExceptConstant(dimension::Int, value::T) where {T <: Number}
+    return AllDifferentExceptConstants(dimension, Set(value))
+end
 
 """
     SymmetricAllDifferent(dimension::Int)
@@ -213,7 +218,7 @@ end
 """
     DifferentFrom{T <: Number}(value::T)
 
-The set exclusing the single point ``x \\in \\mathbb{R}`` where ``x`` is given
+The set excluding the single point ``x \\in \\mathbb{R}`` where ``x`` is given
 by `value`.
 """
 struct DifferentFrom{T <: Number} <: MOI.AbstractScalarSet
@@ -257,7 +262,7 @@ Base.:(==)(x::Element{T}, y::Element{T}) where {T} = x.values == y.values
 """
     ElementVariableArray(dimension::Int)
 
-``\\{(x, i, values) \\in \\mathbb{R} \\times \\mathbb{N} \\times \\mathbb{R}^{dimension} | x = values[i]\\}``
+``\\{(x, i, values) \\in \\mathbb{R} \\times \\mathbb{N} \\times \\mathbb{R}^{\\mathtt{dimension}} | x = values[i]\\}``
 
 Less formally, the first element constrained in this set will take the value of
 `values` at the index given by the second element in the array given by the 
@@ -288,7 +293,7 @@ end
 Ensures that all the `dimension` expressions in this set are at least `k` 
 apart, in absolute value:
 
-``\\{x \\in \\mathbb{S}^{dimension}} | |x_i - x_j| \\geq k, \\forall i \\neq j \\in \\{1, 2\\dots dimension\\} \\}``.
+``\\Big\\{x \\in \\mathbb{S}^{\\mathtt{dimension}} \\Big| |x_i - x_j| \\geq k, \\forall i \\neq j \\in \\{1, 2\\dots \\mathtt{dimension}\\} \\Big\\}``
 
 Also called [`all_min_dist`](https://sofdem.github.io/gccat/gccat/Call_min_dist.html) 
 or `inter_distance`.
@@ -311,7 +316,7 @@ end
 Ensures that all the `dimension` expressions in this set are at most `k` 
 apart, in absolute value:
 
-``\\{x \\in \\mathbb{S}^{dimension}} | |x_i - x_j| \\leq k, \\forall i \\neq j \\in \\{1, 2\\dots dimension\\} \\}``.
+``\\Big\\{x \\in \\mathbb{S}^{\\mathtt{dimension}} \\Big| |x_i - x_j| \\leq k, \\forall i \\neq j \\in \\{1, 2\\dots \\mathtt{dimension}\\} \\Big\\}``
 """
 struct MaximumDistance{T <: Real} <: MOI.AbstractVectorSet
     dimension::Int
@@ -331,7 +336,7 @@ end
 Ensures that the two arrays of variables of size `dimension` are the inverse 
 one of the other. 
 
-``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | x_i = j \\iff y_j = i, \\forall i, j \\in \\{1, 2 \\dots dimension\\} \\}``.
+``\\Big\\{(x, y) \\in \\mathbb{R}^{\\mathtt{dimension}} \\times \\mathbb{R}^{dimension} \\Big| x_i = j \\iff y_j = i, \\forall i, j \\in \\{1, 2 \\dots \\mathtt{dimension}\\} \\Big\\}``
 
 Indices start at 1, like Julia.
 
@@ -348,7 +353,7 @@ end
 Ensures that the sum of all sequences of size `length` have a value between
 `low` and `high`. 
 
-``\\{x \\in \\mathbb{R}^{dimension}} | \\mathtt{low} \\leq \\sum_{j=i}^{i+\\mathtt{length}-1} x_i \\leq \\mathtt{high}, \\forall i \\in \\{ 0, 1 \\dots \\mathtt{dimension} - \\mathtt{length} \\} \\}``.
+``\\{x \\in \\mathbb{R}^{\\mathtt{dimension}} | \\mathtt{low} \\leq \\sum_{j=i}^{i+\\mathtt{length}-1} x_i \\leq \\mathtt{high}, \\forall i \\in \\{ 0, 1 \\dots \\mathtt{dimension} - \\mathtt{length} \\} \\}``
 
 https://sofdem.github.io/gccat/gccat/Csliding_sum.html
 """
@@ -365,7 +370,7 @@ end
 Ensures that the value `before` happens before `value` in the array of size 
 `dimension`. 
 
-``\\{x \\in \\mathbb{R}^{dimension} | \\exists i < j: x_i = \\mathtt{before}, x_j = \\mathtt{value} \\}``.
+``\\{x \\in \\mathbb{R}^{\\mathtt{dimension}} | \\exists i < j: x_i = \\mathtt{before}, x_j = \\mathtt{value} \\}``
 
 Also called `precede` or `value_precede`.
 

@@ -49,7 +49,7 @@ The variables are packed by orthotope:
 
 The set can be defined as: 
 
-    ``(o_1, s_1, d_1, o_2, s_2, d_2 \\dots o_\\mathtt{orthotopes}, s_\\mathtt{orthotopes}, d_\\mathtt{orthotopes}) \\in \\mathbb{R}^{3 \\times \\mathtt{orthotopes} \\times \\mathtt{dimensions} }``
+``(o_1, s_1, d_1, o_2, s_2, d_2 \\dots o_\\mathtt{o}, s_\\mathtt{o}, d_\\mathtt{o}) \\in \\mathbb{R}^{3 \\times \\mathtt{o} \\times \\mathtt{d} }``
 
 Also called [`diffn`](https://sofdem.github.io/gccat/gccat/Cdiffn.html), 
 `geost`, `nooverlap`, `diff2`, or `disjoint`.
@@ -92,12 +92,12 @@ The variables are packed by orthotope:
 * the next `n_dimensions` are the destination of the orthotope. These variables
   are automatically constrained to be `origin + size` (unlike other modelling 
   layers, such as Gecode)
-* the last variable` indicates whether the orthotope is mandatory (`true`) or 
+* the last variable indicates whether the orthotope is mandatory (`true`) or 
   optional (`false`)
 
 The set can be defined as: 
 
-    ``(o_1, s_1, d_1, m1, o_2, s_2, d_2, m2 \\dots o_\\mathtt{orthotopes}, s_\\mathtt{orthotopes}, d_\\mathtt{orthotopes}, m_\\mathtt{orthotopes}) \\in \\prod_{i=1}^{\\mathtt{orthotopes}} (\\mathbb{R}^{3 \\times \\mathtt{dimensions} \\times \\{0, 1\\}) }``
+``(o_1, s_1, d_1, m_1, o_2, s_2, d_2, m_2 \\dots o_\\mathtt{o}, s_\\mathtt{o}, d_\\mathtt{o}, m_\\mathtt{o}) \\in \\prod_{i=1}^{\\mathtt{o}} (\\mathbb{R}^{3 \\times \\mathtt{d} \\times \\{0, 1\\}) }``
 
 Also called [`diffn`](https://sofdem.github.io/gccat/gccat/Cdiffn.html), 
 `nooverlap`, or `disjointconditional`.

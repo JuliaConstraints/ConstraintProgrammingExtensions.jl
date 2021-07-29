@@ -6,7 +6,7 @@ the next column.
 
 Formally, for two columns:
 
-``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{column\\_dim}} | \exists j \\in \\{1, 2 \\dots column\\_dim\\}: x_j < y_j, \\forall i < j, x_i = y_i \\}``.
+``\\{(x, y) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{R}^\\mathtt{column\\_dim} | \\exists j \\in \\{1, 2 \\dots \\mathtt{column\\_dim}\\}: x_j < y_j, \\forall i < j, x_i = y_i \\}``.
 
 Also called [`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html).
 
@@ -33,7 +33,7 @@ the next column.
 
 Formally, for two columns:
 
-``\\{(x, y) \\in \\mathbb{R}^{dimension}} \\times \\mathbb{R}^{dimension}} | \exists j \\in \\{1, 2 \\dots dimension\\}: x_j > y_j, \\forall i < j, x_i = y_i \\}``.
+``\\{(x, y) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{R}^\\mathtt{column\\_dim} | \exists j \\in \\{1, 2 \\dots \\mathtt{dimension}\\}: x_j > y_j, \\forall i < j, x_i = y_i \\}``.
 
 Also called [`lex_greater`](https://sofdem.github.io/gccat/gccat/Clex_greater.html).
 
