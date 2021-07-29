@@ -1,0 +1,3 @@
+using Documenter, ConstraintProgrammingExtensions
+
+makedocs(sitename="ConstraintProgrammingExtensions")
