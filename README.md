@@ -10,4 +10,16 @@
 [![Coverage Status](https://coveralls.io/repos/dourouc05/ConstraintProgrammingExtensions.jl/badge.svg?branch=master)](https://coveralls.io/r/dourouc05/ConstraintProgrammingExtensions.jl?branch=master)
 [![codecov.io](http://codecov.io/github/dourouc05/ConstraintProgrammingExtensions.jl/coverage.svg?branch=master)](http://codecov.io/github/dourouc05/ConstraintProgrammingExtensions.jl?branch=master)
 
-Extensions to [MathOptInterface](https://github.com/JuliaOpt/MathOptInterface.jl) to support constraint programming.
+This package provides extensions to 
+[MathOptInterface](https://github.com/jump-dev/MathOptInterface.jl)
+in order to support constraint programming. This allows to use the same user
+model with several solvers. 
+
+On top of providing a uniform interface, this package also implements a 
+quantity of bridges, i.e. reformulations of constraints, to bridge the gap
+when a solver does not support a specific constraint. In particular, the set 
+of bridges should make it possible to transform any CP model into a MIP model.
+
+Currently, the following solvers are using this interface: 
+
+* [CPLEXCP.jl](https://github.com/dourouc05/CPLEXCP.jl/)
