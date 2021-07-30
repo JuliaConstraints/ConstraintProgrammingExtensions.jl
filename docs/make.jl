@@ -17,6 +17,7 @@ makedocs(
         "Introduction" => "index.md",
         "Reference" => [
             "reference/sets.md",
+            "reference/bridges_sets.md",
         ]
     ],
 )
