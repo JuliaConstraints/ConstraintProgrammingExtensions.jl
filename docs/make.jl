@@ -27,4 +27,5 @@ deploydocs(
     # forcepush = true,
     versions = "v#.#",
     repo = "github.com/dourouc05/ConstraintProgrammingExtensions.jl.git",
+    devbranch = "master",
 )
