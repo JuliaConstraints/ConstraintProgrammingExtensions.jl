@@ -1,12 +1,12 @@
 """
-    LexicographicallyLessThan(dimension::Int)
+    LexicographicallyLessThan(row_dim::Int, column_dim::Int)
 
 Ensures that each column of the matrix is lexicographically less than 
 the next column. 
 
 Formally, for two columns:
 
-``\\{(x, y) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{R}^\\mathtt{column\\_dim} | \\exists j \\in \\{1, 2 \\dots \\mathtt{column\\_dim}\\}: x_j < y_j, \\forall i < j, x_i = y_i \\}``.
+``\\{(x, y) \\in \\mathbb{R}^\\mathtt{column\\_dim} \\times \\mathbb{R}^\\mathtt{column\\_dim} | \\exists j \\in \\{1, 2 \\dots \\mathtt{column\\_dim}\\}: x_j < y_j, \\forall i < j, x_i = y_i \\}``.
 
 Also called [`lex_less`](https://sofdem.github.io/gccat/gccat/Clex_less.html).
 
@@ -26,14 +26,14 @@ end
 MOI.dimension(set::LexicographicallyLessThan) = set.row_dim * set.column_dim
 
 """
-    LexicographicallyGreaterThan(dimension::Int)
+    LexicographicallyGreaterThan(row_dim::Int, column_dim::Int)
 
 Ensures that each column of the matrix is lexicographically greater than 
 the next column. 
 
 Formally, for two columns:
 
-``\\{(x, y) \\in \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{R}^\\mathtt{column\\_dim} | \exists j \\in \\{1, 2 \\dots \\mathtt{dimension}\\}: x_j > y_j, \\forall i < j, x_i = y_i \\}``.
+``\\{(x, y) \\in \\mathbb{R}^\\mathtt{column\\_dim} \\times \\mathbb{R}^\\mathtt{column\\_dim} | \exists j \\in \\{1, 2 \\dots \\mathtt{column\\_dim}\\}: x_j > y_j, \\forall i < j, x_i = y_i \\}``.
 
 Also called [`lex_greater`](https://sofdem.github.io/gccat/gccat/Clex_greater.html).
 
