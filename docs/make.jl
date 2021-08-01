@@ -18,6 +18,17 @@ makedocs(
         "Reference" => [
             "reference/sets.md",
             "reference/bridges_sets.md",
+        ],
+        "Comparison to other CP packages" => [
+            "mappings/constraintsolver.md",
+            "mappings/disjunctive.md",
+            "mappings/facile.md",
+            "mappings/hakank.md",
+            "mappings/juliaconstraints.md",
+            "mappings/minizinc.md",
+            "mappings/numberjack.md",
+            "mappings/sas.md",
+            "mappings/yalmip.md",
         ]
     ],
 )
