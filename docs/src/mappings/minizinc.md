@@ -1,3 +1,5 @@
+# MiniZinc
+
 MiniZinc has a similar goal to this project: a common modelling interface for many underlying solvers. It is based on a similar concept to that of bridges, but with much less flexibility: each high-level constraint is mapped in a fixed way onto lower-level constraints.
 
 * Basic CP constraints: 

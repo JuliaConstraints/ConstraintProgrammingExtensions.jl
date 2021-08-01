@@ -1,3 +1,5 @@
+# JuliaConstraints
+
 All the constraints of the [JuliaConstraints ecosystem](https://github.com/JuliaConstraints) are supported, with the exception of `always_true`: 
 
 * `all_different`: `AllDifferent` set
