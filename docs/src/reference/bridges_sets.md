@@ -5,6 +5,7 @@ CurrentModule = ConstraintProgrammingExtensions.Bridges
 # Set bridges
 
 ```@docs
+add_all_set_bridges
 AbsoluteValue2MILPBridge
 AllDifferent2DifferentFromBridge
 AllDifferentExceptConstants2ConjunctionDisjunctionBridge
