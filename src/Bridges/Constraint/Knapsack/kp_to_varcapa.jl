@@ -80,7 +80,6 @@ end
 function MOIB.added_constraint_types(::Type{Knapsack2VariableCapacityKnapsackBridge{T}}) where {T <: Integer}
     return [
         (MOI.VectorAffineFunction{T}, CP.VariableCapacityKnapsack{T}),
-        (MOI.SingleVariable, MOI.Integer),
     ]
 end
 

@@ -75,7 +75,6 @@ end
 
 function MOIB.added_constraint_types(::Type{Conjunction2ReificationBridge{T}}) where {T}
     return [
-        (MOI.SingleVariable, MOI.ZeroOne),
         (MOI.VectorAffineFunction{T}, CP.Reification), # TODO: how to be more precise?
         (MOI.SingleVariable, MOI.EqualTo{T}),
     ]

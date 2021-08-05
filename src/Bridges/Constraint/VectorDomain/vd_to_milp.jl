@@ -66,7 +66,6 @@ end
 
 function MOIB.added_constraint_types(::Type{VectorDomain2MILPBridge{T}}) where {T}
     return [
-        (MOI.SingleVariable, MOI.ZeroOne),
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
     ]
 end

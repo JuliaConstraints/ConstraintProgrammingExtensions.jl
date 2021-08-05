@@ -82,20 +82,15 @@
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.FixedCapacityBinPacking{T}) == typeof(bridge)
         if T == Int
             @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.Integer,)]
-            @test Set(MOIB.added_constraint_types(typeof(bridge))) == Set([
-                (MOI.VectorAffineFunction{T}, CP.FixedCapacityBinPacking{T}),
-                (MOI.SingleVariable, MOI.Integer),
-                (MOI.SingleVariable, MOI.LessThan{T}),
-            ])
         elseif T == Float64
             @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
-            @test Set(MOIB.added_constraint_types(typeof(bridge))) == Set([
-                (MOI.VectorAffineFunction{T}, CP.FixedCapacityBinPacking{T}),
-                (MOI.SingleVariable, MOI.LessThan{T}),
-            ])
         else 
             @assert false
         end
+        @test Set(MOIB.added_constraint_types(typeof(bridge))) == Set([
+            (MOI.VectorAffineFunction{T}, CP.FixedCapacityBinPacking{T}),
+            (MOI.SingleVariable, MOI.LessThan{T}),
+        ])
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == n_bins
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == ((T == Int) ? n_bins : 0)

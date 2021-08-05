@@ -47,18 +47,14 @@
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Knapsack{T}) == typeof(bridge)
         if T == Int
             @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.Integer,)]
-            @test Set(MOIB.added_constraint_types(typeof(bridge))) == Set([
-                (MOI.VectorAffineFunction{T}, CP.VariableCapacityKnapsack{T}),
-                (MOI.SingleVariable, MOI.Integer),
-            ])
         elseif T == Float64
             @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
-            @test MOIB.added_constraint_types(typeof(bridge)) == [
-                (MOI.VectorAffineFunction{T}, CP.VariableCapacityKnapsack{T}),
-            ]
         else 
             @assert false
         end
+        @test Set(MOIB.added_constraint_types(typeof(bridge))) == Set([
+            (MOI.VectorAffineFunction{T}, CP.VariableCapacityKnapsack{T}),
+        ])
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 1
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.VariableCapacityKnapsack{T}}()) == 1

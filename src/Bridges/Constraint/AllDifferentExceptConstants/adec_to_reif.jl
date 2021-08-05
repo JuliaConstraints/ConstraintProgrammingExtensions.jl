@@ -123,7 +123,6 @@ end
 
 function MOIB.added_constraint_types(::Type{AllDifferentExceptConstants2ReificationBridge{T}}) where {T}
     return [
-        (MOI.SingleVariable, MOI.ZeroOne),
         (MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}),
         (MOI.ScalarAffineFunction{T}, CP.Reification{CP.DifferentFrom{T}}),
         (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),

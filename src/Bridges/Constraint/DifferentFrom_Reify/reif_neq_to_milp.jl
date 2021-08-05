@@ -118,7 +118,6 @@ end
 
 function MOIB.added_constraint_types(::Type{ReificationDifferentFrom2MILPBridge{T}}) where {T <: Integer}
     return [
-        (MOI.SingleVariable, MOI.Integer),
         (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
         (MOI.VectorAffineFunction{T}, MOI.LessThan{T}),
     ]

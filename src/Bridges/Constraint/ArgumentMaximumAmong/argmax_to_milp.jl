@@ -120,19 +120,8 @@ function MOIB.added_constrained_variable_types(::Type{ArgumentMaximumAmong2MILPB
     return [(MOI.ZeroOne,), (MOI.Integer,)]
 end
 
-function MOIB.added_constraint_types(::Type{ArgumentMaximumAmong2MILPBridge{T}}) where {T} # Bool and Real
+function MOIB.added_constraint_types(::Type{ArgumentMaximumAmong2MILPBridge{T}}) where {T}
     return [
-        (MOI.SingleVariable, MOI.ZeroOne),
-        (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
-        (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
-        (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
-    ]
-end
-
-function MOIB.added_constraint_types(::Type{ArgumentMaximumAmong2MILPBridge{T}}) where {T <: Integer}
-    return [
-        (MOI.SingleVariable, MOI.ZeroOne),
-        (MOI.SingleVariable, MOI.Integer),
         (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
         (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),

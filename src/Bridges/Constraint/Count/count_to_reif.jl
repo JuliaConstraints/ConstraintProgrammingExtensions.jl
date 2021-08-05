@@ -68,7 +68,6 @@ end
 
 function MOIB.added_constraint_types(::Type{Count2ReificationBridge{T, S}}) where {T, S <: MOI.AbstractScalarSet}
     return [
-        (MOI.SingleVariable, MOI.ZeroOne),
         (MOI.VectorAffineFunction{T}, CP.Reification{S}),
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
     ]

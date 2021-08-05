@@ -41,7 +41,6 @@
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Element) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
-            (MOI.SingleVariable, MOI.ZeroOne),
             (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
         ]
 

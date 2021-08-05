@@ -116,7 +116,6 @@ end
 
 function MOIB.added_constraint_types(::Type{IfThenElse2ReificationBridge{T}}) where {T}
     return [
-        (MOI.SingleVariable, MOI.ZeroOne),
         (MOI.VectorAffineFunction{T}, CP.Reification), # TODO: how to be more precise?
         (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
     ]

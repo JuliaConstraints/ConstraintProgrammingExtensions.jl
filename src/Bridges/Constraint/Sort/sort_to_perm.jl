@@ -65,7 +65,6 @@ end
 
 function MOIB.added_constraint_types(::Type{Sort2SortPermutationBridge{T}}) where {T}
     return [
-        (MOI.SingleVariable, MOI.Integer),
         (MOI.VectorAffineFunction{T}, CP.SortPermutation),
     ]
 end

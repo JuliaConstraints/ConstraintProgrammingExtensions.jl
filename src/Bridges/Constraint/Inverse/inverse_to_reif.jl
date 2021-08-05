@@ -103,7 +103,6 @@ end
 
 function MOIB.added_constraint_types(::Type{Inverse2ReificationBridge{T}}) where {T}
     return [
-        (MOI.SingleVariable, MOI.ZeroOne),
         (MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}),
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
     ]

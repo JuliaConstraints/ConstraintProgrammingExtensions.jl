@@ -37,7 +37,7 @@ function MOIBC.bridge_constraint(
     # set to true.
     new_f = MOI.ScalarAffineFunction{T}[]
     j = 1
-    for i in 1:s.n_orthotopes
+    for _ in 1:s.n_orthotopes
         for _ in 1:(3 * s.n_dimensions)
             push!(new_f, f_scalars[j])
             j += 1
@@ -69,7 +69,6 @@ end
 
 function MOIB.added_constraint_types(::Type{NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopesBridge{T}}) where {T}
     return [
-        (MOI.SingleVariable, MOI.EqualTo{T}),
         (MOI.VectorAffineFunction{T}, CP.ConditionallyNonOverlappingOrthotopes),
     ]
 end

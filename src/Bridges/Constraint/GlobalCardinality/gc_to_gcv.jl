@@ -88,14 +88,6 @@ function MOIB.added_constraint_types(::Type{GlobalCardinality2GlobalCardinalityV
     ]
 end
 
-function MOIB.added_constraint_types(::Type{GlobalCardinality2GlobalCardinalityVariableBridge{T}}) where {T <: Integer}
-    return [
-        (MOI.SingleVariable, MOI.Integer),
-        (MOI.SingleVariable, MOI.EqualTo{T}),
-        (MOI.VectorAffineFunction{T}, CP.GlobalCardinalityVariable),
-    ]
-end
-
 function MOI.get(b::GlobalCardinality2GlobalCardinalityVariableBridge{T}, ::MOI.NumberOfVariables) where {T}
     return length(b.vars)
 end

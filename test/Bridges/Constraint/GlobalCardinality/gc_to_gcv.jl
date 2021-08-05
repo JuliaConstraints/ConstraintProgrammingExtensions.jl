@@ -46,20 +46,15 @@
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.GlobalCardinality{T}) == typeof(bridge)
         if T == Int
             @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.Integer,)]
-            @test MOIB.added_constraint_types(typeof(bridge)) == [
-                (MOI.SingleVariable, MOI.Integer),
-                (MOI.SingleVariable, MOI.EqualTo{T}),
-                (MOI.VectorAffineFunction{T}, CP.GlobalCardinalityVariable),
-            ]
         elseif T == Float64
             @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
-            @test MOIB.added_constraint_types(typeof(bridge)) == [
-                (MOI.SingleVariable, MOI.EqualTo{T}),
-                (MOI.VectorAffineFunction{T}, CP.GlobalCardinalityVariable),
-            ]
         else
             @assert false
         end
+        @test MOIB.added_constraint_types(typeof(bridge)) == [
+            (MOI.SingleVariable, MOI.EqualTo{T}),
+            (MOI.VectorAffineFunction{T}, CP.GlobalCardinalityVariable),
+        ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == sought_size
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == ((T == Int) ? sought_size : 0)

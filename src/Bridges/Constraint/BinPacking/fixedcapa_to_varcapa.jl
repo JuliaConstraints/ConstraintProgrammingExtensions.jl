@@ -95,15 +95,7 @@ function MOIB.added_constrained_variable_types(::Type{<:FixedCapacityBinPacking2
     return Tuple{DataType}[]
 end
 
-function MOIB.added_constraint_types(::Type{FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T}}) where {T <: Integer}
-    return [
-        (MOI.VectorAffineFunction{T}, CP.FixedCapacityBinPacking{T}),
-        (MOI.SingleVariable, MOI.Integer),
-        (MOI.SingleVariable, MOI.LessThan{T}),
-    ]
-end
-
-function MOIB.added_constraint_types(::Type{FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T}}) where {T <: Real}
+function MOIB.added_constraint_types(::Type{FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T}}) where {T}
     return [
         (MOI.VectorAffineFunction{T}, CP.FixedCapacityBinPacking{T}),
         (MOI.SingleVariable, MOI.LessThan{T}),

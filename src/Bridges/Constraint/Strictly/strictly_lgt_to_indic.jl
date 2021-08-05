@@ -121,7 +121,6 @@ end
 
 function MOIB.added_constraint_types(::Type{StrictlyLexicographicallyGreaterThan2IndicatorBridge{T}}) where {T}
     return [
-        (MOI.SingleVariable, MOI.ZeroOne),
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
         (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}),
         (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}),

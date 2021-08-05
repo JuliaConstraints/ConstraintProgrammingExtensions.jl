@@ -52,22 +52,14 @@
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.ElementVariableArray) == typeof(bridge)
         if T == Int
             @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,), (MOI.Integer,)]
-            @test MOIB.added_constraint_types(typeof(bridge)) == [
-                (MOI.SingleVariable, MOI.ZeroOne),
-                (MOI.SingleVariable, MOI.Integer),
-                (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
-                (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
-                (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
-            ]
         elseif T == Float64
             @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
-            @test MOIB.added_constraint_types(typeof(bridge)) == [
-                (MOI.SingleVariable, MOI.ZeroOne),
-                (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
-                (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
-                (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
-            ]
         end
+        @test MOIB.added_constraint_types(typeof(bridge)) == [
+            (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
+            (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
+            (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
+        ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 2 * dim
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == dim

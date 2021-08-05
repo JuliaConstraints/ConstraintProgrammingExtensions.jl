@@ -126,7 +126,6 @@ end
 
 function MOIB.added_constraint_types(::Type{ElementVariableArray2MILPBridge{T}}) where {T}
     return [
-        (MOI.SingleVariable, MOI.ZeroOne),
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
         (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
         (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
@@ -135,8 +134,6 @@ end
 
 function MOIB.added_constraint_types(::Type{ElementVariableArray2MILPBridge{T}}) where {T <: Integer}
     return [
-        (MOI.SingleVariable, MOI.ZeroOne),
-        (MOI.SingleVariable, MOI.Integer),
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
         (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
         (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),

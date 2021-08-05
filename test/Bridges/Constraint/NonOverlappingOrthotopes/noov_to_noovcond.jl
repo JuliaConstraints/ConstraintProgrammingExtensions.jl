@@ -81,7 +81,6 @@
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.NonOverlappingOrthotopes) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.EqualTo{T},)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
-            (MOI.SingleVariable, MOI.EqualTo{T}),
             (MOI.VectorAffineFunction{T}, CP.ConditionallyNonOverlappingOrthotopes),
         ]
 

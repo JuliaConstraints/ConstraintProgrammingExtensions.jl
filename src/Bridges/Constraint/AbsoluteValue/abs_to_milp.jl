@@ -108,8 +108,6 @@ end
 
 function MOIB.added_constraint_types(::Type{AbsoluteValue2MILPBridge{T}}) where {T}
     return [
-        (MOI.SingleVariable, MOI.ZeroOne),
-        (MOI.SingleVariable, MOI.GreaterThan{T}),
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
         (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
     ]
