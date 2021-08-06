@@ -1,14 +1,5 @@
 @testset "DifferentFrom2PseudoMILP: $(fct_type), $(T)" for fct_type in ["single variable", "scalar affine function"], T in [Int, Bool, Float64]
-    base = if T == Int
-        IntAbsoluteValuePseudoMILPModel{Int}()
-    elseif T == Bool
-        BoolAbsoluteValuePseudoMILPModel{Bool}()
-    elseif T == Float64
-        FloatAbsoluteValuePseudoMILPModel{Float64}()
-    else
-        @assert false
-    end
-    mock = MOIU.MockOptimizer(base)
+    mock = MOIU.MockOptimizer(AbsoluteValuePseudoMILPModel{T}())
     model = COIB.DifferentFrom2PseudoMILP{T}(mock)
 
     if T == Int

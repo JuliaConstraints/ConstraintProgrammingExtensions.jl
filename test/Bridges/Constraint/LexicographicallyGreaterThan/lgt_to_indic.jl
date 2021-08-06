@@ -1,12 +1,5 @@
 @testset "LexicographicallyGreaterThan2Indicator: $(fct_type), $(x_size) × $(y_size), $(T)" for fct_type in ["vector of variables", "vector affine function"], x_size in [2, 4], y_size in [2, 4], T in [Int, Float64]
-    base_model = if T == Int
-        IntIndicatorMILPModel{T}()
-    elseif T == Float64
-        FloatIndicatorMILPModel{T}()
-    else
-        @assert false
-    end
-    mock = MOIU.MockOptimizer(base_model)
+    mock = MOIU.MockOptimizer(IndicatorMILPModel{T}())
     model = COIB.LexicographicallyGreaterThan2Indicator{T}(mock)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)

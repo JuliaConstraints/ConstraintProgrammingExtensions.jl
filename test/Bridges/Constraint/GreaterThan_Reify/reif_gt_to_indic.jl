@@ -1,12 +1,5 @@
 @testset "ReificationGreaterThan2Indicator: $(fct_type), type $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
-    base_model = if T == Int
-        IntIndicatorPseudoMILPModel{Int}()
-    elseif T == Float64
-        FloatIndicatorPseudoMILPModel{Float64}()
-    else
-        @assert false
-    end
-    mock = MOIU.MockOptimizer(base_model)
+    mock = MOIU.MockOptimizer(IndicatorPseudoMILPModel{T}())
     model = COIB.ReificationGreaterThan2Indicator{T}(mock)
 
     if T == Int

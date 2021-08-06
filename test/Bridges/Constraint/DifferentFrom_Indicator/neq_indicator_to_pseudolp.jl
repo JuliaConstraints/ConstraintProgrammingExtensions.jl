@@ -1,14 +1,5 @@
 @testset "IndicatorDifferentFrom2PseudoMILP: $(fct_type), $(T), $(A)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Bool, Float64], A in [MOI.ACTIVATE_ON_ZERO, MOI.ACTIVATE_ON_ONE]
-    base_model = if T == Int
-        IntAbsoluteValueIndicatorPseudoMILPModel{Int}()
-    elseif T == Bool
-        BoolAbsoluteValueIndicatorPseudoMILPModel{Bool}()
-    elseif T == Float64
-        FloatAbsoluteValueIndicatorPseudoMILPModel{Float64}()
-    else
-        @assert false
-    end
-    mock = MOIU.MockOptimizer(base_model)
+    mock = MOIU.MockOptimizer(AbsoluteValueIndicatorPseudoMILPModel{T}())
     model = if A == MOI.ACTIVATE_ON_ZERO
         COIB.Indicator0DifferentFrom2PseudoMILP{T}(mock)
     elseif A == MOI.ACTIVATE_ON_ONE
