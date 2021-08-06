@@ -61,6 +61,14 @@ struct GlobalCardinality{CVT, CVCT, T <: Real} <: MOI.AbstractVectorSet
     n_values::Int
 end
 
+function GlobalCardinality{CVT, CVCT}(dimension::Int, values::Vector{T}) where {CVT, CVCT, T <: Real}
+    return GlobalCardinality{CVT, CVCT, T}(dimension, values, -1)
+end
+
+function GlobalCardinality{CVT, CVCT, T}(dimension::Int, n_values::Int) where {CVT, CVCT, T <: Real}
+    return GlobalCardinality{CVT, CVCT, T}(dimension, T[], n_values)
+end
+
 function n_values(set::GlobalCardinality)
     if length(set.values) > 0
         return length(set.values)
