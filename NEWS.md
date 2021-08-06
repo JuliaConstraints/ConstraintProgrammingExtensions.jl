@@ -6,6 +6,10 @@ Version 0.3.1
 
 Added test sets for `MOI.IndicatorSet`. 
 
+Fixed bug in the reported required constraint types for the bridges.
+
+Added an online documentation.
+
 
 Version 0.3.0
 -------------
