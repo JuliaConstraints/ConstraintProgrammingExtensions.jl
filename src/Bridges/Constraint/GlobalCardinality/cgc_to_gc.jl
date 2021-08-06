@@ -1,5 +1,6 @@
 """
-Bridges `CP.ClosedGlobalCardinality` to `CP.GlobalCardinality`.
+Bridges `CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}`
+to `CP.GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T`.
 """
 struct GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpenBridge{T} <: MOIBC.AbstractBridge
     cons_domain::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, CP.Domain{T}}}

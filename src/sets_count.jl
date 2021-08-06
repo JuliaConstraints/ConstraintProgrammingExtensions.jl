@@ -33,8 +33,8 @@ end
 end
 
 @enum CountedValuesClosureType begin
-    CLOSED_COUNTED_VALUES
     OPEN_COUNTED_VALUES
+    CLOSED_COUNTED_VALUES
 end
 
 """

@@ -251,7 +251,7 @@
         @test MOI.dimension(CP.CountCompare(3)) == 3 * 2 + 1
     end
 
-    @testset "$(S)" for S in [CP.GlobalCardinality, CP.ClosedGlobalCardinality]
+    @testset "$(S)" for S in [CP.GlobalCardinality, CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}]
         @test S(2, [2, 4]) == S(2, [2, 4])
         @test S(2, [2, 4]) != S(3, [2, 4])
         @test S(3, [2, 4]) != S(2, [2, 4])

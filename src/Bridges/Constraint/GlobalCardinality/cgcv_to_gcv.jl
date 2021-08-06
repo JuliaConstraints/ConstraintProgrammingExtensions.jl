@@ -5,7 +5,7 @@ to `GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}`.
 """
 struct GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T} <: MOIBC.AbstractBridge
     cons_domain::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Membership}}
-    con_gcv::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.GlobalCardinalityVariable}
+    con_gcv::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}}
 end
 
 function MOIBC.bridge_constraint(

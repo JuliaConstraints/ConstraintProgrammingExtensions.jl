@@ -35,7 +35,7 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, CP.ClosedGlobalCardinality(array_size, sought_values))
+    c = MOI.add_constraint(model, fct, CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}(array_size, sought_values))
 
     for i in 1:array_size
         @test MOI.is_valid(model, x_array[i])
@@ -45,10 +45,10 @@
     end
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.ClosedGlobalCardinality}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.ClosedGlobalCardinality) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.ScalarAffineFunction{T}, CP.Domain{T}),
