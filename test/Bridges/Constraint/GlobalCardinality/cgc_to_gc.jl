@@ -35,7 +35,7 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}(array_size, sought_values))
+    c = MOI.add_constraint(model, fct, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}(array_size, sought_values))
 
     for i in 1:array_size
         @test MOI.is_valid(model, x_array[i])
@@ -45,22 +45,22 @@
     end
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.ScalarAffineFunction{T}, CP.Domain{T}),
-            (MOI.VectorAffineFunction{T}, CP.GlobalCardinality{T}),
+            (MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, CP.Domain{T}}()) == array_size
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{T}}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}}()) == 1
         
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, CP.Domain{T}}()) == bridge.cons_domain
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{T}}()) == [bridge.con_gc]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}}()) == [bridge.con_gc]
     end
 
     @testset "Domain" begin

@@ -69,7 +69,7 @@ function n_values(set::GlobalCardinality)
     end
 end
 
-function MOI.dimension(set::GlobalCardinality{CVT, CVCT, T})
+function MOI.dimension(set::GlobalCardinality{CVT, CVCT, T}) where {CVT, CVCT, T <: Real}
     dim = set.dimension + n_values(set) # Array to count in, counts.
     if CVT == VARIABLE_COUNTED_VALUES
         dim += n_values(set) # Values to count.

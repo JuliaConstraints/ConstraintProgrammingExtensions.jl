@@ -11,7 +11,7 @@ function MOIBC.bridge_constraint(
     ::Type{GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpenBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T},
+    s::CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T},
 ) where {T}
     return MOIBC.bridge_constraint(
         GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpenBridge{T},
@@ -25,7 +25,7 @@ function MOIBC.bridge_constraint(
     ::Type{GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpenBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T},
+    s::CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T},
 ) where {T}
     f_scalars = MOIU.scalarize(f)
 
@@ -42,7 +42,7 @@ function MOIBC.bridge_constraint(
     con_gc = MOI.add_constraint(
         model,
         f,
-        CP.GlobalCardinality(s.dimension, copy(s.values)),
+        CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}(s.dimension, copy(s.values)),
         # Copy the values for each constraint to avoid sharing any state.
     )
 
@@ -52,7 +52,7 @@ end
 function MOI.supports_constraint(
     ::Type{GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpenBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}},
+    ::Type{CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}},
 ) where {T}
     return true
 end
@@ -64,7 +64,7 @@ end
 function MOIB.added_constraint_types(::Type{GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpenBridge{T}}) where {T}
     return [
         (MOI.ScalarAffineFunction{T}, CP.Domain{T}),
-        (MOI.VectorAffineFunction{T}, CP.GlobalCardinality{T}),
+        (MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}),
     ]
 end
 
@@ -80,7 +80,7 @@ end
 function MOI.get(
     ::GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpenBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.GlobalCardinality{T},
+        MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
     },
 ) where {T}
     return 1
@@ -98,7 +98,7 @@ end
 function MOI.get(
     b::GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpenBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.GlobalCardinality{T},
+        MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
     },
 ) where {T}
     return [b.con_gc]
