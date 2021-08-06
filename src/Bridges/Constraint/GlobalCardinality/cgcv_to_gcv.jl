@@ -1,5 +1,7 @@
 """
-Bridges `CP.ClosedGlobalCardinalityVariable` to `CP.GlobalCardinalityVariable`.
+Bridges 
+`GlobalCardinality{VARIABLE_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}`
+to `GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}`.
 """
 struct ClosedGlobalCardinalityVariable2GlobalCardinalityVariableBridge{T} <: MOIBC.AbstractBridge
     cons_domain::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Membership}}
@@ -10,7 +12,7 @@ function MOIBC.bridge_constraint(
     ::Type{ClosedGlobalCardinalityVariable2GlobalCardinalityVariableBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.ClosedGlobalCardinalityVariable,
+    s::CP.GlobalCardinality{VARIABLE_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T},
 ) where {T}
     return MOIBC.bridge_constraint(
         ClosedGlobalCardinalityVariable2GlobalCardinalityVariableBridge{T},
@@ -24,7 +26,7 @@ function MOIBC.bridge_constraint(
     ::Type{ClosedGlobalCardinalityVariable2GlobalCardinalityVariableBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.ClosedGlobalCardinalityVariable,
+    s::CP.GlobalCardinality{VARIABLE_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T},
 ) where {T}
     f_scalars = MOIU.scalarize(f)
     f_sought = f_scalars[(s.dimension + s.n_values + 1):(s.dimension + 2 * s.n_values)]
@@ -55,7 +57,7 @@ end
 function MOI.supports_constraint(
     ::Type{ClosedGlobalCardinalityVariable2GlobalCardinalityVariableBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.ClosedGlobalCardinalityVariable},
+    ::Type{CP.GlobalCardinality{VARIABLE_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}},
 ) where {T}
     return true
 end

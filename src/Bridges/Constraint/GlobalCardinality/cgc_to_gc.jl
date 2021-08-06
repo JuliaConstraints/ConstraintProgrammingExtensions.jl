@@ -10,7 +10,7 @@ function MOIBC.bridge_constraint(
     ::Type{ClosedGlobalCardinality2GlobalCardinalityBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.ClosedGlobalCardinality{T},
+    s::CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T},
 ) where {T}
     return MOIBC.bridge_constraint(
         ClosedGlobalCardinality2GlobalCardinalityBridge{T},
@@ -24,7 +24,7 @@ function MOIBC.bridge_constraint(
     ::Type{ClosedGlobalCardinality2GlobalCardinalityBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.ClosedGlobalCardinality{T},
+    s::CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T},
 ) where {T}
     f_scalars = MOIU.scalarize(f)
 
@@ -51,7 +51,7 @@ end
 function MOI.supports_constraint(
     ::Type{ClosedGlobalCardinality2GlobalCardinalityBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.ClosedGlobalCardinality{T}},
+    ::Type{CP.GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}},
 ) where {T}
     return true
 end

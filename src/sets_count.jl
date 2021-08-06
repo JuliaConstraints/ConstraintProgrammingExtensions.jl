@@ -129,7 +129,7 @@ MOI.dimension(set::CountDistinct) = set.dimension + 1
 
 # isbits types, nothing to copy
 function copy(
-    set::Union{CountCompare, CountDistinct, GlobalCardinalityVariable, ClosedGlobalCardinalityVariable},
+    set::Union{CountCompare, CountDistinct},
 )
     return set
 end
