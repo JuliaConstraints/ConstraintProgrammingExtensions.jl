@@ -27,6 +27,16 @@ function Base.:(==)(x::Count{S}, y::Count{S}) where {S}
     return x.dimension == y.dimension && x.set == y.set
 end
 
+@enum CountedValuesType begin
+    FIXED_COUNTED_VALUES
+    VARIABLE_COUNTED_VALUES
+end
+
+@enum CountedValuesClosureType begin
+    CLOSED_COUNTED_VALUES
+    OPEN_COUNTED_VALUES
+end
+
 """
     GlobalCardinality{T}(dimension::Int, values::Vector{T})
 
@@ -45,94 +55,35 @@ or `count`.
     # v == sum([x, y, z] .== 2.0)
     # w == sum([x, y, z] .== 4.0)
 """
-struct GlobalCardinality{T} <: MOI.AbstractVectorSet
+struct GlobalCardinality{CVT, CVCT, T <: Real} <: MOI.AbstractVectorSet
     dimension::Int
     values::Vector{T}
-end
-
-MOI.dimension(set::GlobalCardinality) = set.dimension + length(set.values)
-copy(set::GlobalCardinality) = GlobalCardinality(set.dimension, copy(set.values))
-function Base.:(==)(x::GlobalCardinality, y::GlobalCardinality)
-    return x.dimension == y.dimension && x.values == y.values
-end
-
-"""
-    GlobalCardinalityVariable(dimension::Int, n_values::Int)
-
-``\\{(x, y, z) \\in \\mathbb{T}^\\mathtt{dimension} \\times \\mathbb{N}^\\mathtt{n\\_values} \\times \\mathbb{T}^\\mathtt{n\\_values} : y_i = |\\{ j | x_j = z_i, \\forall j \\}| \\}``
-
-The first `dimension` variables are an array, the next `n_values` variables 
-are the number of times that each item of the last `n_values` variables is 
-present in the first array. Values of the first array that are not in the 
-`n_values` are ignored. 
-
-Also called `distribute`.
-
-## Example
-
-    [x, y, z, t, u, v, w] in GlobalCardinalityVariable(3, 2)
-    # t == sum([x, y, z] .== v)
-    # u == sum([x, y, z] .== w)
-"""
-struct GlobalCardinalityVariable <: MOI.AbstractVectorSet
-    dimension::Int
     n_values::Int
 end
 
-MOI.dimension(set::GlobalCardinalityVariable) = set.dimension + 2 * set.n_values
-
-"""
-    ClosedGlobalCardinality{T}(dimension::Int, values::Vector{T})
-
-``\\{(x, y) \\in \\mathbb{T}^\\mathtt{dimension} \\times \\mathbb{N}^d : y_i = |\\{ j | x_j = \\mathtt{values}_i, \\forall j \\}| \\}``
-
-The first `dimension` variables are an array, the last variables are the 
-number of times that each item of `values` is present in the first array.
-Each value of the first array must be within `values`.
-
-## Example
-
-    [x, y, z, v, w] in ClosedGlobalCardinality(3, [2.0, 4.0])
-    # v == sum([x, y, z] .== 2.0)
-    # w == sum([x, y, z] .== 4.0)
-    # x ∈ [2.0, 4.0], y ∈ [2.0, 4.0], z ∈ [2.0, 4.0]
-"""
-struct ClosedGlobalCardinality{T} <: MOI.AbstractVectorSet
-    dimension::Int
-    values::Vector{T}
+function n_values(set::GlobalCardinality)
+    if length(set.values) > 0
+        return length(set.values)
+    else
+        return set.n_values
+    end
 end
 
-MOI.dimension(set::ClosedGlobalCardinality) = set.dimension + length(set.values)
-copy(set::ClosedGlobalCardinality) = ClosedGlobalCardinality(set.dimension, copy(set.values))
-function Base.:(==)(x::ClosedGlobalCardinality, y::ClosedGlobalCardinality)
-    return x.dimension == y.dimension && x.values == y.values
+function MOI.dimension(set::GlobalCardinality{CVT, CVCT, T})
+    dim = set.dimension + n_values(set) # Array to count in, counts.
+    if CVT == VARIABLE_COUNTED_VALUES
+        dim += n_values(set) # Values to count.
+    end
+    return dim
 end
 
-"""
-    ClosedGlobalCardinalityVariable(dimension::Int, n_values::Int)
-
-``\\{(x, y, z) \\in \\mathbb{T}^\\mathtt{dimension} \\times \\mathbb{N}^\\mathtt{n\\_values} \\times \\mathbb{T}^\\mathtt{n\\_values} : y_i = |\\{ j | x_j = z_i, \\forall j \\}| \\}``
-
-The first `dimension` variables are an array, the next `n_values` variables 
-are the number of times that each item of the last `n_values` variables is 
-present in the first array. Each value of the first array must be within the 
-next given `n_values`.
-
-Also called `distribute`.
-
-## Example
-
-    [x, y, z, t, u, v, w] in ClosedGlobalCardinalityVariable(3, 2)
-    # t == sum([x, y, z] .== v)
-    # u == sum([x, y, z] .== w)
-    # x ∈ [v, w], y ∈ [v, w], z ∈ [v, w]
-"""
-struct ClosedGlobalCardinalityVariable <: MOI.AbstractVectorSet
-    dimension::Int
-    n_values::Int
+function copy(set::GlobalCardinality) 
+    return GlobalCardinality(set.dimension, copy(set.values), set.n_values)
 end
 
-MOI.dimension(set::ClosedGlobalCardinalityVariable) = set.dimension + 2 * set.n_values
+function Base.:(==)(x::GlobalCardinality{CVT, CVCT, T}, y::GlobalCardinality{CVT, CVCT, T}) where {CVT, CVCT, T <: Real}
+    return x.dimension == y.dimension && x.values == y.values && x.n_values == y.n_values
+end
 
 """
     CountCompare(dimension::Int)
