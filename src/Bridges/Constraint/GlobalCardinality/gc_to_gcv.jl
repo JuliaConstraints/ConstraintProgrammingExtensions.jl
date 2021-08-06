@@ -12,7 +12,7 @@ function MOIBC.bridge_constraint(
     ::Type{GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T},
+    s::CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
 ) where {T}
     return MOIBC.bridge_constraint(
         GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T},
@@ -26,7 +26,7 @@ function MOIBC.bridge_constraint(
     ::Type{GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T},
+    s::CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
 ) where {T}
     # Create the variables that contain the values that are counted.
     if T <: Integer
@@ -59,7 +59,7 @@ function MOIBC.bridge_constraint(
                 (one(T) .* MOI.SingleVariable.(vars))...
             ]
         ),
-        CP.GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}(s.dimension, length(s.values))
+        CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}(s.dimension, length(s.values))
     )
 
     return GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge(vars, vars_int, cons_eq, con_gcv)
@@ -68,7 +68,7 @@ end
 function MOI.supports_constraint(
     ::Type{GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}},
+    ::Type{CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}},
 ) where {T}
     return true
 end
@@ -84,7 +84,7 @@ end
 function MOIB.added_constraint_types(::Type{GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T}}) where {T}
     return [
         (MOI.SingleVariable, MOI.EqualTo{T}),
-        (MOI.VectorAffineFunction{T}, CP.GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}),
+        (MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}),
     ]
 end
 

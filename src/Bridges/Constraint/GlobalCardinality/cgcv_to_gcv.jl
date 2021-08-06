@@ -1,18 +1,18 @@
 """
 Bridges 
-`GlobalCardinality{VARIABLE_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}`
-to `GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}`.
+`GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}`
+to `GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}`.
 """
 struct GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T} <: MOIBC.AbstractBridge
     cons_domain::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Membership}}
-    con_gcv::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}}
+    con_gcv::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}}
 end
 
 function MOIBC.bridge_constraint(
     ::Type{GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.GlobalCardinality{VARIABLE_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T},
+    s::CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
 ) where {T}
     return MOIBC.bridge_constraint(
         GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T},
@@ -26,7 +26,7 @@ function MOIBC.bridge_constraint(
     ::Type{GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.GlobalCardinality{VARIABLE_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T},
+    s::CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
 ) where {T}
     f_scalars = MOIU.scalarize(f)
     f_sought = f_scalars[(s.dimension + s.n_values + 1):(s.dimension + 2 * s.n_values)]
@@ -57,7 +57,7 @@ end
 function MOI.supports_constraint(
     ::Type{GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.GlobalCardinality{VARIABLE_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}},
+    ::Type{CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}},
 ) where {T}
     return true
 end
@@ -69,7 +69,7 @@ end
 function MOIB.added_constraint_types(::Type{GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T}}) where {T}
     return [
         (MOI.VectorAffineFunction{T}, CP.Membership),
-        (MOI.VectorAffineFunction{T}, CP.GlobalCardinalityVariable),
+        (MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}),
     ]
 end
 
@@ -85,7 +85,7 @@ end
 function MOI.get(
     ::GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.GlobalCardinalityVariable,
+        MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
     },
 ) where {T}
     return 1
@@ -103,7 +103,7 @@ end
 function MOI.get(
     b::GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.GlobalCardinalityVariable,
+        MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
     },
 ) where {T}
     return [b.con_gcv]
