@@ -1,6 +1,6 @@
-@testset "GlobalCardinalityVariable2Count: $(fct_type), $(array_size) items, $(sought_size) sought items, $(T)" for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 3], sought_size in [2, 3], T in [Int, Float64]
+@testset "GlobalCardinalityVariableOpen2Count: $(fct_type), $(array_size) items, $(sought_size) sought items, $(T)" for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 3], sought_size in [2, 3], T in [Int, Float64]
     mock = MOIU.MockOptimizer(CountModel{T}())
-    model = COIB.GlobalCardinalityVariable2Count{T}(mock)
+    model = COIB.GlobalCardinalityVariableOpen2Count{T}(mock)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
     @test MOI.supports_constraint(

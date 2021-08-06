@@ -131,23 +131,23 @@ const ReificationGreaterThan2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ReificationGreaterThan2MILPBridge{T}, OT}
 
 include("GlobalCardinality/cgc_to_gc.jl")
-const ClosedGlobalCardinality2GlobalCardinality{T, OT <: MOI.ModelLike} =
+const GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpen{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpenBridge{T}, OT}
 
 include("GlobalCardinality/cgcv_to_gcv.jl")
-const ClosedGlobalCardinalityVariable2GlobalCardinalityVariable{T, OT <: MOI.ModelLike} =
+const GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpen{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T}, OT}
 
 include("GlobalCardinality/gc_to_count.jl")
-const GlobalCardinality2Count{T, OT <: MOI.ModelLike} =
+const GlobalCardinalityFixedOpen2Count{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{GlobalCardinalityFixedOpen2CountBridge{T}, OT}
 
 include("GlobalCardinality/gc_to_gcv.jl")
-const GlobalCardinality2GlobalCardinalityVariable{T, OT <: MOI.ModelLike} =
+const GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpen{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T}, OT}
 
 include("GlobalCardinality/gcv_to_count.jl")
-const GlobalCardinalityVariable2Count{T, OT <: MOI.ModelLike} =
+const GlobalCardinalityVariableOpen2Count{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{GlobalCardinalityVariableOpen2CountBridge{T}, OT}
 
 include("IfThenElse/ifthenelse_to_imply.jl")

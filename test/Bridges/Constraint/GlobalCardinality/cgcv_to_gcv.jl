@@ -1,6 +1,6 @@
-@testset "ClosedGlobalCardinalityVariable2GlobalCardinalityVariable: $(fct_type), $(array_size) items, $(sought_size) sought items, $(T)" for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 3], sought_size in [2, 3], T in [Int, Float64]
+@testset "GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpen: $(fct_type), $(array_size) items, $(sought_size) sought items, $(T)" for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 3], sought_size in [2, 3], T in [Int, Float64]
     mock = MOIU.MockOptimizer(GlobalCardinalityVariableModel{T}())
-    model = COIB.ClosedGlobalCardinalityVariable2GlobalCardinalityVariable{T}(mock)
+    model = COIB.GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpen{T}(mock)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
     @test MOI.supports_constraint(
