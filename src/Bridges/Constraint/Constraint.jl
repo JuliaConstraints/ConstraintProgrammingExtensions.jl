@@ -46,14 +46,6 @@ include("BinPacking/varcapa_to_milp.jl")
 const VariableCapacityBinPacking2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{VariableCapacityBinPacking2MILPBridge{T}, OT}
 
-include("ClosedGlobalCardinality/cgc_to_gc.jl")
-const ClosedGlobalCardinality2GlobalCardinality{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{ClosedGlobalCardinality2GlobalCardinalityBridge{T}, OT}
-
-include("ClosedGlobalCardinalityVariable/cgcv_to_gcv.jl")
-const ClosedGlobalCardinalityVariable2GlobalCardinalityVariable{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{ClosedGlobalCardinalityVariable2GlobalCardinalityVariableBridge{T}, OT}
-
 include("Conjunction/conjunction_to_reif.jl")
 const Conjunction2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Conjunction2ReificationBridge{T}, OT}
@@ -138,6 +130,14 @@ include("GreaterThan_Reify/reif_gt_to_milp.jl")
 const ReificationGreaterThan2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ReificationGreaterThan2MILPBridge{T}, OT}
 
+include("GlobalCardinality/cgc_to_gc.jl")
+const ClosedGlobalCardinality2GlobalCardinality{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ClosedGlobalCardinality2GlobalCardinalityBridge{T}, OT}
+
+include("GlobalCardinality/cgcv_to_gcv.jl")
+const ClosedGlobalCardinalityVariable2GlobalCardinalityVariable{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{ClosedGlobalCardinalityVariable2GlobalCardinalityVariableBridge{T}, OT}
+
 include("GlobalCardinality/gc_to_count.jl")
 const GlobalCardinality2Count{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{GlobalCardinality2CountBridge{T}, OT}
@@ -146,7 +146,7 @@ include("GlobalCardinality/gc_to_gcv.jl")
 const GlobalCardinality2GlobalCardinalityVariable{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{GlobalCardinality2GlobalCardinalityVariableBridge{T}, OT}
 
-include("GlobalCardinalityVariable/gcv_to_count.jl")
+include("GlobalCardinality/gcv_to_count.jl")
 const GlobalCardinalityVariable2Count{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{GlobalCardinalityVariable2CountBridge{T}, OT}
 
@@ -305,8 +305,6 @@ function add_all_set_bridges(bridged_model, ::Type{T}) where {T}
     MOIB.add_bridge(bridged_model, FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T})
     MOIB.add_bridge(bridged_model, VariableCapacityBinPacking2BinPackingBridge{T})
     MOIB.add_bridge(bridged_model, VariableCapacityBinPacking2MILPBridge{T})
-    MOIB.add_bridge(bridged_model, ClosedGlobalCardinality2GlobalCardinalityBridge{T})
-    MOIB.add_bridge(bridged_model, ClosedGlobalCardinalityVariable2GlobalCardinalityVariableBridge{T})
     MOIB.add_bridge(bridged_model, Conjunction2ReificationBridge{T})
     MOIB.add_bridge(bridged_model, Count2ReificationBridge{T, MOI.EqualTo{T}})
     MOIB.add_bridge(bridged_model, Count2ReificationBridge{T, MOI.LessThan{T}})
@@ -331,6 +329,8 @@ function add_all_set_bridges(bridged_model, ::Type{T}) where {T}
     MOIB.add_bridge(bridged_model, ReificationEqualTo2MILPBridge{T})
     MOIB.add_bridge(bridged_model, ReificationGreaterThan2IndicatorBridge{T})
     MOIB.add_bridge(bridged_model, ReificationGreaterThan2MILPBridge{T})
+    MOIB.add_bridge(bridged_model, ClosedGlobalCardinality2GlobalCardinalityBridge{T})
+    MOIB.add_bridge(bridged_model, ClosedGlobalCardinalityVariable2GlobalCardinalityVariableBridge{T})
     MOIB.add_bridge(bridged_model, GlobalCardinality2CountBridge{T})
     MOIB.add_bridge(bridged_model, GlobalCardinality2GlobalCardinalityVariableBridge{T})
     MOIB.add_bridge(bridged_model, GlobalCardinalityVariable2CountBridge{T})
