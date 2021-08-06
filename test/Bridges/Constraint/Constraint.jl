@@ -32,14 +32,6 @@
         include("BinPacking/varcapa_to_milp.jl")
     end
 
-    @testset "ClosedGlobalCardinality" begin
-        include("ClosedGlobalCardinality/cgc_to_gc.jl")
-    end
-
-    @testset "ClosedGlobalCardinalityVariable" begin
-        include("ClosedGlobalCardinalityVariable/cgcv_to_gcv.jl")
-    end
-
     @testset "Conjunction" begin
         include("Conjunction/conjunction_to_reif.jl")
     end
@@ -85,12 +77,11 @@
     end
 
     @testset "GlobalCardinality" begin
+        include("GlobalCardinality/cgc_to_gc.jl")
+        include("GlobalCardinality/cgcv_to_gcv.jl")
         include("GlobalCardinality/gc_to_count.jl")
         include("GlobalCardinality/gc_to_gcv.jl")
-    end
-
-    @testset "GlobalCardinalityVariable" begin
-        include("GlobalCardinalityVariable/gcv_to_count.jl")
+        include("GlobalCardinality/gcv_to_count.jl")
     end
 
     @testset "IfThenElse" begin
