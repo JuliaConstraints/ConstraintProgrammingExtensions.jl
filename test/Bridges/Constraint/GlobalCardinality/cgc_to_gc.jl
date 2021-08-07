@@ -1,5 +1,4 @@
-@testset "GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpen: $(fct_type), $(array_size) items, $(sought_size) sought items, $(T)" for fct_type in ["vector of variables"], array_size in [2], sought_size in [3], T in [Int]
-    # for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 3], sought_size in [2, 3], T in [Int, Float64]
+@testset "GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpen: $(fct_type), $(array_size) items, $(sought_size) sought items, $(T)" for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 3], sought_size in [2, 3], T in [Int, Float64]
     mock = MOIU.MockOptimizer(GlobalCardinalityModel{T}())
     model = COIB.GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpen{T}(mock)
 
