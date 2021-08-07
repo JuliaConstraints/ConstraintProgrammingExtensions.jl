@@ -1,5 +1,5 @@
 @testset "DifferentFrom2PseudoMILP: $(fct_type), $(T)" for fct_type in ["single variable", "scalar affine function"], T in [Int, Bool, Float64]
-    mock = MOIU.MockOptimizer(AbsoluteValuePseudoMILPModel{T}())
+    mock = MOIU.MockOptimizer(AbsoluteValueIndicatorPseudoMILPModel{T}())
     model = COIB.DifferentFrom2PseudoMILP{T}(mock)
 
     if T == Int
