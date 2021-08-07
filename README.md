@@ -22,4 +22,5 @@ of bridges should make it possible to transform any CP model into a MIP model.
 
 Currently, the following solvers are using this interface: 
 
-* [CPLEXCP.jl](https://github.com/dourouc05/CPLEXCP.jl/)
+* [ConstraintSolver.jl](https://github.com/Wikunia/ConstraintSolver.jl)
+* [CPLEXCP.jl](https://github.com/dourouc05/CPLEXCP.jl)
