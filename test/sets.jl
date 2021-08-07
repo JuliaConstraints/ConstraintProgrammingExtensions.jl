@@ -274,8 +274,8 @@
         @test typeof(copy(s)) <: CP.GlobalCardinality{CVT, CVCT, Int}
         @test copy(s) == s
 
-        @test MOI.dimension(S(2, 2)) == 2 + 2 * 2
-        @test MOI.dimension(S(3, 4)) == 3 + 2 * 4
+        @test MOI.dimension(CP.GlobalCardinality{CVT, CVCT, Int}(2, 2)) == 2 + 2 * 2
+        @test MOI.dimension(CP.GlobalCardinality{CVT, CVCT, Int}(3, 4)) == 3 + 2 * 4
     end
 
     @testset "SlidingSum" begin

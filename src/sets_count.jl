@@ -85,8 +85,8 @@ function MOI.dimension(set::GlobalCardinality{CVT, CVCT, T}) where {CVT, CVCT, T
     return dim
 end
 
-function copy(set::GlobalCardinality) 
-    return GlobalCardinality(set.dimension, copy(set.values), set.n_values)
+function copy(set::GlobalCardinality{CVT, CVCT, T})  where {CVT, CVCT, T <: Real}
+    return GlobalCardinality{CVT, CVCT, T}(set.dimension, copy(set.values), set.n_values)
 end
 
 function Base.:(==)(x::GlobalCardinality{CVT, CVCT, T}, y::GlobalCardinality{CVT, CVCT, T}) where {CVT, CVCT, T <: Real}
