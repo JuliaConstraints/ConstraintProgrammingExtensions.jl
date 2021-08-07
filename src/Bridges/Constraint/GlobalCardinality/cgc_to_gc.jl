@@ -4,7 +4,7 @@ to `CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T`.
 """
 struct GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpenBridge{T} <: MOIBC.AbstractBridge
     cons_domain::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, CP.Domain{T}}}
-    con_gc::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{T}}
+    con_gc::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}}
 end
 
 function MOIBC.bridge_constraint(

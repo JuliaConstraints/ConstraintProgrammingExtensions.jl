@@ -1,4 +1,5 @@
-@testset "GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpen: $(fct_type), $(array_size) items, $(sought_size) sought items, $(T)" for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 3], sought_size in [2, 3], T in [Int, Float64]
+@testset "GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpen: $(fct_type), $(array_size) items, $(sought_size) sought items, $(T)" for fct_type in ["vector of variables"], array_size in [2], sought_size in [3], T in [Int]
+    # for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 3], sought_size in [2, 3], T in [Int, Float64]
     mock = MOIU.MockOptimizer(GlobalCardinalityModel{T}())
     model = COIB.GlobalCardinalityFixedClosed2GlobalCardinalityFixedOpen{T}(mock)
 
@@ -6,7 +7,12 @@
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.GlobalCardinality{T},
+        CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
+    )
+    @test MOI.supports_constraint(
+        model,
+        MOI.VectorAffineFunction{T},
+        GlobalCardinalityFixedOpen{T},
     )
     @test MOI.supports_constraint(
         model,
@@ -35,7 +41,7 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}(array_size, sought_values))
+    c = MOI.add_constraint(model, fct, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES}(array_size, sought_values))
 
     for i in 1:array_size
         @test MOI.is_valid(model, x_array[i])
@@ -80,7 +86,7 @@
     @testset "Global cardinality" begin
         @test MOI.is_valid(model, bridge.con_gc)
         f = MOIU.canonical(MOI.get(model, MOI.ConstraintFunction(), bridge.con_gc))
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_gc) == CP.GlobalCardinality(array_size, sought_values)
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_gc) == CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES}(array_size, sought_values)
 
         # f == fct, in principle, with the exception that the bridge always 
         # uses a VectorAffineFunction, even if the input is a VectorOfVariables.
