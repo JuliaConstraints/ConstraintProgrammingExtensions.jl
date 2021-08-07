@@ -615,42 +615,10 @@ MOIU.@model(
     (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
 )
 
-# Global cardinality (variable).
-
-MOIU.@model(
-    GlobalCardinalityVariableModel,
-    (),
-    (
-        MOI.EqualTo, 
-        MOI.GreaterThan, 
-        MOI.LessThan, 
-        MOI.Interval, 
-    ),
-    (
-        MOI.Zeros,
-        MOI.Nonnegatives,
-        MOI.Nonpositives,
-        MOI.NormInfinityCone,
-        MOI.NormOneCone,
-        MOI.SecondOrderCone,
-        MOI.RotatedSecondOrderCone,
-        MOI.GeometricMeanCone,
-        MOI.RelativeEntropyCone,
-        MOI.NormSpectralCone,
-        MOI.NormNuclearCone,
-        MOI.PositiveSemidefiniteConeTriangle,
-        MOI.ExponentialCone,
-        CP.GlobalCardinalityVariable,
-        CP.Membership,
-    ),
-    (MOI.PowerCone, MOI.DualPowerCone),
-    (),
-    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
-    (MOI.VectorOfVariables,),
-    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
-)
-
 # Global cardinality.
+
+const GlobalCardinalityFixedOpen{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
+const GlobalCardinalityVariableOpen{T} = CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
 
 MOIU.@model(
     GlobalCardinalityModel,
@@ -676,8 +644,42 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
+        GlobalCardinalityFixedOpen,
     ),
-    (MOI.PowerCone, MOI.DualPowerCone, CP.GlobalCardinality),
+    (MOI.PowerCone, MOI.DualPowerCone),
+    (),
+    (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
+    (MOI.VectorOfVariables,),
+    (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
+)
+
+MOIU.@model(
+    GlobalCardinalityVariableModel,
+    (),
+    (
+        MOI.EqualTo, 
+        MOI.GreaterThan, 
+        MOI.LessThan, 
+        MOI.Interval, 
+    ),
+    (
+        MOI.Zeros,
+        MOI.Nonnegatives,
+        MOI.Nonpositives,
+        MOI.NormInfinityCone,
+        MOI.NormOneCone,
+        MOI.SecondOrderCone,
+        MOI.RotatedSecondOrderCone,
+        MOI.GeometricMeanCone,
+        MOI.RelativeEntropyCone,
+        MOI.NormSpectralCone,
+        MOI.NormNuclearCone,
+        MOI.PositiveSemidefiniteConeTriangle,
+        MOI.ExponentialCone,
+        GlobalCardinalityVariableOpen,
+        CP.Membership,
+    ),
+    (MOI.PowerCone, MOI.DualPowerCone),
     (),
     (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
     (MOI.VectorOfVariables,),
