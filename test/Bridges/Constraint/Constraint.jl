@@ -188,9 +188,11 @@
         include("Strictly/strictly_dec_to_lp.jl")
         include("Strictly/strictly_dlgt_to_lgt.jl")
         include("Strictly/strictly_dllt_to_llt.jl")
+        include("Strictly/strictly_gt_to_strictly_lt.jl")
         include("Strictly/strictly_inc_to_lp.jl")
         include("Strictly/strictly_lgt_to_indic.jl")
         include("Strictly/strictly_llt_to_indic.jl")
+        include("Strictly/strictly_lt_to_strictly_gt.jl")
         include("Strictly/strictly_to_lp.jl")
     end
 
