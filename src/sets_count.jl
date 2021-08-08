@@ -97,6 +97,9 @@ function Base.:(==)(x::GlobalCardinality{CVT, CVCT, T}, y::GlobalCardinality{CVT
     return x.dimension == y.dimension && x.values == y.values && x.n_values == y.n_values
 end
 
+const GlobalCardinalityFixedOpen{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
+const GlobalCardinalityVariableOpen{T} = CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
+
 """
     CountCompare(dimension::Int)
 

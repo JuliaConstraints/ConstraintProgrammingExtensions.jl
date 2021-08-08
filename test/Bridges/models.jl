@@ -617,9 +617,6 @@ MOIU.@model(
 
 # Global cardinality.
 
-const GlobalCardinalityFixedOpen{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
-const GlobalCardinalityVariableOpen{T} = CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
-
 MOIU.@model(
     GlobalCardinalityModel,
     (),
@@ -648,7 +645,7 @@ MOIU.@model(
     (
         MOI.PowerCone, 
         MOI.DualPowerCone,
-        GlobalCardinalityFixedOpen,
+        CP.GlobalCardinalityFixedOpen,
     ),
     (),
     (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
@@ -684,7 +681,7 @@ MOIU.@model(
     (
         MOI.PowerCone, 
         MOI.DualPowerCone,
-        GlobalCardinalityVariableOpen,
+        CP.GlobalCardinalityVariableOpen,
     ),
     (),
     (MOI.ScalarAffineFunction, MOI.ScalarQuadraticFunction),
