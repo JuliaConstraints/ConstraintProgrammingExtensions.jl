@@ -101,6 +101,7 @@ function Base.:(==)(x::GlobalCardinality{CVT, CVCT, T}, y::GlobalCardinality{CVT
     return x.dimension == y.dimension && x.values == y.values && x.n_values == y.n_values
 end
 
+# Shortcuts for types.
 # const GlobalCardinality{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
 const GlobalCardinalityOpen{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
 const GlobalCardinalityClosed{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}
@@ -110,6 +111,19 @@ const GlobalCardinalityFixedClosed{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VA
 const GlobalCardinalityVariable{T} = CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
 const GlobalCardinalityVariableOpen{T} = CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
 const GlobalCardinalityVariableClosed{T} = CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}
+
+# Ease dispatch for implementing solvers.
+function MOI.supports_constraint(o, f, s::Type{GlobalCardinality{CVT, CVCT, T}}) where {CVT, CVCT, T <: Real}
+    return MOI.supports_constraint(o, f, s, Val(CVT), Val(CVCT))
+end
+
+function MOI.supports_constraint(o, f, s::Type{GlobalCardinality{CVT, CVCT, T}}, ::Val{CVT}, ::Val{OPEN_COUNTED_VALUES}) where {CVT, T <: Real}
+    return MOI.supports_constraint(o, f, s, Val(CVT))
+end
+
+function MOI.supports_constraint(o, f, s::Type{GlobalCardinality{CVT, CVCT, T}}, ::Val{FIXED_COUNTED_VALUES}, ::Val{CVCT}) where {CVCT, T <: Real}
+    return MOI.supports_constraint(o, f, s, Val(CVCT))
+end
 
 """
     CountCompare(dimension::Int)
