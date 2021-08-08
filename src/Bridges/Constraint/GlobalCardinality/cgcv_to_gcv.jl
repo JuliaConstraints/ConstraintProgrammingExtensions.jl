@@ -12,7 +12,7 @@ function MOIBC.bridge_constraint(
     ::Type{GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
+    s::CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T},
 ) where {T}
     return MOIBC.bridge_constraint(
         GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T},
@@ -26,7 +26,7 @@ function MOIBC.bridge_constraint(
     ::Type{GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
+    s::CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T},
 ) where {T}
     f_scalars = MOIU.scalarize(f)
     f_sought = f_scalars[(s.dimension + s.n_values + 1):(s.dimension + 2 * s.n_values)]
@@ -48,7 +48,7 @@ function MOIBC.bridge_constraint(
     con_gcv = MOI.add_constraint(
         model,
         f,
-        CP.GlobalCardinalityVariable(s.dimension, s.n_values),
+        CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}(s.dimension, s.n_values),
     )
 
     return GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpenBridge(cons_domain, con_gcv)
