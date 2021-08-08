@@ -117,11 +117,11 @@ function MOI.supports_constraint(o, f, s::Type{GlobalCardinality{CVT, CVCT, T}})
     return MOI.supports_constraint(o, f, s, Val(CVT), Val(CVCT))
 end
 
-function MOI.supports_constraint(o, f, s::Type{GlobalCardinality{CVT, CVCT, T}}, ::Val{CVT}, ::Val{OPEN_COUNTED_VALUES}) where {CVT, T <: Real}
+function MOI.supports_constraint(o, f, s::Type{GlobalCardinality{CVT, OPEN_COUNTED_VALUES, T}}, ::Val{CVT}, ::Val{OPEN_COUNTED_VALUES}) where {CVT, T <: Real}
     return MOI.supports_constraint(o, f, s, Val(CVT))
 end
 
-function MOI.supports_constraint(o, f, s::Type{GlobalCardinality{CVT, CVCT, T}}, ::Val{FIXED_COUNTED_VALUES}, ::Val{CVCT}) where {CVCT, T <: Real}
+function MOI.supports_constraint(o, f, s::Type{GlobalCardinality{FIXED_COUNTED_VALUES, CVCT, T}}, ::Val{FIXED_COUNTED_VALUES}, ::Val{CVCT}) where {CVCT, T <: Real}
     return MOI.supports_constraint(o, f, s, Val(CVCT))
 end
 
