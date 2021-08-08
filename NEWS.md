@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.3.2
+-------------
+
+Added a bridge to change the sign of strict inequalities.
+
+
 Version 0.3.1
 -------------
 
