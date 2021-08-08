@@ -62,7 +62,7 @@ struct GlobalCardinality{CVT, CVCT, T <: Real} <: MOI.AbstractVectorSet
 end
 
 function GlobalCardinality{T}(dimension::Int, values::Vector{T}) where {T <: Real}
-    return GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}(dimension, values, -1)
+    return GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}(dimension, values, -1)
 end
 
 function GlobalCardinality{CVT, CVCT}(dimension::Int, values::Vector{T}) where {CVT, CVCT, T <: Real}
@@ -102,15 +102,15 @@ function Base.:(==)(x::GlobalCardinality{CVT, CVCT, T}, y::GlobalCardinality{CVT
 end
 
 # Shortcuts for types.
-# const GlobalCardinality{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
-const GlobalCardinalityOpen{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
-const GlobalCardinalityClosed{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}
-const GlobalCardinalityFixed{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
-const GlobalCardinalityFixedOpen{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
-const GlobalCardinalityFixedClosed{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}
-const GlobalCardinalityVariable{T} = CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
-const GlobalCardinalityVariableOpen{T} = CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
-const GlobalCardinalityVariableClosed{T} = CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}
+# const GlobalCardinality{T} = GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}
+const GlobalCardinalityOpen{T} = GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}
+const GlobalCardinalityClosed{T} = GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}
+const GlobalCardinalityFixed{T} = GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}
+const GlobalCardinalityFixedOpen{T} = GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}
+const GlobalCardinalityFixedClosed{T} = GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}
+const GlobalCardinalityVariable{T} = GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}
+const GlobalCardinalityVariableOpen{T} = GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}
+const GlobalCardinalityVariableClosed{T} = GlobalCardinality{VARIABLE_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}
 
 # Ease dispatch for implementing solvers.
 function MOI.supports_constraint(o, f, s::Type{GlobalCardinality{CVT, CVCT, T}}) where {CVT, CVCT, T <: Real}
