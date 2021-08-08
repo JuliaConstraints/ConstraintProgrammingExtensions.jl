@@ -61,6 +61,10 @@ struct GlobalCardinality{CVT, CVCT, T <: Real} <: MOI.AbstractVectorSet
     n_values::Int
 end
 
+function GlobalCardinality{T}(dimension::Int, values::Vector{T}) where {T <: Real}
+    return GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}(dimension, values, -1)
+end
+
 function GlobalCardinality{CVT, CVCT}(dimension::Int, values::Vector{T}) where {CVT, CVCT, T <: Real}
     return GlobalCardinality{CVT, CVCT, T}(dimension, values, -1)
 end
@@ -97,8 +101,15 @@ function Base.:(==)(x::GlobalCardinality{CVT, CVCT, T}, y::GlobalCardinality{CVT
     return x.dimension == y.dimension && x.values == y.values && x.n_values == y.n_values
 end
 
+# const GlobalCardinality{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
+const GlobalCardinalityOpen{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
+const GlobalCardinalityClosed{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}
+const GlobalCardinalityFixed{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
 const GlobalCardinalityFixedOpen{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
+const GlobalCardinalityFixedClosed{T} = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}
+const GlobalCardinalityVariable{T} = CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
 const GlobalCardinalityVariableOpen{T} = CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
+const GlobalCardinalityVariableClosed{T} = CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}
 
 """
     CountCompare(dimension::Int)
