@@ -130,7 +130,6 @@ MOI.dimension(set::ConditionallyNonOverlappingOrthotopes) = 3 * set.n_orthotopes
 function copy(
     set::Union{
         CumulativeResource, 
-        CumulativeResourceWithDeadline, 
         NonOverlappingOrthotopes,
         ConditionallyNonOverlappingOrthotopes,
     },

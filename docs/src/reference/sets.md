@@ -101,7 +101,6 @@ False
 
 ```@docs
 CumulativeResource
-CumulativeResourceWithDeadline
 NonOverlappingOrthotopes
 ConditionallyNonOverlappingOrthotopes
 ```

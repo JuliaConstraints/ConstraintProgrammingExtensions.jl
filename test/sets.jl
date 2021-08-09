@@ -26,8 +26,6 @@
         CP.Contiguity,
         CP.Circuit,
         CP.CircuitPath,
-        CP.CumulativeResource,
-        CP.CumulativeResourceWithDeadline,
         CP.LexicographicallyLessThan,
         CP.LexicographicallyGreaterThan,
         CP.Sort,
@@ -85,12 +83,6 @@
         elseif S == CP.SortPermutation
             @test MOI.dimension(S(2)) == 2 * 3
             @test MOI.dimension(S(3)) == 3 * 3
-        elseif S == CP.CumulativeResource
-            @test MOI.dimension(S(2)) == 2 * 3 + 1
-            @test MOI.dimension(S(3)) == 3 * 3 + 1
-        elseif S == CP.CumulativeResourceWithDeadline
-            @test MOI.dimension(S(2)) == 2 * 4 + 1
-            @test MOI.dimension(S(3)) == 3 * 4 + 1
         else
             error("$(S) not implemented")
         end
@@ -287,6 +279,31 @@
 
             if CVCT == CP.OPEN_COUNTED_VALUES
                 @test CP.GlobalCardinality{CVCT}(2, [2, 4]) == CP.GlobalCardinality(2, [2, 4])
+            end
+        end
+    end
+
+    @testset "CumulativeResource family" begin
+        @testset "CumulativeResource{$(CRDT)}" for CRDT in [
+            CP.NO_DEADLINE_CUMULATIVE_RESOURCE,
+            CP.VARIABLE_DEADLINE_CUMULATIVE_RESOURCE,
+        ]
+            @test CP.CumulativeResource{CRDT}(2) == CP.CumulativeResource{CRDT}(2)
+            @test CP.CumulativeResource{CRDT}(2) != CP.CumulativeResource{CRDT}(3)
+            @test CP.CumulativeResource{CRDT}(3) != CP.CumulativeResource{CRDT}(2)
+
+            s = CP.CumulativeResource{CRDT}(2)
+            @test typeof(copy(s)) <: CP.CumulativeResource{CRDT}
+            @test copy(s) == s
+
+            if CRDT == CP.NO_DEADLINE_CUMULATIVE_RESOURCE
+                @test MOI.dimension(CP.CumulativeResource{CRDT}(2)) == 2 * 3 + 1
+                @test MOI.dimension(CP.CumulativeResource{CRDT}(3)) == 3 * 3 + 1
+            elseif CRDT == CP.VARIABLE_DEADLINE_CUMULATIVE_RESOURCE
+                @test MOI.dimension(CP.CumulativeResource{CRDT}(2)) == 2 * 4 + 1
+                @test MOI.dimension(CP.CumulativeResource{CRDT}(3)) == 3 * 4 + 1
+            else
+                @assert false
             end
         end
     end
