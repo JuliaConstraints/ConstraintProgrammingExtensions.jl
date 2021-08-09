@@ -13,6 +13,8 @@ The following sets have been touched by the refactor:
 
 * `GlobalCardinality` and friends
 
+Experiments with functions are removed for now.
+
 
 Version 0.3.2
 -------------

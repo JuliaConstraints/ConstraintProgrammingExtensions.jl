@@ -12,6 +12,5 @@ const MOIBC = MOIB.Constraint
 
 include("helpers.jl")
 include("Constraint/Constraint.jl")
-# include("Function/Function.jl")
 
 end
