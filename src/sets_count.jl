@@ -27,18 +27,41 @@ function Base.:(==)(x::Count{S}, y::Count{S}) where {S}
     return x.dimension == y.dimension && x.set == y.set
 end
 
+"""
+    CountedValuesType
+
+Kind of values to be counted for a `GlobalCardinality` constraint:
+
+* either the values to count are fixed when creating the set:
+  `FIXED_COUNTED_VALUES`
+* or the values are themselves variables (typically constrained elsewhere): 
+  `VARIABLE_COUNTED_VALUES`
+"""
 @enum CountedValuesType begin
     FIXED_COUNTED_VALUES
     VARIABLE_COUNTED_VALUES
 end
 
+"""
+    CountedValuesClosureType
+
+Whether values that are not counted in `GlobalCardinality` constraint are 
+allowed in the array whose values are counted:
+
+* either uncounted values are allowed: `OPEN_COUNTED_VALUES`
+* or they are not allowed: `CLOSED_COUNTED_VALUES`
+"""
 @enum CountedValuesClosureType begin
     OPEN_COUNTED_VALUES
     CLOSED_COUNTED_VALUES
 end
 
 """
-    GlobalCardinality{T}(dimension::Int, values::Vector{T})
+    GlobalCardinality{CVT, CVCT, T}(dimension::Int, values::Vector{T})
+
+This set represents the large majority of the variants of the 
+global-cardinality constraint, with the parameters set in `CountedValuesType` 
+(`CVT` parameter) and `CountedValuesClosureType` (`CVCT` parameter).
 
 ``\\{(x, y) \\in \\mathbb{T}^\\mathtt{dimension} \\times \\mathbb{N}^d : y_i = |\\{ j | x_j = \\mathtt{values}_i, \\forall j \\}| \\}``
 
