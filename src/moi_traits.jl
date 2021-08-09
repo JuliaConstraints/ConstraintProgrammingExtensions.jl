@@ -141,29 +141,29 @@ function has_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     return false
 end
 
-function is_affine(::MOI.ModelLike, ::MOI.VariableIndex)
-    return true
-end
+# function is_affine(::MOI.ModelLike, ::MOI.VariableIndex)
+#     return true
+# end
 
-function is_affine(::MOI.ModelLike, ::MOI.SingleVariable)
-    return true
-end
+# function is_affine(::MOI.ModelLike, ::MOI.SingleVariable)
+#     return true
+# end
 
-function is_affine(::MOI.ModelLike, ::MOI.ScalarAffineFunction{T}) where {T}
-    return true
-end
+# function is_affine(::MOI.ModelLike, ::MOI.ScalarAffineFunction{T}) where {T}
+#     return true
+# end
 
-function is_affine(::MOI.ModelLike, ::MOI.VectorOfVariables)
-    return true
-end
+# function is_affine(::MOI.ModelLike, ::MOI.VectorOfVariables)
+#     return true
+# end
 
-function is_affine(::MOI.ModelLike, ::MOI.VectorAffineFunction{T}) where {T}
-    return true
-end
+# function is_affine(::MOI.ModelLike, ::MOI.VectorAffineFunction{T}) where {T}
+#     return true
+# end
 
-function is_affine(::MOI.ModelLike, ::Any)
-    return false
-end
+# function is_affine(::MOI.ModelLike, ::Any)
+#     return false
+# end
 
 # -----------------------------------------------------------------------------
 # - Get some properties about a variable or a function.
