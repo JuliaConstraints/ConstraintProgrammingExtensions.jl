@@ -1,6 +1,19 @@
 Release Notes
 =============
 
+Version 0.4.0
+-------------
+
+Refactor for sets with many variants. Discussion: 
+
+* https://github.com/dourouc05/ConstraintProgrammingExtensions.jl/issues/22 
+* https://github.com/dourouc05/ConstraintProgrammingExtensions.jl/pull/23
+
+The following sets have been touched by the refactor: 
+
+* `GlobalCardinality` and friends
+
+
 Version 0.3.2
 -------------
 
