@@ -12,6 +12,7 @@ Refactor for sets with many variants. Discussion:
 The following sets have been touched by the refactor: 
 
 * `GlobalCardinality` and friends
+* `CumulativeResource` and friends
 
 Experiments with functions are removed for now.
 

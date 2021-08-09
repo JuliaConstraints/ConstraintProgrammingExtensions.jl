@@ -1,5 +1,24 @@
 """
-    CumulativeResource(n_tasks::Int)
+CumulativeResourceDeadlineType
+
+Whether resources in `CumulativeResource` constraint have deadlines:
+
+* either there are no deadlines: `NO_DEADLINE_CUMULATIVE_RESOURCE`
+* or deadlines are given as variables: `VARIABLE_DEADLINE_CUMULATIVE_RESOURCE`
+"""
+@enum CumulativeResourceDeadlineType begin
+    NO_DEADLINE_CUMULATIVE_RESOURCE
+    VARIABLE_DEADLINE_CUMULATIVE_RESOURCE
+end
+
+"""
+    CumulativeResource{CRDT}(n_tasks::Int)
+
+This set models most variants of task scheduling with cumulative resource 
+usage. Presence of deadlines can be indicated with the 
+`CumulativeResourceDeadlineType` enumeration.
+
+## Without deadline
 
 Each task is given by a minimum start time (the first `n_tasks` variables), 
 a duration (the next `n_tasks` variables), and the resource consumption 
@@ -8,28 +27,26 @@ the resource available.
 
 Also called [`cumulative`](https://sofdem.github.io/gccat/gccat/Ccumulative.html).
 This version does not consider end deadlines for tasks.
-"""
-struct CumulativeResource <: MOI.AbstractVectorSet
-    n_tasks::Int
-end
 
-MOI.dimension(set::CumulativeResource) = 3 * set.n_tasks + 1
-
-"""
-    CumulativeResourceWithDeadline(n_tasks::Int)
+## With variable deadline
 
 Each task is given by a minimum start time (the first `n_tasks` variables), 
 a duration (the next `n_tasks` variables), a deadline (the following `n_tasks` 
 variables), and the resource consumption (the next `n_tasks` variables). 
 The final variable is the maximum amount of the resource available.
 
-Also called [`cumulative`](https://sofdem.github.io/gccat/gccat/Ccumulative.html).
+Also called [`cumulative`](https://sofdem.github.io/gccat/gccat/Ccumulative.html)
 """
-struct CumulativeResourceWithDeadline <: MOI.AbstractVectorSet
+struct CumulativeResource{CRDT} <: MOI.AbstractVectorSet
     n_tasks::Int
 end
 
-MOI.dimension(set::CumulativeResourceWithDeadline) = 4 * set.n_tasks + 1
+function CumulativeResource(n_tasks::Int)
+    return CumulativeResource{NO_DEADLINE_CUMULATIVE_RESOURCE}(n_tasks)
+end
+
+MOI.dimension(set::CumulativeResource{NO_DEADLINE_CUMULATIVE_RESOURCE}) = 3 * set.n_tasks + 1
+MOI.dimension(set::CumulativeResource{VARIABLE_DEADLINE_CUMULATIVE_RESOURCE}) = 4 * set.n_tasks + 1
 
 """
     NonOverlappingOrthotopes(n_orthotopes::Int, n_dimensions::Int)
