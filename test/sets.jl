@@ -246,36 +246,45 @@
         @test MOI.dimension(CP.CountCompare(3)) == 3 * 2 + 1
     end
 
-    @testset "GlobalCardinality{FIXED_COUNTED_VALUES, $(CVCT), Int}" for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
-        @test CP.GlobalCardinality{CVCT}(2, [2, 4]) == CP.GlobalCardinality{CVCT}(2, [2, 4])
-        @test CP.GlobalCardinality{CVCT}(2, [2, 4]) != CP.GlobalCardinality{CVCT}(3, [2, 4])
-        @test CP.GlobalCardinality{CVCT}(3, [2, 4]) != CP.GlobalCardinality{CVCT}(2, [2, 4])
-        @test CP.GlobalCardinality{CVCT}(2, [2, 4]) != CP.GlobalCardinality{CVCT}(2, [3, 5])
-
-        s = CP.GlobalCardinality{CVCT}(2, [2, 4])
-        @test typeof(copy(s)) <: CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CVCT, Int}
-        @test copy(s) == s
-
-        @test MOI.dimension(CP.GlobalCardinality{CVCT}(2, [2, 4])) == 2 + 2
-        @test MOI.dimension(CP.GlobalCardinality{CVCT}(3, [2, 4, 6, 8])) == 3 + 4
-
-        if CVCT == CP.OPEN_COUNTED_VALUES
-            @test CP.GlobalCardinality{CVCT}(2, [2, 4]) == CP.GlobalCardinality(2, [2, 4])
+    @testset "GlobalCardinality family" begin
+        @testset "Constructor" begin
+            for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
+                @test_throws ErrorException CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CVCT, Int}(4, Int[], 5)
+                @test_throws ErrorException CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CVCT, Int}(4, [4, 5], -1)
+            end
         end
-    end
 
-    @testset "GlobalCardinality{VARIABLE_COUNTED_VALUES, $(CVCT), Int}" for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
-        @test CP.GlobalCardinality{CVCT, Int}(2, 2) == CP.GlobalCardinality{CVCT, Int}(2, 2)
-        @test CP.GlobalCardinality{CVCT, Int}(2, 2) != CP.GlobalCardinality{CVCT, Int}(3, 3)
-        @test CP.GlobalCardinality{CVCT, Int}(3, 2) != CP.GlobalCardinality{CVCT, Int}(2, 2)
-        @test CP.GlobalCardinality{CVCT, Int}(2, 2) != CP.GlobalCardinality{CVCT, Int}(2, 3)
+        @testset "GlobalCardinality{FIXED_COUNTED_VALUES, $(CVCT), Int}" for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
+            @test CP.GlobalCardinality{CVCT}(2, [2, 4]) == CP.GlobalCardinality{CVCT}(2, [2, 4])
+            @test CP.GlobalCardinality{CVCT}(2, [2, 4]) != CP.GlobalCardinality{CVCT}(3, [2, 4])
+            @test CP.GlobalCardinality{CVCT}(3, [2, 4]) != CP.GlobalCardinality{CVCT}(2, [2, 4])
+            @test CP.GlobalCardinality{CVCT}(2, [2, 4]) != CP.GlobalCardinality{CVCT}(2, [3, 5])
 
-        s = CP.GlobalCardinality{CVCT, Int}(2, 2)
-        @test typeof(copy(s)) <: CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CVCT, Int}
-        @test copy(s) == s
+            s = CP.GlobalCardinality{CVCT}(2, [2, 4])
+            @test typeof(copy(s)) <: CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CVCT, Int}
+            @test copy(s) == s
 
-        @test MOI.dimension(CP.GlobalCardinality{CVCT, Int}(2, 2)) == 2 + 2 * 2
-        @test MOI.dimension(CP.GlobalCardinality{CVCT, Int}(3, 4)) == 3 + 2 * 4
+            @test MOI.dimension(CP.GlobalCardinality{CVCT}(2, [2, 4])) == 2 + 2
+            @test MOI.dimension(CP.GlobalCardinality{CVCT}(3, [2, 4, 6, 8])) == 3 + 4
+
+            if CVCT == CP.OPEN_COUNTED_VALUES
+                @test CP.GlobalCardinality{CVCT}(2, [2, 4]) == CP.GlobalCardinality(2, [2, 4])
+            end
+        end
+
+        @testset "GlobalCardinality{VARIABLE_COUNTED_VALUES, $(CVCT), Int}" for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
+            @test CP.GlobalCardinality{CVCT, Int}(2, 2) == CP.GlobalCardinality{CVCT, Int}(2, 2)
+            @test CP.GlobalCardinality{CVCT, Int}(2, 2) != CP.GlobalCardinality{CVCT, Int}(3, 3)
+            @test CP.GlobalCardinality{CVCT, Int}(3, 2) != CP.GlobalCardinality{CVCT, Int}(2, 2)
+            @test CP.GlobalCardinality{CVCT, Int}(2, 2) != CP.GlobalCardinality{CVCT, Int}(2, 3)
+
+            s = CP.GlobalCardinality{CVCT, Int}(2, 2)
+            @test typeof(copy(s)) <: CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CVCT, Int}
+            @test copy(s) == s
+
+            @test MOI.dimension(CP.GlobalCardinality{CVCT, Int}(2, 2)) == 2 + 2 * 2
+            @test MOI.dimension(CP.GlobalCardinality{CVCT, Int}(3, 4)) == 3 + 2 * 4
+        end
     end
 
     @testset "SlidingSum" begin
