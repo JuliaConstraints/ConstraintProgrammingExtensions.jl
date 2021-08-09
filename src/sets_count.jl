@@ -138,8 +138,20 @@ struct GlobalCardinality{CVT, CVCT, T <: Real} <: MOI.AbstractVectorSet
     dimension::Int
     values::Vector{T}
     n_values::Int
+
+    function GlobalCardinality{CVT, CVCT, T}(dimension::Int, values::Vector{T}, n_values::Int) where {CVT, CVCT, T <: Real}
+        if CVT == FIXED_COUNTED_VALUES && length(values) == 0
+            error("Inconsistent GlobalCardinality set: the counted values should be fixed, but array of values to count is $(values).")
+        end
+        if CVT == VARIABLE_COUNTED_VALUES && n_values <= 0
+            error("Inconsistent GlobalCardinality set: the counted values should be variables, but their number is $(n_values).")
+        end
+
+        return new{CVT, CVCT, T}(dimension, values, n_values)
+    end
 end
 
+# Helper functions: always FIXED_COUNTED_VALUES.
 function GlobalCardinality(dimension::Int, values::Vector{T}) where {T <: Real}
     return GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}(dimension, values, -1)
 end
@@ -152,16 +164,25 @@ function GlobalCardinality{CVCT, T}(dimension::Int, values::Vector{T}) where {CV
     return GlobalCardinality{FIXED_COUNTED_VALUES, CVCT, T}(dimension, values, -1)
 end
 
-function GlobalCardinality{CVCT, T}(dimension::Int, values::Vector{T}) where {CVCT, T <: Real}
-    return GlobalCardinality{FIXED_COUNTED_VALUES, CVCT, T}(dimension, values, -1)
+function GlobalCardinality{CVT, CVCT}(dimension::Int, values::Vector{T}) where {CVT, CVCT, T <: Real}
+    return GlobalCardinality{CVT, CVCT, T}(dimension, values, -1)
 end
 
+function GlobalCardinality{CVT, CVCT, T}(dimension::Int, values::Vector{T}) where {CVT, CVCT, T <: Real}
+    return GlobalCardinality{CVT, CVCT, T}(dimension, values, -1)
+end
+
+# Helper functions: always VARIABLE_COUNTED_VALUES.
 function GlobalCardinality{T}(dimension::Int, n_values::Int) where {T <: Real}
     return GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}(dimension, T[], n_values)
 end
 
 function GlobalCardinality{CVCT, T}(dimension::Int, n_values::Int) where {CVCT, T <: Real}
     return GlobalCardinality{VARIABLE_COUNTED_VALUES, CVCT, T}(dimension, T[], n_values)
+end
+
+function GlobalCardinality{CVT, CVCT, T}(dimension::Int, n_values::Int) where {CVT, CVCT, T <: Real}
+    return GlobalCardinality{CVT, CVCT, T}(dimension, T[], n_values)
 end
 
 function n_values(set::GlobalCardinality)

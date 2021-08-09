@@ -30,7 +30,7 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}(array_size, sought_values))
+    c = MOI.add_constraint(model, fct, CP.GlobalCardinality{CP.OPEN_COUNTED_VALUES, T}(array_size, sought_values))
 
     for i in 1:array_size
         @test MOI.is_valid(model, x_array[i])
