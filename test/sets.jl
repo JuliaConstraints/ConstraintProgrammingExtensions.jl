@@ -130,8 +130,6 @@
     @testset "$(S)" for S in [
         CP.NonOverlappingOrthotopes,
         CP.ConditionallyNonOverlappingOrthotopes,
-        CP.GlobalCardinalityVariable,
-        CP.ClosedGlobalCardinalityVariable,
         CP.LexicographicallyLessThan,
         CP.LexicographicallyGreaterThan,
         CP.DoublyLexicographicallyLessThan,
@@ -154,9 +152,6 @@
         elseif S == CP.ConditionallyNonOverlappingOrthotopes
             @test MOI.dimension(S(2, 2)) == 3 * 2 * 2 + 2
             @test MOI.dimension(S(3, 4)) == 3 * 3 * 4 + 3
-        elseif S == CP.GlobalCardinalityVariable || S == CP.ClosedGlobalCardinalityVariable
-            @test MOI.dimension(S(2, 2)) == 2 + 2 * 2
-            @test MOI.dimension(S(3, 4)) == 3 + 2 * 4
         elseif S == CP.LexicographicallyLessThan || S == CP.LexicographicallyGreaterThan || S == CP.DoublyLexicographicallyLessThan || S == CP.DoublyLexicographicallyGreaterThan
             @test MOI.dimension(S(2, 2)) == 2 * 2
             @test MOI.dimension(S(3, 4)) == 3 * 4
@@ -251,18 +246,36 @@
         @test MOI.dimension(CP.CountCompare(3)) == 3 * 2 + 1
     end
 
-    @testset "$(S)" for S in [CP.GlobalCardinality, CP.ClosedGlobalCardinality]
-        @test S(2, [2, 4]) == S(2, [2, 4])
-        @test S(2, [2, 4]) != S(3, [2, 4])
-        @test S(3, [2, 4]) != S(2, [2, 4])
-        @test S(2, [2, 4]) != S(2, [3, 5])
+    @testset "GlobalCardinality{FIXED_COUNTED_VALUES, $(CVCT), Int}" for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
+        CVT = CP.FIXED_COUNTED_VALUES
 
-        s = S(2, [2, 4])
-        @test typeof(copy(s)) <: S
+        @test CP.GlobalCardinality{CVT, CVCT}(2, [2, 4]) == CP.GlobalCardinality{CVT, CVCT}(2, [2, 4])
+        @test CP.GlobalCardinality{CVT, CVCT}(2, [2, 4]) != CP.GlobalCardinality{CVT, CVCT}(3, [2, 4])
+        @test CP.GlobalCardinality{CVT, CVCT}(3, [2, 4]) != CP.GlobalCardinality{CVT, CVCT}(2, [2, 4])
+        @test CP.GlobalCardinality{CVT, CVCT}(2, [2, 4]) != CP.GlobalCardinality{CVT, CVCT}(2, [3, 5])
+
+        s = CP.GlobalCardinality{CVT, CVCT}(2, [2, 4])
+        @test typeof(copy(s)) <: CP.GlobalCardinality{CVT, CVCT, Int}
         @test copy(s) == s
 
-        @test MOI.dimension(S(2, [2, 4])) == 2 + 2
-        @test MOI.dimension(S(3, [2, 4, 6, 8])) == 3 + 4
+        @test MOI.dimension(CP.GlobalCardinality{CVT, CVCT}(2, [2, 4])) == 2 + 2
+        @test MOI.dimension(CP.GlobalCardinality{CVT, CVCT}(3, [2, 4, 6, 8])) == 3 + 4
+    end
+
+    @testset "GlobalCardinality{VARIABLE_COUNTED_VALUES, $(CVCT), Int}" for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
+        CVT = CP.VARIABLE_COUNTED_VALUES
+
+        @test CP.GlobalCardinality{CVT, CVCT, Int}(2, 2) == CP.GlobalCardinality{CVT, CVCT, Int}(2, 2)
+        @test CP.GlobalCardinality{CVT, CVCT, Int}(2, 2) != CP.GlobalCardinality{CVT, CVCT, Int}(3, 3)
+        @test CP.GlobalCardinality{CVT, CVCT, Int}(3, 2) != CP.GlobalCardinality{CVT, CVCT, Int}(2, 2)
+        @test CP.GlobalCardinality{CVT, CVCT, Int}(2, 2) != CP.GlobalCardinality{CVT, CVCT, Int}(2, 3)
+
+        s = CP.GlobalCardinality{CVT, CVCT, Int}(2, 2)
+        @test typeof(copy(s)) <: CP.GlobalCardinality{CVT, CVCT, Int}
+        @test copy(s) == s
+
+        @test MOI.dimension(CP.GlobalCardinality{CVT, CVCT, Int}(2, 2)) == 2 + 2 * 2
+        @test MOI.dimension(CP.GlobalCardinality{CVT, CVCT, Int}(3, 4)) == 3 + 2 * 4
     end
 
     @testset "SlidingSum" begin

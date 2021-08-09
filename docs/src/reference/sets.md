@@ -69,9 +69,6 @@ Contiguity
 ```@docs
 Count
 GlobalCardinality
-GlobalCardinalityVariable
-ClosedGlobalCardinality
-ClosedGlobalCardinalityVariable
 CountCompare
 CountDistinct
 ```

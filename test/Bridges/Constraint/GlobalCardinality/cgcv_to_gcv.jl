@@ -1,12 +1,12 @@
-@testset "ClosedGlobalCardinalityVariable2GlobalCardinalityVariable: $(fct_type), $(array_size) items, $(sought_size) sought items, $(T)" for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 3], sought_size in [2, 3], T in [Int, Float64]
+@testset "GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpen: $(fct_type), $(array_size) items, $(sought_size) sought items, $(T)" for fct_type in ["vector of variables", "vector affine function"], array_size in [2, 3], sought_size in [2, 3], T in [Int, Float64]
     mock = MOIU.MockOptimizer(GlobalCardinalityVariableModel{T}())
-    model = COIB.ClosedGlobalCardinalityVariable2GlobalCardinalityVariable{T}(mock)
+    model = COIB.GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpen{T}(mock)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.GlobalCardinalityVariable,
+        CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
     )
     @test MOI.supports_constraint(
         model,
@@ -16,7 +16,7 @@
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorOfVariables,
-        CP.ClosedGlobalCardinalityVariable,
+        CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T},
     )
 
     x_counts, _ = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:sought_size])
@@ -36,7 +36,7 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, CP.ClosedGlobalCardinalityVariable(array_size, sought_size))
+    c = MOI.add_constraint(model, fct, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}(array_size, sought_size))
 
     for i in 1:array_size
         @test MOI.is_valid(model, x_array[i])
@@ -47,22 +47,22 @@
     end
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.ClosedGlobalCardinalityVariable}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.ClosedGlobalCardinalityVariable) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.VectorAffineFunction{T}, CP.Membership),
-            (MOI.VectorAffineFunction{T}, CP.GlobalCardinalityVariable),
+            (MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Membership}()) == array_size
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.GlobalCardinalityVariable}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}}()) == 1
         
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Membership}()) == bridge.cons_domain
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.GlobalCardinalityVariable}()) == [bridge.con_gcv]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}}()) == [bridge.con_gcv]
     end
 
     @testset "Membership" begin
@@ -89,7 +89,7 @@
     @testset "Global cardinality" begin
         @test MOI.is_valid(model, bridge.con_gcv)
         f = MOIU.canonical(MOI.get(model, MOI.ConstraintFunction(), bridge.con_gcv))
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_gcv) == CP.GlobalCardinalityVariable(array_size, sought_size)
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_gcv) == CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}(array_size, sought_size)
 
         # f == fct, in principle, with the exception that the bridge always 
         # uses a VectorAffineFunction, even if the input is a VectorOfVariables.

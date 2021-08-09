@@ -1,18 +1,18 @@
 """
-Bridges `CP.GlobalCardinalityVariable` to `CP.Count`.
+Bridges `CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}` to `CP.Count`.
 """
-struct GlobalCardinalityVariable2CountBridge{T} <: MOIBC.AbstractBridge
+struct GlobalCardinalityVariableOpen2CountBridge{T} <: MOIBC.AbstractBridge
     cons_count::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Count{MOI.EqualTo{T}}}}
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{GlobalCardinalityVariable2CountBridge{T}},
+    ::Type{GlobalCardinalityVariableOpen2CountBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.GlobalCardinalityVariable,
+    s::CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
 ) where {T}
     return MOIBC.bridge_constraint(
-        GlobalCardinalityVariable2CountBridge{T},
+        GlobalCardinalityVariableOpen2CountBridge{T},
         model,
         MOI.VectorAffineFunction{T}(f),
         s,
@@ -20,10 +20,10 @@ function MOIBC.bridge_constraint(
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{GlobalCardinalityVariable2CountBridge{T}},
+    ::Type{GlobalCardinalityVariableOpen2CountBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.GlobalCardinalityVariable,
+    s::CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T},
 ) where {T}
     f_scalars = MOIU.scalarize(f)
     f_array = f_scalars[1:s.dimension]
@@ -44,33 +44,33 @@ function MOIBC.bridge_constraint(
         for i in 1:s.n_values
     ]
 
-    return GlobalCardinalityVariable2CountBridge(cons_count)
+    return GlobalCardinalityVariableOpen2CountBridge(cons_count)
 end
 
 function MOI.supports_constraint(
-    ::Type{GlobalCardinalityVariable2CountBridge{T}},
+    ::Type{GlobalCardinalityVariableOpen2CountBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.GlobalCardinalityVariable},
+    ::Type{CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}},
 ) where {T}
     return true
 end
 
-function MOIB.added_constrained_variable_types(::Type{GlobalCardinalityVariable2CountBridge{T}}) where {T}
+function MOIB.added_constrained_variable_types(::Type{GlobalCardinalityVariableOpen2CountBridge{T}}) where {T}
     return Tuple{DataType}[]
 end
 
-function MOIB.added_constraint_types(::Type{GlobalCardinalityVariable2CountBridge{T}}) where {T}
+function MOIB.added_constraint_types(::Type{GlobalCardinalityVariableOpen2CountBridge{T}}) where {T}
     return [
         (MOI.VectorAffineFunction{T}, CP.Count{MOI.EqualTo{T}}),
     ]
 end
 
-function MOI.get(::GlobalCardinalityVariable2CountBridge{T}, ::MOI.NumberOfVariables) where {T}
+function MOI.get(::GlobalCardinalityVariableOpen2CountBridge{T}, ::MOI.NumberOfVariables) where {T}
     return 0
 end
 
 function MOI.get(
-    b::GlobalCardinalityVariable2CountBridge{T},
+    b::GlobalCardinalityVariableOpen2CountBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.VectorAffineFunction{T}, CP.Count{MOI.EqualTo{T}},
     },
@@ -79,7 +79,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::GlobalCardinalityVariable2CountBridge{T},
+    b::GlobalCardinalityVariableOpen2CountBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.VectorAffineFunction{T}, CP.Count{MOI.EqualTo{T}},
     },
