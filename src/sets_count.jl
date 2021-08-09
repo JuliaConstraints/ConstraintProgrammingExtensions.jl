@@ -152,6 +152,10 @@ function GlobalCardinality{CVCT, T}(dimension::Int, values::Vector{T}) where {CV
     return GlobalCardinality{FIXED_COUNTED_VALUES, CVCT, T}(dimension, values, -1)
 end
 
+function GlobalCardinality{CVCT, T}(dimension::Int, values::Vector{T}) where {CVCT, T <: Real}
+    return GlobalCardinality{FIXED_COUNTED_VALUES, CVCT, T}(dimension, values, -1)
+end
+
 function GlobalCardinality{T}(dimension::Int, n_values::Int) where {T <: Real}
     return GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}(dimension, T[], n_values)
 end
