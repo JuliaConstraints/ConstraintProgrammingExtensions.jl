@@ -278,7 +278,7 @@
             @test MOI.dimension(CP.GlobalCardinality{CVCT, Int}(3, 4)) == 3 + 2 * 4
 
             if CVCT == CP.OPEN_COUNTED_VALUES
-                @test CP.GlobalCardinality{CVCT}(2, [2, 4]) == CP.GlobalCardinality(2, [2, 4])
+                @test CP.GlobalCardinality{CVCT, Int}(2, 3) == CP.GlobalCardinality{Int}(2, 3)
             end
         end
     end
