@@ -260,6 +260,10 @@
 
         @test MOI.dimension(CP.GlobalCardinality{CVT, CVCT}(2, [2, 4])) == 2 + 2
         @test MOI.dimension(CP.GlobalCardinality{CVT, CVCT}(3, [2, 4, 6, 8])) == 3 + 4
+
+        if CVCT == CP.OPEN_COUNTED_VALUES
+            @test CP.GlobalCardinality{CVT, CVCT}(2, [2, 4]) == CP.GlobalCardinality(2, [2, 4])
+        end
     end
 
     @testset "GlobalCardinality{VARIABLE_COUNTED_VALUES, $(CVCT), Int}" for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]

@@ -61,7 +61,7 @@ struct GlobalCardinality{CVT, CVCT, T <: Real} <: MOI.AbstractVectorSet
     n_values::Int
 end
 
-function GlobalCardinality{T}(dimension::Int, values::Vector{T}) where {T <: Real}
+function GlobalCardinality(dimension::Int, values::Vector{T}) where {T <: Real}
     return GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}(dimension, values, -1)
 end
 
