@@ -85,12 +85,12 @@
     end
 
     @testset "IfThenElse" begin
-        include("IfThenElse/ifthenelse_to_imply.jl")
+        include("IfThenElse/ifthenelse_to_implication.jl")
         include("IfThenElse/ifthenelse_to_reif.jl")
     end
 
-    @testset "Imply" begin
-        include("Imply/imply_to_reif.jl")
+    @testset "Implication" begin
+        include("Implication/implication_to_reif.jl")
     end
 
     @testset "Increasing" begin

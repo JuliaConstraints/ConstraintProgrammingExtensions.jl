@@ -1,4 +1,4 @@
-function imply_singlevariable_test(
+function implication_singlevariable_test(
     model::MOI.ModelLike,
     config::MOIT.TestConfig,
 )
@@ -9,7 +9,7 @@ function imply_singlevariable_test(
     @test MOI.supports_constraint(
         model,
         MOI.VectorOfVariables,
-        CP.Imply{MOI.EqualTo{Int}, MOI.EqualTo{Int}},
+        CP.Implication{MOI.EqualTo{Int}, MOI.EqualTo{Int}},
     )
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -19,7 +19,7 @@ function imply_singlevariable_test(
     c2 = MOI.add_constraint(
         model,
         _vov([x1, x2]),
-        CP.Imply(MOI.EqualTo(1), MOI.EqualTo(1)),
+        CP.Implication(MOI.EqualTo(1), MOI.EqualTo(1)),
     )
 
     @test MOI.is_valid(model, x1)
@@ -38,7 +38,7 @@ function imply_singlevariable_test(
     end
 end
 
-function imply_scalaraffinefunction_test(
+function implication_scalaraffinefunction_test(
     model::MOI.ModelLike,
     config::MOIT.TestConfig,
 )
@@ -53,7 +53,7 @@ function imply_scalaraffinefunction_test(
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{Int},
-        CP.Imply{MOI.EqualTo{Int}, MOI.EqualTo{Int}},
+        CP.Implication{MOI.EqualTo{Int}, MOI.EqualTo{Int}},
     )
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -63,7 +63,7 @@ function imply_scalaraffinefunction_test(
     c2 = MOI.add_constraint(
         model,
         _vaf([x1, x2]),
-        CP.Imply(MOI.EqualTo(1), MOI.EqualTo(1)),
+        CP.Implication(MOI.EqualTo(1), MOI.EqualTo(1)),
     )
 
     @test MOI.is_valid(model, x1)
@@ -82,9 +82,9 @@ function imply_scalaraffinefunction_test(
     end
 end
 
-const implytests = Dict(
-    "imply_singlevariable" => imply_singlevariable_test,
-    "imply_scalaraffinefunction" => imply_scalaraffinefunction_test,
+const implicationtests = Dict(
+    "implication_singlevariable" => implication_singlevariable_test,
+    "implication_scalaraffinefunction" => implication_scalaraffinefunction_test,
 )
 
-MOIT.@moitestset imply
+MOIT.@moitestset implication

@@ -652,7 +652,7 @@
         end
     end
 
-    @testset "$(S)" for S in [CP.Equivalence, CP.EquivalenceNot, CP.Imply]
+    @testset "$(S)" for S in [CP.Equivalence, CP.EquivalenceNot, CP.Implication]
         @test S(MOI.EqualTo(0.0), MOI.EqualTo(0.0)) ==
               S(MOI.EqualTo(0.0), MOI.EqualTo(0.0))
         @test S(MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=

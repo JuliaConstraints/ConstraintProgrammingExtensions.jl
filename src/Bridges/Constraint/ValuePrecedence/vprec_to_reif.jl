@@ -8,7 +8,7 @@ struct ValuePrecedence2ReificationBridge{T} <: MOIBC.AbstractBridge
     vars_reif_precv_bin::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
     cons_reif_value::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}} # Compare values from 2 to end.
     cons_reif_precv::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}} # Compare values from 1 to end-1.
-    cons_imply::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}
+    cons_implication::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}
 end
 
 function MOIBC.bridge_constraint(
@@ -65,7 +65,7 @@ function MOIBC.bridge_constraint(
     ]
 
     # If there is one `value`, then there must be at least one `before` before.
-    cons_imply = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}[
+    cons_implication = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}[
         MOI.add_constraint(
             model,
             MOI.SingleVariable(vars_reif_value[i - 1]) - sum(one(T) .* MOI.SingleVariable.(vars_reif_precv[1:(i - 1)])),
@@ -74,7 +74,7 @@ function MOIBC.bridge_constraint(
         for i in 2:s.dimension
     ]
 
-    return ValuePrecedence2ReificationBridge(vars_reif_value, vars_reif_precv, vars_reif_value_bin, vars_reif_precv_bin, cons_reif_value, cons_reif_precv, cons_imply)
+    return ValuePrecedence2ReificationBridge(vars_reif_value, vars_reif_precv, vars_reif_value_bin, vars_reif_precv_bin, cons_reif_value, cons_reif_precv, cons_implication)
 end
 
 function MOI.supports_constraint(
@@ -124,7 +124,7 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T}
     },
 ) where {T}
-    return length(b.cons_imply)
+    return length(b.cons_implication)
 end
 
 function MOI.get(
@@ -158,5 +158,5 @@ function MOI.get(
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T}
     },
 ) where {T}
-    return copy(b.cons_imply)
+    return copy(b.cons_implication)
 end

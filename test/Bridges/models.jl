@@ -689,10 +689,10 @@ MOIU.@model(
     (MOI.VectorAffineFunction, MOI.VectorQuadraticFunction)
 )
 
-# Imply.
+# Implication.
 
 MOIU.@model(
-    ImplyModel,
+    ImplicationModel,
     (),
     (
         MOI.EqualTo, 
@@ -714,8 +714,8 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
-        CP.Imply{MOI.LessThan{Int}, MOI.LessThan{Int}},
-        CP.Imply{MOI.LessThan{Float64}, MOI.LessThan{Float64}},
+        CP.Implication{MOI.LessThan{Int}, MOI.LessThan{Int}},
+        CP.Implication{MOI.LessThan{Float64}, MOI.LessThan{Float64}},
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),

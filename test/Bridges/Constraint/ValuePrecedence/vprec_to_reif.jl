@@ -64,7 +64,7 @@
         @test Set(MOI.get(bridge, MOI.ListOfVariableIndices())) == Set([bridge.vars_reif_precv..., bridge.vars_reif_value...])
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}())) == Set([bridge.vars_reif_precv_bin..., bridge.vars_reif_value_bin...])
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}())) == Set([bridge.cons_reif_value..., bridge.cons_reif_precv...])
-        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}())) == Set(bridge.cons_imply)
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}())) == Set(bridge.cons_implication)
     end
 
     @testset "Set of variables" begin
@@ -134,12 +134,12 @@
     end
 
     @testset "Implications" begin
-        @test length(bridge.cons_imply) == dim - 1
+        @test length(bridge.cons_implication) == dim - 1
 
         for i in 2:dim
-            @test MOI.is_valid(model, bridge.cons_imply[i - 1])
-            @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_imply[i - 1]) == MOI.LessThan(zero(T))
-            f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_imply[i - 1])
+            @test MOI.is_valid(model, bridge.cons_implication[i - 1])
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_implication[i - 1]) == MOI.LessThan(zero(T))
+            f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_implication[i - 1])
             @test length(f.terms) == i
             @test abs(f.constant) === zero(T)
 

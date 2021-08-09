@@ -1,4 +1,4 @@
-@testset "Imply" begin
+@testset "Implication" begin
     mock = MOIU.MockOptimizer(MOIU.UniversalFallback(MOIU.Model{Int}()))
     config = MOIT.TestConfig()
 
@@ -7,5 +7,5 @@
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [1, 1])),
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [1, 1])),
     )
-    COIT.implytest(mock, config)
+    COIT.implicationtest(mock, config)
 end

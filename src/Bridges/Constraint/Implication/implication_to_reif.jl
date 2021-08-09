@@ -1,7 +1,7 @@
 """
-Bridges `CP.Imply` to reification.
+Bridges `CP.Implication` to reification.
 """
-struct Imply2ReificationBridge{T} <: MOIBC.AbstractBridge
+struct Implication2ReificationBridge{T} <: MOIBC.AbstractBridge
     var_antecedent::MOI.VariableIndex
     var_consequent::MOI.VariableIndex
     var_antecedent_bin::MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}
@@ -14,13 +14,13 @@ struct Imply2ReificationBridge{T} <: MOIBC.AbstractBridge
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{Imply2ReificationBridge{T}},
+    ::Type{Implication2ReificationBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.Imply{S1, S2},
+    s::CP.Implication{S1, S2},
 ) where {T, S1, S2}
     return MOIBC.bridge_constraint(
-        Imply2ReificationBridge{T},
+        Implication2ReificationBridge{T},
         model,
         MOI.VectorAffineFunction{T}(f),
         s,
@@ -28,10 +28,10 @@ function MOIBC.bridge_constraint(
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{Imply2ReificationBridge{T}},
+    ::Type{Implication2ReificationBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.Imply{S1, S2},
+    s::CP.Implication{S1, S2},
 ) where {T, S1, S2}
     var_antecedent, var_antecedent_bin = MOI.add_constrained_variable(model, MOI.ZeroOne())
     var_consequent, var_consequent_bin = MOI.add_constrained_variable(model, MOI.ZeroOne())
@@ -68,36 +68,36 @@ function MOIBC.bridge_constraint(
         MOI.GreaterThan(zero(T))
     )
 
-    return Imply2ReificationBridge(var_antecedent, var_consequent, var_antecedent_bin, var_consequent_bin, con_reif_antecedent, con_reif_consequent, con_implication)
+    return Implication2ReificationBridge(var_antecedent, var_consequent, var_antecedent_bin, var_consequent_bin, con_reif_antecedent, con_reif_consequent, con_implication)
 end
 
 function MOI.supports_constraint(
-    ::Type{Imply2ReificationBridge{T}},
+    ::Type{Implication2ReificationBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Imply{S1, S2}},
+    ::Type{CP.Implication{S1, S2}},
 ) where {T, S1, S2}
     return true
     # Ideally, ensure that the underlying solver supports all the needed 
     # reified constraints.
 end
 
-function MOIB.added_constrained_variable_types(::Type{Imply2ReificationBridge{T}}) where {T}
+function MOIB.added_constrained_variable_types(::Type{Implication2ReificationBridge{T}}) where {T}
     return [(MOI.ZeroOne,)]
 end
 
-function MOIB.added_constraint_types(::Type{Imply2ReificationBridge{T}}) where {T}
+function MOIB.added_constraint_types(::Type{Implication2ReificationBridge{T}}) where {T}
     return [
         (MOI.VectorAffineFunction{T}, CP.Reification), # TODO: how to be more precise?
         (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
     ]
 end
 
-function MOI.get(::Imply2ReificationBridge{T}, ::MOI.NumberOfVariables) where {T}
+function MOI.get(::Implication2ReificationBridge{T}, ::MOI.NumberOfVariables) where {T}
     return 2
 end
 
 function MOI.get(
-    ::Imply2ReificationBridge{T},
+    ::Implication2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.SingleVariable, MOI.ZeroOne,
     },
@@ -106,7 +106,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    ::Imply2ReificationBridge{T},
+    ::Implication2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.VectorAffineFunction{T}, CP.Reification,
     },
@@ -115,7 +115,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    ::Imply2ReificationBridge{T},
+    ::Implication2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
     },
@@ -124,14 +124,14 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::Imply2ReificationBridge{T},
+    b::Implication2ReificationBridge{T},
     ::MOI.ListOfVariableIndices,
 ) where {T}
     return [b.var_antecedent, b.var_consequent]
 end
 
 function MOI.get(
-    b::Imply2ReificationBridge{T},
+    b::Implication2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.SingleVariable, MOI.ZeroOne,
     },
@@ -140,7 +140,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::Imply2ReificationBridge{T},
+    b::Implication2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.VectorAffineFunction{T}, CP.Reification,
     },
@@ -149,7 +149,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::Imply2ReificationBridge{T},
+    b::Implication2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
     },

@@ -10,7 +10,7 @@
     include("equivalence.jl")
     include("equivalencenot.jl")
     include("ifthenelse.jl")
-    include("imply.jl")
+    include("implication.jl")
     include("indicator.jl")
     include("inverse.jl")
     include("lexicographically.jl")

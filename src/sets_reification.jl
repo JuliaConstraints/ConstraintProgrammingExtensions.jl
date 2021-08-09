@@ -117,7 +117,7 @@ function Base.:(==)(x::IfThenElse{S, T, U}, y::IfThenElse{S, T, U}) where {S, T,
 end
 
 """
-    Imply{
+    Implication{
         Antecedent <: MOI.AbstractSet,
         Consequent <: MOI.AbstractSet
     }(antecedent::Antecedent, consequent::Consequent)
@@ -131,21 +131,21 @@ satisfied. Otherwise, nothing is implied on the truth value of `consequent`.
 
 Also called `if_then`, material implication, or material conditional.
 """
-struct Imply{Antecedent <: MOI.AbstractSet, Consequent <: MOI.AbstractSet} <:
+struct Implication{Antecedent <: MOI.AbstractSet, Consequent <: MOI.AbstractSet} <:
        MOI.AbstractVectorSet
     antecedent::Antecedent
     consequent::Consequent
 end
 
-function MOI.dimension(set::Imply{S, T}) where {S, T}
+function MOI.dimension(set::Implication{S, T}) where {S, T}
     return MOI.dimension(set.antecedent) + MOI.dimension(set.consequent)
 end
 
-function copy(set::Imply{S, T}) where {S, T}
-    return Imply(copy(set.antecedent), copy(set.consequent))
+function copy(set::Implication{S, T}) where {S, T}
+    return Implication(copy(set.antecedent), copy(set.consequent))
 end
 
-function Base.:(==)(x::Imply{S, T}, y::Imply{S, T}) where {S, T}
+function Base.:(==)(x::Implication{S, T}, y::Implication{S, T}) where {S, T}
     return x.antecedent == y.antecedent && x.consequent == y.consequent
 end
 

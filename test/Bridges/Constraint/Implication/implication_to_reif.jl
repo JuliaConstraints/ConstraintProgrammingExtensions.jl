@@ -1,4 +1,4 @@
-@testset "Imply2Reification: $(fct_type), $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
+@testset "Implication2Reification: $(fct_type), $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
     base_model = if T == Int
         IntReificationEqualToModel{T}()
     elseif T == Float64
@@ -7,7 +7,7 @@
         @assert false
     end
     mock = MOIU.MockOptimizer(base_model)
-    model = COIB.Imply2Reification{T}(mock)
+    model = COIB.Implication2Reification{T}(mock)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
     @test MOI.supports_constraint(
@@ -18,7 +18,7 @@
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.Imply{MOI.LessThan{T}, MOI.LessThan{T}},
+        CP.Implication{MOI.LessThan{T}, MOI.LessThan{T}},
     )
     
     if T == Int
@@ -36,13 +36,13 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, CP.Imply(MOI.LessThan(one(T)), MOI.LessThan(zero(T))))
+    c = MOI.add_constraint(model, fct, CP.Implication(MOI.LessThan(one(T)), MOI.LessThan(zero(T))))
 
     @test MOI.is_valid(model, x_1)
     @test MOI.is_valid(model, x_2)
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Imply}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Implication}(-1)]
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Reification) == typeof(bridge)

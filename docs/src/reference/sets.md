@@ -89,7 +89,7 @@ Reification
 Equivalence
 EquivalenceNot
 IfThenElse
-Imply
+Implication
 Conjunction
 Disjunction
 Negation

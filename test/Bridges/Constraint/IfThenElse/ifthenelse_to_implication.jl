@@ -1,11 +1,11 @@
-@testset "IfThenElse2Imply: $(fct_type), $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
-    mock = MOIU.MockOptimizer(ImplyModel{T}())
-    model = COIB.IfThenElse2Imply{T}(mock)
+@testset "IfThenElse2Implication: $(fct_type), $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
+    mock = MOIU.MockOptimizer(ImplicationModel{T}())
+    model = COIB.IfThenElse2Implication{T}(mock)
 
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.Imply{MOI.LessThan{T}, MOI.LessThan{T}},
+        CP.Implication{MOI.LessThan{T}, MOI.LessThan{T}},
     )
     @test MOIB.supports_bridging_constraint(
         model,
@@ -43,20 +43,20 @@
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.IfThenElse{MOI.LessThan{T}, MOI.LessThan{T}, MOI.LessThan{T}}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
-            (MOI.VectorAffineFunction{T}, CP.Imply),
+            (MOI.VectorAffineFunction{T}, CP.Implication),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Imply}()) == 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Implication}()) == 2
 
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Imply}()) == [bridge.con_if, bridge.con_else]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Implication}()) == [bridge.con_if, bridge.con_else]
     end
 
     @testset "If" begin
         @test MOI.is_valid(model, bridge.con_if)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_if)
         @test length(f.terms) == 2
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_if) == CP.Imply(MOI.LessThan(one(T)), MOI.LessThan(zero(T)))
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_if) == CP.Implication(MOI.LessThan(one(T)), MOI.LessThan(zero(T)))
 
         t1 = f.terms[1]
         @test t1.output_index == 1
@@ -73,7 +73,7 @@
         @test MOI.is_valid(model, bridge.con_else)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_else)
         @test length(f.terms) == 2
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_else) == CP.Imply(MOI.LessThan(one(T)), MOI.LessThan(zero(T)))
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_else) == CP.Implication(MOI.LessThan(one(T)), MOI.LessThan(zero(T)))
 
         t1 = f.terms[1]
         @test t1.output_index == 1

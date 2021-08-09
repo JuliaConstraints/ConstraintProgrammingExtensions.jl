@@ -150,17 +150,17 @@ include("GlobalCardinality/gcv_to_count.jl")
 const GlobalCardinalityVariableOpen2Count{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{GlobalCardinalityVariableOpen2CountBridge{T}, OT}
 
-include("IfThenElse/ifthenelse_to_imply.jl")
-const IfThenElse2Imply{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{IfThenElse2ImplyBridge{T}, OT}
+include("IfThenElse/ifthenelse_to_implication.jl")
+const IfThenElse2Implication{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{IfThenElse2ImplicationBridge{T}, OT}
 
 include("IfThenElse/ifthenelse_to_reif.jl")
 const IfThenElse2Reification{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{IfThenElse2ReificationBridge{T}, OT}
 
-include("Imply/imply_to_reif.jl")
-const Imply2Reification{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{Imply2ReificationBridge{T}, OT}
+include("Implication/implication_to_reif.jl")
+const Implication2Reification{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Implication2ReificationBridge{T}, OT}
 
 include("Increasing/inc_to_lp.jl")
 const Increasing2LP{T, OT <: MOI.ModelLike} =
@@ -234,9 +234,9 @@ include("Strictly/strictly_llt_to_indic.jl")
 const StrictlyLexicographicallyLessThan2Indicator{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{StrictlyLexicographicallyLessThan2IndicatorBridge{T}, OT}
 
-    include("Strictly/strictly_lt_to_strictly_gt.jl")
-    const StrictlyLessThan2StrictlyGreaterThan{T, OT <: MOI.ModelLike} =
-        MOIBC.SingleBridgeOptimizer{StrictlyLessThan2StrictlyGreaterThanBridge{T}, OT}
+include("Strictly/strictly_lt_to_strictly_gt.jl")
+const StrictlyLessThan2StrictlyGreaterThan{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{StrictlyLessThan2StrictlyGreaterThanBridge{T}, OT}
 
 include("Strictly/strictly_to_lp.jl")
 const Strictly2LP{T, OT <: MOI.ModelLike} =
@@ -334,9 +334,9 @@ function add_all_set_bridges(bridged_model, ::Type{T}) where {T}
     MOIB.add_bridge(bridged_model, GlobalCardinalityFixedOpen2CountBridge{T})
     MOIB.add_bridge(bridged_model, GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T})
     MOIB.add_bridge(bridged_model, GlobalCardinalityVariableOpen2CountBridge{T})
-    MOIB.add_bridge(bridged_model, IfThenElse2ImplyBridge{T})
+    MOIB.add_bridge(bridged_model, IfThenElse2ImplicationBridge{T})
     MOIB.add_bridge(bridged_model, IfThenElse2ReificationBridge{T})
-    MOIB.add_bridge(bridged_model, Imply2ReificationBridge{T})
+    MOIB.add_bridge(bridged_model, Implication2ReificationBridge{T})
     MOIB.add_bridge(bridged_model, Increasing2LPBridge{T})
     MOIB.add_bridge(bridged_model, Inverse2ReificationBridge{T})
     MOIB.add_bridge(bridged_model, Knapsack2MILPBridge{T})

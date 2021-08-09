@@ -16,6 +16,8 @@ The following sets have been touched by the refactor:
 
 Experiments with functions are removed for now.
 
+For consistency, `Imply` has been renamed `Implication`.
+
 
 Version 0.3.2
 -------------
