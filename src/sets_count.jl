@@ -129,7 +129,7 @@ Also called `distribute`.
 
 ### Example
 
-    [x, y, z, t, u, v, w] in ClosedGlobalCardinalityVariable(3, 2)
+    [x, y, z, t, u, v, w] in GlobalCardinality{VARIABLE_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}(3, 2)
     # t == sum([x, y, z] .== v)
     # u == sum([x, y, z] .== w)
     # x ∈ [v, w], y ∈ [v, w], z ∈ [v, w]
