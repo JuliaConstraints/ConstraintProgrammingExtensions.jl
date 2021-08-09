@@ -100,6 +100,39 @@ Also called `distribute`.
     [x, y, z, t, u, v, w] in GlobalCardinality{T}(3, 2)
     # t == sum([x, y, z] .== v)
     # u == sum([x, y, z] .== w)
+
+## Fixed and closed
+
+``\\{(x, y) \\in \\mathbb{T}^\\mathtt{dimension} \\times \\mathbb{N}^d : y_i = |\\{ j | x_j = \\mathtt{values}_i, \\forall j \\}| \\}``
+
+The first `dimension` variables are an array, the last variables are the 
+number of times that each item of `values` is present in the first array.
+Each value of the first array must be within `values`.
+
+### Example
+
+    [x, y, z, v, w] in GlobalCardinality{FIXED_COUNTED_VALUES, CLOSED_COUNTED_VALUES, T}(3, [2.0, 4.0])
+    # v == sum([x, y, z] .== 2.0)
+    # w == sum([x, y, z] .== 4.0)
+    # x ∈ [2.0, 4.0], y ∈ [2.0, 4.0], z ∈ [2.0, 4.0]
+
+## Variable and closed
+
+``\\{(x, y, z) \\in \\mathbb{T}^\\mathtt{dimension} \\times \\mathbb{N}^\\mathtt{n\\_values} \\times \\mathbb{T}^\\mathtt{n\\_values} : y_i = |\\{ j | x_j = z_i, \\forall j \\}| \\}``
+
+The first `dimension` variables are an array, the next `n_values` variables 
+are the number of times that each item of the last `n_values` variables is 
+present in the first array. Each value of the first array must be within the 
+next given `n_values`.
+
+Also called `distribute`.
+
+### Example
+
+    [x, y, z, t, u, v, w] in ClosedGlobalCardinalityVariable(3, 2)
+    # t == sum([x, y, z] .== v)
+    # u == sum([x, y, z] .== w)
+    # x ∈ [v, w], y ∈ [v, w], z ∈ [v, w]
 """
 struct GlobalCardinality{CVT, CVCT, T <: Real} <: MOI.AbstractVectorSet
     dimension::Int
