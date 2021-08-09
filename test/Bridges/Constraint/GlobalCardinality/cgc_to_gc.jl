@@ -11,7 +11,7 @@
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        GlobalCardinalityFixedOpen{T},
+        CP.GlobalCardinalityFixedOpen{T},
     )
     @test MOI.supports_constraint(
         model,
