@@ -63,6 +63,8 @@ This set represents the large majority of the variants of the
 global-cardinality constraint, with the parameters set in `CountedValuesType` 
 (`CVT` parameter) and `CountedValuesClosureType` (`CVCT` parameter).
 
+## Fixed and open
+
 ``\\{(x, y) \\in \\mathbb{T}^\\mathtt{dimension} \\times \\mathbb{N}^d : y_i = |\\{ j | x_j = \\mathtt{values}_i, \\forall j \\}| \\}``
 
 The first `dimension` variables are an array, the last variables are the 
@@ -72,11 +74,32 @@ Values that are not in `values` are ignored.
 Also called [`gcc`](https://sofdem.github.io/gccat/gccat/Cglobal_cardinality.html)
 or `count`.
 
-## Example
+### Example
 
+    [x, y, z, v, w] in GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES}(3, [2.0, 4.0])
+    [x, y, z, v, w] in GlobalCardinality{OPEN_COUNTED_VALUES}(3, [2.0, 4.0])
     [x, y, z, v, w] in GlobalCardinality(3, [2.0, 4.0])
     # v == sum([x, y, z] .== 2.0)
     # w == sum([x, y, z] .== 4.0)
+
+## Variable and open
+
+``\\{(x, y, z) \\in \\mathbb{T}^\\mathtt{dimension} \\times \\mathbb{N}^\\mathtt{n\\_values} \\times \\mathbb{T}^\\mathtt{n\\_values} : y_i = |\\{ j | x_j = z_i, \\forall j \\}| \\}``
+
+The first `dimension` variables are an array, the next `n_values` variables 
+are the number of times that each item of the last `n_values` variables is 
+present in the first array. Values of the first array that are not in the 
+`n_values` are ignored. 
+
+Also called `distribute`.
+
+### Example
+
+    [x, y, z, t, u, v, w] in GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}(3, 2)
+    [x, y, z, t, u, v, w] in GlobalCardinality{OPEN_COUNTED_VALUES, T}(3, 2)
+    [x, y, z, t, u, v, w] in GlobalCardinality{T}(3, 2)
+    # t == sum([x, y, z] .== v)
+    # u == sum([x, y, z] .== w)
 """
 struct GlobalCardinality{CVT, CVCT, T <: Real} <: MOI.AbstractVectorSet
     dimension::Int
@@ -88,16 +111,20 @@ function GlobalCardinality(dimension::Int, values::Vector{T}) where {T <: Real}
     return GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}(dimension, values, -1)
 end
 
-function GlobalCardinality{CVT, CVCT}(dimension::Int, values::Vector{T}) where {CVT, CVCT, T <: Real}
-    return GlobalCardinality{CVT, CVCT, T}(dimension, values, -1)
+function GlobalCardinality{CVCT}(dimension::Int, values::Vector{T}) where {CVCT, T <: Real}
+    return GlobalCardinality{FIXED_COUNTED_VALUES, CVCT, T}(dimension, values, -1)
 end
 
-function GlobalCardinality{CVT, CVCT, T}(dimension::Int, values::Vector{T}) where {CVT, CVCT, T <: Real}
-    return GlobalCardinality{CVT, CVCT, T}(dimension, values, -1)
+function GlobalCardinality{CVCT, T}(dimension::Int, values::Vector{T}) where {CVCT, T <: Real}
+    return GlobalCardinality{FIXED_COUNTED_VALUES, CVCT, T}(dimension, values, -1)
 end
 
-function GlobalCardinality{CVT, CVCT, T}(dimension::Int, n_values::Int) where {CVT, CVCT, T <: Real}
-    return GlobalCardinality{CVT, CVCT, T}(dimension, T[], n_values)
+function GlobalCardinality{T}(dimension::Int, n_values::Int) where {T <: Real}
+    return GlobalCardinality{VARIABLE_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}(dimension, T[], n_values)
+end
+
+function GlobalCardinality{CVCT, T}(dimension::Int, n_values::Int) where {CVCT, T <: Real}
+    return GlobalCardinality{VARIABLE_COUNTED_VALUES, CVCT, T}(dimension, T[], n_values)
 end
 
 function n_values(set::GlobalCardinality)
