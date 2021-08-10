@@ -59,7 +59,7 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
             * [`bin_packing_load_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/bin_packing_load.mzn): [similar MILP-like model](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_bin_packing_load_reif.mzn).
         * Function: `CP.BinPacking` and `CP.BinPackingLoadFunction`
             * [`bin_packing_load_fn`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/bin_packing_load_fn.mzn) directly returns the load variables.
-    * Knapsack: `CP.ValuedKnapsack`
+    * Knapsack: `CP.Knapsack` with values
         * [`knapsack`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/knapsack.mzn): mapped onto [a MILP model](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_knapsack.mzn).
         * [`knapsack_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/knapsack.mzn): similar, [with an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_knapsack_reif.mzn).
 * Sorting: 

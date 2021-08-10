@@ -13,12 +13,12 @@
     @test MOI.supports_constraint(
         model,
         MOI.VectorOfVariables,
-        CP.Knapsack{T},
+        CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_CAPACITY_KNAPSACK, T},
     )
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorOfVariables,
-        CP.ValuedKnapsack{T},
+        CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_CAPACITY_KNAPSACK, T},
     )
 
     n_items = 2
@@ -43,28 +43,28 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, CP.ValuedKnapsack(weights, values, capacity))
+    c = MOI.add_constraint(model, fct, CP.Knapsack(weights, capacity, values))
 
     @test MOI.is_valid(model, x_1)
     @test MOI.is_valid(model, x_2)
     @test MOI.is_valid(model, x_value)
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.ValuedKnapsack{T}}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_CAPACITY_KNAPSACK, T}}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.ValuedKnapsack{T}) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_CAPACITY_KNAPSACK, T}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
         @test Set(MOIB.added_constraint_types(typeof(bridge))) == Set([
-            (MOI.VectorAffineFunction{T}, CP.Knapsack{T}),
+            (MOI.VectorAffineFunction{T}, CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T}),
             (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
         ])
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Knapsack{T}}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T}}()) == 1
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == 1
 
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Knapsack{T}}()) == [bridge.kp]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T}}()) == [bridge.kp]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.value]
     end
 

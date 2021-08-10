@@ -1,5 +1,5 @@
 """
-Bridges `CP.VariableCapacityKnapsack` to a MILP by adding the corresponding 
+Bridges `CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.VALUED_CAPACITY_KNAPSACK, T}` to a MILP by adding the corresponding 
 MILP constraint.
 """
 struct VariableCapacityKnapsack2MILPBridge{T} <: MOIBC.AbstractBridge
@@ -10,8 +10,8 @@ function MOIBC.bridge_constraint(
     ::Type{VariableCapacityKnapsack2MILPBridge{T}},
     model,
     f::MOI.AbstractVectorFunction,
-    s::CP.VariableCapacityKnapsack{T},
-) where {T}
+    s::CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T},
+) where {T <: Real}
     # Create the knapsack constraint.
     f_scalars = MOIU.scalarize(f)
     new_f = cpdot(f_scalars[1:end-1], s.weights) - f_scalars[end]
@@ -23,8 +23,8 @@ end
 function MOI.supports_constraint(
     ::Type{VariableCapacityKnapsack2MILPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.VariableCapacityKnapsack{T}},
-) where {T}
+    ::Type{CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T}},
+) where {T <: Real}
     return true
 end
 

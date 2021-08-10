@@ -111,6 +111,7 @@
 
 # --- standard operations on MOI functions
 # https://github.com/jump-dev/MathOptInterface.jl/issues/1380
+# TODO: MOI.SingleVariable.(x) instead, on the caller side?
 
 function cpdot(x::Vector{MOI.VariableIndex}, y::Vector{T}) where {T <: Real}
     return MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.(y, x), zero(T))

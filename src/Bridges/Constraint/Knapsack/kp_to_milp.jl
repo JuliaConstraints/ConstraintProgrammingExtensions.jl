@@ -1,5 +1,5 @@
 """
-Bridges `CP.Knapsack` to a MILP by adding the corresponding MILP constraint.
+Bridges `CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK}` to a MILP by adding the corresponding MILP constraint.
 """
 struct Knapsack2MILPBridge{T} <: MOIBC.AbstractBridge
     kp::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}
@@ -9,7 +9,7 @@ function MOIBC.bridge_constraint(
     ::Type{Knapsack2MILPBridge{T}},
     model,
     f::MOI.AbstractVectorFunction,
-    s::CP.Knapsack{T},
+    s::CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T},
 ) where {T}
     new_f = cpdot(MOIU.scalarize(f), s.weights)
     kp = MOI.add_constraint(model, new_f, MOI.LessThan(s.capacity))
@@ -20,7 +20,7 @@ end
 function MOI.supports_constraint(
     ::Type{Knapsack2MILPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Knapsack{T}},
+    ::Type{CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T}},
 ) where {T}
     return true
 end

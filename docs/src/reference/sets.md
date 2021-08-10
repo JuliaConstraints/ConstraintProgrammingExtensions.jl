@@ -53,9 +53,8 @@ VariableCapacityBinPacking
 
 ```@docs
 Knapsack
-VariableCapacityKnapsack
-ValuedKnapsack
-VariableCapacityValuedKnapsack
+KnapsackCapacityType
+KnapsackValueType
 ```
 
 ### Others

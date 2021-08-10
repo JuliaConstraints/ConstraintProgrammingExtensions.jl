@@ -11,8 +11,9 @@ Refactor for sets with many variants. Discussion:
 
 The following sets have been touched by the refactor: 
 
-* `GlobalCardinality` and friends
 * `CumulativeResource` and friend
+* `GlobalCardinality` and friends
+* `Knapsack` and friends
 * `NonOverlappingOrthotopes` and friend
 
 Experiments with functions are removed for now.
