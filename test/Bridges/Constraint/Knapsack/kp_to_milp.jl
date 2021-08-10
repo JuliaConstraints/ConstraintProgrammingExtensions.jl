@@ -53,7 +53,8 @@
         @test MOI.is_valid(model, bridge.kp)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.kp)
         @test length(f.terms) == n_items
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.kp) == MOI.LessThan(capacity)
+        @test f.constant === -capacity
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.kp) == MOI.LessThan(zero(T))
 
         for item in 1:n_items
             t = f.terms[item]

@@ -172,7 +172,9 @@ const Inverse2Reification{T, OT <: MOI.ModelLike} =
     
 include("Knapsack/kp_to_milp.jl")
 const Knapsack2MILP{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{Knapsack2MILPBridge{T}, OT}
+    MOIBC.SingleBridgeOptimizer{Knapsack2MILPBridge{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}, OT}
+const VariableCapacityKnapsack2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Knapsack2MILPBridge{CP.VARIABLE_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}, OT}
     
 include("Knapsack/kp_to_varcapa.jl")
 const Knapsack2VariableCapacityKnapsack{T, OT <: MOI.ModelLike} =
@@ -181,10 +183,6 @@ const Knapsack2VariableCapacityKnapsack{T, OT <: MOI.ModelLike} =
 include("Knapsack/vkp_to_kp.jl")
 const ValuedKnapsack2Knapsack{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{ValuedKnapsack2KnapsackBridge{T}, OT}
-    
-include("Knapsack/varcapa_to_milp.jl")
-const VariableCapacityKnapsack2MILP{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{VariableCapacityKnapsack2MILPBridge{T}, OT}
 
 include("Knapsack/varcapav_to_varcapa.jl")
 const VariableCapacityValuedKnapsack2VariableCapacityKnapsack{T, OT <: MOI.ModelLike} =
