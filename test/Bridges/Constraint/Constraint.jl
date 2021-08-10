@@ -119,8 +119,10 @@
         include("Knapsack/kp_to_milp.jl")
         include("Knapsack/kp_to_varcapa.jl")
         include("Knapsack/varcapa_to_milp.jl")
-        include("Knapsack/vkp_to_kp.jl")
+        include("Knapsack/varcapav_to_milp.jl")
         include("Knapsack/varcapav_to_varcapa.jl")
+        include("Knapsack/vkp_to_kp.jl")
+        include("Knapsack/vkp_to_milp.jl")
     end
 
     @testset "LexicographicallyGreaterThan" begin

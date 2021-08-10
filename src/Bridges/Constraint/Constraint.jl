@@ -175,6 +175,10 @@ const Knapsack2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Knapsack2MILPBridge{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}, OT}
 const VariableCapacityKnapsack2MILP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{Knapsack2MILPBridge{CP.VARIABLE_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}, OT}
+const ValuedKnapsack2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Knapsack2MILPBridge{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_KNAPSACK, T}, OT}
+const ValuedVariableCapacityKnapsack2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{Knapsack2MILPBridge{CP.VARIABLE_CAPACITY_KNAPSACK, CP.VALUED_KNAPSACK, T}, OT}
     
 include("Knapsack/kp_to_varcapa.jl")
 const Knapsack2VariableCapacityKnapsack{T, OT <: MOI.ModelLike} =
