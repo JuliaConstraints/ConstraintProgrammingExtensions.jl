@@ -28,7 +28,11 @@ const ArgumentMinimumAmong2MILP{T, OT <: MOI.ModelLike} =
     
 include("BinPacking/bp_to_milp.jl")
 const BinPacking2MILP{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{BinPacking2MILPBridge{T}, OT}
+    MOIBC.SingleBridgeOptimizer{BinPacking2MILPBridge{CP.NO_CAPACITY_BINPACKING, T}, OT}
+const FixedCapacityBinPacking2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{BinPacking2MILPBridge{CP.FIXED_CAPACITY_BINPACKING, T}, OT}
+const VariableCapacityBinPacking2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{BinPacking2MILPBridge{CP.VARIABLE_CAPACITY_BINPACKING, T}, OT}
 
 include("BinPacking/fixedcapa_to_bp.jl")
 const FixedCapacityBinPacking2BinPacking{T, OT <: MOI.ModelLike} =
@@ -41,10 +45,6 @@ const FixedCapacityBinPacking2VariableCapacityBinPacking{T, OT <: MOI.ModelLike}
 include("BinPacking/varcapa_to_bp.jl")
 const VariableCapacityBinPacking2BinPacking{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{VariableCapacityBinPacking2BinPackingBridge{T}, OT}
-    
-include("BinPacking/varcapa_to_milp.jl")
-const VariableCapacityBinPacking2MILP{T, OT <: MOI.ModelLike} =
-    MOIBC.SingleBridgeOptimizer{VariableCapacityBinPacking2MILPBridge{T}, OT}
 
 include("Conjunction/conjunction_to_reif.jl")
 const Conjunction2Reification{T, OT <: MOI.ModelLike} =
