@@ -102,7 +102,6 @@ False
 ```@docs
 CumulativeResource
 NonOverlappingOrthotopes
-ConditionallyNonOverlappingOrthotopes
 ```
 
 ## Sorting constraints

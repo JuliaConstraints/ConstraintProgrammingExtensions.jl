@@ -6,12 +6,12 @@
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.ConditionallyNonOverlappingOrthotopes,
+        CP.NonOverlappingOrthotopes{CP.CONDITIONAL_NONVERLAPPING_ORTHOTOPES},
     )
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.NonOverlappingOrthotopes,
+        CP.NonOverlappingOrthotopes{CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES},
     )
 
     n_vars_position = n_ortho * dim
@@ -78,19 +78,19 @@
     bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.NonOverlappingOrthotopes}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.NonOverlappingOrthotopes) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.NonOverlappingOrthotopes{CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.EqualTo{T},)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
-            (MOI.VectorAffineFunction{T}, CP.ConditionallyNonOverlappingOrthotopes),
+            (MOI.VectorAffineFunction{T}, CP.NonOverlappingOrthotopes{CP.CONDITIONAL_NONVERLAPPING_ORTHOTOPES}),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 1
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.EqualTo{T}}()) == 1
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.ConditionallyNonOverlappingOrthotopes}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.NonOverlappingOrthotopes{CP.CONDITIONAL_NONVERLAPPING_ORTHOTOPES}}()) == 1
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.var]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.EqualTo{T}}()) == [bridge.var_con]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.ConditionallyNonOverlappingOrthotopes}()) == [bridge.con]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.NonOverlappingOrthotopes{CP.CONDITIONAL_NONVERLAPPING_ORTHOTOPES}}()) == [bridge.con]
     end
 
     @testset "New variable" begin
@@ -102,7 +102,7 @@
 
     @testset "New constraint" begin
         @test MOI.is_valid(model, bridge.con)
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.con) == CP.ConditionallyNonOverlappingOrthotopes(n_ortho, dim)
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.con) == CP.NonOverlappingOrthotopes{CP.CONDITIONAL_NONVERLAPPING_ORTHOTOPES}(n_ortho, dim)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.con)
 
         for i in 1:length(f.terms)

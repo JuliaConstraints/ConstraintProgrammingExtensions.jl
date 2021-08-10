@@ -17,7 +17,7 @@
         @test MOIB.supports_bridging_constraint(
             model,
             MOI.VectorOfVariables,
-            CP.NonOverlappingOrthotopes,
+            CP.NonOverlappingOrthotopes{CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES},
         )
     elseif fct_type == "vector affine function"
         @test MOI.supports_constraint(
@@ -33,7 +33,7 @@
         @test MOIB.supports_bridging_constraint(
             model,
             MOI.VectorAffineFunction{T},
-            CP.NonOverlappingOrthotopes,
+            CP.NonOverlappingOrthotopes{CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES},
         )
     else
         @assert false
@@ -98,10 +98,10 @@
     end
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.NonOverlappingOrthotopes}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.NonOverlappingOrthotopes{CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES}}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.NonOverlappingOrthotopes) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.NonOverlappingOrthotopes{CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),

@@ -1086,7 +1086,7 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
-        CP.ConditionallyNonOverlappingOrthotopes,
+        CP.NonOverlappingOrthotopes{CP.CONDITIONAL_NONVERLAPPING_ORTHOTOPES},
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),

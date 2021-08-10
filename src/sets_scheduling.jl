@@ -49,7 +49,26 @@ MOI.dimension(set::CumulativeResource{NO_DEADLINE_CUMULATIVE_RESOURCE}) = 3 * se
 MOI.dimension(set::CumulativeResource{VARIABLE_DEADLINE_CUMULATIVE_RESOURCE}) = 4 * set.n_tasks + 1
 
 """
-    NonOverlappingOrthotopes(n_orthotopes::Int, n_dimensions::Int)
+    NonOverlappingOrthotopesConditionalityType
+
+Whether orthotopes in `NonOverlappingOrthotopes` constraint are considered:
+
+* either all orthotopes must be considered: `UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES`
+* or orthotopes can be disabled by variables: `CONDITIONAL_NONVERLAPPING_ORTHOTOPES`
+"""
+@enum NonOverlappingOrthotopesConditionalityType begin
+    UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES
+    CONDITIONAL_NONVERLAPPING_ORTHOTOPES
+end
+
+"""
+    NonOverlappingOrthotopes{NOOCT}(n_orthotopes::Int, n_dimensions::Int)
+
+This set corresponds to a guarantee that orthotopes do not overlap. Some 
+orthotopes can optionally be disabled for the constraint (guided by variables),
+based on the value of `NonOverlappingOrthotopesConditionalityType`.
+
+## Unconditional constraint
 
 Guarantees that the `n_orthotopes` orthotopes do not overlap. The orthotopes 
 live in various dimensions: segments if `n_dimensions = 1`, rectangles if 
@@ -71,7 +90,7 @@ The set can be defined as:
 Also called [`diffn`](https://sofdem.github.io/gccat/gccat/Cdiffn.html), 
 `geost`, `nooverlap`, `diff2`, or `disjoint`.
 
-## Example: two 2-D rectangles
+### Example: two 2-D rectangles
     [x1, y1, w1, h1, x1e, y1e, x2, y2, w2, h2, x2e, y2e] in NonOverlappingOrthotopes(2, 2)
     # Enforces the following five constraints: 
     #   OR(
@@ -84,16 +103,8 @@ Also called [`diffn`](https://sofdem.github.io/gccat/gccat/Cdiffn.html),
     #   y1e = y1 + h1
     #   x2e = x2 + w2
     #   y2e = y2 + h2
-"""
-struct NonOverlappingOrthotopes <: MOI.AbstractVectorSet
-    n_orthotopes::Int
-    n_dimensions::Int
-end
 
-MOI.dimension(set::NonOverlappingOrthotopes) = 3 * set.n_orthotopes * set.n_dimensions
-
-"""
-    ConditionallyNonOverlappingOrthotopes(n_orthotopes::Int, n_dimensions::Int)
+## Conditional constraint
 
 Guarantees that the `n_orthotopes` orthotopes do not overlap, with a binary 
 variable indicating whether a given orthotope must not overlap with other 
@@ -119,19 +130,23 @@ The set can be defined as:
 Also called [`diffn`](https://sofdem.github.io/gccat/gccat/Cdiffn.html), 
 `nooverlap`, or `disjointconditional`.
 """
-struct ConditionallyNonOverlappingOrthotopes <: MOI.AbstractVectorSet
+struct NonOverlappingOrthotopes{NOOCT} <: MOI.AbstractVectorSet
     n_orthotopes::Int
     n_dimensions::Int
 end
 
-MOI.dimension(set::ConditionallyNonOverlappingOrthotopes) = 3 * set.n_orthotopes * set.n_dimensions + set.n_orthotopes
+function NonOverlappingOrthotopes(n_orthotopes::Int, n_dimensions::Int)
+    return NonOverlappingOrthotopes{UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES}(n_orthotopes, n_dimensions)
+end
+
+MOI.dimension(set::NonOverlappingOrthotopes{UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES}) = 3 * set.n_orthotopes * set.n_dimensions
+MOI.dimension(set::NonOverlappingOrthotopes{CONDITIONAL_NONVERLAPPING_ORTHOTOPES}) = 3 * set.n_orthotopes * set.n_dimensions + set.n_orthotopes
 
 # isbits types, nothing to copy
 function copy(
     set::Union{
         CumulativeResource, 
         NonOverlappingOrthotopes,
-        ConditionallyNonOverlappingOrthotopes,
     },
 )
     return set

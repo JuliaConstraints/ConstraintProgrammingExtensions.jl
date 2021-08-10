@@ -91,7 +91,7 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
         * [`strict_lex2`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/strict_lex2.mzn): in a matrix, have both rows and columns strictly lexicographically sorted, [mapped to two chains](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_strict_lex2.mzn).
         * Reifications are available.
 * Scheduling: 
-    * Rectangle overlapping: `CP.NonOverlappingOrthotopes` and `CP.ConditionallyNonOverlappingOrthotopes`
+    * Rectangle overlapping: `CP.NonOverlappingOrthotopes`
         * [`diffn`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/diffn.mzn): [mapped to a disjunction of linear inequalities](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_diffn.mzn).
         * [`diffn_k`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/diffn.mzn): generalisation to `k` dimensions.
         * No reification available, but [a similar mapping is available](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_diffn_reif.mzn).

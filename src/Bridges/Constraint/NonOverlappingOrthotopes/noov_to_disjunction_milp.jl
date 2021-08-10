@@ -13,7 +13,7 @@ function MOIBC.bridge_constraint(
     ::Type{NonOverlappingOrthotopes2DisjunctionLPBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.NonOverlappingOrthotopes
+    s::CP.NonOverlappingOrthotopes{CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES}
 ) where {T}
     return MOIBC.bridge_constraint(
         NonOverlappingOrthotopes2DisjunctionLPBridge{T},
@@ -27,7 +27,7 @@ function MOIBC.bridge_constraint(
     ::Type{NonOverlappingOrthotopes2DisjunctionLPBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.NonOverlappingOrthotopes
+    s::CP.NonOverlappingOrthotopes{CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES}
 ) where {T}
     f_scalars = MOIU.scalarize(f)
     f_pos = Vector{MOI.ScalarAffineFunction{T}}[
@@ -85,7 +85,7 @@ end
 function MOI.supports_constraint(
     ::Type{NonOverlappingOrthotopes2DisjunctionLPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.NonOverlappingOrthotopes},
+    ::Type{CP.NonOverlappingOrthotopes{CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES}},
 ) where {T}
     return true
 end

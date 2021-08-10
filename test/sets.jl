@@ -120,8 +120,6 @@
 
     # Two arguments: two dimensions.
     @testset "$(S)" for S in [
-        CP.NonOverlappingOrthotopes,
-        CP.ConditionallyNonOverlappingOrthotopes,
         CP.LexicographicallyLessThan,
         CP.LexicographicallyGreaterThan,
         CP.DoublyLexicographicallyLessThan,
@@ -138,13 +136,7 @@
         @test typeof(copy(s)) <: S
         @test copy(s) == s
 
-        if S == CP.NonOverlappingOrthotopes
-            @test MOI.dimension(S(2, 2)) == 3 * 2 * 2
-            @test MOI.dimension(S(3, 4)) == 3 * 3 * 4
-        elseif S == CP.ConditionallyNonOverlappingOrthotopes
-            @test MOI.dimension(S(2, 2)) == 3 * 2 * 2 + 2
-            @test MOI.dimension(S(3, 4)) == 3 * 3 * 4 + 3
-        elseif S == CP.LexicographicallyLessThan || S == CP.LexicographicallyGreaterThan || S == CP.DoublyLexicographicallyLessThan || S == CP.DoublyLexicographicallyGreaterThan
+        if S == CP.LexicographicallyLessThan || S == CP.LexicographicallyGreaterThan || S == CP.DoublyLexicographicallyLessThan || S == CP.DoublyLexicographicallyGreaterThan
             @test MOI.dimension(S(2, 2)) == 2 * 2
             @test MOI.dimension(S(3, 4)) == 3 * 4
         else
@@ -538,7 +530,23 @@
         @test MOI.dimension(CP.ValuePrecedence(2, 4, 20)) == 20
     end
 
-    
+    @testset "$(S)" for S in [CP.WeightedCircuit, CP.WeightedCircuitPath]
+        @test S(3, [1 2 3; 4 5 6; 7 8 9]) == S(3, [1 2 3; 4 5 6; 7 8 9])
+        @test S(3, [1 2 3; 4 5 6; 7 8 9]) != S(2, [1 2; 3 4])
+        @test S(2, [1 2; 3 4]) != S(3, [1 2 3; 4 5 6; 7 8 9])
+
+        s = S(3, [1 2 3; 4 5 6; 7 8 9])
+        @test typeof(copy(s)) <: S
+        @test copy(s) == s
+
+        if S == CP.WeightedCircuit
+            @test MOI.dimension(S(3, [1 2 3; 4 5 6; 7 8 9])) == 3 + 1
+        elseif S == CP.WeightedCircuitPath
+            @test MOI.dimension(S(3, [1 2 3; 4 5 6; 7 8 9])) == 3 * 2 + 1
+        else
+            error("$(S) not implemented")
+        end
+    end    
 
     @testset "GlobalCardinality family" begin
         @testset "Constructor" begin
@@ -754,21 +762,35 @@
         end
     end
 
-    @testset "$(S)" for S in [CP.WeightedCircuit, CP.WeightedCircuitPath]
-        @test S(3, [1 2 3; 4 5 6; 7 8 9]) == S(3, [1 2 3; 4 5 6; 7 8 9])
-        @test S(3, [1 2 3; 4 5 6; 7 8 9]) != S(2, [1 2; 3 4])
-        @test S(2, [1 2; 3 4]) != S(3, [1 2 3; 4 5 6; 7 8 9])
+    @testset "NonOverlappingOrthotopes family" begin
+        for NOOCT in [
+            CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES,
+            CP.CONDITIONAL_NONVERLAPPING_ORTHOTOPES,
+        ]
+            @test isbitstype(CP.NonOverlappingOrthotopes{NOOCT})
 
-        s = S(3, [1 2 3; 4 5 6; 7 8 9])
-        @test typeof(copy(s)) <: S
-        @test copy(s) == s
+            @test CP.NonOverlappingOrthotopes{NOOCT}(2, 2) == CP.NonOverlappingOrthotopes{NOOCT}(2, 2)
+            @test CP.NonOverlappingOrthotopes{NOOCT}(2, 2) != CP.NonOverlappingOrthotopes{NOOCT}(2, 1)
+            @test CP.NonOverlappingOrthotopes{NOOCT}(2, 2) != CP.NonOverlappingOrthotopes{NOOCT}(3, 2)
+            @test CP.NonOverlappingOrthotopes{NOOCT}(3, 2) != CP.NonOverlappingOrthotopes{NOOCT}(2, 2)
 
-        if S == CP.WeightedCircuit
-            @test MOI.dimension(S(3, [1 2 3; 4 5 6; 7 8 9])) == 3 + 1
-        elseif S == CP.WeightedCircuitPath
-            @test MOI.dimension(S(3, [1 2 3; 4 5 6; 7 8 9])) == 3 * 2 + 1
-        else
-            error("$(S) not implemented")
+            s = CP.NonOverlappingOrthotopes{NOOCT}(2, 2)
+            @test typeof(copy(s)) <: CP.NonOverlappingOrthotopes{NOOCT}
+            @test copy(s) == s
+
+            if NOOCT == CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES
+                @test MOI.dimension(CP.NonOverlappingOrthotopes{NOOCT}(2, 2)) == 3 * 2 * 2
+                @test MOI.dimension(CP.NonOverlappingOrthotopes{NOOCT}(3, 4)) == 3 * 3 * 4
+            elseif NOOCT == CP.CONDITIONAL_NONVERLAPPING_ORTHOTOPES
+                @test MOI.dimension(CP.NonOverlappingOrthotopes{NOOCT}(2, 2)) == 3 * 2 * 2 + 2
+                @test MOI.dimension(CP.NonOverlappingOrthotopes{NOOCT}(3, 4)) == 3 * 3 * 4 + 3
+            else
+                error("$(NOOCT) not implemented")
+            end
+
+            if NOOCT == CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES
+                @test CP.NonOverlappingOrthotopes{NOOCT}(2, 2) == CP.NonOverlappingOrthotopes(2, 2)
+            end
         end
     end
 end
