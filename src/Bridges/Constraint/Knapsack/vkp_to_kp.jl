@@ -1,19 +1,19 @@
 """
 Bridges 
-`CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_CAPACITY_KNAPSACK, T}` to 
-`CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T}` 
+`CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_KNAPSACK, T}` to 
+`CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}` 
 by creating a value constraint.
 """
 struct ValuedKnapsack2KnapsackBridge{T} <: MOIBC.AbstractBridge
     value::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
-    kp::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T}}
+    kp::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}}
 end
 
 function MOIBC.bridge_constraint(
     ::Type{ValuedKnapsack2KnapsackBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_CAPACITY_KNAPSACK, T},
+    s::CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_KNAPSACK, T},
 ) where {T}
     return MOIBC.bridge_constraint(
         ValuedKnapsack2KnapsackBridge{T},
@@ -27,7 +27,7 @@ function MOIBC.bridge_constraint(
     ::Type{ValuedKnapsack2KnapsackBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_CAPACITY_KNAPSACK, T},
+    s::CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_KNAPSACK, T},
 ) where {T <: Real}
     f_scalars = MOIU.scalarize(f)
 
@@ -46,7 +46,7 @@ end
 function MOI.supports_constraint(
     ::Type{ValuedKnapsack2KnapsackBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_CAPACITY_KNAPSACK, T}},
+    ::Type{CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_KNAPSACK, T}},
 ) where {T}
     return true
 end
@@ -57,7 +57,7 @@ end
 
 function MOIB.added_constraint_types(::Type{ValuedKnapsack2KnapsackBridge{T}}) where {T <: Real}
     return [
-        (MOI.VectorAffineFunction{T}, CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T}),
+        (MOI.VectorAffineFunction{T}, CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}),
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
     ]
 end
@@ -66,7 +66,7 @@ function MOI.get(
     ::ValuedKnapsack2KnapsackBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.VectorAffineFunction{T},
-        CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T},
+        CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T},
     },
 ) where {T}
     return 1
@@ -86,7 +86,7 @@ function MOI.get(
     b::ValuedKnapsack2KnapsackBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.VectorAffineFunction{T},
-        CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T},
+        CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T},
     },
 ) where {T}
     return [b.kp]

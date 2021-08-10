@@ -16,12 +16,12 @@ end
 
 Whether the value of a `Knapsack` constraint is needed:
 
-* either the value is not available: `UNVALUED_CAPACITY_KNAPSACK`
-* or the value is available as a new variable: `VALUED_CAPACITY_KNAPSACK`
+* either the value is not available: `UNVALUED_KNAPSACK`
+* or the value is available as a new variable: `VALUED_KNAPSACK`
 """
 @enum KnapsackValueType begin
-    UNVALUED_CAPACITY_KNAPSACK
-    VALUED_CAPACITY_KNAPSACK
+    UNVALUED_KNAPSACK
+    VALUED_KNAPSACK
 end
 
 """
@@ -64,7 +64,7 @@ struct Knapsack{KCT, KVT, T <: Real} <: MOI.AbstractVectorSet
 
     function Knapsack{KCT, KVT}(weights::Vector{T}, capacity::T, values::Vector{T}) where {KCT, KVT, T <: Real}
         @assert all(weights .>= zero(T))
-        if KVT == VALUED_CAPACITY_KNAPSACK
+        if KVT == VALUED_KNAPSACK
             @assert all(values .>= zero(T))
         end
         if KCT == FIXED_CAPACITY_KNAPSACK
@@ -74,23 +74,23 @@ struct Knapsack{KCT, KVT, T <: Real} <: MOI.AbstractVectorSet
     end
 end
 
-Knapsack(weights::Vector{T}) where {T} = Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK}(weights, zero(T), T[])
-Knapsack(weights::Vector{T}, capacity::T) where {T} = Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK}(weights, capacity, T[])
-Knapsack(weights::Vector{T}, values::Vector{T}) where {T} = Knapsack{VARIABLE_CAPACITY_KNAPSACK, VALUED_CAPACITY_KNAPSACK}(weights, zero(T), values)
-Knapsack(weights::Vector{T}, capacity::T, values::Vector{T}) where {T} = Knapsack{FIXED_CAPACITY_KNAPSACK, VALUED_CAPACITY_KNAPSACK}(weights, capacity, values)
+Knapsack(weights::Vector{T}) where {T} = Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_KNAPSACK}(weights, zero(T), T[])
+Knapsack(weights::Vector{T}, capacity::T) where {T} = Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_KNAPSACK}(weights, capacity, T[])
+Knapsack(weights::Vector{T}, values::Vector{T}) where {T} = Knapsack{VARIABLE_CAPACITY_KNAPSACK, VALUED_KNAPSACK}(weights, zero(T), values)
+Knapsack(weights::Vector{T}, capacity::T, values::Vector{T}) where {T} = Knapsack{FIXED_CAPACITY_KNAPSACK, VALUED_KNAPSACK}(weights, capacity, values)
 
 # TODO: looks like dispatch cannot be done on this code!?
 # TODO: CP.Knapsack(weights = [1, 2]) throws T not defined.
 # function Knapsack(; weights::Vector{T}, capacity::T=zero(T), values::Vector{T}=T[]) where {T <: Real}
 #     KCT = iszero(capacity) ? VARIABLE_CAPACITY_KNAPSACK : FIXED_CAPACITY_KNAPSACK
-#     KVT = length(values) == 0 ? UNVALUED_CAPACITY_KNAPSACK : VALUED_CAPACITY_KNAPSACK
+#     KVT = length(values) == 0 ? UNVALUED_KNAPSACK : VALUED_KNAPSACK
 #     return Knapsack{KCT, KVT}(weights, capacity, values)
 # end
 
-MOI.dimension(set::Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK, T}) where {T} = length(set.weights)
-MOI.dimension(set::Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK, T}) where {T} = length(set.weights) + 1
-MOI.dimension(set::Knapsack{FIXED_CAPACITY_KNAPSACK, VALUED_CAPACITY_KNAPSACK, T}) where {T} = length(set.weights) + 1
-MOI.dimension(set::Knapsack{VARIABLE_CAPACITY_KNAPSACK, VALUED_CAPACITY_KNAPSACK, T}) where {T} = length(set.weights) + 2
+MOI.dimension(set::Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_KNAPSACK, T}) where {T} = length(set.weights)
+MOI.dimension(set::Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_KNAPSACK, T}) where {T} = length(set.weights) + 1
+MOI.dimension(set::Knapsack{FIXED_CAPACITY_KNAPSACK, VALUED_KNAPSACK, T}) where {T} = length(set.weights) + 1
+MOI.dimension(set::Knapsack{VARIABLE_CAPACITY_KNAPSACK, VALUED_KNAPSACK, T}) where {T} = length(set.weights) + 2
 
 function copy(set::Knapsack{KCT, KVT, T}) where {KCT, KVT, T}
     return Knapsack{KCT, KVT}(copy(set.weights), copy(set.capacity), copy(set.values))
@@ -101,11 +101,11 @@ function Base.:(==)(x::Knapsack{KCT, KVT, T}, y::Knapsack{KCT, KVT, T}) where {K
 end
 
 # Shortcuts for types.
-# const Knapsack{T} = Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK, T}
-const KnapsackFixedCapacity{T} = Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK, T}
-const KnapsackFixedCapacityUnvalued{T} = Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK, T}
-const KnapsackFixedCapacityValued{T} = Knapsack{FIXED_CAPACITY_KNAPSACK, VALUED_CAPACITY_KNAPSACK, T}
-const KnapsackValued{T} = Knapsack{FIXED_CAPACITY_KNAPSACK, VALUED_CAPACITY_KNAPSACK, T}
-const KnapsackVariableCapacity{T} = Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK, T}
-const KnapsackVariableCapacityUnvalued{T} = Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK, T}
-const KnapsackVariableCapacityValued{T} = Knapsack{VARIABLE_CAPACITY_KNAPSACK, VALUED_CAPACITY_KNAPSACK, T}
+# const Knapsack{T} = Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_KNAPSACK, T}
+const KnapsackFixedCapacity{T} = Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_KNAPSACK, T}
+const KnapsackFixedCapacityUnvalued{T} = Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_KNAPSACK, T}
+const KnapsackFixedCapacityValued{T} = Knapsack{FIXED_CAPACITY_KNAPSACK, VALUED_KNAPSACK, T}
+const KnapsackValued{T} = Knapsack{FIXED_CAPACITY_KNAPSACK, VALUED_KNAPSACK, T}
+const KnapsackVariableCapacity{T} = Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_KNAPSACK, T}
+const KnapsackVariableCapacityUnvalued{T} = Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_KNAPSACK, T}
+const KnapsackVariableCapacityValued{T} = Knapsack{VARIABLE_CAPACITY_KNAPSACK, VALUED_KNAPSACK, T}

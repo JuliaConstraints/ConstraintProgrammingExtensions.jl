@@ -707,10 +707,10 @@
         #     @test_throws UndefKeywordError CP.Knapsack(capacity=1)
 
         #     @test CP.Knapsack(weights=[1, 2]) == CP.Knapsack([1, 2])
-        #     @test CP.Knapsack(weights=[1, 2]) == CP.Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK, Int}([1, 2])
+        #     @test CP.Knapsack(weights=[1, 2]) == CP.Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_KNAPSACK, Int}([1, 2])
         # end
 
-        @testset "Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK}" begin
+        @testset "Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_KNAPSACK}" begin
             @test CP.Knapsack([1, 2, 3], 3) == CP.Knapsack([1, 2, 3], 3)
             @test CP.Knapsack([1, 2, 3], 3) != CP.Knapsack([1, 2, 3], 4)
             @test CP.Knapsack([1, 2, 3], 4) != CP.Knapsack([1, 2, 3], 3)
@@ -725,11 +725,11 @@
             @test_throws AssertionError CP.Knapsack([1, 2, 3], -3)
         end
 
-        @testset "Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK}" begin
+        @testset "Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_KNAPSACK}" begin
             @test CP.Knapsack([1, 2, 3]) == CP.Knapsack([1, 2, 3])
 
             s = CP.Knapsack([1, 2, 3])
-            @test typeof(copy(s)) <: CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK}
+            @test typeof(copy(s)) <: CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK}
             @test copy(s) == s
 
             @test MOI.dimension(CP.Knapsack([1, 2, 3])) == 3 + 1
@@ -737,7 +737,7 @@
             @test_throws AssertionError CP.Knapsack([-1, 2, 3])
         end
 
-        @testset "Knapsack{FIXED_CAPACITY_KNAPSACK, VALUED_CAPACITY_KNAPSACK}" begin
+        @testset "Knapsack{FIXED_CAPACITY_KNAPSACK, VALUED_KNAPSACK}" begin
             @test CP.Knapsack([1, 2, 3], 3, [1, 2, 3]) == CP.Knapsack([1, 2, 3], 3, [1, 2, 3])
             @test CP.Knapsack([1, 2, 3], 3, [1, 2, 3]) != CP.Knapsack([1, 2, 3], 4, [1, 2, 3])
             @test CP.Knapsack([1, 2, 3], 4, [1, 2, 3]) != CP.Knapsack([1, 2, 3], 3, [1, 2, 3])
@@ -753,11 +753,11 @@
             @test_throws AssertionError CP.Knapsack([1, 2, 3], -3, [1, 2, 3])
         end
 
-        @testset "Knapsack{VARIABLE_CAPACITY_KNAPSACK, VALUED_CAPACITY_KNAPSACK}" begin
+        @testset "Knapsack{VARIABLE_CAPACITY_KNAPSACK, VALUED_KNAPSACK}" begin
             @test CP.Knapsack([1, 2, 3], [1, 2, 3]) == CP.Knapsack([1, 2, 3], [1, 2, 3])
 
             s = CP.Knapsack([1, 2, 3], [1, 2, 3])
-            @test typeof(copy(s)) <: CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.VALUED_CAPACITY_KNAPSACK}
+            @test typeof(copy(s)) <: CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.VALUED_KNAPSACK}
             @test copy(s) == s
 
             @test MOI.dimension(CP.Knapsack([1, 2, 3], [1, 2, 3])) == 3 + 2
