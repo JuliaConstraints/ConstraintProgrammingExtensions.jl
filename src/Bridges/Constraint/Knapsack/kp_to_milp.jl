@@ -11,7 +11,7 @@ function MOIBC.bridge_constraint(
     f::MOI.AbstractVectorFunction,
     s::CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_CAPACITY_KNAPSACK, T},
 ) where {T}
-    new_f = cpdot(MOIU.scalarize(f), s.weights)
+    new_f = dot(MOIU.scalarize(f), s.weights)
     kp = MOI.add_constraint(model, new_f, MOI.LessThan(s.capacity))
 
     return Knapsack2MILPBridge(kp)

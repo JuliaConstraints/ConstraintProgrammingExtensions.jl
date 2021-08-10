@@ -32,7 +32,7 @@ function MOIBC.bridge_constraint(
     f_scalars = MOIU.scalarize(f)
 
     # Add the value constraint.
-    val_f = cpdot(s.values, f_scalars[1:end-1]) - f_scalars[end]
+    val_f = dot(s.values, f_scalars[1:end-1]) - f_scalars[end]
     val = MOI.add_constraint(model, val_f, MOI.EqualTo(zero(T)))
 
     # Add the knapsack constraint.

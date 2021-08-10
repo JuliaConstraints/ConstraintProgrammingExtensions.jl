@@ -109,18 +109,6 @@
 #     )
 # end
 
-# --- standard operations on MOI functions
-# https://github.com/jump-dev/MathOptInterface.jl/issues/1380
-# TODO: MOI.SingleVariable.(x) instead, on the caller side?
-
-function cpdot(x::Vector{MOI.VariableIndex}, y::Vector{T}) where {T <: Real}
-    return MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.(y, x), zero(T))
-end
-function cpdot(y::Vector{T}, x::Vector{MOI.VariableIndex}) where {T <: Real}
-    return MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.(y, x), zero(T))
-end
-cpdot(x, y) = LinearAlgebra.dot(x, y)
-
 # --- casting from Bool to Int
 
 # function MOI.ScalarAffineTerm{Int}(t::MOI.ScalarAffineTerm{Bool})

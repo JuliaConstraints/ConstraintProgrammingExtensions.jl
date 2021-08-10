@@ -14,7 +14,7 @@ function MOIBC.bridge_constraint(
 ) where {T <: Real}
     # Create the knapsack constraint.
     f_scalars = MOIU.scalarize(f)
-    new_f = cpdot(f_scalars[1:end-1], s.weights) - f_scalars[end]
+    new_f = dot(f_scalars[1:end-1], s.weights) - f_scalars[end]
     kp = MOI.add_constraint(model, new_f, MOI.LessThan(zero(T)))
 
     return VariableCapacityKnapsack2MILPBridge(kp)

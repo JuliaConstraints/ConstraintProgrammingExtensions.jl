@@ -48,21 +48,21 @@ function MOIBC.bridge_constraint(
     # Each item is assigned to exactly one bin.
     assign_unique = Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}(undef, s.n_items)
     for item in 1:s.n_items
-        assign_unique_f = cpdot(assign_var[item, :], ones(T, s.n_bins))
+        assign_unique_f = dot(MOI.SingleVariable.(assign_var[item, :]), ones(T, s.n_bins))
         assign_unique[item] = MOI.add_constraint(model, assign_unique_f, MOI.EqualTo(one(T)))
     end
 
     # Relate the assignment to the number of the bin to which the item is assigned.
     assign_number = Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}(undef, s.n_items)
     for item in 1:s.n_items
-        assign_number_f = cpdot(T.(collect(1:s.n_bins)), assign_var[item, :]) - f_scalars[2 * s.n_bins + item]
+        assign_number_f = dot(T.(collect(1:s.n_bins)), MOI.SingleVariable.(assign_var[item, :])) - f_scalars[2 * s.n_bins + item]
         assign_number[item] = MOI.add_constraint(model, assign_number_f, MOI.EqualTo(zero(T)))
     end
 
     # Relate the assignment to the load.
     assign_load = Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}(undef, s.n_bins)
     for bin in 1:s.n_bins
-        assign_load_f = cpdot(s.weights, assign_var[:, bin]) - f_scalars[bin]
+        assign_load_f = dot(s.weights, MOI.SingleVariable.(assign_var[:, bin])) - f_scalars[bin]
         assign_load[bin] = MOI.add_constraint(model, assign_load_f, MOI.EqualTo(zero(T)))
     end
 
