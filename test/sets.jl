@@ -238,76 +238,6 @@
         @test MOI.dimension(CP.CountCompare(3)) == 3 * 2 + 1
     end
 
-    @testset "GlobalCardinality family" begin
-        @testset "Constructor" begin
-            for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
-                @test_throws ErrorException CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CVCT, Int}(4, Int[], 5)
-                @test_throws ErrorException CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CVCT, Int}(4, [4, 5], -1)
-            end
-        end
-
-        @testset "GlobalCardinality{FIXED_COUNTED_VALUES, $(CVCT), Int}" for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
-            @test CP.GlobalCardinality{CVCT}(2, [2, 4]) == CP.GlobalCardinality{CVCT}(2, [2, 4])
-            @test CP.GlobalCardinality{CVCT}(2, [2, 4]) != CP.GlobalCardinality{CVCT}(3, [2, 4])
-            @test CP.GlobalCardinality{CVCT}(3, [2, 4]) != CP.GlobalCardinality{CVCT}(2, [2, 4])
-            @test CP.GlobalCardinality{CVCT}(2, [2, 4]) != CP.GlobalCardinality{CVCT}(2, [3, 5])
-
-            s = CP.GlobalCardinality{CVCT}(2, [2, 4])
-            @test typeof(copy(s)) <: CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CVCT, Int}
-            @test copy(s) == s
-
-            @test MOI.dimension(CP.GlobalCardinality{CVCT}(2, [2, 4])) == 2 + 2
-            @test MOI.dimension(CP.GlobalCardinality{CVCT}(3, [2, 4, 6, 8])) == 3 + 4
-
-            if CVCT == CP.OPEN_COUNTED_VALUES
-                @test CP.GlobalCardinality{CVCT}(2, [2, 4]) == CP.GlobalCardinality(2, [2, 4])
-            end
-        end
-
-        @testset "GlobalCardinality{VARIABLE_COUNTED_VALUES, $(CVCT), Int}" for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
-            @test CP.GlobalCardinality{CVCT, Int}(2, 2) == CP.GlobalCardinality{CVCT, Int}(2, 2)
-            @test CP.GlobalCardinality{CVCT, Int}(2, 2) != CP.GlobalCardinality{CVCT, Int}(3, 3)
-            @test CP.GlobalCardinality{CVCT, Int}(3, 2) != CP.GlobalCardinality{CVCT, Int}(2, 2)
-            @test CP.GlobalCardinality{CVCT, Int}(2, 2) != CP.GlobalCardinality{CVCT, Int}(2, 3)
-
-            s = CP.GlobalCardinality{CVCT, Int}(2, 2)
-            @test typeof(copy(s)) <: CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CVCT, Int}
-            @test copy(s) == s
-
-            @test MOI.dimension(CP.GlobalCardinality{CVCT, Int}(2, 2)) == 2 + 2 * 2
-            @test MOI.dimension(CP.GlobalCardinality{CVCT, Int}(3, 4)) == 3 + 2 * 4
-
-            if CVCT == CP.OPEN_COUNTED_VALUES
-                @test CP.GlobalCardinality{CVCT, Int}(2, 3) == CP.GlobalCardinality{Int}(2, 3)
-            end
-        end
-    end
-
-    @testset "CumulativeResource family" begin
-        @testset "CumulativeResource{$(CRDT)}" for CRDT in [
-            CP.NO_DEADLINE_CUMULATIVE_RESOURCE,
-            CP.VARIABLE_DEADLINE_CUMULATIVE_RESOURCE,
-        ]
-            @test CP.CumulativeResource{CRDT}(2) == CP.CumulativeResource{CRDT}(2)
-            @test CP.CumulativeResource{CRDT}(2) != CP.CumulativeResource{CRDT}(3)
-            @test CP.CumulativeResource{CRDT}(3) != CP.CumulativeResource{CRDT}(2)
-
-            s = CP.CumulativeResource{CRDT}(2)
-            @test typeof(copy(s)) <: CP.CumulativeResource{CRDT}
-            @test copy(s) == s
-
-            if CRDT == CP.NO_DEADLINE_CUMULATIVE_RESOURCE
-                @test MOI.dimension(CP.CumulativeResource{CRDT}(2)) == 2 * 3 + 1
-                @test MOI.dimension(CP.CumulativeResource{CRDT}(3)) == 3 * 3 + 1
-            elseif CRDT == CP.VARIABLE_DEADLINE_CUMULATIVE_RESOURCE
-                @test MOI.dimension(CP.CumulativeResource{CRDT}(2)) == 2 * 4 + 1
-                @test MOI.dimension(CP.CumulativeResource{CRDT}(3)) == 3 * 4 + 1
-            else
-                @assert false
-            end
-        end
-    end
-
     @testset "SlidingSum" begin
         @test CP.SlidingSum(1, 2, 3, 4) == CP.SlidingSum(1, 2, 3, 4)
         @test CP.SlidingSum(1, 2, 3, 4) != CP.SlidingSum(0, 2, 3, 4)
@@ -462,6 +392,222 @@
         @test MOI.constant(CP.DifferentFrom(3)) == 3
         @test MOI.dimension(CP.DifferentFrom(3)) == 1
         @test MOIU.shift_constant(CP.DifferentFrom(3), 1) == CP.DifferentFrom(4)
+    end
+
+    @testset "$(S)" for S in [CP.Reification, CP.Negation]
+        @test S(MOI.EqualTo(0.0)) == S(MOI.EqualTo(0.0))
+        @test S(MOI.EqualTo(0.0)) != S(MOI.EqualTo(1.0))
+        @test S(MOI.EqualTo(1.0)) != S(MOI.EqualTo(0.0))
+        @test S(MOI.GreaterThan(0.0)) != S(MOI.EqualTo(1.0))
+        @test S(MOI.EqualTo(1.0)) != S(MOI.GreaterThan(0.0))
+
+        s = S(MOI.EqualTo(0.0))
+        @test typeof(copy(s)) <: S
+        @test copy(s) == s
+
+        if S == CP.Reification
+            @test MOI.dimension(S(MOI.EqualTo(0.0))) ==
+                  1 + MOI.dimension(MOI.EqualTo(0.0))
+            @test MOI.dimension(S(MOI.GreaterThan(0.0))) ==
+                  1 + MOI.dimension(MOI.GreaterThan(0.0))
+        elseif S == CP.Negation
+            @test MOI.dimension(S(MOI.EqualTo(0.0))) ==
+                  MOI.dimension(MOI.EqualTo(0.0))
+            @test MOI.dimension(S(MOI.GreaterThan(0.0))) ==
+                  MOI.dimension(MOI.GreaterThan(0.0))
+        else
+            error("$(S) not implemented")
+        end
+    end
+
+    @testset "$(S)" for S in [CP.Equivalence, CP.EquivalenceNot, CP.Implication]
+        @test S(MOI.EqualTo(0.0), MOI.EqualTo(0.0)) ==
+              S(MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test S(MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+              S(MOI.EqualTo(1.0), MOI.EqualTo(0.0))
+        @test S(MOI.EqualTo(1.0), MOI.EqualTo(0.0)) !=
+              S(MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test S(MOI.GreaterThan(0.0), MOI.EqualTo(0.0)) !=
+              S(MOI.EqualTo(1.0), MOI.EqualTo(0.0))
+        @test S(MOI.EqualTo(1.0), MOI.EqualTo(0.0)) !=
+              S(MOI.GreaterThan(0.0), MOI.EqualTo(0.0))
+
+        s = S(MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test typeof(copy(s)) <: S
+        @test copy(s) == s
+
+        @test MOI.dimension(S(MOI.EqualTo(0.0), MOI.EqualTo(0.0))) ==
+              2 * MOI.dimension(MOI.EqualTo(0.0))
+        @test MOI.dimension(S(MOI.GreaterThan(0.0), MOI.EqualTo(0.0))) ==
+              2 * MOI.dimension(MOI.GreaterThan(0.0))
+    end
+
+    @testset "$(S)" for S in [CP.IfThenElse]
+        @test S(MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) ==
+              S(MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test S(MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+              S(MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test S(MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+              S(MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test S(MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+              S(MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test S(MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+              S(MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+
+        s = S(MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test typeof(copy(s)) <: S
+        @test copy(s) == s
+
+        @test MOI.dimension(
+            S(MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)),
+        ) == 3 * MOI.dimension(MOI.EqualTo(0.0))
+        @test MOI.dimension(
+            S(MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)),
+        ) == 3 * MOI.dimension(MOI.GreaterThan(0.0))
+    end
+
+    @testset "$(S)" for S in [CP.Conjunction, CP.Disjunction]
+        # Ensure that tuples can be compared.
+        @test (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) ==
+            (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+                (MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test (MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+                (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test (MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+                (MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test (MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
+                (MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
+        @test (MOI.EqualTo(1), MOI.EqualTo(0), MOI.EqualTo(0)) !=
+                (MOI.GreaterThan(0), MOI.EqualTo(0), MOI.EqualTo(0))
+        @test (CP.Domain(Set([0, 1])),) == (CP.Domain(Set([0, 1])),)
+
+        # Then, wrap the tuples in conjunctions and disjunctions.
+        @test S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) ==
+              S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
+        @test S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) !=
+              S((MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
+        @test S((MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) !=
+              S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
+        @test S((MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) !=
+              S((MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
+        @test S((MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) !=
+              S((MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
+        @test S((MOI.EqualTo(1), MOI.EqualTo(0), MOI.EqualTo(0))) !=
+              S((MOI.GreaterThan(0), MOI.EqualTo(0), MOI.EqualTo(0)))
+        @test S((CP.Domain(Set([0, 1])), MOI.EqualTo(0))) ==
+              S((CP.Domain(Set([0, 1])), MOI.EqualTo(0)))
+        @test S((CP.Domain(Set([0, 1])),)) == S((CP.Domain(Set([0, 1])),))
+
+        s = S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
+        @test typeof(copy(s)) <: S
+        @test copy(s) == s
+
+        @test MOI.dimension(
+            S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))),
+        ) == 3 * MOI.dimension(MOI.EqualTo(0.0))
+        @test MOI.dimension(
+            S((MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))),
+        ) == 3 * MOI.dimension(MOI.GreaterThan(0.0))
+    end
+
+    @testset "$(S)" for S in [CP.True, CP.False]
+        @test isbitstype(S)
+
+        @test S() == S()
+
+        s = S()
+        @test typeof(copy(s)) <: S
+        @test copy(s) == s
+
+        @test MOI.dimension(S()) == 0
+    end
+
+    @testset "ValuePrecedence" begin
+        @test CP.ValuePrecedence(1, 4, 20) == CP.ValuePrecedence(1, 4, 20)
+        @test CP.ValuePrecedence(1, 4, 20) != CP.ValuePrecedence(1, 4, 25)
+        @test CP.ValuePrecedence(1, 4, 20) != CP.ValuePrecedence(1, 5, 20)
+        @test CP.ValuePrecedence(1, 4, 20) != CP.ValuePrecedence(2, 4, 20)
+
+        s = CP.ValuePrecedence(1, 4, 20)
+        @test typeof(copy(s)) <: CP.ValuePrecedence
+        @test copy(s) == s
+
+        @test MOI.dimension(CP.ValuePrecedence(1, 4, 20)) == 20
+        @test MOI.dimension(CP.ValuePrecedence(1, 5, 20)) == 20
+        @test MOI.dimension(CP.ValuePrecedence(2, 4, 20)) == 20
+    end
+
+    
+
+    @testset "GlobalCardinality family" begin
+        @testset "Constructor" begin
+            for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
+                @test_throws ErrorException CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CVCT, Int}(4, Int[], 5)
+                @test_throws ErrorException CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CVCT, Int}(4, [4, 5], -1)
+            end
+        end
+
+        @testset "GlobalCardinality{FIXED_COUNTED_VALUES, $(CVCT), Int}" for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
+            @test CP.GlobalCardinality{CVCT}(2, [2, 4]) == CP.GlobalCardinality{CVCT}(2, [2, 4])
+            @test CP.GlobalCardinality{CVCT}(2, [2, 4]) != CP.GlobalCardinality{CVCT}(3, [2, 4])
+            @test CP.GlobalCardinality{CVCT}(3, [2, 4]) != CP.GlobalCardinality{CVCT}(2, [2, 4])
+            @test CP.GlobalCardinality{CVCT}(2, [2, 4]) != CP.GlobalCardinality{CVCT}(2, [3, 5])
+
+            s = CP.GlobalCardinality{CVCT}(2, [2, 4])
+            @test typeof(copy(s)) <: CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CVCT, Int}
+            @test copy(s) == s
+
+            @test MOI.dimension(CP.GlobalCardinality{CVCT}(2, [2, 4])) == 2 + 2
+            @test MOI.dimension(CP.GlobalCardinality{CVCT}(3, [2, 4, 6, 8])) == 3 + 4
+
+            if CVCT == CP.OPEN_COUNTED_VALUES
+                @test CP.GlobalCardinality{CVCT}(2, [2, 4]) == CP.GlobalCardinality(2, [2, 4])
+            end
+        end
+
+        @testset "GlobalCardinality{VARIABLE_COUNTED_VALUES, $(CVCT), Int}" for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
+            @test CP.GlobalCardinality{CVCT, Int}(2, 2) == CP.GlobalCardinality{CVCT, Int}(2, 2)
+            @test CP.GlobalCardinality{CVCT, Int}(2, 2) != CP.GlobalCardinality{CVCT, Int}(3, 3)
+            @test CP.GlobalCardinality{CVCT, Int}(3, 2) != CP.GlobalCardinality{CVCT, Int}(2, 2)
+            @test CP.GlobalCardinality{CVCT, Int}(2, 2) != CP.GlobalCardinality{CVCT, Int}(2, 3)
+
+            s = CP.GlobalCardinality{CVCT, Int}(2, 2)
+            @test typeof(copy(s)) <: CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CVCT, Int}
+            @test copy(s) == s
+
+            @test MOI.dimension(CP.GlobalCardinality{CVCT, Int}(2, 2)) == 2 + 2 * 2
+            @test MOI.dimension(CP.GlobalCardinality{CVCT, Int}(3, 4)) == 3 + 2 * 4
+
+            if CVCT == CP.OPEN_COUNTED_VALUES
+                @test CP.GlobalCardinality{CVCT, Int}(2, 3) == CP.GlobalCardinality{Int}(2, 3)
+            end
+        end
+    end
+
+    @testset "CumulativeResource family" begin
+        @testset "CumulativeResource{$(CRDT)}" for CRDT in [
+            CP.NO_DEADLINE_CUMULATIVE_RESOURCE,
+            CP.VARIABLE_DEADLINE_CUMULATIVE_RESOURCE,
+        ]
+            @test CP.CumulativeResource{CRDT}(2) == CP.CumulativeResource{CRDT}(2)
+            @test CP.CumulativeResource{CRDT}(2) != CP.CumulativeResource{CRDT}(3)
+            @test CP.CumulativeResource{CRDT}(3) != CP.CumulativeResource{CRDT}(2)
+
+            s = CP.CumulativeResource{CRDT}(2)
+            @test typeof(copy(s)) <: CP.CumulativeResource{CRDT}
+            @test copy(s) == s
+
+            if CRDT == CP.NO_DEADLINE_CUMULATIVE_RESOURCE
+                @test MOI.dimension(CP.CumulativeResource{CRDT}(2)) == 2 * 3 + 1
+                @test MOI.dimension(CP.CumulativeResource{CRDT}(3)) == 3 * 3 + 1
+            elseif CRDT == CP.VARIABLE_DEADLINE_CUMULATIVE_RESOURCE
+                @test MOI.dimension(CP.CumulativeResource{CRDT}(2)) == 2 * 4 + 1
+                @test MOI.dimension(CP.CumulativeResource{CRDT}(3)) == 3 * 4 + 1
+            else
+                @assert false
+            end
+        end
     end
 
     @testset "BinPacking family" begin
@@ -624,149 +770,5 @@
         else
             error("$(S) not implemented")
         end
-    end
-
-    @testset "$(S)" for S in [CP.Reification, CP.Negation]
-        @test S(MOI.EqualTo(0.0)) == S(MOI.EqualTo(0.0))
-        @test S(MOI.EqualTo(0.0)) != S(MOI.EqualTo(1.0))
-        @test S(MOI.EqualTo(1.0)) != S(MOI.EqualTo(0.0))
-        @test S(MOI.GreaterThan(0.0)) != S(MOI.EqualTo(1.0))
-        @test S(MOI.EqualTo(1.0)) != S(MOI.GreaterThan(0.0))
-
-        s = S(MOI.EqualTo(0.0))
-        @test typeof(copy(s)) <: S
-        @test copy(s) == s
-
-        if S == CP.Reification
-            @test MOI.dimension(S(MOI.EqualTo(0.0))) ==
-                  1 + MOI.dimension(MOI.EqualTo(0.0))
-            @test MOI.dimension(S(MOI.GreaterThan(0.0))) ==
-                  1 + MOI.dimension(MOI.GreaterThan(0.0))
-        elseif S == CP.Negation
-            @test MOI.dimension(S(MOI.EqualTo(0.0))) ==
-                  MOI.dimension(MOI.EqualTo(0.0))
-            @test MOI.dimension(S(MOI.GreaterThan(0.0))) ==
-                  MOI.dimension(MOI.GreaterThan(0.0))
-        else
-            error("$(S) not implemented")
-        end
-    end
-
-    @testset "$(S)" for S in [CP.Equivalence, CP.EquivalenceNot, CP.Implication]
-        @test S(MOI.EqualTo(0.0), MOI.EqualTo(0.0)) ==
-              S(MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test S(MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
-              S(MOI.EqualTo(1.0), MOI.EqualTo(0.0))
-        @test S(MOI.EqualTo(1.0), MOI.EqualTo(0.0)) !=
-              S(MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test S(MOI.GreaterThan(0.0), MOI.EqualTo(0.0)) !=
-              S(MOI.EqualTo(1.0), MOI.EqualTo(0.0))
-        @test S(MOI.EqualTo(1.0), MOI.EqualTo(0.0)) !=
-              S(MOI.GreaterThan(0.0), MOI.EqualTo(0.0))
-
-        s = S(MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test typeof(copy(s)) <: S
-        @test copy(s) == s
-
-        @test MOI.dimension(S(MOI.EqualTo(0.0), MOI.EqualTo(0.0))) ==
-              2 * MOI.dimension(MOI.EqualTo(0.0))
-        @test MOI.dimension(S(MOI.GreaterThan(0.0), MOI.EqualTo(0.0))) ==
-              2 * MOI.dimension(MOI.GreaterThan(0.0))
-    end
-
-    @testset "$(S)" for S in [CP.IfThenElse]
-        @test S(MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) ==
-              S(MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test S(MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
-              S(MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test S(MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
-              S(MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test S(MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
-              S(MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test S(MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
-              S(MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-
-        s = S(MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test typeof(copy(s)) <: S
-        @test copy(s) == s
-
-        @test MOI.dimension(
-            S(MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)),
-        ) == 3 * MOI.dimension(MOI.EqualTo(0.0))
-        @test MOI.dimension(
-            S(MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)),
-        ) == 3 * MOI.dimension(MOI.GreaterThan(0.0))
-    end
-
-    @testset "$(S)" for S in [CP.Conjunction, CP.Disjunction]
-        # Ensure that tuples can be compared.
-        @test (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) ==
-            (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
-                (MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test (MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
-                (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test (MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
-                (MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test (MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) !=
-                (MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))
-        @test (MOI.EqualTo(1), MOI.EqualTo(0), MOI.EqualTo(0)) !=
-                (MOI.GreaterThan(0), MOI.EqualTo(0), MOI.EqualTo(0))
-        @test (CP.Domain(Set([0, 1])),) == (CP.Domain(Set([0, 1])),)
-
-        # Then, wrap the tuples in conjunctions and disjunctions.
-        @test S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) ==
-              S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
-        @test S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) !=
-              S((MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
-        @test S((MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) !=
-              S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
-        @test S((MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) !=
-              S((MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
-        @test S((MOI.EqualTo(1.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))) !=
-              S((MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
-        @test S((MOI.EqualTo(1), MOI.EqualTo(0), MOI.EqualTo(0))) !=
-              S((MOI.GreaterThan(0), MOI.EqualTo(0), MOI.EqualTo(0)))
-        @test S((CP.Domain(Set([0, 1])), MOI.EqualTo(0))) ==
-              S((CP.Domain(Set([0, 1])), MOI.EqualTo(0)))
-        @test S((CP.Domain(Set([0, 1])),)) == S((CP.Domain(Set([0, 1])),))
-
-        s = S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)))
-        @test typeof(copy(s)) <: S
-        @test copy(s) == s
-
-        @test MOI.dimension(
-            S((MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))),
-        ) == 3 * MOI.dimension(MOI.EqualTo(0.0))
-        @test MOI.dimension(
-            S((MOI.GreaterThan(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))),
-        ) == 3 * MOI.dimension(MOI.GreaterThan(0.0))
-    end
-
-    @testset "$(S)" for S in [CP.True, CP.False]
-        @test isbitstype(S)
-
-        @test S() == S()
-
-        s = S()
-        @test typeof(copy(s)) <: S
-        @test copy(s) == s
-
-        @test MOI.dimension(S()) == 0
-    end
-
-    @testset "ValuePrecedence" begin
-        @test CP.ValuePrecedence(1, 4, 20) == CP.ValuePrecedence(1, 4, 20)
-        @test CP.ValuePrecedence(1, 4, 20) != CP.ValuePrecedence(1, 4, 25)
-        @test CP.ValuePrecedence(1, 4, 20) != CP.ValuePrecedence(1, 5, 20)
-        @test CP.ValuePrecedence(1, 4, 20) != CP.ValuePrecedence(2, 4, 20)
-
-        s = CP.ValuePrecedence(1, 4, 20)
-        @test typeof(copy(s)) <: CP.ValuePrecedence
-        @test copy(s) == s
-
-        @test MOI.dimension(CP.ValuePrecedence(1, 4, 20)) == 20
-        @test MOI.dimension(CP.ValuePrecedence(1, 5, 20)) == 20
-        @test MOI.dimension(CP.ValuePrecedence(2, 4, 20)) == 20
     end
 end
