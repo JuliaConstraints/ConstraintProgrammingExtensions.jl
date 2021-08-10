@@ -98,9 +98,18 @@ False
 
 ## Scheduling constraints
 
+### Cumulative resource 
+
 ```@docs
 CumulativeResource
+CumulativeResourceDeadlineType
+```
+
+### Non-overlapping orthotopes
+
+```@docs
 NonOverlappingOrthotopes
+NonOverlappingOrthotopesConditionalityType
 ```
 
 ## Sorting constraints
