@@ -79,11 +79,13 @@ Knapsack(weights::Vector{T}, capacity::T) where {T} = Knapsack{FIXED_CAPACITY_KN
 Knapsack(weights::Vector{T}, values::Vector{T}) where {T} = Knapsack{VARIABLE_CAPACITY_KNAPSACK, VALUED_CAPACITY_KNAPSACK}(weights, zero(T), values)
 Knapsack(weights::Vector{T}, capacity::T, values::Vector{T}) where {T} = Knapsack{FIXED_CAPACITY_KNAPSACK, VALUED_CAPACITY_KNAPSACK}(weights, capacity, values)
 
-function Knapsack(; weights::Vector{T}, capacity::T=zero(T), values::Vector{T}=T[]) where {T <: Real}
-    KCT = iszero(capacity) ? VARIABLE_CAPACITY_KNAPSACK : FIXED_CAPACITY_KNAPSACK
-    KVT = length(values) == 0 ? UNVALUED_CAPACITY_KNAPSACK : VALUED_CAPACITY_KNAPSACK
-    return Knapsack{KCT, KVT, T}(weights, capacity, values)
-end
+# TODO: looks like dispatch cannot be done on this code!?
+# TODO: CP.Knapsack(weights = [1, 2]) throws T not defined.
+# function Knapsack(; weights::Vector{T}, capacity::T=zero(T), values::Vector{T}=T[]) where {T <: Real}
+#     KCT = iszero(capacity) ? VARIABLE_CAPACITY_KNAPSACK : FIXED_CAPACITY_KNAPSACK
+#     KVT = length(values) == 0 ? UNVALUED_CAPACITY_KNAPSACK : VALUED_CAPACITY_KNAPSACK
+#     return Knapsack{KCT, KVT}(weights, capacity, values)
+# end
 
 MOI.dimension(set::Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK, T}) where {T} = length(set.weights)
 MOI.dimension(set::Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK, T}) where {T} = length(set.weights) + 1

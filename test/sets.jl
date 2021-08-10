@@ -703,6 +703,13 @@
     end
 
     @testset "Knapsack family" begin
+        # @testset "Easy constructor" begin
+        #     @test_throws UndefKeywordError CP.Knapsack(capacity=1)
+
+        #     @test CP.Knapsack(weights=[1, 2]) == CP.Knapsack([1, 2])
+        #     @test CP.Knapsack(weights=[1, 2]) == CP.Knapsack{VARIABLE_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK, Int}([1, 2])
+        # end
+
         @testset "Knapsack{FIXED_CAPACITY_KNAPSACK, UNVALUED_CAPACITY_KNAPSACK}" begin
             @test CP.Knapsack([1, 2, 3], 3) == CP.Knapsack([1, 2, 3], 3)
             @test CP.Knapsack([1, 2, 3], 3) != CP.Knapsack([1, 2, 3], 4)
