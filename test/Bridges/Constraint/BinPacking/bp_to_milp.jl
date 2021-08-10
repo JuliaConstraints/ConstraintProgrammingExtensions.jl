@@ -13,7 +13,7 @@
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorOfVariables,
-        CP.BinPacking{T},
+        CP.BinPacking{CP.NO_CAPACITY_BINPACKING, T},
     )
 
     n_items = 2
@@ -60,7 +60,7 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, CP.BinPacking(n_bins, n_items, weights))
+    c = MOI.add_constraint(model, fct, CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(n_bins, n_items, weights))
 
     @test MOI.is_valid(model, x_load_1)
     if n_bins >= 2
@@ -70,10 +70,10 @@
     @test MOI.is_valid(model, x_bin_2)
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.BinPacking{T}}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.BinPacking{CP.NO_CAPACITY_BINPACKING, T}}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.BinPacking{T}) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.BinPacking{CP.NO_CAPACITY_BINPACKING, T}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [(MOI.ScalarAffineFunction{T}, MOI.EqualTo{T})]
 

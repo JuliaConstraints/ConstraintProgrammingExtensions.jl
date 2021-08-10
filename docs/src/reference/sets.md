@@ -41,12 +41,15 @@ ValuePrecedence
 
 ## Combinatorial constraints
 
+```@docs
+Contiguity
+```
+
 ### Bin packing
 
 ```@docs
 BinPacking
-FixedCapacityBinPacking
-VariableCapacityBinPacking
+BinPackingCapacityType
 ```
 
 ### Knapsack
@@ -57,19 +60,20 @@ KnapsackCapacityType
 KnapsackValueType
 ```
 
-### Others
-
-```@docs
-Contiguity
-```
-
 ## Counting constraints
 
 ```@docs
 Count
-GlobalCardinality
 CountCompare
 CountDistinct
+```
+
+### Global cardinality
+
+```@docs
+GlobalCardinality
+CountedValuesType
+CountedValuesClosureType
 ```
 
 ## Graph constraints

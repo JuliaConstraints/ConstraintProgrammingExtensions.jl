@@ -1,5 +1,22 @@
 """
+    BinPackingCapacityType
+
+Whether the capacities of a `BinPacking` constraint are fixed:
+
+* either there is no capacity: `NO_CAPACITY_BINPACKING`
+* or the capacity values are fixed when creating the set: `FIXED_CAPACITY_BINPACKING`
+* or the capacity values are themselves variable: `VARIABLE_CAPACITY_BINPACKING`
+"""
+@enum BinPackingCapacityType begin
+    NO_CAPACITY_BINPACKING
+    FIXED_CAPACITY_BINPACKING
+    VARIABLE_CAPACITY_BINPACKING
+end
+
+"""
     BinPacking(n_bins::Int, n_items::Int, weights::Vector{T})
+
+## Uncapacitated bin packing
 
 Implements an uncapacitated version of the bin-packing problem.
 
@@ -11,46 +28,17 @@ bin.
 
 Also called [`pack`](https://sofdem.github.io/gccat/gccat/Cbin_packing.html).
 
-## Example
+### Example
 
-    [a, b, c] in BinPacking{Int}(1, 2, [2, 3])
+    [a, b, c] in BinPacking{NO_CAPACITY_BINPACKING}(1, 2, [2, 3])
     # As there is only one bin, the only solution is to put all the items in 
     # that bin.
     # Enforces that:
     # - the bin load is the sum of the weights of the objects in that bin: 
     #   a = 2 + 3
     # - the bin number of the two items is 1: b = c = 1
-"""
-struct BinPacking{T <: Real} <: MOI.AbstractVectorSet
-    n_bins::Int
-    n_items::Int
-    weights::Vector{T}
 
-    function BinPacking(
-        n_bins::Int,
-        n_items::Int,
-        weights::Vector{T},
-    ) where {T <: Real}
-        @assert n_items == length(weights)
-        @assert all(weights .>= zero(T))
-        @assert n_bins > 0
-        @assert n_items > 0
-        return new{T}(n_bins, n_items, weights)
-    end
-end
-
-MOI.dimension(set::BinPacking) = set.n_bins + set.n_items
-function copy(set::BinPacking{T}) where {T}
-    return BinPacking(set.n_bins, set.n_items, copy(set.weights))
-end
-function Base.:(==)(x::BinPacking{T}, y::BinPacking{T}) where {T}
-    return x.n_bins == y.n_bins &&
-           x.n_items == y.n_items &&
-           x.weights == y.weights
-end
-
-"""
-    FixedCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T}, capacities::Vector{<:Real})
+## Fixed-capacity bin packing
 
 Implements a capacitated version of the bin-packing problem where capacities
 are constant.
@@ -69,8 +57,8 @@ make the conversion seamless.
 
 Also called [`bin_packing_capa`](https://sofdem.github.io/gccat/gccat/Cbin_packing_capa.html).
 
-## Example
-    [a, b, c] in FixedCapacityBinPacking{Int}(1, 2, [2, 3], [4])
+### Example
+    [a, b, c] in BinPacking{FIXED_CAPACITY_BINPACKING}(1, 2, [2, 3], [4])
     # As there is only one bin, the only solution is to put all the items in
     # that bin if its capacity is large enough.
     # Enforces that:
@@ -78,50 +66,8 @@ Also called [`bin_packing_capa`](https://sofdem.github.io/gccat/gccat/Cbin_packi
     #   a = 2 + 3
     # - the bin load is at most its capacity: a <= 4 (given in the set)
     # - the bin number of the two items is 1: b = c = 1
-"""
-struct FixedCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
-    n_bins::Int
-    n_items::Int
-    weights::Vector{T}
-    capacities::Vector{T}
 
-    function FixedCapacityBinPacking(
-        n_bins::Int,
-        n_items::Int,
-        weights::Vector{T},
-        capacities::Vector{T},
-    ) where {T <: Real}
-        @assert n_items == length(weights)
-        @assert n_bins == length(capacities)
-        @assert all(weights .>= zero(T))
-        @assert all(capacities .>= zero(T))
-        @assert n_bins > 0
-        @assert n_items > 0
-        return new{T}(n_bins, n_items, weights, capacities)
-    end
-end
-
-MOI.dimension(set::FixedCapacityBinPacking) = set.n_bins + set.n_items
-function copy(set::FixedCapacityBinPacking{T}) where {T}
-    return FixedCapacityBinPacking(
-        set.n_bins,
-        set.n_items,
-        copy(set.weights),
-        copy(set.capacities),
-    )
-end
-function Base.:(==)(
-    x::FixedCapacityBinPacking{T},
-    y::FixedCapacityBinPacking{T},
-) where {T}
-    return x.n_bins == y.n_bins &&
-           x.n_items == y.n_items &&
-           x.weights == y.weights &&
-           x.capacities == y.capacities
-end
-
-"""
-    VariableCapacityBinPacking(n_bins::Int, n_items::Int, weights::Vector{T})
+## Variable-capacity bin packing
 
 Implements an capacitated version of the bin-packing problem where capacities 
 are optimisation variables.
@@ -141,7 +87,7 @@ maximum load) and for the fixed-capacity version.
 Also called [`bin_packing_capa`](https://sofdem.github.io/gccat/gccat/Cbin_packing_capa.html).
 
 ## Example
-    [a, 2, b, c] in VariableCapacityBinPacking(1, 2, [2, 3])
+    [a, 2, b, c] in BinPacking{VARIABLE_CAPACITY_BINPACKING}(1, 2, [2, 3])
     # As there is only one bin, the only solution is to put all the items in
     # that bin if its capacity is large enough.
     # Enforces that:
@@ -150,37 +96,67 @@ Also called [`bin_packing_capa`](https://sofdem.github.io/gccat/gccat/Cbin_packi
     # - the bin load is at most its capacity: a <= 2 (given in a variable)
     # - the bin number of the two items is 1: b = c = 1
 """
-struct VariableCapacityBinPacking{T <: Real} <: MOI.AbstractVectorSet
+struct BinPacking{BPCT, T <: Real} <: MOI.AbstractVectorSet
     n_bins::Int
     n_items::Int
     weights::Vector{T}
+    capacities::Vector{T}
 
-    function VariableCapacityBinPacking(
+    function BinPacking{BPCT}(
         n_bins::Int,
         n_items::Int,
         weights::Vector{T},
-    ) where {T <: Real}
+        capacities::Vector{T},
+    ) where {BPCT, T <: Real}
         @assert n_items == length(weights)
         @assert all(weights .>= zero(T))
+
+        if BPCT == FIXED_CAPACITY_BINPACKING
+            @assert n_bins == length(capacities)
+            @assert all(capacities .>= zero(T))
+        end
+
         @assert n_bins > 0
         @assert n_items > 0
-        return new{T}(n_bins, n_items, weights)
+
+        return new{BPCT, T}(n_bins, n_items, weights, capacities)
     end
 end
 
-MOI.dimension(set::VariableCapacityBinPacking) = 2 * set.n_bins + set.n_items
-function copy(set::VariableCapacityBinPacking{T}) where {T}
-    return VariableCapacityBinPacking(
+function BinPacking{NO_CAPACITY_BINPACKING}(n_bins::Int, n_items::Int, weights::Vector{T}) where {T <: Real}
+    return BinPacking{NO_CAPACITY_BINPACKING}(n_bins, n_items, weights, T[])
+end
+
+function BinPacking(n_bins::Int, n_items::Int, weights::Vector{T}, capacities::Vector{T}) where {T <: Real}
+    return BinPacking{FIXED_CAPACITY_BINPACKING}(n_bins, n_items, weights, capacities)
+end
+
+function BinPacking{VARIABLE_CAPACITY_BINPACKING}(n_bins::Int, n_items::Int, weights::Vector{T}) where {T <: Real}
+    return BinPacking{VARIABLE_CAPACITY_BINPACKING}(n_bins, n_items, weights, T[])
+end
+
+MOI.dimension(set::BinPacking{NO_CAPACITY_BINPACKING, T}) where {T} = set.n_bins + set.n_items
+MOI.dimension(set::BinPacking{FIXED_CAPACITY_BINPACKING, T}) where {T} = set.n_bins + set.n_items
+MOI.dimension(set::BinPacking{VARIABLE_CAPACITY_BINPACKING, T}) where {T} = 2 * set.n_bins + set.n_items
+
+function copy(set::BinPacking{BPCT, T}) where {BPCT, T}
+    return BinPacking{BPCT}(
         set.n_bins,
         set.n_items,
         copy(set.weights),
+        copy(set.capacities),
     )
 end
-function Base.:(==)(
-    x::VariableCapacityBinPacking{T},
-    y::VariableCapacityBinPacking{T},
-) where {T}
+
+function Base.:(==)(x::BinPacking{BPCT, T}, y::BinPacking{BPCT, T}) where {BPCT, T}
     return x.n_bins == y.n_bins &&
            x.n_items == y.n_items &&
-           x.weights == y.weights
+           x.weights == y.weights &&
+           x.capacities == y.capacities
 end
+
+# Shortcuts for types.
+# const BinPacking{T} = BinPacking{NO_CAPACITY_BINPACKING, T}
+const BinPackingNoCapacity{T} = BinPacking{NO_CAPACITY_BINPACKING, T}
+const BinPackingFixedCapacity{T} = BinPacking{FIXED_CAPACITY_BINPACKING, T}
+const BinPackingVariableCapacity{T} = BinPacking{VARIABLE_CAPACITY_BINPACKING, T}

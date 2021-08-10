@@ -13,12 +13,12 @@
     @test MOI.supports_constraint(
         model,
         MOI.VectorOfVariables,
-        CP.VariableCapacityBinPacking{T},
+        CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T},
     )
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorOfVariables,
-        CP.FixedCapacityBinPacking{T},
+        CP.BinPacking{CP.FIXED_CAPACITY_BINPACKING, T},
     )
 
     n_items = 2
@@ -66,7 +66,7 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, CP.FixedCapacityBinPacking(n_bins, n_items, weights, capas))
+    c = MOI.add_constraint(model, fct, CP.BinPacking{CP.FIXED_CAPACITY_BINPACKING}(n_bins, n_items, weights, capas))
 
     @test MOI.is_valid(model, x_load_1)
     if n_bins >= 2
@@ -76,10 +76,10 @@
     @test MOI.is_valid(model, x_bin_2)
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.FixedCapacityBinPacking{T}}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.BinPacking{CP.FIXED_CAPACITY_BINPACKING, T}}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.FixedCapacityBinPacking{T}) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.BinPacking{CP.FIXED_CAPACITY_BINPACKING, T}) == typeof(bridge)
         if T == Int
             @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.Integer,)]
         elseif T == Float64
@@ -88,19 +88,19 @@
             @assert false
         end
         @test Set(MOIB.added_constraint_types(typeof(bridge))) == Set([
-            (MOI.VectorAffineFunction{T}, CP.FixedCapacityBinPacking{T}),
-            (MOI.SingleVariable, MOI.LessThan{T}),
+            (MOI.VectorAffineFunction{T}, CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T}),
+            (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
         ])
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == n_bins
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == ((T == Int) ? n_bins : 0)
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.LessThan{T}}()) == n_bins
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.VariableCapacityBinPacking{T}}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == n_bins
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T}}()) == 1
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == bridge.capa_var
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.Integer}()) == bridge.capa_con
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.LessThan{T}}()) == bridge.capa_bound
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.VariableCapacityBinPacking{T}}()) == [bridge.bp]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == bridge.capa_bound
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T}}()) == [bridge.bp]
     end
 
     @testset "BinPacking constraint" begin
@@ -125,18 +125,20 @@
         else
             @assert false
         end
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.bp) == CP.VariableCapacityBinPacking(n_bins, n_items, weights)
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.bp) == CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(n_bins, n_items, weights)
     end
 
     @testset "Capacity constraints" begin
         @test length(bridge.capa_var) == n_bins
         for i in 1:n_bins
             @test MOI.is_valid(model, bridge.capa_var[i])
-            # f = MOI.get(model, MOI.ConstraintFunction(), bridge.capa_var[i])
-            # @test length(f.terms) == 1
-            # @test f.terms[1].coefficient == 1
-            # @test f.terms[1].variable_index == ((i == 1) ? x_load_1 : x_load_2)
-            # @test MOI.get(model, MOI.ConstraintSet(), bridge.capa_var[i]) == MOI.LessThan(capas[i])
+            @test MOI.is_valid(model, bridge.capa_bound[i])
+            @show bridge.capa_bound[i]
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.capa_bound[i]) == MOI.LessThan(capas[i])
+            f = MOI.get(model, MOI.ConstraintFunction(), bridge.capa_bound[i])
+            @test length(f.terms) == 1
+            @test f.terms[1].coefficient == 1
+            @test f.terms[1].variable_index == bridge.capa_var[i]
         end
     end
 end

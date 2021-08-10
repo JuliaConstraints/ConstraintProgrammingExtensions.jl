@@ -11,6 +11,7 @@ Refactor for sets with many variants. Discussion:
 
 The following sets have been touched by the refactor: 
 
+* `BinPacking` and friends
 * `CumulativeResource` and friend
 * `GlobalCardinality` and friends
 * `Knapsack` and friends

@@ -1,6 +1,6 @@
 """
-Bridges `CP.BinPacking` to a MILP by creating binary variables for the bin 
-assignment and MILP constraints.
+Bridges `CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T}` to a MILP by 
+creating binary variables for the bin assignment and MILP constraints.
 """
 struct VariableCapacityBinPacking2MILPBridge{T} <: MOIBC.AbstractBridge
     assign_var::Matrix{MOI.VariableIndex}
@@ -15,7 +15,7 @@ function MOIBC.bridge_constraint(
     ::Type{VariableCapacityBinPacking2MILPBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.VariableCapacityBinPacking{T},
+    s::CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T},
 ) where {T}
     return MOIBC.bridge_constraint(
         VariableCapacityBinPacking2MILPBridge{T},
@@ -29,7 +29,7 @@ function MOIBC.bridge_constraint(
     ::Type{VariableCapacityBinPacking2MILPBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.VariableCapacityBinPacking{T},
+    s::CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T},
 ) where {T}
     # Variables in f: 
     # - load (n_bins variables), integer or float
@@ -80,7 +80,7 @@ end
 function MOI.supports_constraint(
     ::Type{VariableCapacityBinPacking2MILPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.VariableCapacityBinPacking{T}},
+    ::Type{CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T}},
 ) where {T}
     return true
 end

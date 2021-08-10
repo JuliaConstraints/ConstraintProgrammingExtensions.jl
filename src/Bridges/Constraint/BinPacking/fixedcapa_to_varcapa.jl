@@ -1,19 +1,20 @@
 """
-Bridges `CP.FixedCapacityBinPacking` to `CP.VariableCapacityBinPacking` by creating 
-capacity variables.
+Bridges `CP.BinPacking{CP.FIXED_CAPACITY_BINPACKING, T}` to 
+`CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T}` by creating capacity 
+variables.
 """
 struct FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T} <: MOIBC.AbstractBridge
     capa_var::Vector{MOI.VariableIndex}
     capa_con::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}}
-    capa_bound::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{T}}}
-    bp::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.VariableCapacityBinPacking{T}}
+    capa_bound::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}
+    bp::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T}}
 end
 
 function MOIBC.bridge_constraint(
     ::Type{FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.FixedCapacityBinPacking{T},
+    s::CP.BinPacking{CP.FIXED_CAPACITY_BINPACKING, T},
 ) where {T}
     return MOIBC.bridge_constraint(
         FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T},
@@ -27,14 +28,21 @@ function MOIBC.bridge_constraint(
     ::Type{FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.FixedCapacityBinPacking{T},
+    s::CP.BinPacking{CP.FIXED_CAPACITY_BINPACKING, T},
 ) where {T <: Integer}
     # Add the capacity integer variables (because its values are ensured to 
     # be integers, T <: Integer).
     capa_var, capa_con = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:s.n_bins])
 
     # Add the capacity constraints.
-    capa_bound = [MOI.add_constraint(model, capa_var[bin], MOI.LessThan(s.capacities[bin])) for bin in 1:s.n_bins]
+    capa_bound = [
+        MOI.add_constraint(
+            model, 
+            one(T) * MOI.SingleVariable(capa_var[bin]), 
+            MOI.LessThan(s.capacities[bin])
+        ) 
+        for bin in 1:s.n_bins
+    ]
 
     # Create the variable-capacity bin-packing constraint.
     f_scalars = MOIU.scalarize(f)
@@ -45,7 +53,7 @@ function MOIBC.bridge_constraint(
             f_scalars[s.n_bins+1:end]...
         ]
     )
-    bp_set = CP.VariableCapacityBinPacking(s.n_bins, s.n_items, s.weights)
+    bp_set = CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(s.n_bins, s.n_items, s.weights)
     bp = MOI.add_constraint(model, new_f, bp_set)
 
     return FixedCapacityBinPacking2VariableCapacityBinPackingBridge(capa_var, capa_con, capa_bound, bp)
@@ -55,14 +63,21 @@ function MOIBC.bridge_constraint(
     ::Type{FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.FixedCapacityBinPacking{T},
+    s::CP.BinPacking{CP.FIXED_CAPACITY_BINPACKING, T},
 ) where {T <: Real}
     # Add the capacity variables, without integer constraint.
     capa_var = MOI.add_variables(model, s.n_bins)
     capa_con = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}[]
 
     # Add the capacity constraints.
-    capa_bound = [MOI.add_constraint(model, capa_var[bin], MOI.LessThan(s.capacities[bin])) for bin in 1:s.n_bins]
+    capa_bound = [
+        MOI.add_constraint(
+            model, 
+            one(T) * MOI.SingleVariable(capa_var[bin]), 
+            MOI.LessThan(s.capacities[bin])
+        ) 
+        for bin in 1:s.n_bins
+    ]
 
     # Create the variable-capacity bin-packing constraint.
     f_scalars = MOIU.scalarize(f)
@@ -82,7 +97,7 @@ end
 function MOI.supports_constraint(
     ::Type{FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.FixedCapacityBinPacking{T}},
+    ::Type{CP.BinPacking{CP.FIXED_CAPACITY_BINPACKING, T}},
 ) where {T}
     return true
 end
@@ -97,8 +112,8 @@ end
 
 function MOIB.added_constraint_types(::Type{FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T}}) where {T}
     return [
-        (MOI.VectorAffineFunction{T}, CP.FixedCapacityBinPacking{T}),
-        (MOI.SingleVariable, MOI.LessThan{T}),
+        (MOI.VectorAffineFunction{T}, CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T}),
+        (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
     ]
 end
 
@@ -110,7 +125,7 @@ function MOI.get(
     ::FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.VectorAffineFunction{T},
-        CP.VariableCapacityBinPacking{T},
+        CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T},
     },
 ) where {T}
     return 1
@@ -129,7 +144,7 @@ end
 function MOI.get(
     b::FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable,
+        MOI.ScalarAffineFunction{T},
         MOI.LessThan{T},
     },
 ) where {T}
@@ -147,7 +162,7 @@ function MOI.get(
     b::FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.VectorAffineFunction{T},
-        CP.VariableCapacityBinPacking{T},
+        CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T},
     },
 ) where {T}
     return [b.bp]
@@ -166,7 +181,7 @@ end
 function MOI.get(
     b::FixedCapacityBinPacking2VariableCapacityBinPackingBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable,
+        MOI.ScalarAffineFunction{T},
         MOI.LessThan{T},
     },
 ) where {T}

@@ -619,86 +619,86 @@
     end
 
     @testset "BinPacking family" begin
-        @testset "BinPacking" begin
-            @test_throws AssertionError CP.BinPacking(1, 2, [1, 2, 3])
+        @testset "BinPacking{NO_CAPACITY_BINPACKING}" begin
+            @test_throws AssertionError CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [1, 2, 3])
 
-            @test CP.BinPacking(1, 2, [1, 2]) == CP.BinPacking(1, 2, [1, 2])
-            @test CP.BinPacking(2, 2, [1, 2]) != CP.BinPacking(1, 2, [1, 2])
-            @test CP.BinPacking(1, 3, [1, 2, 3]) != CP.BinPacking(1, 2, [1, 2])
+            @test CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [1, 2]) == CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [1, 2])
+            @test CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(2, 2, [1, 2]) != CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [1, 2])
+            @test CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 3, [1, 2, 3]) != CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [1, 2])
 
-            s = CP.BinPacking(1, 2, [1, 2])
-            @test typeof(copy(s)) <: CP.BinPacking
+            s = CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [1, 2])
+            @test typeof(copy(s)) <: CP.BinPacking{CP.NO_CAPACITY_BINPACKING}
             @test copy(s) == s
 
-            @test MOI.dimension(CP.BinPacking(1, 2, [1, 2])) == 3
+            @test MOI.dimension(CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [1, 2])) == 3
             
-            @test_throws AssertionError CP.BinPacking(1, 2, [-1, 2])
-            @test_throws AssertionError CP.BinPacking(0, 2, [1, 2])
-            @test_throws AssertionError CP.BinPacking(1, 0, [1, 2])
+            @test_throws AssertionError CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [-1, 2])
+            @test_throws AssertionError CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(0, 2, [1, 2])
+            @test_throws AssertionError CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 0, [1, 2])
         end
 
-        @testset "FixedCapacityBinPacking" begin
-            @test_throws AssertionError CP.FixedCapacityBinPacking(
+        @testset "BinPacking{FIXED_CAPACITY_BINPACKING}" begin
+            @test_throws AssertionError CP.BinPacking(
                 1,
                 2,
                 [1, 2, 3],
                 [4],
             )
-            @test_throws AssertionError CP.FixedCapacityBinPacking(
+            @test_throws AssertionError CP.BinPacking(
                 1,
                 2,
                 [1, 2],
                 [3, 4],
             )
-            @test_throws AssertionError CP.FixedCapacityBinPacking(
+            @test_throws AssertionError CP.BinPacking(
                 1,
                 2,
                 [1, 2, 3],
                 [4, 5],
             )
 
-            @test CP.FixedCapacityBinPacking(1, 2, [1, 2], [4]) ==
-                CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
-            @test CP.FixedCapacityBinPacking(2, 2, [1, 2], [4, 5]) !=
-                CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
-            @test CP.FixedCapacityBinPacking(1, 3, [1, 2, 3], [4]) !=
-                CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
+            @test CP.BinPacking(1, 2, [1, 2], [4]) ==
+                CP.BinPacking(1, 2, [1, 2], [4])
+            @test CP.BinPacking(2, 2, [1, 2], [4, 5]) !=
+                CP.BinPacking(1, 2, [1, 2], [4])
+            @test CP.BinPacking(1, 3, [1, 2, 3], [4]) !=
+                CP.BinPacking(1, 2, [1, 2], [4])
 
-            s = CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])
-            @test typeof(copy(s)) <: CP.FixedCapacityBinPacking
+            s = CP.BinPacking(1, 2, [1, 2], [4])
+            @test typeof(copy(s)) <: CP.BinPacking{CP.FIXED_CAPACITY_BINPACKING, Int}
             @test copy(s) == s
 
-            @test MOI.dimension(CP.FixedCapacityBinPacking(1, 2, [1, 2], [4])) == 3
+            @test MOI.dimension(CP.BinPacking(1, 2, [1, 2], [4])) == 3
 
-            @test_throws AssertionError CP.FixedCapacityBinPacking(1, 2, [-1, 2], [4])
-            @test_throws AssertionError CP.FixedCapacityBinPacking(1, 2, [1, 2], [-4])
-            @test_throws AssertionError CP.FixedCapacityBinPacking(0, 2, [1, 2], [4])
-            @test_throws AssertionError CP.FixedCapacityBinPacking(1, 0, [1, 2], [4])
+            @test_throws AssertionError CP.BinPacking(1, 2, [-1, 2], [4])
+            @test_throws AssertionError CP.BinPacking(1, 2, [1, 2], [-4])
+            @test_throws AssertionError CP.BinPacking(0, 2, [1, 2], [4])
+            @test_throws AssertionError CP.BinPacking(1, 0, [1, 2], [4])
         end
 
-        @testset "VariableCapacityBinPacking" begin
-            @test_throws AssertionError CP.VariableCapacityBinPacking(
+        @testset "BinPacking{VARIABLE_CAPACITY_BINPACKING}" begin
+            @test_throws AssertionError CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(
                 1,
                 2,
                 [1, 2, 3],
             )
 
-            @test CP.VariableCapacityBinPacking(1, 2, [1, 2]) ==
-                CP.VariableCapacityBinPacking(1, 2, [1, 2])
-            @test CP.VariableCapacityBinPacking(2, 2, [1, 2]) !=
-                CP.VariableCapacityBinPacking(1, 2, [1, 2])
-            @test CP.VariableCapacityBinPacking(1, 3, [1, 2, 3]) !=
-                CP.VariableCapacityBinPacking(1, 2, [1, 2])
+            @test CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(1, 2, [1, 2]) ==
+                CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(1, 2, [1, 2])
+            @test CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(2, 2, [1, 2]) !=
+                CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(1, 2, [1, 2])
+            @test CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(1, 3, [1, 2, 3]) !=
+                CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(1, 2, [1, 2])
 
-            s = CP.VariableCapacityBinPacking(1, 2, [1, 2])
-            @test typeof(copy(s)) <: CP.VariableCapacityBinPacking
+            s = CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(1, 2, [1, 2])
+            @test typeof(copy(s)) <: CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}
             @test copy(s) == s
 
-            @test MOI.dimension(CP.VariableCapacityBinPacking(1, 2, [1, 2])) == 4
+            @test MOI.dimension(CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(1, 2, [1, 2])) == 4
 
-            @test_throws AssertionError CP.VariableCapacityBinPacking(1, 2, [-1, 2])
-            @test_throws AssertionError CP.VariableCapacityBinPacking(0, 2, [1, 2])
-            @test_throws AssertionError CP.VariableCapacityBinPacking(1, 0, [1, 2])
+            @test_throws AssertionError CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(1, 2, [-1, 2])
+            @test_throws AssertionError CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(0, 2, [1, 2])
+            @test_throws AssertionError CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(1, 0, [1, 2])
         end
     end
 
