@@ -25,7 +25,7 @@ function binpacking_vectorofvariables_test(
     c1 = MOI.add_constraint(
         model,
         _vov([x1, x2, x3]),
-        CP.BinPacking(1, 2, [w1, w2]),
+        CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [w1, w2]),
     )
 
     @test MOI.is_valid(model, x1)
@@ -72,7 +72,7 @@ function binpacking_scalaraffinefunction_test(
     c1 = MOI.add_constraint(
         model,
         _vaf([x1, x2, x3]),
-        CP.BinPacking(1, 2, [w1, w2]),
+        CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [w1, w2]),
     )
 
     @test MOI.is_valid(model, x1)
