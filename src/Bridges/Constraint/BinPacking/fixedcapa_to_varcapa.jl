@@ -88,7 +88,7 @@ function MOIBC.bridge_constraint(
             f_scalars[s.n_bins+1:end]...
         ]
     )
-    bp_set = CP.VariableCapacityBinPacking(s.n_bins, s.n_items, s.weights)
+    bp_set = CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING}(s.n_bins, s.n_items, s.weights)
     bp = MOI.add_constraint(model, new_f, bp_set)
 
     return FixedCapacityBinPacking2VariableCapacityBinPackingBridge(capa_var, capa_con, capa_bound, bp)
