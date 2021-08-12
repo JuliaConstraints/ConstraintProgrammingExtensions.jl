@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.4.1
+-------------
+
+Hot fix for the bin-packing tests.
+
+
 Version 0.4.0
 -------------
 

@@ -13,7 +13,7 @@ function binpacking_vectorofvariables_test(
     @test MOI.supports_constraint(
         model,
         MOI.VectorOfVariables,
-        CP.BinPacking{Int},
+        CP.BinPacking{CP.NO_CAPACITY_BINPACKING, Int},
     )
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -60,7 +60,7 @@ function binpacking_scalaraffinefunction_test(
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{Int},
-        CP.BinPacking{Int},
+        CP.BinPacking{CP.NO_CAPACITY_BINPACKING, Int},
     )
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
