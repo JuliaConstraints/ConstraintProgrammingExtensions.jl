@@ -35,9 +35,7 @@ function MOIBC.bridge_constraint(
     
     # Only change with respect to CP.Reification{MOI.EqualTo}: change the 
     # sign of the first variable.
-    # @show f_scalars
     f_scalars[1] = one(T) - f_scalars[1]
-    # @show f_scalars
 
     # For this formulation work, both lower and upper bounds are required on
     # the constrained expression (but obviously not on the binary reified 

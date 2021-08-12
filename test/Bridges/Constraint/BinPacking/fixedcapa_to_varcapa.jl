@@ -133,7 +133,6 @@
         for i in 1:n_bins
             @test MOI.is_valid(model, bridge.capa_var[i])
             @test MOI.is_valid(model, bridge.capa_bound[i])
-            @show bridge.capa_bound[i]
             @test MOI.get(model, MOI.ConstraintSet(), bridge.capa_bound[i]) == MOI.LessThan(capas[i])
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.capa_bound[i])
             @test length(f.terms) == 1
