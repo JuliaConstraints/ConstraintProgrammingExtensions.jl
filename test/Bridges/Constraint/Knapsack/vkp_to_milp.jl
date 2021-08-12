@@ -1,4 +1,4 @@
-@testset "ValuedKnapsack2MILP: $(fct_type), 2 items, $(T)" for fct_type in ["vector of variables"], T in [Int]# for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
+@testset "ValuedKnapsack2MILP: $(fct_type), 2 items, $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
     mock = MOIU.MockOptimizer(MILPModel{T}())
     model = COIB.ValuedKnapsack2MILP{T}(mock)
 
