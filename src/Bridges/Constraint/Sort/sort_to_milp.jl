@@ -1,6 +1,33 @@
 """
 Bridges `CP.Sort` to MILP constraints by adding O(n²) binary variables, with a 
 transportation-like model.
+
+## Detailed model
+
+Let `x` be the array to sort and `y` its sorted copy, both vectors having 
+length `n`. This bridge handles the constraint `[y..., x...]`-in-`CP.Sort(n)`.
+
+Two sets of variables: 
+* `f[i, j]`: real variable, `i` from 1 to `n`; the "flow" from the array to 
+  sort to the sorted copy, equal to the value of `x[i]` and `y[j]`
+* `a[i, j]`: binary variable, `i` from 1 to `n`; `a[i, j]` indicates whether 
+  the flow `f[i, j]` is nonzero
+
+Constraints: 
+* Flow coming from the array to sort `x`: 
+    ``x_i = \\sum_{j=1}^n f_{i,j} \\qquad \\forall i \\in \\{1, 2\\dots n\\}``
+* Flow going to the sorted array: 
+    ``y_j = \\sum_{i=1}^n f_{i,j} \\qquad \\forall j \\in \\{1, 2\\dots n\\}``
+* The flow from one value of the array to sort can only go to one element of 
+  the sorted array:
+    ``\sum_{i=1}^n a_{i,j} = 1 \\qquad \\forall j \\in \\{1, 2\\dots n\\}``
+* The flow to one value of the sorted array can only come from one element of 
+  the array to sort:
+    ``\sum_{j=1}^n a_{i,j} = 1 \\qquad \\forall i \\in \\{1, 2\\dots n\\}``
+* The flow `f[i, j]` is related to the binary variable `a[i, j]`: 
+    ``U a_{i,j} \\leq f_{i,j} \\leq L a_{i,j} \\qquad \\forall (i,j) \\in \\{1, 2\\dots n\\}^2``
+* The array `y` must be sorted:
+    ``y_{j-1} \\leq y_{j} \\qquad \\forall j \\in \\{2, 3\\dots n\\}``
 """
 struct Sort2MILPBridge{T} <: MOIBC.AbstractBridge
     vars_flow::Matrix{MOI.VariableIndex}
