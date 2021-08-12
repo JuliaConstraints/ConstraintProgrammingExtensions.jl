@@ -272,6 +272,10 @@ include("SortPermutation/perm_to_alldiff_indexing.jl")
 const SortPermutation2AllDifferent{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{SortPermutation2AllDifferentBridge{T}, OT}
 
+include("SortPermutation/perm_to_milp.jl")
+const SortPermutation2MILP{T, OT <: MOI.ModelLike} =
+    MOIBC.SingleBridgeOptimizer{SortPermutation2MILPBridge{T}, OT}
+
 include("SlidingSum/ss_to_lp.jl")
 const SlidingSum2LP{T, OT <: MOI.ModelLike} =
     MOIBC.SingleBridgeOptimizer{SlidingSum2LPBridge{T}, OT}
@@ -362,6 +366,7 @@ function add_all_set_bridges(bridged_model, ::Type{T}) where {T}
     MOIB.add_bridge(bridged_model, Sort2MILPBridge{T})
     MOIB.add_bridge(bridged_model, Sort2SortPermutationBridge{T})
     MOIB.add_bridge(bridged_model, SortPermutation2AllDifferentBridge{T})
+    MOIB.add_bridge(bridged_model, SortPermutation2MILPBridge{T})
     MOIB.add_bridge(bridged_model, SlidingSum2LPBridge{T})
     MOIB.add_bridge(bridged_model, SymmetricAllDifferent2AllDifferentInverseBridge{T})
     MOIB.add_bridge(bridged_model, ValuePrecedence2ReificationBridge{T})

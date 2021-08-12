@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.4.2
+-------------
+
+Add bridges:
+* from `SortPermutation` to MILP
+
+
 Version 0.4.1
 -------------
 

@@ -1,7 +1,7 @@
-@testset "Sort2MILP: $(fct_type), dimension $(array_dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], array_dim in [2, 3], T in [Int, Float64]
-    dim = 2 * array_dim
+@testset "SortPermutation2MILP: $(fct_type), dimension $(array_dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], array_dim in [2, 3], T in [Int, Float64]
+    dim = 3 * array_dim
     mock = MOIU.MockOptimizer(MILPModel{T}())
-    model = COIB.Sort2MILP{T}(mock)
+    model = COIB.SortPermutation2MILP{T}(mock)
 
     if T == Int
         @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -10,7 +10,7 @@
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.Sort,
+        CP.SortPermutation,
     )
 
     if T == Int
@@ -27,24 +27,24 @@
         @assert false
     end
 
-    @test_throws AssertionError MOI.add_constraint(model, fct, CP.Sort(array_dim))
+    @test_throws AssertionError MOI.add_constraint(model, fct, CP.SortPermutation(array_dim))
 
     for i in 1:array_dim
         MOI.add_constraint(model, x[array_dim + i], MOI.LessThan(T(4)))
         MOI.add_constraint(model, x[array_dim + i], MOI.GreaterThan(-T(4)))
     end
 
-    c = MOI.add_constraint(model, fct, CP.Sort(array_dim))
+    c = MOI.add_constraint(model, fct, CP.SortPermutation(array_dim))
 
     for i in 1:dim
         @test MOI.is_valid(model, x[i])
     end
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Sort}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.SortPermutation}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Sort) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.SortPermutation) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
@@ -222,6 +222,30 @@
             t2 = f.terms[2]
             @test t2.coefficient === -one(T)
             @test t2.variable_index == x[i + 1]
+        end
+    end
+
+    @testset "Constraint: permutation array" begin
+        @test length(bridge.cons_perm) == array_dim
+        
+        for i in 1:array_dim
+            @test MOI.is_valid(model, bridge.cons_perm[i])
+                
+            s = MOI.get(model, MOI.ConstraintSet(), bridge.cons_perm[i])
+            f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_perm[i])
+
+            @test s == MOI.EqualTo(zero(T))
+            @test length(f.terms) == array_dim + 1
+                
+            t1 = f.terms[1]
+            @test t1.coefficient === one(T)
+            @test t1.variable_index == x[2 * array_dim + i]
+            
+            for j in 1:array_dim
+                t = f.terms[1 + j]
+                @test t.coefficient === -T(j)
+                @test t.variable_index == bridge.vars_unicity[i, j]
+            end
         end
     end
 end

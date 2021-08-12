@@ -176,6 +176,7 @@
 
     @testset "SortPermutation" begin
         include("SortPermutation/perm_to_alldiff_indexing.jl")
+        include("SortPermutation/perm_to_milp.jl")
     end
 
     @testset "Strictly" begin

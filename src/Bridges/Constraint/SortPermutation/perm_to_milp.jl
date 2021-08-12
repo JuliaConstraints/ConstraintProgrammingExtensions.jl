@@ -1,35 +1,10 @@
 """
-Bridges `CP.Sort` to MILP constraints by adding O(n²) binary variables, with a 
-transportation-like model.
+Bridges `CP.SortPermutation` to MILP constraints by adding O(n²) binary 
+variables, with a transportation-like model.
 
-## Detailed model
-
-Let `x` be the array to sort and `y` its sorted copy, both vectors having 
-length `n`. This bridge handles the constraint `[y..., x...]`-in-`CP.Sort(n)`.
-
-Two sets of variables: 
-* `f[i, j]`: real variable, `i` from 1 to `n`; the "flow" from the array to 
-  sort to the sorted copy, equal to the value of `x[i]` and `y[j]`
-* `a[i, j]`: binary variable, `i` from 1 to `n`; `a[i, j]` indicates whether 
-  the flow `f[i, j]` is nonzero
-
-Constraints: 
-* Flow coming from the array to sort `x`: 
-    ``x_i = \\sum_{j=1}^n f_{i,j} \\qquad \\forall i \\in \\{1, 2\\dots n\\}``
-* Flow going to the sorted array: 
-    ``y_j = \\sum_{i=1}^n f_{i,j} \\qquad \\forall j \\in \\{1, 2\\dots n\\}``
-* The flow from one value of the array to sort can only go to one element of 
-  the sorted array:
-    ``\\sum_{i=1}^n a_{i,j} = 1 \\qquad \\forall j \\in \\{1, 2\\dots n\\}``
-* The flow to one value of the sorted array can only come from one element of 
-  the array to sort:
-    ``\\sum_{j=1}^n a_{i,j} = 1 \\qquad \\forall i \\in \\{1, 2\\dots n\\}``
-* The flow `f[i, j]` is related to the binary variable `a[i, j]`: 
-    ``U a_{i,j} \\leq f_{i,j} \\leq L a_{i,j} \\qquad \\forall (i,j) \\in \\{1, 2\\dots n\\}^2``
-* The array `y` must be sorted:
-    ``y_{j-1} \\leq y_{j} \\qquad \\forall j \\in \\{2, 3\\dots n\\}``
+The implemented model is highly similar to that of [`Sort2MILPBridge`](@ref).
 """
-struct Sort2MILPBridge{T} <: MOIBC.AbstractBridge
+struct SortPermutation2MILPBridge{T} <: MOIBC.AbstractBridge
     vars_flow::Matrix{MOI.VariableIndex}
     vars_unicity::Matrix{MOI.VariableIndex}
     vars_unicity_bin::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
@@ -40,16 +15,17 @@ struct Sort2MILPBridge{T} <: MOIBC.AbstractBridge
     cons_flow_gt::Matrix{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}}
     cons_flow_lt::Matrix{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}
     cons_sort::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}}
+    cons_perm::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{Sort2MILPBridge{T}},
+    ::Type{SortPermutation2MILPBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.Sort,
+    s::CP.SortPermutation,
 ) where {T}
     return MOIBC.bridge_constraint(
-        Sort2MILPBridge{T},
+        SortPermutation2MILPBridge{T},
         model,
         MOI.VectorAffineFunction{T}(f),
         s,
@@ -57,16 +33,17 @@ function MOIBC.bridge_constraint(
 end
 
 function MOIBC.bridge_constraint(
-    ::Type{Sort2MILPBridge{T}},
+    ::Type{SortPermutation2MILPBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.Sort,
+    s::CP.SortPermutation,
 ) where {T}
     f_scalars = MOIU.scalarize(f)
     dim = s.dimension
     
     f_sorted = f_scalars[1:dim]
     f_to_sort = f_scalars[(dim + 1):(2 * dim)]
+    f_perm = f_scalars[(2 * dim + 1):(3 * dim)]
 
     # For this formulation work, both lower and upper bounds are required on
     # the values of the array to sort.
@@ -151,7 +128,17 @@ function MOIBC.bridge_constraint(
         for i in 1:(dim - 1)
     ]
 
-    return Sort2MILPBridge(
+    # Constrain the variables of the permutation.
+    cons_perm = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
+        MOI.add_constraint(
+            model, 
+            f_perm[i] - sum(T(j) * MOI.SingleVariable(vars_unicity[i, j]) for j in 1:dim),
+            MOI.EqualTo(zero(T))
+        )
+        for i in 1:dim
+    ]
+
+    return SortPermutation2MILPBridge(
         vars_flow, 
         vars_unicity, 
         vars_unicity_bin, 
@@ -162,22 +149,23 @@ function MOIBC.bridge_constraint(
         cons_flow_gt, 
         cons_flow_lt, 
         cons_sort,
+        cons_perm,
     )
 end
 
 function MOI.supports_constraint(
-    ::Type{Sort2MILPBridge{T}},
+    ::Type{SortPermutation2MILPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.Sort},
+    ::Type{CP.SortPermutation},
 ) where {T}
     return true
 end
 
-function MOIB.added_constrained_variable_types(::Type{Sort2MILPBridge{T}}) where {T}
+function MOIB.added_constrained_variable_types(::Type{SortPermutation2MILPBridge{T}}) where {T}
     return [(MOI.ZeroOne,)]
 end
 
-function MOIB.added_constraint_types(::Type{Sort2MILPBridge{T}}) where {T}
+function MOIB.added_constraint_types(::Type{SortPermutation2MILPBridge{T}}) where {T}
     return [
         (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
         (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
@@ -185,12 +173,12 @@ function MOIB.added_constraint_types(::Type{Sort2MILPBridge{T}}) where {T}
     ]
 end
 
-function MOI.get(b::Sort2MILPBridge, ::MOI.NumberOfVariables)
+function MOI.get(b::SortPermutation2MILPBridge, ::MOI.NumberOfVariables)
     return length(b.vars_flow) + length(b.vars_unicity)
 end
 
 function MOI.get(
-    b::Sort2MILPBridge{T},
+    b::SortPermutation2MILPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.SingleVariable, MOI.ZeroOne,
     },
@@ -199,7 +187,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::Sort2MILPBridge{T},
+    b::SortPermutation2MILPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
     },
@@ -208,7 +196,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::Sort2MILPBridge{T},
+    b::SortPermutation2MILPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
@@ -217,7 +205,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::Sort2MILPBridge{T},
+    b::SortPermutation2MILPBridge{T},
     ::MOI.NumberOfConstraints{
         MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
     },
@@ -226,14 +214,14 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::Sort2MILPBridge{T},
+    b::SortPermutation2MILPBridge{T},
     ::MOI.ListOfVariableIndices,
 ) where {T}
     return vcat(vec(b.vars_flow), vec(b.vars_unicity))
 end
 
 function MOI.get(
-    b::Sort2MILPBridge{T},
+    b::SortPermutation2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.SingleVariable, MOI.ZeroOne,
     },
@@ -242,7 +230,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::Sort2MILPBridge{T},
+    b::SortPermutation2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T},
     },
@@ -251,7 +239,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::Sort2MILPBridge{T},
+    b::SortPermutation2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.ScalarAffineFunction{T}, MOI.LessThan{T},
     },
@@ -260,7 +248,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    b::Sort2MILPBridge{T},
+    b::SortPermutation2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
         MOI.ScalarAffineFunction{T}, MOI.EqualTo{T},
     },
