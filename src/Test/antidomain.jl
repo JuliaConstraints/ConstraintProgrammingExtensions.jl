@@ -15,7 +15,7 @@ function antidomain_singlevariable_test(
     c1 = MOI.add_constraint(model, x1, MOI.EqualTo(1))
     c2 = MOI.add_constraint(model, x2, MOI.GreaterThan(1))
     c3 = MOI.add_constraint(model, x2, MOI.LessThan(3))
-    c4 = MOI.add_constraint(model, _vaf([x1, x2]), CP.AllDifferent(2))
+    c4 = MOI.add_constraint(model, MOI.VectorOfVariables([x1, x2]), CP.AllDifferent(2))
 
     c5 = MOI.add_constraint(model, x2, CP.AntiDomain(Set([3])))
 
@@ -67,7 +67,7 @@ function antidomain_scalaraffinefunction_test(
     c1 = MOI.add_constraint(model, x1, MOI.EqualTo(1))
     c2 = MOI.add_constraint(model, x2, MOI.GreaterThan(1))
     c3 = MOI.add_constraint(model, x2, MOI.LessThan(3))
-    c4 = MOI.add_constraint(model, _vaf([x1, x2]), CP.AllDifferent(2))
+    c4 = MOI.add_constraint(model, MOIU.vectorize(MOI.SingleVariable.([x1, x2])), CP.AllDifferent(2))
 
     c5 = MOI.add_constraint(
         model,
