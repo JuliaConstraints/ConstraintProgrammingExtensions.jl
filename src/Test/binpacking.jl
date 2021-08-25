@@ -71,7 +71,7 @@ function binpacking_scalaraffinefunction_test(
 
     c1 = MOI.add_constraint(
         model,
-        _vaf([x1, x2, x3]),
+        MOIU.vectorize(MOI.SingleVariable.([x1, x2, x3])),
         CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [w1, w2]),
     )
 
