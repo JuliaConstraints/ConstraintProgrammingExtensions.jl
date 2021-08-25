@@ -58,8 +58,8 @@ function differentfrom_scalaraffinefunction_test(
     c1 = MOI.add_constraint(model, x1, MOI.Interval(1, 2))
     c2 = MOI.add_constraint(model, x2, MOI.Interval(1, 2))
 
-    c3 = MOI.add_constraint(model, _saf([1, -1], [x1, x2]), CP.DifferentFrom(0))
-    c4 = MOI.add_constraint(model, _saf(x1), MOI.EqualTo(1))
+    c3 = MOI.add_constraint(model, 1 * MOI.SingleVariable(x1) - 1 * MOI.SingleVariable(x2), CP.DifferentFrom(0))
+    c4 = MOI.add_constraint(model, 1 * MOI.SingleVariable(x1), MOI.EqualTo(1))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)

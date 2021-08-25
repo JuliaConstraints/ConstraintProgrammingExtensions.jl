@@ -20,7 +20,7 @@ function strictly_lessthan_singlevariable_test(
 
     c3 = MOI.add_constraint(
         model,
-        _saf([1, -1], [x1, x2]),
+        1 * MOI.SingleVariable(x1) - 1 * MOI.SingleVariable(x2),
         CP.Strictly(MOI.LessThan(0)),
     )
 
@@ -62,7 +62,7 @@ function strictly_greaterthan_singlevariable_test(
 
     c3 = MOI.add_constraint(
         model,
-        _saf([-1, 1], [x1, x2]),
+        1 * MOI.SingleVariable(x1) - 1 * MOI.SingleVariable(x2),
         CP.Strictly(MOI.GreaterThan(0)),
     )
 

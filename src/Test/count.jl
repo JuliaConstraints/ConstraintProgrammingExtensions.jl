@@ -64,9 +64,9 @@ function count_vectoraffinefunction_test(
     x3, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x4, _ = MOI.add_constrained_variable(model, MOI.Integer())
 
-    c1 = MOI.add_constraint(model, _saf(x1), MOI.EqualTo(1))
-    c2 = MOI.add_constraint(model, _saf(x2), MOI.EqualTo(1))
-    c3 = MOI.add_constraint(model, _saf(x3), MOI.EqualTo(2))
+    c1 = MOI.add_constraint(model, 1 * MOI.SingleVariable(x1), MOI.EqualTo(1))
+    c2 = MOI.add_constraint(model, 1 * MOI.SingleVariable(x2), MOI.EqualTo(1))
+    c3 = MOI.add_constraint(model, 1 * MOI.SingleVariable(x3), MOI.EqualTo(2))
 
     c4 = MOI.add_constraint(model, _vaf([x4, x1, x2, x3]), CP.Count(3, 1))
 
