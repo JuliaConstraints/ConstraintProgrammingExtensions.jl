@@ -10,10 +10,6 @@ const MOIT = MOI.Test
 const CP = ConstraintProgrammingExtensions
 
 # A few helpers
-function _vov(vars::Vector{MOI.VariableIndex})
-    return MOI.VectorOfVariables(vars)
-end
-
 function _saf(var::MOI.VariableIndex)
     return MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1], [var]), 0)
 end

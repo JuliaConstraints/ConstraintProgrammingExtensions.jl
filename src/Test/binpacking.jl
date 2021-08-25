@@ -24,7 +24,7 @@ function binpacking_vectorofvariables_test(
 
     c1 = MOI.add_constraint(
         model,
-        _vov([x1, x2, x3]),
+        MOI.VectorOfVariables([x1, x2, x3]),
         CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [w1, w2]),
     )
 

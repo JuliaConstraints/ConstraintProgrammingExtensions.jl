@@ -24,7 +24,7 @@ function lexicographicallylessthan_vectorofvariables_test(
 
     c5 = MOI.add_constraint(
         model,
-        _vov([x1, x2, x3, x4]),
+        MOI.VectorOfVariables([x1, x2, x3, x4]),
         CP.LexicographicallyLessThan(2),
     )
 

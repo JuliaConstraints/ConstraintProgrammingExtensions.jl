@@ -13,7 +13,7 @@ function element_singlevariable_test(
 
     c1 = MOI.add_constraint(model, x1, MOI.EqualTo(1))
 
-    c2 = MOI.add_constraint(model, _vov([x1, x2]), CP.Element([6, 5, 4]))
+    c2 = MOI.add_constraint(model, MOI.VectorOfVariables([x1, x2]), CP.Element([6, 5, 4]))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)

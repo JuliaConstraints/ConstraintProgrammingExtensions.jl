@@ -9,7 +9,7 @@ function true_test(model::MOI.ModelLike, config::MOIT.TestConfig)
 
     c1 = MOI.add_constraint(
         model,
-        _vov([x1, x1]),
+        MOI.VectorOfVariables([x1, x1]),
         CP.IfThenElse(CP.True(), MOI.EqualTo(1), MOI.EqualTo(0)),
     )
 
@@ -37,7 +37,7 @@ function false_test(model::MOI.ModelLike, config::MOIT.TestConfig)
 
     c1 = MOI.add_constraint(
         model,
-        _vov([x1, x1]),
+        MOI.VectorOfVariables([x1, x1]),
         CP.IfThenElse(CP.False(), MOI.EqualTo(1), MOI.EqualTo(0)),
     )
 

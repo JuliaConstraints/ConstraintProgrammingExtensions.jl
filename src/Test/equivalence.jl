@@ -18,7 +18,7 @@ function equivalence_singlevariable_test(
     c1 = MOI.add_constraint(model, x1, MOI.EqualTo(1))
     c2 = MOI.add_constraint(
         model,
-        _vov([x1, x2]),
+        MOI.VectorOfVariables([x1, x2]),
         CP.Equivalence(MOI.EqualTo(1), MOI.EqualTo(1)),
     )
 

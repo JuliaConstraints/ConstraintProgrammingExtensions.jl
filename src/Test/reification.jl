@@ -16,7 +16,7 @@ function reification_singlevariable_test(
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
 
     c1 = MOI.add_constraint(model, x2, MOI.EqualTo(1))
-    c2 = MOI.add_constraint(model, _vov([x1, x2]), CP.Reification(MOI.EqualTo(2)))
+    c2 = MOI.add_constraint(model, MOI.VectorOfVariables([x1, x2]), CP.Reification(MOI.EqualTo(2)))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)

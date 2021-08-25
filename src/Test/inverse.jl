@@ -16,7 +16,7 @@ function inverse_vectorofvariables_test(
     c1 = MOI.add_constraint(model, x1, MOI.EqualTo(2))
     c2 = MOI.add_constraint(model, x2, MOI.EqualTo(1))
 
-    c3 = MOI.add_constraint(model, _vov([x1, x2, x3, x4]), CP.Inverse(2))
+    c3 = MOI.add_constraint(model, MOI.VectorOfVariables([x1, x2, x3, x4]), CP.Inverse(2))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)
