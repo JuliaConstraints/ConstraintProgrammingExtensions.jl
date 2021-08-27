@@ -7,6 +7,8 @@ Version 0.4.2
 Add bridges:
 * from `SortPermutation` to MILP
 
+Refactor the test sets to avoid using helpers.
+
 
 Version 0.4.1
 -------------
@@ -17,7 +19,7 @@ Hot fix for the bin-packing tests.
 Version 0.4.0
 -------------
 
-Refactor for sets with many variants. Discussion: 
+Refactor for sets with many variants. Related discussion: 
 
 * https://github.com/dourouc05/ConstraintProgrammingExtensions.jl/issues/22 
 * https://github.com/dourouc05/ConstraintProgrammingExtensions.jl/pull/23
