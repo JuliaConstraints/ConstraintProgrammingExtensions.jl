@@ -62,7 +62,7 @@ function equivalence_scalaraffinefunction_test(
     c1 = MOI.add_constraint(model, 1 * MOI.SingleVariable(x1), MOI.EqualTo(1))
     c2 = MOI.add_constraint(
         model,
-        _vaf([x1, x2]),
+        MOIU.vectorize(MOI.SingleVariable.([x1, x2])),
         CP.Equivalence(MOI.EqualTo(1), MOI.EqualTo(1)),
     )
 

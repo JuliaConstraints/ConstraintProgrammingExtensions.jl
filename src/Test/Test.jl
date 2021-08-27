@@ -9,17 +9,6 @@ const MOIU = MOI.Utilities
 const MOIT = MOI.Test
 const CP = ConstraintProgrammingExtensions
 
-# A few helpers
-function _vaf(vars::Vector{MOI.VariableIndex})
-    return MOI.VectorAffineFunction(
-        MOI.VectorAffineTerm.(
-            collect(1:length(vars)),
-            MOI.ScalarAffineTerm.(ones(Int, length(vars)), vars),
-        ),
-        zeros(Int, length(vars)),
-    )
-end
-
 # Test sets.
 include("alldifferent.jl")
 include("antidomain.jl")
