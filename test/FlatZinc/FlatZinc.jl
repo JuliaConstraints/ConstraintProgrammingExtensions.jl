@@ -105,6 +105,7 @@
             MOI.Integer,
         ]
             m = CP.FlatZinc.Optimizer()
+            @test MOI.supports_add_constrained_variable(m, S)
             @test MOI.supports_add_constrained_variables(m, S)
         end
     end
