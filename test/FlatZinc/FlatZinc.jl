@@ -94,11 +94,9 @@
         @testset "Supported constrained variable with $(S)" for S in [
             MOI.EqualTo{Float64},
             MOI.LessThan{Float64},
-            MOI.GreaterThan{Float64},
             MOI.Interval{Float64},
             MOI.EqualTo{Int},
             MOI.LessThan{Int},
-            MOI.GreaterThan{Int},
             MOI.Interval{Int},
             MOI.EqualTo{Bool},
             MOI.ZeroOne,
