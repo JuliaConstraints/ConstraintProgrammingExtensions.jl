@@ -152,6 +152,15 @@ function _create_constraint(
     return index
 end
 
+# Fallback for copying operations.
+function MOI.copy_to(dest::Optimizer, src::MOI.ModelLike; kwargs...)
+    return MOUI.automatic_copy_to(dest, src; kwargs...)
+end
+
+function MOIU.supports_default_copy_to(::Optimizer, ::Bool)
+    return true
+end
+
 # Names. 
 # No support for constraint names in fzn, hence no ConstraintName.
 
