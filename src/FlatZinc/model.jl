@@ -178,11 +178,9 @@ function MOI.supports_add_constrained_variable(
     F <: Union{
         MOI.EqualTo{Float64},
         MOI.LessThan{Float64},
-        MOI.GreaterThan{Float64},
         MOI.Interval{Float64},
         MOI.EqualTo{Int},
         MOI.LessThan{Int},
-        MOI.GreaterThan{Int},
         MOI.Interval{Int},
         MOI.EqualTo{Bool},
         MOI.ZeroOne,
@@ -199,11 +197,9 @@ function MOI.supports_add_constrained_variables(
     F <: Union{
         MOI.EqualTo{Float64},
         MOI.LessThan{Float64},
-        MOI.GreaterThan{Float64},
         MOI.Interval{Float64},
         MOI.EqualTo{Int},
         MOI.LessThan{Int},
-        MOI.GreaterThan{Int},
         MOI.Interval{Int},
         MOI.EqualTo{Bool},
         MOI.ZeroOne,
