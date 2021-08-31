@@ -4,10 +4,14 @@ Release Notes
 Version 0.4.2
 -------------
 
-Add bridges:
+Add bridge:
 * from `SortPermutation` to MILP
 
 Refactor the test sets to avoid using helpers.
+
+Fix bugs in the FlatZinc implementation, like supporting more constraints than
+actually supported in the most basic FlatZinc or providing no way to copy 
+models.
 
 
 Version 0.4.1
