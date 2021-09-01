@@ -143,14 +143,14 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var -1.7976931348623157e308..0.0: x2;
-                var float: x3 = 0.0;
-                var 0.0..1.0: x4;
-                var -9223372036854775808..0: x6;
-                var int: x7 = 0;
-                var 0..1: x8;
-                var bool: x9 = false;
-                var float: x10;
+            @test fzn == """var -1.7976931348623157e308..0.0: x1;
+                var float: x2 = 0.0;
+                var 0.0..1.0: x3;
+                var -9223372036854775808..0: x4;
+                var int: x5 = 0;
+                var 0..1: x6;
+                var bool: x7 = false;
+                var float: x8;
                 
                 
                 
