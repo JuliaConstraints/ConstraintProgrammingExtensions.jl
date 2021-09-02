@@ -143,14 +143,14 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var -1.7976931348623157e308..0.0: x1;
-                var float: x2 = 0.0;
-                var 0.0..1.0: x3;
-                var -9223372036854775808..0: x4;
-                var int: x5 = 0;
-                var 0..1: x6;
-                var bool: x7 = false;
-                var float: x8;
+            @test fzn == """var -1.7976931348623157e308..0.0: x1 :: output_var;
+                var float: x2 :: output_var = 0.0;
+                var 0.0..1.0: x3 :: output_var;
+                var -9223372036854775808..0: x4 :: output_var;
+                var int: x5 :: output_var = 0;
+                var 0..1: x6 :: output_var;
+                var bool: x7 :: output_var = false;
+                var float: x8 :: output_var;
                 
                 
                 
@@ -230,16 +230,16 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var int: x1;
-                var int: x2;
-                var int: x3;
-                var int: x4;
-                var int: x5;
-                var float: x6;
-                var float: x7;
-                var float: x8;
-                var float: x9;
-                var float: x10;
+            @test fzn == """var int: x1 :: output_var;
+                var int: x2 :: output_var;
+                var int: x3 :: output_var;
+                var int: x4 :: output_var;
+                var int: x5 :: output_var;
+                var float: x6 :: output_var;
+                var float: x7 :: output_var;
+                var float: x8 :: output_var;
+                var float: x9 :: output_var;
+                var float: x10 :: output_var;
                 
                 
                 
@@ -320,12 +320,12 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var int: x1;
-                var int: x2;
-                var bool: x3;
-                var bool: x4;
-                var float: x5;
-                var float: x6;
+            @test fzn == """var int: x1 :: output_var;
+                var int: x2 :: output_var;
+                var bool: x3 :: output_var;
+                var bool: x4 :: output_var;
+                var float: x5 :: output_var;
+                var float: x6 :: output_var;
                 
                 
                 array [1..3] of int: ARRAY0 = [6, 5, 4];
@@ -391,10 +391,10 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var int: x1;
-                var int: x2;
-                var float: x3;
-                var float: x4;
+            @test fzn == """var int: x1 :: output_var;
+                var int: x2 :: output_var;
+                var float: x3 :: output_var;
+                var float: x4 :: output_var;
                 
                 
 
@@ -436,7 +436,7 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var int: x1;
+            @test fzn == """var int: x1 :: output_var;
                 
                 set of int: SET0 = {0, 2, 1};
                 
@@ -475,7 +475,7 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var float: x1;
+            @test fzn == """var float: x1 :: output_var;
                 
                 
                 
@@ -601,12 +601,12 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var int: x1;
-                var int: x2;
-                var bool: x3;
-                var bool: x4;
-                var float: x5;
-                var float: x6;
+            @test fzn == """var int: x1 :: output_var;
+                var int: x2 :: output_var;
+                var bool: x3 :: output_var;
+                var bool: x4 :: output_var;
+                var float: x5 :: output_var;
+                var float: x6 :: output_var;
                 
                 
                 
@@ -678,8 +678,8 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var int: x1;
-                var bool: x2;
+            @test fzn == """var int: x1 :: output_var;
+                var bool: x2 :: output_var;
                 
                 
                 
@@ -735,7 +735,7 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var float: x1;
+            @test fzn == """var float: x1 :: output_var;
                 
                 
                 
@@ -794,8 +794,8 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var bool: x1;
-                var int: x2;
+            @test fzn == """var bool: x1 :: output_var;
+                var int: x2 :: output_var;
                 
                 
                 
@@ -854,8 +854,8 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var bool: x1;
-                var float: x2;
+            @test fzn == """var bool: x1 :: output_var;
+                var float: x2 :: output_var;
                 
                 
                 
@@ -928,10 +928,10 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var bool: x1;
-                var bool: x2;
-                var int: x3;
-                var int: x4;
+            @test fzn == """var bool: x1 :: output_var;
+                var bool: x2 :: output_var;
+                var int: x3 :: output_var;
+                var int: x4 :: output_var;
                 
                 
                 
@@ -1003,10 +1003,10 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var bool: x1;
-                var bool: x2;
-                var int: x3;
-                var float: x4;
+            @test fzn == """var bool: x1 :: output_var;
+                var bool: x2 :: output_var;
+                var int: x3 :: output_var;
+                var float: x4 :: output_var;
                 
                 
                 
@@ -1051,12 +1051,12 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var int: x_x;
-                var bool: y_1;
-                var bool: y_2;
-                var bool: y_3;
-                var bool: y_4;
-                var bool: y_5;
+            @test fzn == """var int: x_x :: output_var;
+                var bool: y_1 :: output_var;
+                var bool: y_2 :: output_var;
+                var bool: y_3 :: output_var;
+                var bool: y_4 :: output_var;
+                var bool: y_5 :: output_var;
                 
                 
                 
@@ -1093,7 +1093,7 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var int: x1;
+            @test fzn == """var int: x1 :: output_var;
 
 
 
@@ -1124,7 +1124,7 @@
             write(io, m)
             fzn = String(take!(io))
 
-            @test fzn == """var int: x1;
+            @test fzn == """var int: x1 :: output_var;
 
 
 
