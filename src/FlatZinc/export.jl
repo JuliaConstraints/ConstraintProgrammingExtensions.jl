@@ -84,17 +84,17 @@ end
 # Variable printing.
 
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Float64})
-    print(io, "var float: $(name) = $(s.value) :: output_var;")
+    print(io, "var float: $(name) :: output_var = $(s.value);")
     return nothing
 end
 
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Int})
-    print(io, "var int: $(name) = $(s.value) :: output_var;")
+    print(io, "var int: $(name) :: output_var = $(s.value);")
     return nothing
 end
 
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Bool})
-    print(io, "var bool: $(name) = $(s.value) :: output_var;")
+    print(io, "var bool: $(name) :: output_var = $(s.value);")
     return nothing
 end
 
