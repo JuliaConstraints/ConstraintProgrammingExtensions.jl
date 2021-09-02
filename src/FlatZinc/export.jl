@@ -84,17 +84,17 @@ end
 # Variable printing.
 
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Float64})
-    print(io, "var float: $(name) = $(s.value);")
+    print(io, "var float: $(name) = $(s.value) :: output_var;")
     return nothing
 end
 
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Int})
-    print(io, "var int: $(name) = $(s.value);")
+    print(io, "var int: $(name) = $(s.value) :: output_var;")
     return nothing
 end
 
 function write_variable(io::IO, name::String, s::MOI.EqualTo{Bool})
-    print(io, "var bool: $(name) = $(s.value);")
+    print(io, "var bool: $(name) = $(s.value) :: output_var;")
     return nothing
 end
 
@@ -102,12 +102,12 @@ function write_variable(io::IO, name::String, s::MOI.LessThan{Float64})
     # typemin(Float64) is -Inf, which is "-Inf" as a string (which is not 
     # allowed by FlatZinc). Take the next smallest value as a proxy, because 
     # it has a standard scientific notation (and this is allowed in FlatZinc).
-    print(io, "var $(nextfloat(typemin(Float64)))..$(s.upper): $(name);")
+    print(io, "var $(nextfloat(typemin(Float64)))..$(s.upper): $(name) :: output_var;")
     return nothing
 end
 
 function write_variable(io::IO, name::String, s::MOI.LessThan{Int})
-    print(io, "var $(typemin(Int))..$(s.upper): $(name);")
+    print(io, "var $(typemin(Int))..$(s.upper): $(name) :: output_var;")
     return nothing
 end
 
@@ -115,12 +115,12 @@ function write_variable(io::IO, name::String, s::MOI.GreaterThan{Float64})
     # typemax(Float64) is Inf, which is "Inf" as a string (which is not 
     # allowed by FlatZinc). Take the next largest value as a proxy, because 
     # it has a standard scientific notation (and this is allowed in FlatZinc).
-    print(io, "var $(s.lower)..$(prevfloat(typemax(Float64))): $(name);")
+    print(io, "var $(s.lower)..$(prevfloat(typemax(Float64))): $(name) :: output_var;")
     return nothing
 end
 
 function write_variable(io::IO, name::String, s::MOI.GreaterThan{Int})
-    print(io, "var $(s.lower)..$(typemax(Int)): $(name);")
+    print(io, "var $(s.lower)..$(typemax(Int)): $(name) :: output_var;")
     return nothing
 end
 
@@ -129,22 +129,22 @@ function write_variable(
     name::String,
     s::MOI.Interval{T},
 ) where {T <: Union{Int, Float64}}
-    print(io, "var $(s.lower)..$(s.upper): $(name);")
+    print(io, "var $(s.lower)..$(s.upper): $(name) :: output_var;")
     return nothing
 end
 
 function write_variable(io::IO, name::String, ::MOI.Reals)
-    print(io, "var float: $(name);")
+    print(io, "var float: $(name) :: output_var;")
     return nothing
 end
 
 function write_variable(io::IO, name::String, ::MOI.ZeroOne)
-    print(io, "var bool: $(name);")
+    print(io, "var bool: $(name) :: output_var;")
     return nothing
 end
 
 function write_variable(io::IO, name::String, ::MOI.Integer)
-    print(io, "var int: $(name);")
+    print(io, "var int: $(name) :: output_var;")
     return nothing
 end
 
