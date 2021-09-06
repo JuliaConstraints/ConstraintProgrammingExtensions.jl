@@ -1,7 +1,7 @@
 name = "ConstraintProgrammingExtensions"
 uuid = "b65d079e-ed98-51d9-b0db-edee61a5c5f8"
 authors = ["Thibaut Cuvelier"]
-version = "0.4.2"
+version = "0.4.3"
 
 [deps]
 MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
