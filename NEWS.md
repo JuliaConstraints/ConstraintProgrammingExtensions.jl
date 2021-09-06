@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.4.3
+-------------
+
+Improvements to FlatZinc backend.
+
+
 Version 0.4.2
 -------------
 
