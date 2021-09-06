@@ -168,11 +168,15 @@ function MOI.get(model::Optimizer, ::MOI.VariableName, v::MOI.VariableIndex)
     return model.variable_info[v].name
 end
 
-function MOI.get(model::Optimizer, ::MOI.VariableIndex, n::String)
-    idx_in_variable_info = findfirst(1:length(model.variable_info)) do i
-        model.variable_info[i].name == n
+function MOI.get(model::Optimizer, ::Type{MOI.VariableIndex}, n::String)::MOI.VariableIndex
+    # TODO: test this.
+    # TODO: not terribly efficient, and used in FZN for parsing a solution (finding a variable by its name). Rather build a dict to retrieve the indices faster.
+    for i in keys(model.variable_info)
+        if model.variable_info[i].name == n
+            return i
+        end
     end
-    return model.variable_info[idx_in_variable_info].index
+    return nothing
 end
 
 function MOI.set(
