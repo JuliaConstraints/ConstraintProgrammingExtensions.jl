@@ -168,6 +168,13 @@ function MOI.get(model::Optimizer, ::MOI.VariableName, v::MOI.VariableIndex)
     return model.variable_info[v].name
 end
 
+function MOI.get(model::Optimizer, ::MOI.VariableIndex, n::String)
+    idx_in_variable_info = findfirst(1:length(model.variable_info)) do i
+        model.variable_info[i].name == n
+    end
+    return model.variable_info[idx_in_variable_info].index
+end
+
 function MOI.set(
     model::Optimizer,
     ::MOI.VariableName,
