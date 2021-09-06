@@ -22,5 +22,6 @@ of bridges should make it possible to transform any CP model into a MIP model.
 
 Currently, the following solvers are using this interface: 
 
-* [ConstraintSolver.jl](https://github.com/Wikunia/ConstraintSolver.jl)
-* [CPLEXCP.jl](https://github.com/dourouc05/CPLEXCP.jl)
+* [Chuffed.jl](https://github.com/dourouc05/Chuffed.jl), wrapper for the [Chuffed](https://github.com/chuffed/chuffed) solver
+* [ConstraintSolver.jl](https://github.com/Wikunia/ConstraintSolver.jl), a native Julia solver
+* [CPLEXCP.jl](https://github.com/dourouc05/CPLEXCP.jl), wrapper for the [CPLEX CP Optimizer](https://www.ibm.com/analytics/cplex-cp-optimizer) solver
