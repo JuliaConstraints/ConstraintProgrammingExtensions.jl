@@ -12,5 +12,6 @@ const CP = ConstraintProgrammingExtensions
 include("model.jl")
 include("export.jl")
 include("import.jl")
+include("optimizer.jl")
 
 end
