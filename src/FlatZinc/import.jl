@@ -1684,6 +1684,7 @@ function split_variable(item::AbstractString)
     # Typical input: "var int: x1;" -> scalar
     # Complex input: "array [1..5] of var int: x1;" -> array
     # Complex input: "var int: x1 :: some_annotation = some_value;" -> scalar
+    # Complex input: "var int: x1 :: some_annotation :: some_other_annotation;" -> scalar
 
     @assert length(item) > 5
 
@@ -1713,7 +1714,8 @@ function split_variable_scalar(item::AbstractString)
     item = lstrip(item)
 
     # Potentially split on the double colon (::) to detect annotations, then
-    # on the equal (=) to detect literal values.
+    # on the equal (=) to detect literal values. There may be several 
+    # annotations.
     if occursin("::", item)
         var_name, item = split(item, "::", limit=2)
         var_name = strip(var_name)
@@ -1727,8 +1729,11 @@ function split_variable_scalar(item::AbstractString)
             var_annotations = strip(item)
             var_value = ""
         end
+
+        var_annotations = split(var_annotations, "::")
+        var_annotations = map(strip, var_annotations)
     else
-        var_annotations = ""
+        var_annotations = [""]
 
         if occursin('=', item)
             var_name, var_value = split(item, '=', limit=2)
