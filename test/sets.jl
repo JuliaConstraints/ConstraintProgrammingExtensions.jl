@@ -458,7 +458,7 @@
         ) == 3 * MOI.dimension(MOI.GreaterThan(0.0))
     end
 
-    @testset "$(S)" for S in [CP.Conjunction, CP.Disjunction]
+    @testset "$(S)" for S in [CP.Conjunction, CP.Disjunction, CP.ExclusiveDisjunction]
         # Ensure that tuples can be compared.
         @test (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0)) ==
             (MOI.EqualTo(0.0), MOI.EqualTo(0.0), MOI.EqualTo(0.0))

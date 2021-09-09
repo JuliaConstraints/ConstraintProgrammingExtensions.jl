@@ -152,7 +152,8 @@ end
 """
     Conjunction{Ts}(constraints::Ts)
 
-The logical conjunction operator ∧ (AND).
+The logical conjunction operator ∧ (AND): all the constraints in the 
+conjunction must be satisfied.
 
 ``\\{(x, y\\dots) \\in \\mathbb{R}^a \\times \\mathbb{R}^b\\dots | x \\in \\mathbb{S_1} \\land y \\in \\mathbb{S_2} \\dots \\}``.
 """
@@ -178,7 +179,8 @@ end
 """
     Disjunction{Ts}(constraints::Ts)
 
-The logical disjunction operator ∨ (AND).
+The logical disjunction operator ∨ (OR): at least one of the constraints in 
+the disjunction must be satisfied.
 
 ``\\{(x, y\\dots) \\in \\mathbb{R}^a \\times \\mathbb{R}^b\\dots | x \\in \\mathbb{S_1} \\lor y \\in \\mathbb{S_2} \\dots \\}``.
 """
@@ -198,6 +200,33 @@ function copy(set::Disjunction{Ts}) where {Ts}
 end
 
 function Base.:(==)(x::Disjunction{Ts}, y::Disjunction{Ts}) where {Ts}
+    return x.constraints == y.constraints
+end
+
+"""
+    ExclusiveDisjunction{Ts}(constraints::Ts)
+
+The logical exclusive disjunction operator ⊻ (XOR): an odd number of 
+constraints in the exclusive disjunction must be satisfied.
+
+``\\{(x, y\\dots) \\in \\mathbb{R}^a \\times \\mathbb{R}^b\\dots | x \\in \\mathbb{S_1} \\veebar y \\in \\mathbb{S_2} \\dots \\}``.
+"""
+struct ExclusiveDisjunction{Ts} <: MOI.AbstractVectorSet where {Ts <: Tuple}
+    constraints::Ts
+end
+
+# Currently, no varargs for parametric types... For instance, see:
+# https://discourse.julialang.org/t/user-defined-variadic-parametric-types/25487/4
+
+function MOI.dimension(set::ExclusiveDisjunction{Ts}) where {Ts}
+    return sum(MOI.dimension(s) for s in set.constraints)
+end
+
+function copy(set::ExclusiveDisjunction{Ts}) where {Ts}
+    return ExclusiveDisjunction(deepcopy(set.constraints))
+end
+
+function Base.:(==)(x::ExclusiveDisjunction{Ts}, y::ExclusiveDisjunction{Ts}) where {Ts}
     return x.constraints == y.constraints
 end
 
