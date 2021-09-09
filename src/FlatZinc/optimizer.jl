@@ -1,10 +1,6 @@
 # TODO: introduce a way for solvers to indicate that they support some features. For now, only the barest FZN file is generated, with extremely little structure.
 
-# MOI wrapper.
-# Based on AmplNLWriter.jl's _NLResults and Optimizer. 
-# The main difference is that typical solutions do not have a Float64 type,
-# but rather Int. However, it all depends on the actual FZN solver that is
-# used below (some of them can still deal with floats).
+# A few generic helpers for parsing the FZN output.
 
 mutable struct _FznResults
     raw_status_string::String
@@ -90,6 +86,12 @@ function _parse_to_assignments(str::String)::Vector{Dict{String, Vector{Number}}
 
     return results
 end
+
+# MOI wrapper.
+# Based on AmplNLWriter.jl's _NLResults and Optimizer. 
+# The main difference is that typical solutions do not have a Float64 type,
+# but rather Int. However, it all depends on the actual FZN solver that is
+# used below (some of them can still deal with floats).
 
 mutable struct Optimizer <: MOI.AbstractOptimizer
     # Solver to call and options.
@@ -312,7 +314,7 @@ MOI.get(model::Optimizer, ::MOI.ResultCount) = length(model.results.primal_solut
 MOI.supports(::Optimizer, ::MOI.DualStatus) = true
 MOI.get(::Optimizer, ::MOI.DualStatus) = MOI.NO_SOLUTION
 
-# Helpers to parse FZN output.
+# Final helper to parse FZN output. It needs access to the model above...
 
 """
     _parse_to_assignments(sols::Vector{Dict{String, Vector{Number}}}, model::CP.FlatZinc.Model)
