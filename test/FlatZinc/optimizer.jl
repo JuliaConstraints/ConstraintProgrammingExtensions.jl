@@ -22,6 +22,14 @@
             ]
         end
     
+        @testset "basic.fzn with a float value" begin
+            # Marker for the end of search: '=' ^ 10
+            out_string = "x = 3.0;\r\n\r\n----------\r\n"
+            @test CP.FlatZinc._parse_to_assignments(out_string) == [
+                Dict("x" => [3.0])
+            ]
+        end
+    
         @testset "several_solutions.fzn" begin
             # Several solutions (with CLI parameter -a)
             out_string = "xs = array1d(1..2, [2, 3]);\r\n\r\n----------\r\nxs = array1d(1..2, [1, 3]);\r\n\r\n----------\r\nxs = array1d(1..2, [1, 2]);\r\n\r\n----------\r\n==========\r\n"
