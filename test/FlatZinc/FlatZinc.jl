@@ -1,12 +1,12 @@
 @testset "FlatZinc" begin
     @testset "Model" begin
         @testset "Optimiser attributes" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test sprint(show, m) == "A FlatZinc (fzn) model"
         end
 
         @testset "Supported constraints" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
 
             @test MOI.supports_constraint(
                 m,
@@ -102,7 +102,7 @@
             MOI.ZeroOne,
             MOI.Integer,
         ]
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.supports_add_constrained_variable(m, S)
             @test MOI.supports_add_constrained_variables(m, S)
         end
@@ -110,7 +110,7 @@
 
     @testset "Writing" begin
         @testset "Variables" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             b, b_c = MOI.add_constrained_variable(m, MOI.LessThan(0.0))
@@ -160,7 +160,7 @@
         end
 
         @testset "Constraints: CP.MinimumAmong / CP.MaximumAmong" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variables.
@@ -259,7 +259,7 @@
         end
 
         @testset "Constraints: CP.Element" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variables.
@@ -347,7 +347,7 @@
         end
 
         @testset "Constraints: CP.DifferentFrom" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variables.
@@ -412,7 +412,7 @@
         end
 
         @testset "Constraints: CP.Domain" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variable.
@@ -452,7 +452,7 @@
         end
 
         @testset "Constraints: CP.Interval" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variable.
@@ -490,7 +490,7 @@
         end
 
         @testset "Constraints: MOI.ScalarAffineFunction in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variables.
@@ -633,7 +633,7 @@
         end
 
         @testset "Constraints: MOI.SingleVariable of integer in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variable.
@@ -704,7 +704,7 @@
         end
 
         @testset "Constraints: MOI.SingleVariable of float in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variable.
@@ -755,7 +755,7 @@
         end
 
         @testset "Constraints: CP.Reification{MOI.VectorOfVariables of integers in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variable.
@@ -815,7 +815,7 @@
         end
 
         @testset "Constraints: CP.Reification{MOI.VectorOfVariables of floats in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variable.
@@ -875,7 +875,7 @@
         end
 
         @testset "Constraints: CP.Reification{MOI.VectorAffineFunction of integers in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variable.
@@ -951,7 +951,7 @@
         end
 
         @testset "Constraints: CP.Reification{MOI.VectorAffineFunction of floats in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom}" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variable.
@@ -1026,7 +1026,7 @@
         end
 
         @testset "Name rewriting" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             # Create variables.
@@ -1072,7 +1072,7 @@
         end
 
         @testset "Maximising" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             x, x_int = MOI.add_constrained_variable(m, MOI.Integer())
@@ -1103,7 +1103,7 @@
         end
 
         @testset "Minimising" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             x, x_int = MOI.add_constrained_variable(m, MOI.Integer())
@@ -1396,13 +1396,13 @@
         end
 
         @testset "Predicate section" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
             @test_throws ErrorException CP.FlatZinc.parse_predicate!("", m)
         end
 
         @testset "Parameter section" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
             @test_throws ErrorException CP.FlatZinc.parse_parameter!("", m)
         end
@@ -1510,7 +1510,7 @@
             end
 
             @testset "Variable entry" begin
-                m = CP.FlatZinc.Optimizer()
+                m = CP.FlatZinc.Model()
                 @test MOI.is_empty(m)
 
                 moi_var_1 = CP.FlatZinc.parse_variable!("var bool: x1;", m)
@@ -1844,7 +1844,7 @@
 
             @testset "Array of mixed values to MOI variables" begin
                 @testset "Variables and Booleans" begin
-                    m = CP.FlatZinc.Optimizer()
+                    m = CP.FlatZinc.Model()
                     @test MOI.is_empty(m)
 
                     x = CP.FlatZinc.parse_variable!("var bool: x;", m)
@@ -1866,7 +1866,7 @@
                 end
 
                 @testset "Variables and integers" begin
-                    m = CP.FlatZinc.Optimizer()
+                    m = CP.FlatZinc.Model()
                     @test MOI.is_empty(m)
 
                     x = CP.FlatZinc.parse_variable!("var int: x;", m)
@@ -1885,7 +1885,7 @@
                 end
 
                 @testset "Variables and floats" begin
-                    m = CP.FlatZinc.Optimizer()
+                    m = CP.FlatZinc.Model()
                     @test MOI.is_empty(m)
 
                     x = CP.FlatZinc.parse_variable!("var float: x;", m)
@@ -1908,7 +1908,7 @@
             end
 
             @testset "Constraint entry" begin
-                m = CP.FlatZinc.Optimizer()
+                m = CP.FlatZinc.Model()
                 @test MOI.is_empty(m)
 
                 x1 = CP.FlatZinc.parse_variable!("var bool: x1;", m)
@@ -3789,7 +3789,7 @@
             end
 
             @testset "Solve entry" begin
-                m = CP.FlatZinc.Optimizer()
+                m = CP.FlatZinc.Model()
                 @test MOI.is_empty(m)
                 moi_var = CP.FlatZinc.parse_variable!("var bool: x1;", m)
                 @test MOI.get(m, MOI.ObjectiveSense()) == MOI.FEASIBILITY_SENSE
@@ -3810,7 +3810,7 @@
         end
 
         @testset "Base.read!" begin
-            m = CP.FlatZinc.Optimizer()
+            m = CP.FlatZinc.Model()
             @test MOI.is_empty(m)
 
             fzn = """var int: x1;

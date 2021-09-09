@@ -167,7 +167,7 @@ const FZN_UNPARSED_ARGUMENT_LIST = Vector{FZN_UNPARSED_ARGUMENT}
 const FZN_PARAMETER_TYPES_PREFIX =
     String["bool", "int", "float", "set of int", "array"]
 
-function Base.read!(io::IO, model::Optimizer)
+function Base.read!(io::IO, model::Model)
     if !MOI.is_empty(model)
         error("Cannot read in file because model is not empty.")
     end
@@ -244,17 +244,17 @@ end
 # - High-level parsing functions (FlatZinc items).
 # -----------------------------------------------------------------------------
 
-function parse_predicate!(::AbstractString, ::Optimizer)
+function parse_predicate!(::AbstractString, ::Model)
     error("Predicates are not supported.")
     return nothing
 end
 
-function parse_parameter!(::AbstractString, ::Optimizer)
+function parse_parameter!(::AbstractString, ::Model)
     error("Parameters are not supported.")
     return nothing
 end
 
-function parse_variable!(item::AbstractString, model::Optimizer)
+function parse_variable!(item::AbstractString, model::Model)
     # Typical input: "var int: x1;"
     # Complex input: "array [1..5] of var int: x1;"
     # Complex input: "var int: x1 :: some_annotation = some_value;"
@@ -323,7 +323,7 @@ function parse_variable!(item::AbstractString, model::Optimizer)
     return moi_var
 end
 
-function parse_constraint!(item::AbstractString, model::Optimizer)
+function parse_constraint!(item::AbstractString, model::Model)
     cons_verb, cons_args, cons_annotations = split_constraint(item)
     cons_verb = parse_constraint_verb(cons_verb)
     cons_args = split_constraint_arguments(cons_args)
@@ -338,7 +338,7 @@ function parse_constraint!(item::AbstractString, model::Optimizer)
     return nothing
 end
 
-function parse_solve!(item::AbstractString, model::Optimizer)
+function parse_solve!(item::AbstractString, model::Model)
     # Typical input: "solve satisfy;", "solve minimize x1;", "solve maximize x1;
     obj_sense, obj_var = CP.FlatZinc.split_solve(item)
 
@@ -381,32 +381,32 @@ function map_to_moi(var_type::FznVariableType)
     return mapping[var_type]
 end
 
-function mixed_var_int_to_moi_var(v::AbstractString, model::Optimizer)
+function mixed_var_int_to_moi_var(v::AbstractString, model::Model)
     return model.name_to_var[v]
 end
 
-function mixed_var_int_to_moi_var(v::Integer, model::Optimizer)
+function mixed_var_int_to_moi_var(v::Integer, model::Model)
     moi_var, _ = MOI.add_constrained_variable(model, MOI.Integer())
     MOI.add_constraint(model, MOI.SingleVariable(moi_var), MOI.EqualTo(v))
     return moi_var
 end
 
-function mixed_var_int_to_moi_var(v::Any, ::Optimizer)
+function mixed_var_int_to_moi_var(v::Any, ::Model)
     error("Unexpected literal: $v. Expected a variable or an integer.")
     return nothing
 end
 
-function mixed_var_bool_to_moi_var(v::AbstractString, model::Optimizer)
+function mixed_var_bool_to_moi_var(v::AbstractString, model::Model)
     return model.name_to_var[v]
 end
 
-function mixed_var_bool_to_moi_var(v::Bool, model::Optimizer)
+function mixed_var_bool_to_moi_var(v::Bool, model::Model)
     moi_var, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
     MOI.add_constraint(model, MOI.SingleVariable(moi_var), MOI.EqualTo(v))
     return moi_var
 end
 
-function mixed_var_bool_to_moi_var(v::Integer, model::Optimizer)
+function mixed_var_bool_to_moi_var(v::Integer, model::Model)
     moi_var, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
     moi_set = if v == 0
         MOI.EqualTo(false)
@@ -419,34 +419,34 @@ function mixed_var_bool_to_moi_var(v::Integer, model::Optimizer)
     return moi_var
 end
 
-function mixed_var_bool_to_moi_var(v::Any, ::Optimizer)
+function mixed_var_bool_to_moi_var(v::Any, ::Model)
     error("Unexpected literal: $v. Expected a variable or a Boolean.")
     return nothing
 end
 
-function mixed_var_float_to_moi_var(v::AbstractString, model::Optimizer)
+function mixed_var_float_to_moi_var(v::AbstractString, model::Model)
     return model.name_to_var[v]
 end
 
-function mixed_var_float_to_moi_var(v::Real, model::Optimizer)
+function mixed_var_float_to_moi_var(v::Real, model::Model)
     moi_var, _ = MOI.add_constrained_variable(model, MOI.EqualTo(v))
     return moi_var
 end
 
-function mixed_var_float_to_moi_var(v::Any, ::Optimizer)
+function mixed_var_float_to_moi_var(v::Any, ::Model)
     error("Unexpected literal: $v. Expected a variable or a Boolean.")
     return nothing
 end
 
-function array_mixed_var_int_to_moi_var(array::Vector, model::Optimizer)
+function array_mixed_var_int_to_moi_var(array::Vector, model::Model)
     return MOI.VariableIndex[mixed_var_int_to_moi_var(v, model) for v in array]
 end
 
-function array_mixed_var_bool_to_moi_var(array::Vector, model::Optimizer)
+function array_mixed_var_bool_to_moi_var(array::Vector, model::Model)
     return MOI.VariableIndex[mixed_var_bool_to_moi_var(v, model) for v in array]
 end
 
-function array_mixed_var_float_to_moi_var(array::Vector, model::Optimizer)
+function array_mixed_var_float_to_moi_var(array::Vector, model::Model)
     return MOI.VariableIndex[
         mixed_var_float_to_moi_var(v, model) for v in array
     ]
@@ -455,7 +455,7 @@ end
 function add_constraint_to_model(
     cons::FznConstraintIdentifier,
     args,
-    model::Optimizer,
+    model::Model,
 )
     return add_constraint_to_model(Val(cons), args, model)
 end
@@ -467,7 +467,7 @@ function add_constraint_to_model(
         Val{FznArrayFloatElement},
     },
     args,
-    model::Optimizer,
+    model::Model,
 )
     @assert length(args) == 3
     @assert typeof(args[1]) <: AbstractString
@@ -500,7 +500,7 @@ function add_constraint_to_model(
         Val{FznArrayFloatMinimum},
     },
     args,
-    model::Optimizer,
+    model::Model,
 )
     @assert length(args) == 2
     @assert typeof(args[1]) <: AbstractString
@@ -539,7 +539,7 @@ function add_constraint_to_model(
         Val{FznArrayVarFloatElement},
     },
     args,
-    model::Optimizer,
+    model::Model,
 )
     @assert length(args) == 3
     @assert typeof(args[1]) <: AbstractString
@@ -579,7 +579,7 @@ function add_constraint_to_model(
         Val{FznFloatNe},
     },
     args,
-    model::Optimizer,
+    model::Model,
 )
     @assert length(args) == 2
     @assert typeof(args[1]) <: AbstractString ||
@@ -701,7 +701,7 @@ function add_constraint_to_model(
         Val{FznFloatNeReif},
     },
     args,
-    model::Optimizer,
+    model::Model,
 )
     @assert length(args) == 3
     @assert typeof(args[1]) <: AbstractString ||
@@ -856,7 +856,7 @@ function add_constraint_to_model(
         Val{FznFloatLinNeReif},
     },
     args,
-    model::Optimizer,
+    model::Model,
 )
     if cons_verb ∈ [
         Val(FznIntLinEq),
@@ -1023,7 +1023,7 @@ function add_constraint_to_model(
         Val{FznFloatMin},
     },
     args,
-    model::Optimizer,
+    model::Model,
 )
     @assert length(args) == 3
     for i in 1:3
@@ -1053,7 +1053,7 @@ end
 function add_constraint_to_model(
     cons_verb::Union{Val{FznIntPlus}, Val{FznFloatPlus}},
     args,
-    model::Optimizer,
+    model::Model,
 )
     @assert length(args) == 3
     for i in 1:3
@@ -1091,7 +1091,7 @@ end
 # FznArrayBoolXor: not supported yet.
 # FznArrayVarBoolElement: implemented within FznArrayVarIntElement.
 
-function add_constraint_to_model(::Val{FznBoolToInt}, args, model::Optimizer)
+function add_constraint_to_model(::Val{FznBoolToInt}, args, model::Model)
     @assert length(args) == 2
     for i in 1:2
         @assert typeof(args[i]) <: AbstractString
@@ -1167,7 +1167,7 @@ end
 # FznFloatEqReif: implemented within FznIntEqReif.
 # FznFloatExp: not supported yet.
 
-function add_constraint_to_model(::Val{FznFloatIn}, args, model::Optimizer)
+function add_constraint_to_model(::Val{FznFloatIn}, args, model::Model)
     @assert length(args) == 3
     @assert typeof(args[1]) <: AbstractString
     @assert typeof(args[2]) <: Real
@@ -1184,7 +1184,7 @@ function add_constraint_to_model(::Val{FznFloatIn}, args, model::Optimizer)
     )
 end
 
-function add_constraint_to_model(::Val{FznFloatInReif}, args, model::Optimizer)
+function add_constraint_to_model(::Val{FznFloatInReif}, args, model::Model)
     @assert length(args) == 4
     @assert typeof(args[1]) <: AbstractString
     @assert typeof(args[2]) <: Real
@@ -1246,7 +1246,7 @@ end
 # FznArrayVarIntElement2DNonshifted: not supported yet.
 # FznArrayVarSetElement2DNonshifted: not supported yet.
 
-function add_constraint_to_model(::Val{FznIntToFloat}, args, model::Optimizer)
+function add_constraint_to_model(::Val{FznIntToFloat}, args, model::Model)
     @assert length(args) == 2
     for i in 1:2
         @assert typeof(args[i]) <: AbstractString

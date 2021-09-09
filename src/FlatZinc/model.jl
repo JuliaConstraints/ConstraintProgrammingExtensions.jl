@@ -18,7 +18,7 @@ mutable struct ConstraintInfo
     output_as_part_of_variable::Bool
 end
 
-mutable struct Optimizer <: MOI.AbstractOptimizer
+mutable struct Model <: MOI.AbstractOptimizer
     # A mapping from the MOI.VariableIndex to the variable object.
     # VariableInfo also stores some additional fields like the type of variable.
     variable_info::CleverDicts.CleverDict{MOI.VariableIndex, VariableInfo}
@@ -45,11 +45,11 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
     name_to_var::Dict{String, MOI.VariableIndex}
 
     """
-        Optimizer()
+        Model()
 
-    Create a new Optimizer object.
+    Create a new Model object.
     """
-    function Optimizer()
+    function Model()
         model = new()
         model.variable_info =
             CleverDicts.CleverDict{MOI.VariableIndex, VariableInfo}()
@@ -68,12 +68,12 @@ mutable struct Optimizer <: MOI.AbstractOptimizer
     end
 end
 
-function Base.show(io::IO, ::Optimizer)
+function Base.show(io::IO, ::Model)
     print(io, "A FlatZinc (fzn) model")
     return
 end
 
-function MOI.empty!(model::Optimizer)
+function MOI.empty!(model::Model)
     empty!(model.variable_info)
     empty!(model.constraint_info)
 
@@ -88,7 +88,7 @@ function MOI.empty!(model::Optimizer)
     return
 end
 
-function MOI.is_empty(model::Optimizer)
+function MOI.is_empty(model::Model)
     !isempty(model.variable_info) && return false
     !isempty(model.constraint_info) && return false
     model.objective_sense != MOI.FEASIBILITY_SENSE && return false
@@ -98,12 +98,12 @@ end
 
 # Set the objective.
 
-function MOI.get(model::Optimizer, ::MOI.ObjectiveFunction{MOI.SingleVariable})
+function MOI.get(model::Model, ::MOI.ObjectiveFunction{MOI.SingleVariable})
     return model.objective_function
 end
 
 function MOI.set(
-    model::Optimizer,
+    model::Model,
     ::MOI.ObjectiveFunction{MOI.SingleVariable},
     f::MOI.SingleVariable,
 )
@@ -111,12 +111,12 @@ function MOI.set(
     return nothing
 end
 
-function MOI.get(model::Optimizer, ::MOI.ObjectiveSense)
+function MOI.get(model::Model, ::MOI.ObjectiveSense)
     return model.objective_sense
 end
 
 function MOI.set(
-    model::Optimizer,
+    model::Model,
     ::MOI.ObjectiveSense,
     s::MOI.OptimizationSense,
 )
@@ -127,7 +127,7 @@ end
 # Helpers.
 
 function _create_variable(
-    model::Optimizer,
+    model::Model,
     set::Union{MOI.AbstractScalarSet, MOI.Reals},
 )
     index = CleverDicts.add_item(
@@ -139,7 +139,7 @@ function _create_variable(
 end
 
 function _create_constraint(
-    model::Optimizer,
+    model::Model,
     f::F,
     set::S,
     as_part_of_variable::Bool,
@@ -153,22 +153,22 @@ function _create_constraint(
 end
 
 # Fallback for copying operations.
-function MOI.copy_to(dest::Optimizer, src::MOI.ModelLike; kwargs...)
+function MOI.copy_to(dest::Model, src::MOI.ModelLike; kwargs...)
     return MOUI.automatic_copy_to(dest, src; kwargs...)
 end
 
-function MOIU.supports_default_copy_to(::Optimizer, ::Bool)
+function MOIU.supports_default_copy_to(::Model, ::Bool)
     return true
 end
 
 # Names. 
 # No support for constraint names in fzn, hence no ConstraintName.
 
-function MOI.get(model::Optimizer, ::MOI.VariableName, v::MOI.VariableIndex)
+function MOI.get(model::Model, ::MOI.VariableName, v::MOI.VariableIndex)
     return model.variable_info[v].name
 end
 
-function MOI.get(model::Optimizer, ::Type{MOI.VariableIndex}, n::String)::MOI.VariableIndex
+function MOI.get(model::Model, ::Type{MOI.VariableIndex}, n::String)::MOI.VariableIndex
     # TODO: test this.
     # TODO: not terribly efficient, and used in FZN for parsing a solution (finding a variable by its name). Rather build a dict to retrieve the indices faster.
     for i in keys(model.variable_info)
@@ -180,7 +180,7 @@ function MOI.get(model::Optimizer, ::Type{MOI.VariableIndex}, n::String)::MOI.Va
 end
 
 function MOI.set(
-    model::Optimizer,
+    model::Model,
     ::MOI.VariableName,
     v::MOI.VariableIndex,
     name::AbstractString,
@@ -192,7 +192,7 @@ end
 # Variables.
 
 function MOI.supports_add_constrained_variable(
-    ::Optimizer,
+    ::Model,
     ::Type{F},
 ) where {
     F <: Union{
@@ -211,7 +211,7 @@ function MOI.supports_add_constrained_variable(
 end
 
 function MOI.supports_add_constrained_variables(
-    ::Optimizer,
+    ::Model,
     ::Type{F},
 ) where {
     F <: Union{
@@ -229,12 +229,12 @@ function MOI.supports_add_constrained_variables(
     return true
 end
 
-function MOI.add_variable(model::Optimizer)
+function MOI.add_variable(model::Model)
     return _create_variable(model, MOI.Reals(1))
 end
 
 function MOI.add_constrained_variables(
-    model::Optimizer,
+    model::Model,
     sets::AbstractVector{<:MOI.AbstractScalarSet},
 )
     # TODO: memorise that these variables are part of the same call, so that 
@@ -248,7 +248,7 @@ function MOI.add_constrained_variables(
 end
 
 function MOI.add_constrained_variable(
-    model::Optimizer,
+    model::Model,
     set::MOI.AbstractScalarSet,
 )
     # Unlike FZN, MOI does not assume that a variable >= 0.0 is any different 
@@ -258,22 +258,22 @@ function MOI.add_constrained_variable(
     return vidx, cidx
 end
 
-function MOI.is_valid(model::Optimizer, v::MOI.VariableIndex)
+function MOI.is_valid(model::Model, v::MOI.VariableIndex)
     return haskey(model.variable_info, v)
 end
 
-function MOI.get(model::Optimizer, ::MOI.NumberOfVariables)
+function MOI.get(model::Model, ::MOI.NumberOfVariables)
     return length(model.variable_info)
 end
 
-function MOI.get(model::Optimizer, ::MOI.ListOfVariableIndices)
+function MOI.get(model::Model, ::MOI.ListOfVariableIndices)
     return collect(keys(model.variable_info))
 end
 
 # Constraints.
 
 function MOI.is_valid(
-    model::Optimizer,
+    model::Model,
     c::MOI.ConstraintIndex{F, S},
 ) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
     info = get(model.constraint_info, c.value, nothing)
@@ -281,7 +281,7 @@ function MOI.is_valid(
 end
 
 function MOI.add_constraint(
-    model::Optimizer,
+    model::Model,
     f::F,
     s::S,
 ) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
@@ -291,7 +291,7 @@ function MOI.add_constraint(
 end
 
 function MOI.get(
-    model::Optimizer,
+    model::Model,
     ::MOI.ConstraintFunction,
     c::MOI.ConstraintIndex{F, S},
 ) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
@@ -299,7 +299,7 @@ function MOI.get(
 end
 
 function MOI.get(
-    model::Optimizer,
+    model::Model,
     ::MOI.ConstraintSet,
     c::MOI.ConstraintIndex{F, S},
 ) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
@@ -307,119 +307,119 @@ function MOI.get(
 end
 
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.SingleVariable},
     ::Type{MOI.LessThan{Int}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.SingleVariable},
     ::Type{MOI.LessThan{Float64}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.SingleVariable},
     ::Type{CP.Strictly{MOI.LessThan{Float64}}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.SingleVariable},
     ::Type{CP.Domain{Int}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.SingleVariable},
     ::Type{MOI.Interval{Float64}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.VectorOfVariables},
     ::Type{CP.Element{Int}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.VectorOfVariables},
     ::Type{CP.Element{Bool}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.VectorOfVariables},
     ::Type{CP.Element{Float64}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.VectorOfVariables},
     ::Type{CP.MaximumAmong},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.VectorOfVariables},
     ::Type{CP.MinimumAmong},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.ScalarAffineFunction{Int}},
     ::Type{MOI.EqualTo{Int}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.ScalarAffineFunction{Int}},
     ::Type{MOI.LessThan{Int}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.ScalarAffineFunction{Int}},
     ::Type{CP.DifferentFrom{Int}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.ScalarAffineFunction{Float64}},
     ::Type{MOI.EqualTo{Float64}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.ScalarAffineFunction{Float64}},
     ::Type{MOI.LessThan{Float64}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.ScalarAffineFunction{Float64}},
     ::Type{CP.Strictly{MOI.LessThan{Float64}}},
 )
     return true
 end
 function MOI.supports_constraint(
-    ::Optimizer,
+    ::Model,
     ::Type{MOI.ScalarAffineFunction{Float64}},
     ::Type{CP.DifferentFrom{Float64}},
 )
@@ -427,7 +427,7 @@ function MOI.supports_constraint(
 end
 
 function MOI.get(
-    model::Optimizer,
+    model::Model,
     ::MOI.ListOfConstraintIndices{F, S},
 ) where {F, S}
     return [
@@ -436,7 +436,7 @@ function MOI.get(
     ]
 end
 
-function MOI.get(model::Optimizer, ::MOI.NumberOfConstraints{F, S}) where {F, S}
+function MOI.get(model::Model, ::MOI.NumberOfConstraints{F, S}) where {F, S}
     count = 0
     for c in model.constraint_info
         if typeof(c.f) == F && typeof(c.s) == S
@@ -446,7 +446,7 @@ function MOI.get(model::Optimizer, ::MOI.NumberOfConstraints{F, S}) where {F, S}
     return count
 end
 
-function MOI.get(model::Optimizer, ::MOI.ListOfConstraints)
+function MOI.get(model::Model, ::MOI.ListOfConstraints)
     types = Set{Tuple{Any, Any}}()
     for info in model.constraint_info
         push!(types, (typeof(info.f), typeof(info.s)))
