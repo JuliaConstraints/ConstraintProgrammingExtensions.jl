@@ -7,6 +7,12 @@
                 Dict("x" => [10])
             ]
         end
+
+        @testset "Infeasible" begin
+            # Output for an infeasible model.
+            out_string = "=====UNSATISFIABLE=====\r\n"
+            @test CP.FlatZinc._parse_to_assignments(out_string) == []
+        end
     
         @testset "basic.fzn" begin
             # Marker for the end of search: '=' ^ 10
