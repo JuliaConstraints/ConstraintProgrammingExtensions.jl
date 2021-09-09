@@ -283,7 +283,13 @@ function MOI.get(model::Optimizer, ::MOI.TerminationStatus)
 end
 
 function MOI.get(model::Optimizer, attr::MOI.VariablePrimal, vi::MOI.VariableIndex)
-    return model.results.primal_solutions[attr.N][vi]
+    if length(model.results.primal_solutions) >= attr.N
+        return model.results.primal_solutions[attr.N][vi]
+    else
+        # No solution with this number. In particular, with infeasibility,
+        # there is no solution, and this always returns nothing.
+        return nothing
+    end
 end
 
 MOI.supports(::Optimizer, ::MOI.SolveTime) = true
