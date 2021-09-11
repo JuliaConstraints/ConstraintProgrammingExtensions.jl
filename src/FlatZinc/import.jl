@@ -1733,7 +1733,7 @@ function split_variable_scalar(item::AbstractString)
         var_annotations = split(var_annotations, "::")
         var_annotations = map(strip, var_annotations)
     else
-        var_annotations = [""]
+        var_annotations = String[]
 
         if occursin('=', item)
             var_name, var_value = split(item, '=', limit=2)
