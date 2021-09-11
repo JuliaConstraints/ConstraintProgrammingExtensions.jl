@@ -6,7 +6,7 @@ using ConstraintProgrammingExtensions
 
 const MOI = MathOptInterface
 const MOIU = MOI.Utilities
-const MOIT = MOI.Test
+const MOIT = MOI.DeprecatedTest
 const CP = ConstraintProgrammingExtensions
 
 # Test sets.

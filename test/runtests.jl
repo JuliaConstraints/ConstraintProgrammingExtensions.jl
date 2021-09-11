@@ -8,7 +8,7 @@ const COIB = CP.Bridges
 const MOI = MathOptInterface
 const MOIB = MOI.Bridges
 const MOIBC = MOIB.Constraint
-const MOIT = MOI.Test
+const MOIT = MOI.DeprecatedTest
 const MOIU = MOI.Utilities
 
 include("Bridges/models.jl")
