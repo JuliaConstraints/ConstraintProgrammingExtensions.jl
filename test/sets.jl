@@ -616,6 +616,17 @@
                 @assert false
             end
         end
+        
+        @test CP.CumulativeResource(2) == CP.CumulativeResource(2)
+        @test CP.CumulativeResource(2) != CP.CumulativeResource(3)
+        @test CP.CumulativeResource(3) != CP.CumulativeResource(2)
+
+        s = CP.CumulativeResource(2)
+        @test typeof(copy(s)) <: CP.CumulativeResource{CP.NO_DEADLINE_CUMULATIVE_RESOURCE}
+        @test copy(s) == s
+
+        @test MOI.dimension(CP.CumulativeResource(2)) == 2 * 3 + 1
+        @test MOI.dimension(CP.CumulativeResource(3)) == 3 * 3 + 1
     end
 
     @testset "BinPacking family" begin
