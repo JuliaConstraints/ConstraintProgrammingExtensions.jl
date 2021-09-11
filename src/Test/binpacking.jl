@@ -4,7 +4,7 @@ function binpacking_vectorofvariables_test(
 )
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     @test MOI.supports_constraint(
         model,
         MOI.ScalarAffineFunction{Int},
@@ -51,7 +51,7 @@ function binpacking_scalaraffinefunction_test(
 )
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     @test MOI.supports_constraint(
         model,
         MOI.ScalarAffineFunction{Int},
@@ -71,7 +71,7 @@ function binpacking_scalaraffinefunction_test(
 
     c1 = MOI.add_constraint(
         model,
-        MOIU.vectorize(MOI.SingleVariable.([x1, x2, x3])),
+        MOIU.vectorize(MOI.VariableIndex.([x1, x2, x3])),
         CP.BinPacking{CP.NO_CAPACITY_BINPACKING}(1, 2, [w1, w2]),
     )
 
@@ -96,7 +96,7 @@ end
 #     model = OPTIMIZER
 #     MOI.empty!(model)
 
-#     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+#     @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
 #     @test MOI.supports_constraint(model, MOI.ScalarAffineFunction{Int}, MOI.EqualTo{Int})
 #     @test MOI.supports_constraint(model, MOI.VectorAffineFunction{Int}, CP.BinPacking)
 

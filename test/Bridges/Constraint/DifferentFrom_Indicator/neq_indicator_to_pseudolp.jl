@@ -6,7 +6,7 @@
         COIB.Indicator1DifferentFrom2PseudoMILP{T}(mock)
     end
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.ZeroOne)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
@@ -32,7 +32,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x, y])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.([x, y]))
+        MOIU.vectorize(MOI.VariableIndex.([x, y]))
     else
         @assert false
     end

@@ -7,7 +7,7 @@ The implemented model is highly similar to that of [`Sort2MILPBridge`](@ref).
 struct SortPermutation2MILPBridge{T} <: MOIBC.AbstractBridge
     vars_flow::Matrix{MOI.VariableIndex}
     vars_unicity::Matrix{MOI.VariableIndex}
-    vars_unicity_bin::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    vars_unicity_bin::Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     cons_transportation_x::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
     cons_transportation_y::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
     cons_unicity_x::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
@@ -55,7 +55,7 @@ function MOIBC.bridge_constraint(
     # Create the new variables.
     vars_flow = Matrix{MOI.VariableIndex}(undef, dim, dim)
     vars_unicity = Matrix{MOI.VariableIndex}(undef, dim, dim)
-    vars_unicity_bin = Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}(undef, dim, dim)
+    vars_unicity_bin = Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}(undef, dim, dim)
     for i in 1:dim
         vars_flow[i, :] = MOI.add_variables(model, dim)
         vars_unicity[i, :], vars_unicity_bin[i, :] = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:dim])
@@ -65,7 +65,7 @@ function MOIBC.bridge_constraint(
     cons_transportation_x = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
         MOI.add_constraint(
             model, 
-            f_sorted[i] - sum(one(T) .* MOI.SingleVariable.(vars_flow[i, :])),
+            f_sorted[i] - sum(one(T) .* MOI.VariableIndex.(vars_flow[i, :])),
             MOI.EqualTo(zero(T))
         )
         for i in 1:dim
@@ -73,7 +73,7 @@ function MOIBC.bridge_constraint(
     cons_transportation_y = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
         MOI.add_constraint(
             model, 
-            f_to_sort[j] - sum(one(T) .* MOI.SingleVariable.(vars_flow[:, j])),
+            f_to_sort[j] - sum(one(T) .* MOI.VariableIndex.(vars_flow[:, j])),
             MOI.EqualTo(zero(T))
         )
         for j in 1:dim
@@ -83,7 +83,7 @@ function MOIBC.bridge_constraint(
     cons_unicity_x = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
         MOI.add_constraint(
             model, 
-            sum(one(T) .* MOI.SingleVariable.(vars_unicity[i, :])),
+            sum(one(T) .* MOI.VariableIndex.(vars_unicity[i, :])),
             MOI.EqualTo(one(T))
         )
         for i in 1:dim
@@ -91,7 +91,7 @@ function MOIBC.bridge_constraint(
     cons_unicity_y = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
         MOI.add_constraint(
             model, 
-            sum(one(T) .* MOI.SingleVariable.(vars_unicity[:, j])),
+            sum(one(T) .* MOI.VariableIndex.(vars_unicity[:, j])),
             MOI.EqualTo(one(T))
         )
         for j in 1:dim
@@ -107,12 +107,12 @@ function MOIBC.bridge_constraint(
         for j in 1:dim
             cons_flow_gt[i, j] = MOI.add_constraint(
                 model, 
-                MOI.SingleVariable(vars_flow[i, j]) - U * MOI.SingleVariable(vars_unicity[i, j]),
+                vars_flow[i, j] - U * vars_unicity[i, j],
                 MOI.GreaterThan(zero(T))
             )
             cons_flow_lt[i, j] = MOI.add_constraint(
                 model, 
-                MOI.SingleVariable(vars_flow[i, j]) - L * MOI.SingleVariable(vars_unicity[i, j]),
+                vars_flow[i, j] - L * vars_unicity[i, j],
                 MOI.LessThan(zero(T))
             )
         end
@@ -132,7 +132,7 @@ function MOIBC.bridge_constraint(
     cons_perm = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
         MOI.add_constraint(
             model, 
-            f_perm[i] - sum(T(j) * MOI.SingleVariable(vars_unicity[i, j]) for j in 1:dim),
+            f_perm[i] - sum(T(j) * vars_unicity[i, j] for j in 1:dim),
             MOI.EqualTo(zero(T))
         )
         for i in 1:dim
@@ -180,7 +180,7 @@ end
 function MOI.get(
     b::SortPermutation2MILPBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return length(b.vars_unicity)
@@ -223,7 +223,7 @@ end
 function MOI.get(
     b::SortPermutation2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return copy(b.vars_unicity_bin)

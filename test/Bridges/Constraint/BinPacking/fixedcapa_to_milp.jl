@@ -3,7 +3,7 @@
     model = COIB.FixedCapacityBinPacking2MILP{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -52,9 +52,9 @@
         end
     elseif fct_type == "vector affine function"
         if n_bins == 1
-            MOIU.vectorize(MOI.SingleVariable.([x_load_1, x_bin_1, x_bin_2]))
+            MOIU.vectorize(MOI.VariableIndex.([x_load_1, x_bin_1, x_bin_2]))
         elseif n_bins == 2
-            MOIU.vectorize(MOI.SingleVariable.([x_load_1, x_load_2, x_bin_1, x_bin_2]))
+            MOIU.vectorize(MOI.VariableIndex.([x_load_1, x_load_2, x_bin_1, x_bin_2]))
         else
             @assert false
         end
@@ -82,12 +82,12 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == n_bins * n_items
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == n_bins * n_items
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == n_bins * n_items
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == n_bins + 2 * n_items
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == n_bins
 
         @test Set(MOI.get(bridge, MOI.ListOfVariableIndices())) == Set(bridge.assign_var)
-        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}())) == Set(bridge.assign_con)
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}())) == Set(bridge.assign_con)
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}())) == Set([bridge.assign_unique..., bridge.assign_number..., bridge.assign_load...])
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}())) == Set(bridge.load_capacity)
     end

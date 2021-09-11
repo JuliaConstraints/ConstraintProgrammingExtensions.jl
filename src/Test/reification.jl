@@ -4,8 +4,8 @@ function reification_singlevariable_test(
 )
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.EqualTo{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{Int})
     @test MOI.supports_constraint(
         model,
         MOI.VectorOfVariables,
@@ -40,7 +40,7 @@ function reification_scalaraffinefunction_test(
 )
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     @test MOI.supports_constraint(
         model,
         MOI.ScalarAffineFunction{Int},
@@ -55,8 +55,8 @@ function reification_scalaraffinefunction_test(
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
 
-    c1 = MOI.add_constraint(model, 1 * MOI.SingleVariable(x2), MOI.EqualTo(1))
-    c2 = MOI.add_constraint(model, MOIU.vectorize(MOI.SingleVariable.([x1, x2])), CP.Reification(MOI.EqualTo(2)))
+    c1 = MOI.add_constraint(model, 1 * x2, MOI.EqualTo(1))
+    c2 = MOI.add_constraint(model, MOIU.vectorize(MOI.VariableIndex.([x1, x2])), CP.Reification(MOI.EqualTo(2)))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)

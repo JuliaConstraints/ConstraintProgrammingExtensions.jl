@@ -2,7 +2,7 @@
     mock = MOIU.MockOptimizer(DisjunctionModel{T}())
     model = COIB.NonOverlappingOrthotopes2DisjunctionLP{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.ZeroOne)
     if fct_type == "vector of variables"
         @test MOI.supports_constraint(
             model,
@@ -86,7 +86,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x)
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x))
+        MOIU.vectorize(MOI.VariableIndex.(x))
     else
         @assert false
     end
@@ -161,7 +161,7 @@
 
                         # Doesn't work, because == requires that the order 
                         # of the terms is the same.
-                        # @test f1 == one(T) * MOI.SingleVariable(x_pos[(i - 1) * dim + d]) + one(T) * MOI.SingleVariable(x_sze[(i - 1) * dim + d]) - one(T) * MOI.SingleVariable(x_pos[(j - 1) * dim + d])
+                        # @test f1 == one(T) * x_pos[(i - 1) * dim + d] + one(T) * x_sze[(i - 1) * dim + d] - one(T) * x_pos[(j - 1) * dim + d]
 
                         t = f1.terms[1]
                         @test t.coefficient === one(T)

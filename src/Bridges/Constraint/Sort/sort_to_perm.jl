@@ -3,7 +3,7 @@ Bridges `CP.Sort` to `CP.SortPermutation` by adding index variables.
 """
 struct Sort2SortPermutationBridge{T} <: MOIBC.AbstractBridge
     vars::Vector{MOI.VariableIndex}
-    vars_int::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}}
+    vars_int::Vector{MOI.ConstraintIndex{MOI.VariableIndex, MOI.Integer}}
     con_perm::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.SortPermutation}
 end
 
@@ -42,7 +42,7 @@ function MOIBC.bridge_constraint(
         MOIU.vectorize(
             MOI.ScalarAffineFunction{T}[
                 f_scalars...,
-                (one(T) .* MOI.SingleVariable.(vars))...
+                (one(T) .* MOI.VariableIndex.(vars))...
             ]
         ),
         CP.SortPermutation(dim)
@@ -76,7 +76,7 @@ end
 function MOI.get(
     b::Sort2SortPermutationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.Integer,
+        MOI.VariableIndex, MOI.Integer,
     },
 ) where {T}
     return length(b.vars)
@@ -101,7 +101,7 @@ end
 function MOI.get(
     b::Sort2SortPermutationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.Integer,
+        MOI.VariableIndex, MOI.Integer,
     },
 ) where {T}
     return copy(b.vars_int)

@@ -4,7 +4,7 @@ assignment and MILP constraints.
 """
 struct BinPacking2MILPBridge{BPCT, T} <: MOIBC.AbstractBridge
     assign_var::Matrix{MOI.VariableIndex}
-    assign_con::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    assign_con::Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     assign_unique::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
     assign_number::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
     assign_load::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
@@ -42,7 +42,7 @@ function MOIBC.bridge_constraint(
     # Add the assignment variables. Indexed first by item, then by bin: 
     # first item, all bins; second item, all bins; etc.
     assign_var = Matrix{MOI.VariableIndex}(undef, s.n_items, s.n_bins)
-    assign_con = Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}(undef, s.n_items, s.n_bins)
+    assign_con = Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}(undef, s.n_items, s.n_bins)
     for item in 1:s.n_items
         assign_var[item, :], assign_con[item, :] = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:s.n_bins])
     end
@@ -50,21 +50,21 @@ function MOIBC.bridge_constraint(
     # Each item is assigned to exactly one bin.
     assign_unique = Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}(undef, s.n_items)
     for item in 1:s.n_items
-        assign_unique_f = dot(MOI.SingleVariable.(assign_var[item, :]), ones(T, s.n_bins))
+        assign_unique_f = dot(MOI.VariableIndex.(assign_var[item, :]), ones(T, s.n_bins))
         assign_unique[item] = MOI.add_constraint(model, assign_unique_f, MOI.EqualTo(one(T)))
     end
 
     # Relate the assignment to the number of the bin to which the item is assigned.
     assign_number = Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}(undef, s.n_items)
     for item in 1:s.n_items
-        assign_number_f = dot(T.(collect(1:s.n_bins)), MOI.SingleVariable.(assign_var[item, :])) - f_assigned[item]
+        assign_number_f = dot(T.(collect(1:s.n_bins)), MOI.VariableIndex.(assign_var[item, :])) - f_assigned[item]
         assign_number[item] = MOI.add_constraint(model, assign_number_f, MOI.EqualTo(zero(T)))
     end
 
     # Relate the assignment to the load.
     assign_load = Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}(undef, s.n_bins)
     for bin in 1:s.n_bins
-        assign_load_f = dot(s.weights, MOI.SingleVariable.(assign_var[:, bin])) - f_load[bin]
+        assign_load_f = dot(s.weights, MOI.VariableIndex.(assign_var[:, bin])) - f_load[bin]
         assign_load[bin] = MOI.add_constraint(model, assign_load_f, MOI.EqualTo(zero(T)))
     end
 
@@ -147,7 +147,7 @@ end
 function MOI.get(
     b::BinPacking2MILPBridge{BPCT, T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable,
+        MOI.VariableIndex,
         MOI.ZeroOne,
     },
 ) where {BPCT, T}
@@ -184,9 +184,9 @@ end
 function MOI.get(
     b::BinPacking2MILPBridge{BPCT, T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable,
+        MOI.VariableIndex,
         MOI.ZeroOne,
     },
-)::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}} where {BPCT, T}
+)::Vector{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}} where {BPCT, T}
     return vec(b.assign_con)
 end

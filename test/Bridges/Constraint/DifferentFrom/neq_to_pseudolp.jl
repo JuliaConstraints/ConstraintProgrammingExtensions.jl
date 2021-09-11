@@ -3,7 +3,7 @@
     model = COIB.DifferentFrom2PseudoMILP{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -27,9 +27,9 @@
     end
 
     fct = if fct_type == "single variable"
-        MOI.SingleVariable(x)
+        x
     elseif fct_type == "scalar affine function"
-        one(T) * MOI.SingleVariable(x)
+        one(T) * x
     else
         @assert false
     end
@@ -39,7 +39,7 @@
     @test MOI.is_valid(model, c)
 
     bridge = if fct_type == "single variable"
-        MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.SingleVariable, CP.DifferentFrom{T}}(x.value)]
+        MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VariableIndex, CP.DifferentFrom{T}}(x.value)]
     elseif fct_type == "scalar affine function"
         MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T}}(1)] # Why a 1 for this specific case? Usually, it's -1.
     else
@@ -53,7 +53,7 @@
         if T == Int
             @test MOIB.added_constraint_types(typeof(bridge)) == [
                 (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
-                (MOI.SingleVariable, MOI.GreaterThan{T}),
+                (MOI.VariableIndex, MOI.GreaterThan{T}),
             ]
         elseif T == Bool
             @test MOIB.added_constraint_types(typeof(bridge)) == [
@@ -62,7 +62,7 @@
         elseif T == Float64
             @test MOIB.added_constraint_types(typeof(bridge)) == [
                 (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
-                (MOI.SingleVariable, CP.Strictly{MOI.GreaterThan{T}}),
+                (MOI.VariableIndex, CP.Strictly{MOI.GreaterThan{T}}),
             ]
         else
             @assert false

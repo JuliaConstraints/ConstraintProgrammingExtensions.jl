@@ -2,7 +2,7 @@
     mock = MOIU.MockOptimizer(MILPModel{T}())
     model = COIB.Element2MILP{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     @test MOI.supports_constraint(
         model,
         MOI.ScalarAffineFunction{T},
@@ -25,7 +25,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_value, x_index])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.([x_value, x_index]))
+        MOIU.vectorize(MOI.VariableIndex.([x_value, x_index]))
     else
         @assert false
     end
@@ -45,11 +45,11 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == dim
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == dim
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == dim
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == 3
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == bridge.vars
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == bridge.vars_bin
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}()) == bridge.vars_bin
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.con_unary, bridge.con_choose_one, bridge.con_value]
     end
 
@@ -58,7 +58,7 @@
         for i in 1:dim
             @test MOI.is_valid(model, bridge.vars[i])
             @test MOI.is_valid(model, bridge.vars_bin[i])
-            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_bin[i]) == MOI.SingleVariable(bridge.vars[i])
+            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_bin[i]) == bridge.vars[i]
             @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_bin[i]) == MOI.ZeroOne()
         end
     end

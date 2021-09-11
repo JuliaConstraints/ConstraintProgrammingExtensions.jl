@@ -4,7 +4,7 @@
     model = COIB.SortPermutation2AllDifferent{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -31,7 +31,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x)
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x))
+        MOIU.vectorize(MOI.VariableIndex.(x))
     else
         @assert false
     end

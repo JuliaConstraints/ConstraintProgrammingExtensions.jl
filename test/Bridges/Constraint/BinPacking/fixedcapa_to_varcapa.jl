@@ -3,7 +3,7 @@
     model = COIB.FixedCapacityBinPacking2VariableCapacityBinPacking{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -57,9 +57,9 @@
         end
     elseif fct_type == "vector affine function"
         if n_bins == 1
-            MOIU.vectorize(MOI.SingleVariable.([x_load_1, x_bin_1, x_bin_2]))
+            MOIU.vectorize(MOI.VariableIndex.([x_load_1, x_bin_1, x_bin_2]))
         elseif n_bins == 2
-            MOIU.vectorize(MOI.SingleVariable.([x_load_1, x_load_2, x_bin_1, x_bin_2]))
+            MOIU.vectorize(MOI.VariableIndex.([x_load_1, x_load_2, x_bin_1, x_bin_2]))
         else
             @assert false
         end
@@ -93,12 +93,12 @@
         ])
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == n_bins
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == ((T == Int) ? n_bins : 0)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.Integer}()) == ((T == Int) ? n_bins : 0)
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == n_bins
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T}}()) == 1
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == bridge.capa_var
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.Integer}()) == bridge.capa_con
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.Integer}()) == bridge.capa_con
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == bridge.capa_bound
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.BinPacking{CP.VARIABLE_CAPACITY_BINPACKING, T}}()) == [bridge.bp]
     end

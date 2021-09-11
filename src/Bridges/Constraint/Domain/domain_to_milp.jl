@@ -4,7 +4,7 @@ combination.
 """
 struct Domain2MILPBridge{T} <: MOIBC.AbstractBridge
     vars::Vector{MOI.VariableIndex}
-    vars_bin::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    vars_bin::Vector{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     con_choose_one::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
     con_value::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
 end
@@ -12,7 +12,7 @@ end
 function MOIBC.bridge_constraint(
     ::Type{Domain2MILPBridge{T}},
     model,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::CP.Domain{T},
 ) where {T}
     return MOIBC.bridge_constraint(
@@ -33,7 +33,7 @@ function MOIBC.bridge_constraint(
 
     con_choose_one = MOI.add_constraint(
         model,
-        sum(one(T) .* MOI.SingleVariable.(vars)),
+        sum(one(T) .* MOI.VariableIndex.(vars)),
         MOI.EqualTo(one(T))
     )
     
@@ -41,7 +41,7 @@ function MOIBC.bridge_constraint(
 
     con_value = MOI.add_constraint(
         model,
-        f - sum(one(T) * MOI.SingleVariable(vars[i]) * values[i] for i in 1:length(s.values)),
+        f - sum(one(T) * vars[i] * values[i] for i in 1:length(s.values)),
         MOI.EqualTo(zero(T))
     )
 
@@ -50,7 +50,7 @@ end
 
 function MOI.supports_constraint(
     ::Type{Domain2MILPBridge{T}},
-    ::Union{Type{MOI.SingleVariable}, Type{MOI.ScalarAffineFunction{T}}},
+    ::Union{Type{MOI.VariableIndex}, Type{MOI.ScalarAffineFunction{T}}},
     ::Type{CP.Domain{T}},
 ) where {T}
     return true
@@ -73,7 +73,7 @@ end
 function MOI.get(
     b::Domain2MILPBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return length(b.vars_bin)
@@ -98,7 +98,7 @@ end
 function MOI.get(
     b::Domain2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return copy(b.vars_bin)

@@ -2,7 +2,7 @@
     mock = MOIU.MockOptimizer(MILPModel{T}())
     model = COIB.ElementVariableArray2MILP{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     @test MOI.supports_constraint(
         model,
         MOI.ScalarAffineFunction{T},
@@ -26,7 +26,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_value, x_index, x_array...])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.([x_value, x_index, x_array...]))
+        MOIU.vectorize(MOI.VariableIndex.([x_value, x_index, x_array...]))
     else
         @assert false
     end
@@ -34,7 +34,7 @@
     @test_throws AssertionError MOI.add_constraint(model, fct, CP.ElementVariableArray(dim))
 
     for i in 1:dim
-        MOI.add_constraint(model, MOI.SingleVariable(x_array[i]), MOI.Interval(zero(T), one(T)))
+        MOI.add_constraint(model, x_array[i], MOI.Interval(zero(T), one(T)))
     end
 
     c = MOI.add_constraint(model, fct, CP.ElementVariableArray(dim))
@@ -62,15 +62,15 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 2 * dim
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == dim
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == ((T == Int) ? dim : 0)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == dim
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.Integer}()) == ((T == Int) ? dim : 0)
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == 3
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == dim
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == dim
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == vcat(bridge.vars_unary, bridge.vars_product)
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == bridge.vars_unary_bin
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.Integer}()) == bridge.vars_product_int
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}()) == bridge.vars_unary_bin
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.Integer}()) == bridge.vars_product_int
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.con_unary, bridge.con_choose_one, bridge.con_value]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == bridge.con_product_lt
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == bridge.con_product_gt
@@ -83,7 +83,7 @@
         for i in 1:dim
             @test MOI.is_valid(model, bridge.vars_unary[i])
             @test MOI.is_valid(model, bridge.vars_unary_bin[i])
-            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_unary_bin[i]) == MOI.SingleVariable(bridge.vars_unary[i])
+            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_unary_bin[i]) == bridge.vars_unary[i]
             @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_unary_bin[i]) == MOI.ZeroOne()
         end
     end
@@ -97,7 +97,7 @@
 
             if T == Int
                 @test MOI.is_valid(model, bridge.vars_product_int[i])
-                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_product_int[i]) == MOI.SingleVariable(bridge.vars_product[i])
+                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_product_int[i]) == bridge.vars_product[i]
                 @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_product_int[i]) == MOI.Integer()
             end
         end

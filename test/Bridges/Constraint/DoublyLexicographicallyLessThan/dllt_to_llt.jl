@@ -2,7 +2,7 @@
     mock = MOIU.MockOptimizer(LexicographicallyLessThanModel{T}())
     model = COIB.DoublyLexicographicallyLessThan2LexicographicallyLessThan{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.ZeroOne)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
@@ -23,7 +23,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x_array)
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x_array))
+        MOIU.vectorize(MOI.VariableIndex.(x_array))
     else
         @assert false
     end

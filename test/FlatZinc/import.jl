@@ -393,14 +393,14 @@
             @test MOI.get(m, MOI.NumberOfVariables()) == 1
             @test MOI.get(
                 m,
-                MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}(),
+                MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}(),
             ) == 1
             @test length(m.variable_info) == 1
             @test m.variable_info[moi_var_1] !== nothing
             @test m.variable_info[moi_var_1].name == "x1"
             @test m.variable_info[moi_var_1].set == MOI.ZeroOne()
             @test length(m.constraint_info) == 1
-            @test m.constraint_info[1].f == MOI.SingleVariable(moi_var_1)
+            @test m.constraint_info[1].f == moi_var_1
             @test m.constraint_info[1].s == MOI.ZeroOne()
             @test m.constraint_info[1].output_as_part_of_variable
 
@@ -414,14 +414,14 @@
             @test MOI.get(m, MOI.NumberOfVariables()) == 2
             @test MOI.get(
                 m,
-                MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}(),
+                MOI.NumberOfConstraints{MOI.VariableIndex, MOI.Integer}(),
             ) == 1
             @test length(m.variable_info) == 2
             @test m.variable_info[moi_var_2] !== nothing
             @test m.variable_info[moi_var_2].name == "x2"
             @test m.variable_info[moi_var_2].set == MOI.Integer()
             @test length(m.constraint_info) == 2
-            @test m.constraint_info[2].f == MOI.SingleVariable(moi_var_2)
+            @test m.constraint_info[2].f == moi_var_2
             @test m.constraint_info[2].s == MOI.Integer()
             @test m.constraint_info[2].output_as_part_of_variable
 
@@ -439,17 +439,17 @@
             @test MOI.get(m, MOI.NumberOfVariables()) == 4
             @test MOI.get(
                 m,
-                MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}(),
+                MOI.NumberOfConstraints{MOI.VariableIndex, MOI.Integer}(),
             ) == 2
             @test length(m.variable_info) == 4
             @test m.variable_info[moi_var_4] !== nothing
             @test m.variable_info[moi_var_4].name == "x4"
             @test m.variable_info[moi_var_4].set == MOI.Integer()
             @test length(m.constraint_info) == 4
-            @test m.constraint_info[3].f == MOI.SingleVariable(moi_var_4)
+            @test m.constraint_info[3].f == moi_var_4
             @test m.constraint_info[3].s == MOI.Integer()
             @test m.constraint_info[3].output_as_part_of_variable
-            @test m.constraint_info[4].f == MOI.SingleVariable(moi_var_4)
+            @test m.constraint_info[4].f == Mmoi_var_4
             @test m.constraint_info[4].s == MOI.Interval(0, 7)
             @test !m.constraint_info[4].output_as_part_of_variable
 
@@ -461,7 +461,7 @@
             @test m.variable_info[moi_var_5].name == "x5"
             @test m.variable_info[moi_var_5].set == MOI.Reals(1)
             @test length(m.constraint_info) == 5
-            @test m.constraint_info[5].f == MOI.SingleVariable(moi_var_5)
+            @test m.constraint_info[5].f == moi_var_5
             @test m.constraint_info[5].s == MOI.Interval(0.0, 7.0)
             @test !m.constraint_info[5].output_as_part_of_variable
 
@@ -470,17 +470,17 @@
             @test MOI.get(m, MOI.NumberOfVariables()) == 6
             @test MOI.get(
                 m,
-                MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}(),
+                MOI.NumberOfConstraints{MOI.VariableIndex, MOI.Integer}(),
             ) == 3
             @test length(m.variable_info) == 6
             @test m.variable_info[moi_var_6] !== nothing
             @test m.variable_info[moi_var_6].name == "x6"
             @test m.variable_info[moi_var_6].set == MOI.Integer()
             @test length(m.constraint_info) == 7
-            @test m.constraint_info[6].f == MOI.SingleVariable(moi_var_6)
+            @test m.constraint_info[6].f == moi_var_6
             @test m.constraint_info[6].s == MOI.Integer()
             @test m.constraint_info[6].output_as_part_of_variable
-            @test m.constraint_info[7].f == MOI.SingleVariable(moi_var_6)
+            @test m.constraint_info[7].f == moi_var_6
             @test m.constraint_info[7].s == CP.Domain(Set([0, 7]))
             @test !m.constraint_info[7].output_as_part_of_variable
 
@@ -493,7 +493,7 @@
             @test m.variable_info[moi_var_7].name == "x7"
             @test m.variable_info[moi_var_7].set == MOI.Reals(1)
             @test length(m.constraint_info) == 8
-            @test m.constraint_info[8].f == MOI.SingleVariable(moi_var_7)
+            @test m.constraint_info[8].f == moi_var_7
             @test m.constraint_info[8].s == CP.Domain(Set([0.0, 7.0]))
             @test !m.constraint_info[8].output_as_part_of_variable
 
@@ -816,11 +816,11 @@
             )
             for i in 1:3
                 nc += 1
-                @test typeof(m.constraint_info[nc].f) <: MOI.SingleVariable
+                @test typeof(m.constraint_info[nc].f) <: MOI.VariableIndex
                 @test m.constraint_info[nc].s == MOI.Integer()
 
                 nc += 1
-                @test typeof(m.constraint_info[nc].f) <: MOI.SingleVariable
+                @test typeof(m.constraint_info[nc].f) <: MOI.VariableIndex
                 @test typeof(m.constraint_info[nc].s) <: MOI.EqualTo{Int}
             end
             nc += 1
@@ -846,11 +846,11 @@
             )
             for i in 1:3
                 nc += 1
-                @test typeof(m.constraint_info[nc].f) <: MOI.SingleVariable
+                @test typeof(m.constraint_info[nc].f) <: MOI.VariableIndex
                 @test m.constraint_info[nc].s == MOI.Integer()
                 nc += 1
 
-                @test typeof(m.constraint_info[nc].f) <: MOI.SingleVariable
+                @test typeof(m.constraint_info[nc].f) <: MOI.VariableIndex
                 @test typeof(m.constraint_info[nc].s) <: MOI.EqualTo{Int}
             end
             nc += 1
@@ -897,7 +897,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
+                  MOI.ScalarAffineFunction # Equivalent to: x4
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
             @test m.constraint_info[nc].f.terms[1].variabl == x4
@@ -907,7 +907,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
+                  MOI.ScalarAffineFunction # Equivalent to: x3
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
             @test m.constraint_info[nc].f.terms[1].variabl == x3
@@ -1001,7 +1001,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x4).
+                  MOI.ScalarAffineFunction{Int} # Equivalent to x4.
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === -1
@@ -1012,7 +1012,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x3).
+                  MOI.ScalarAffineFunction{Int} # Equivalent to x3.
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
@@ -1236,7 +1236,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x4).
+                  MOI.ScalarAffineFunction{Int} # Equivalent to x4.
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === -1
@@ -1247,7 +1247,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x3).
+                  MOI.ScalarAffineFunction{Int} # Equivalent to x3.
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
@@ -1369,7 +1369,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
+                  MOI.ScalarAffineFunction # Equivalent to: x4
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
             @test m.constraint_info[nc].f.terms[1].variabl == x4
@@ -1379,7 +1379,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
+                  MOI.ScalarAffineFunction # Equivalent to: x3
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
             @test m.constraint_info[nc].f.terms[1].variabl == x3
@@ -1523,7 +1523,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
+                  MOI.ScalarAffineFunction # Equivalent to: x4
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
             @test m.constraint_info[nc].f.terms[1].variabl == x4
@@ -1533,7 +1533,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
+                  MOI.ScalarAffineFunction # Equivalent to: x3
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
             @test m.constraint_info[nc].f.terms[1].variabl == x3
@@ -1627,7 +1627,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x4).
+                  MOI.ScalarAffineFunction{Int} # Equivalent to x4.
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === -1
@@ -1638,7 +1638,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x3).
+                  MOI.ScalarAffineFunction{Int} # Equivalent to x3.
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
@@ -1765,7 +1765,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x4).
+                  MOI.ScalarAffineFunction{Int} # Equivalent to x4.
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === -1
@@ -1776,7 +1776,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction{Int} # Equivalent to MOI.SingleVariable(x3).
+                  MOI.ScalarAffineFunction{Int} # Equivalent to x3.
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
@@ -1872,7 +1872,7 @@
             )
             for i in 1:3
                 nc += 1
-                @test typeof(m.constraint_info[nc].f) <: MOI.SingleVariable
+                @test typeof(m.constraint_info[nc].f) <: MOI.VariableIndex
                 @test typeof(m.constraint_info[nc].s) <:
                       MOI.EqualTo{Float64}
             end
@@ -1899,7 +1899,7 @@
             )
             for i in 1:3
                 nc += 1
-                @test typeof(m.constraint_info[nc].f) <: MOI.SingleVariable
+                @test typeof(m.constraint_info[nc].f) <: MOI.VariableIndex
                 @test typeof(m.constraint_info[nc].s) <:
                       MOI.EqualTo{Float64}
             end
@@ -1947,7 +1947,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
+                  MOI.ScalarAffineFunction # Equivalent to: x4
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
             @test m.constraint_info[nc].f.terms[1].variabl == x4
@@ -1957,7 +1957,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
+                  MOI.ScalarAffineFunction # Equivalent to: x3
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
             @test m.constraint_info[nc].f.terms[1].variabl == x3
@@ -2040,7 +2040,7 @@
             )
             nc += 1
             @test length(m.constraint_info) == nc
-            @test m.constraint_info[nc].f == MOI.SingleVariable(x5)
+            @test m.constraint_info[nc].f == x5
             @test m.constraint_info[nc].s == MOI.Interval(1.0, 2.0)
 
             CP.FlatZinc.parse_constraint!(
@@ -2070,7 +2070,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction{Float64} # Equivalent to MOI.SingleVariable(x4).
+                  MOI.ScalarAffineFunction{Float64} # Equivalent to x4.
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === -1.0
@@ -2081,7 +2081,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction{Float64} # Equivalent to MOI.SingleVariable(x3).
+                  MOI.ScalarAffineFunction{Float64} # Equivalent to x3.
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
@@ -2353,7 +2353,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction{Float64} # Equivalent to MOI.SingleVariable(x4).
+                  MOI.ScalarAffineFunction{Float64} # Equivalent to x4.
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === -1.0
@@ -2367,7 +2367,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction{Float64} # Equivalent to MOI.SingleVariable(x3).
+                  MOI.ScalarAffineFunction{Float64} # Equivalent to x3.
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
@@ -2492,7 +2492,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
+                  MOI.ScalarAffineFunction # Equivalent to: x4
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
             @test m.constraint_info[nc].f.terms[1].variabl == x4
@@ -2505,7 +2505,7 @@
             nc += 1
             @test length(m.constraint_info) == nc
             @test typeof(m.constraint_info[nc].f) <:
-                  MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
+                  MOI.ScalarAffineFunction # Equivalent to: x3
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
             @test m.constraint_info[nc].f.terms[1].variabl == x3
@@ -2674,13 +2674,11 @@
 
             CP.FlatZinc.parse_solve!("solve minimize x1;", m)
             @test MOI.get(m, MOI.ObjectiveSense()) == MOI.MIN_SENSE
-            @test MOI.get(m, MOI.ObjectiveFunction{MOI.SingleVariable}()) ==
-                  MOI.SingleVariable(moi_var)
+            @test MOI.get(m, MOI.ObjectiveFunction{MOI.VariableIndex}()) == moi_var
 
             CP.FlatZinc.parse_solve!("solve maximize x1;", m)
             @test MOI.get(m, MOI.ObjectiveSense()) == MOI.MAX_SENSE
-            @test MOI.get(m, MOI.ObjectiveFunction{MOI.SingleVariable}()) ==
-                  MOI.SingleVariable(moi_var)
+            @test MOI.get(m, MOI.ObjectiveFunction{MOI.VariableIndex}()) == moi_var
         end
     end
 
@@ -2698,11 +2696,11 @@
         @test MOI.get(m, MOI.NumberOfVariables()) == 1
         @test MOI.get(
             m,
-            MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}(),
+            MOI.NumberOfConstraints{MOI.VariableIndex, MOI.Integer}(),
         ) == 1
         @test MOI.get(
             m,
-            MOI.NumberOfConstraints{MOI.SingleVariable, MOI.LessThan}(),
+            MOI.NumberOfConstraints{MOI.VariableIndex, MOI.LessThan}(),
         ) == 0
         @test MOI.get(
             m,

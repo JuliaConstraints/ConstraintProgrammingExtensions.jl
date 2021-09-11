@@ -353,15 +353,15 @@ function parse_solve!(item::AbstractString, model::Model)
         MOI.set(model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
         MOI.set(
             model,
-            MOI.ObjectiveFunction{MOI.SingleVariable}(),
-            MOI.SingleVariable(moi_var),
+            MOI.ObjectiveFunction{MOI.VariableIndex}(),
+            moi_var,
         )
     elseif obj_sense == FznMaximise
         MOI.set(model, MOI.ObjectiveSense(), MOI.MAX_SENSE)
         MOI.set(
             model,
-            MOI.ObjectiveFunction{MOI.SingleVariable}(),
-            MOI.SingleVariable(moi_var),
+            MOI.ObjectiveFunction{MOI.VariableIndex}(),
+            moi_var,
         )
     end
 
@@ -387,7 +387,7 @@ end
 
 function mixed_var_int_to_moi_var(v::Integer, model::Model)
     moi_var, _ = MOI.add_constrained_variable(model, MOI.Integer())
-    MOI.add_constraint(model, MOI.SingleVariable(moi_var), MOI.EqualTo(v))
+    MOI.add_constraint(model, moi_var, MOI.EqualTo(v))
     return moi_var
 end
 
@@ -402,7 +402,7 @@ end
 
 function mixed_var_bool_to_moi_var(v::Bool, model::Model)
     moi_var, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
-    MOI.add_constraint(model, MOI.SingleVariable(moi_var), MOI.EqualTo(v))
+    MOI.add_constraint(model, moi_var, MOI.EqualTo(v))
     return moi_var
 end
 
@@ -415,7 +415,7 @@ function mixed_var_bool_to_moi_var(v::Integer, model::Model)
     else
         error("Unexpected literal: $v. Expected a variable or a Boolean.")
     end
-    MOI.add_constraint(model, MOI.SingleVariable(moi_var), moi_set)
+    MOI.add_constraint(model, moi_var, moi_set)
     return moi_var
 end
 
@@ -1179,7 +1179,7 @@ function add_constraint_to_model(::Val{FznFloatIn}, args, model::Model)
 
     return MOI.add_constraint(
         model,
-        MOI.SingleVariable(moi_var),
+        moi_var,
         MOI.Interval(bound_min, bound_max),
     )
 end

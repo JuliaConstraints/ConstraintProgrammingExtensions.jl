@@ -4,9 +4,9 @@
     model = COIB.SortPermutation2MILP{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.ZeroOne)
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorAffineFunction{T},
@@ -22,7 +22,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x)
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x))
+        MOIU.vectorize(MOI.VariableIndex.(x))
     else
         @assert false
     end
@@ -53,13 +53,13 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 2 * array_dim ^ 2
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == array_dim ^ 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == array_dim ^ 2
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == 4 * array_dim
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == array_dim ^ 2
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == array_dim ^ 2 + array_dim - 1
 
         @test Set(MOI.get(bridge, MOI.ListOfVariableIndices())) == Set(vcat(bridge.vars_flow, bridge.vars_unicity))
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == bridge.vars_unicity_bin
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}()) == bridge.vars_unicity_bin
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == vcat(bridge.cons_transportation_x, bridge.cons_transportation_y, bridge.cons_unicity_x, bridge.cons_unicity_y)
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == vec(bridge.cons_flow_lt)
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == vcat(vec(bridge.cons_flow_gt), bridge.cons_sort)

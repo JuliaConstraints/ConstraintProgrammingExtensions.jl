@@ -1,4 +1,4 @@
-function _detect_variable_type(model::MOI.ModelLike, v::Union{MOI.SingleVariable, MOI.VariableIndex})
+function _detect_variable_type(model::MOI.ModelLike, v::MOI.VariableIndex)
     # TODO: is this enough? Or should the code rather try all the countless possibilities for T in the calling functions (based on the constraint types that are used in the model)?
     if is_integer(model, v) || is_binary(model, v)
         return Int
@@ -11,12 +11,8 @@ end
 # - Detect whether a variable or a function has some properties.
 # -----------------------------------------------------------------------------
 
-function is_integer(model::MOI.ModelLike, v::MOI.SingleVariable)
-    return is_integer(model, v.variable)
-end
-
 function is_integer(model::MOI.ModelLike, v::MOI.VariableIndex)
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}(v.value)
+    c_idx = MOI.ConstraintIndex{MOI.VariableIndex, MOI.Integer}(v.value)
     return MOI.is_valid(model, c_idx)
 end
 
@@ -30,12 +26,8 @@ function is_integer(model::MOI.ModelLike, f::MOI.ScalarAffineFunction{T}) where 
     return true
 end
 
-function is_binary(model::MOI.ModelLike, v::MOI.SingleVariable)
-    return is_binary(model, v.variable)
-end
-
 function is_binary(model::MOI.ModelLike, v::MOI.VariableIndex)
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}(v.value)
+    c_idx = MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}(v.value)
     return MOI.is_valid(model, c_idx)
 end
 
@@ -59,10 +51,6 @@ function is_binary(model::MOI.ModelLike, f::MOI.ScalarAffineFunction{T}) where {
     end
 end
 
-function has_lower_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
-    return has_lower_bound(model, v.variable)
-end
-
 function has_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) where {T <: Real}
     for t in v.terms
         if t.coefficient == zero(T)
@@ -81,13 +69,13 @@ function has_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     # TODO: should infinite values be disregarded? 
 
     # Check if the variable has an explicit lower bound.
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{T}}(v.value)
+    c_idx = MOI.ConstraintIndex{MOI.VariableIndex, MOI.GreaterThan{T}}(v.value)
     if MOI.is_valid(model, c_idx)
         return true
     end
 
     # Check if the variable has an interval.
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Interval{T}}(v.value)
+    c_idx = MOI.ConstraintIndex{MOI.VariableIndex, MOI.Interval{T}}(v.value)
     if MOI.is_valid(model, c_idx)
         return true
     end
@@ -98,10 +86,6 @@ function has_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     end
 
     return false
-end
-
-function has_upper_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
-    return has_upper_bound(model, v.variable)
 end
 
 function has_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) where {T <: Real}
@@ -122,13 +106,13 @@ function has_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     # TODO: should infinite values be disregarded? 
 
     # Check if the variable has an explicit upper bound.
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{T}}(v.value)
+    c_idx = MOI.ConstraintIndex{MOI.VariableIndex, MOI.LessThan{T}}(v.value)
     if MOI.is_valid(model, c_idx)
         return true
     end
 
     # Check if the variable has an interval.
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Interval{T}}(v.value)
+    c_idx = MOI.ConstraintIndex{MOI.VariableIndex, MOI.Interval{T}}(v.value)
     if MOI.is_valid(model, c_idx)
         return true
     end
@@ -142,10 +126,6 @@ function has_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
 end
 
 # function is_affine(::MOI.ModelLike, ::MOI.VariableIndex)
-#     return true
-# end
-
-# function is_affine(::MOI.ModelLike, ::MOI.SingleVariable)
 #     return true
 # end
 
@@ -168,10 +148,6 @@ end
 # -----------------------------------------------------------------------------
 # - Get some properties about a variable or a function.
 # -----------------------------------------------------------------------------
-
-function get_lower_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
-    return get_lower_bound(model, v.variable)
-end
 
 function get_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) where {T <: Real}
     if !has_lower_bound(model, v)
@@ -207,7 +183,7 @@ function get_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     end
 
     # Check if the variable has an explicit lower bound.
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{T}}(
+    c_idx = MOI.ConstraintIndex{MOI.VariableIndex, MOI.GreaterThan{T}}(
         v.value,
     )
     if MOI.is_valid(model, c_idx)
@@ -215,16 +191,12 @@ function get_lower_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     end
 
     # Check if the variable has an interval.
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Interval{T}}(v.value)
+    c_idx = MOI.ConstraintIndex{MOI.VariableIndex, MOI.Interval{T}}(v.value)
     if MOI.is_valid(model, c_idx)
         return MOI.get(model, MOI.ConstraintSet(), c_idx).lower
     end
 
     return typemin(T)
-end
-
-function get_upper_bound(model::MOI.ModelLike, v::MOI.SingleVariable)
-    return get_upper_bound(model, v.variable)
 end
 
 function get_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) where {T <: Real}
@@ -261,7 +233,7 @@ function get_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     end
 
     # Check if the variable has an explicit lower bound.
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.LessThan{T}}(
+    c_idx = MOI.ConstraintIndex{MOI.VariableIndex, MOI.LessThan{T}}(
         v.value,
     )
     if MOI.is_valid(model, c_idx)
@@ -269,7 +241,7 @@ function get_upper_bound(model::MOI.ModelLike, v::MOI.VariableIndex)
     end
 
     # Check if the variable has an interval.
-    c_idx = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Interval{T}}(v.value)
+    c_idx = MOI.ConstraintIndex{MOI.VariableIndex, MOI.Interval{T}}(v.value)
     if MOI.is_valid(model, c_idx)
         return MOI.get(model, MOI.ConstraintSet(), c_idx).upper
     end

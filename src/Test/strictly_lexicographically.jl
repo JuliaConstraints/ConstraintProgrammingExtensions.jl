@@ -4,8 +4,8 @@ function strictly_lexicographicallylessthan_vectorofvariables_test(
 )
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.EqualTo{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{Int})
     @test MOI.supports_constraint(
         model,
         MOI.VectorOfVariables,
@@ -57,8 +57,8 @@ function strictly_lexicographicallylessthan_vectoraffinefunction_test(
 )
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.EqualTo{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{Int})
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{Int},
@@ -77,7 +77,7 @@ function strictly_lexicographicallylessthan_vectoraffinefunction_test(
 
     c5 = MOI.add_constraint(
         model,
-        MOIU.vectorize(MOI.SingleVariable.([x1, x2, x3, x4])),
+        MOIU.vectorize(MOI.VariableIndex.([x1, x2, x3, x4])),
         CP.Strictly(CP.LexicographicallyLessThan(2)),
     )
 

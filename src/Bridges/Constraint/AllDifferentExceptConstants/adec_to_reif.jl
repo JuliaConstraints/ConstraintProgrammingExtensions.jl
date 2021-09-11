@@ -3,7 +3,7 @@ Bridges `CP.AllDifferentExceptConstants` to reifications.
 """
 struct AllDifferentExceptConstants2ReificationBridge{T} <: MOIBC.AbstractBridge
     vars_compare::Matrix{MOI.VariableIndex} # First index: value in the array; second index: excepted variable
-    vars_compare_bin::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    vars_compare_bin::Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     cons_compare_reif::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}}
     # An upper-triangular matrix (i.e. nothing if i < j, constraint if i >= j).
     # Standard sparse matrices cannot store anything that is not a Number 
@@ -12,7 +12,7 @@ struct AllDifferentExceptConstants2ReificationBridge{T} <: MOIBC.AbstractBridge
     vars_different::Dict{Tuple{Int, Int}, MOI.VariableIndex}
     vars_different_bin::Dict{
         Tuple{Int, Int},
-        MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne},
+        MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne},
     }
     cons_different_reif::Dict{
         Tuple{Int, Int},
@@ -50,7 +50,7 @@ function MOIBC.bridge_constraint(
     values = collect(s.k)
 
     vars_compare = Matrix{MOI.VariableIndex}(undef, s.dimension, length(values))
-    vars_compare_bin = Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}(undef, s.dimension, length(values))
+    vars_compare_bin = Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}(undef, s.dimension, length(values))
     for i in 1:s.dimension
         vars_compare[i, :], vars_compare_bin[i, :] = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:length(values)])
     end
@@ -62,7 +62,7 @@ function MOIBC.bridge_constraint(
                 model,
                 MOIU.vectorize(
                     [
-                        one(T) * MOI.SingleVariable(vars_compare[i, j]),
+                        one(T) * vars_compare[i, j],
                         f_scalars[i] - T(values[j]),
                     ]
                 ),
@@ -74,7 +74,7 @@ function MOIBC.bridge_constraint(
     # Upper-triangular matrix of constraints: i >= j, i.e. d(d-1)/2 elements:
     #     \sum_{i=2}^{d} (n - i + 1) = d (d - 1) / 2
     vars_different = Dict{Tuple{Int, Int}, MOI.VariableIndex}()
-    vars_different_bin = Dict{Tuple{Int, Int}, MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}()
+    vars_different_bin = Dict{Tuple{Int, Int}, MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}()
     cons_different_reif = Dict{Tuple{Int, Int}, MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{CP.DifferentFrom{T}}}}()
     cons = Dict{Tuple{Int, Int}, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}}()
 
@@ -91,7 +91,7 @@ function MOIBC.bridge_constraint(
                 model,
                 MOIU.vectorize(
                     [
-                        one(T) * MOI.SingleVariable(vars_different[i, j]),
+                        one(T) * vars_different[i, j],
                         f_scalars[i] - f_scalars[j],
                     ]
                 ),
@@ -100,7 +100,7 @@ function MOIBC.bridge_constraint(
             
             cons[i, j] = MOI.add_constraint(
                 model,
-                sum(one(T) .* MOI.SingleVariable.(vars_compare[i, :])) + sum(one(T) .* MOI.SingleVariable.(vars_compare[j, :])) + MOI.SingleVariable(vars_different[i, j]),
+                sum(one(T) .* vars_compare[i, :]) + sum(one(T) .* vars_compare[j, :]) + vars_different[i, j],
                 MOI.GreaterThan(one(T)),
             )
         end
@@ -136,7 +136,7 @@ end
 function MOI.get(
     b::AllDifferentExceptConstants2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return length(b.vars_compare_bin) + length(b.vars_different_bin)
@@ -179,7 +179,7 @@ end
 function MOI.get(
     b::AllDifferentExceptConstants2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return vcat(vec(collect(values(b.vars_compare_bin))), vec(collect(values(b.vars_different_bin))))

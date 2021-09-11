@@ -3,7 +3,7 @@ Bridges `Function`-in-`Scalar` to `ScalarAffineFunction`-in-`Scalar`.
 """
 struct FunctionBridge{T} <: MOIBC.AbstractBridge
     vars::Matrix{MOI.VariableIndex}
-    cons::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    cons::Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     oths::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
 end
 

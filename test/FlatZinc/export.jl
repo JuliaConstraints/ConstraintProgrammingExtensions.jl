@@ -522,7 +522,7 @@
         end
     end
 
-    @testset "Constraints: MOI.SingleVariable of integer in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom" begin
+    @testset "Constraints: MOI.VariableIndex of integer in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom" begin
         m = CP.FlatZinc.Model()
         @test MOI.is_empty(m)
 
@@ -593,7 +593,7 @@
         end
     end
 
-    @testset "Constraints: MOI.SingleVariable of float in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom" begin
+    @testset "Constraints: MOI.VariableIndex of float in MOI.EqualTo / MOI.LessThan / CP.Strictly{MOI.LessThan} / CP.DifferentFrom" begin
         m = CP.FlatZinc.Model()
         @test MOI.is_empty(m)
 
@@ -973,8 +973,8 @@
 
         MOI.set(
             m,
-            MOI.ObjectiveFunction{MOI.SingleVariable}(),
-            MOI.SingleVariable(x),
+            MOI.ObjectiveFunction{MOI.VariableIndex}(),
+            x,
         )
 
         MOI.set(m, MOI.ObjectiveSense(), MOI.MAX_SENSE)
@@ -1004,8 +1004,8 @@
 
         MOI.set(
             m,
-            MOI.ObjectiveFunction{MOI.SingleVariable}(),
-            MOI.SingleVariable(x),
+            MOI.ObjectiveFunction{MOI.VariableIndex}(),
+            x,
         )
 
         MOI.set(m, MOI.ObjectiveSense(), MOI.MIN_SENSE)

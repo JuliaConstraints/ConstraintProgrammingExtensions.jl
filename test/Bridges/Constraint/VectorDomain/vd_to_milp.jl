@@ -3,9 +3,9 @@
     model = COIB.VectorDomain2MILP{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.ZeroOne)
     @test MOI.supports_constraint(
         model,
         MOI.ScalarAffineFunction{T},
@@ -31,7 +31,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x)
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x))
+        MOIU.vectorize(MOI.VariableIndex.(x))
     else
         @assert false
     end
@@ -45,18 +45,18 @@
     bridge = first(MOIBC.bridges(model))[2]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.SingleVariable, CP.VectorDomain{T}) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VariableIndex, CP.VectorDomain{T}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == n_values
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == n_values
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == n_values
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == 1 + dim
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == bridge.vars
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == bridge.vars_bin
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}()) == bridge.vars_bin
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.con_choose_one, bridge.cons_values...]
     end
 
@@ -67,7 +67,7 @@
         for i in 1:n_values
             @test MOI.is_valid(model, bridge.vars[i])
             @test MOI.is_valid(model, bridge.vars_bin[i])
-            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_bin[i]) == MOI.SingleVariable(bridge.vars[i])
+            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_bin[i]) == bridge.vars[i]
             @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_bin[i]) == MOI.ZeroOne()
         end
     end

@@ -10,8 +10,8 @@ Bridges `CP.LexicographicallyGreaterThan` to indicators.
 struct LexicographicallyGreaterThan2IndicatorBridge{T} <: MOIBC.AbstractBridge
     vars_eq::Matrix{MOI.VariableIndex}
     vars_gt::Matrix{MOI.VariableIndex}
-    vars_eq_bin::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
-    vars_gt_bin::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    vars_eq_bin::Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
+    vars_gt_bin::Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     cons_one_gt::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}
     cons_move::Matrix{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
     cons_indic_eq::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}}
@@ -43,8 +43,8 @@ function MOIBC.bridge_constraint(
 
     vars_eq = Matrix{MOI.VariableIndex}(undef, s.column_dim - 1, s.row_dim)
     vars_gt = Matrix{MOI.VariableIndex}(undef, s.column_dim - 1, s.row_dim)
-    vars_eq_bin = Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}(undef, s.column_dim - 1, s.row_dim)
-    vars_gt_bin = Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}(undef, s.column_dim - 1, s.row_dim)
+    vars_eq_bin = Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}(undef, s.column_dim - 1, s.row_dim)
+    vars_gt_bin = Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}(undef, s.column_dim - 1, s.row_dim)
     cons_one_gt = Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}(undef, s.column_dim - 1)
     cons_move = Matrix{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}(undef, s.column_dim - 1, s.row_dim - 1)
     cons_indic_eq = Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}}(undef, s.column_dim - 1, s.row_dim)
@@ -62,14 +62,14 @@ function MOIBC.bridge_constraint(
 
         cons_one_gt[i] = MOI.add_constraint(
             model,
-            sum(one(T) .* MOI.SingleVariable.(vars_gt[i, :])),
+            sum(one(T) .* MOI.VariableIndex.(vars_gt[i, :])),
             MOI.LessThan(one(T)),
         )
 
         cons_move[i, :] = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
             MOI.add_constraint(
                 model,
-                one(T) * MOI.SingleVariable(vars_eq[i, j - 1]) - one(T) * MOI.SingleVariable(vars_eq[i, j]) - one(T) * MOI.SingleVariable(vars_gt[i, j]),
+                one(T) * vars_eq[i, j - 1] - one(T) * vars_eq[i, j] - one(T) * vars_gt[i, j],
                 MOI.EqualTo(zero(T)),
             )            
             for j in 2:s.row_dim
@@ -80,7 +80,7 @@ function MOIBC.bridge_constraint(
                 model,
                 MOIU.vectorize(
                     [
-                        one(T) * MOI.SingleVariable(vars_eq[i, j]),
+                        one(T) * vars_eq[i, j],
                         f_matrix[i, j] - f_matrix[i + 1, j],
                     ]
                 ),
@@ -94,7 +94,7 @@ function MOIBC.bridge_constraint(
                 model,
                 MOIU.vectorize(
                     [
-                        one(T) * MOI.SingleVariable(vars_gt[i, j]),
+                        one(T) * vars_gt[i, j],
                         f_matrix[i, j] - f_matrix[i + 1, j],
                     ]
                 ),
@@ -135,7 +135,7 @@ end
 function MOI.get(
     b::LexicographicallyGreaterThan2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return length(b.vars_eq_bin) + length(b.vars_gt_bin)
@@ -184,7 +184,7 @@ end
 function MOI.get(
     b::LexicographicallyGreaterThan2IndicatorBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return vcat(vec(b.vars_eq_bin), vec(b.vars_gt_bin))

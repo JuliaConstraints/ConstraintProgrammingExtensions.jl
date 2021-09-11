@@ -5,9 +5,9 @@ struct IfThenElse2ReificationBridge{T} <: MOIBC.AbstractBridge
     var_condition::MOI.VariableIndex
     var_true::MOI.VariableIndex
     var_false::MOI.VariableIndex
-    var_condition_bin::MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}
-    var_true_bin::MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}
-    var_false_bin::MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}
+    var_condition_bin::MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}
+    var_true_bin::MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}
+    var_false_bin::MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}
     con_reif_condition::MOI.ConstraintIndex
     con_reif_true::MOI.ConstraintIndex
     con_reif_false::MOI.ConstraintIndex
@@ -48,7 +48,7 @@ function MOIBC.bridge_constraint(
         model,
         MOIU.vectorize(
             [
-                one(T) * MOI.SingleVariable(var_condition),
+                one(T) * var_condition,
                 f_scalars[idx_beg : idx_end]...,
             ]
         ),
@@ -61,7 +61,7 @@ function MOIBC.bridge_constraint(
         model,
         MOIU.vectorize(
             [
-                one(T) * MOI.SingleVariable(var_true),
+                one(T) * var_true,
                 f_scalars[idx_beg : idx_end]...,
             ]
         ),
@@ -74,7 +74,7 @@ function MOIBC.bridge_constraint(
         model,
         MOIU.vectorize(
             [
-                one(T) * MOI.SingleVariable(var_false),
+                one(T) * var_false,
                 f_scalars[idx_beg : idx_end]...,
             ]
         ),
@@ -88,12 +88,12 @@ function MOIBC.bridge_constraint(
     #     \____________ if ____________/   \____________ else ___________/
     con_if = MOI.add_constraint(
         model, 
-        one(T) * MOI.SingleVariable(var_true) - one(T) * MOI.SingleVariable(var_condition),
+        one(T) * var_true - one(T) * var_condition,
         MOI.GreaterThan(zero(T))
     )
     con_else = MOI.add_constraint(
         model, 
-        one(T) * MOI.SingleVariable(var_false) + one(T) * MOI.SingleVariable(var_condition),
+        one(T) * var_false + one(T) * var_condition,
         MOI.GreaterThan(one(T))
     )
 
@@ -128,7 +128,7 @@ end
 function MOI.get(
     ::IfThenElse2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return 3
@@ -162,7 +162,7 @@ end
 function MOI.get(
     b::IfThenElse2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return [b.var_condition_bin, b.var_true_bin, b.var_false_bin]

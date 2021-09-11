@@ -9,7 +9,7 @@
     mock = MOIU.MockOptimizer(base_model)
     model = COIB.AllDifferentExceptConstants2Reification{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.ZeroOne)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
@@ -30,7 +30,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x)
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x))
+        MOIU.vectorize(MOI.VariableIndex.(x))
     else
         @assert false
     end
@@ -54,13 +54,13 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == dim * length(values_set) + dim * (dim - 1) / 2
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == dim * length(values_set) + dim * (dim - 1) / 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == dim * length(values_set) + dim * (dim - 1) / 2
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}()) == dim * length(values_set)
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, CP.Reification{CP.DifferentFrom{T}}}()) == dim * (dim - 1) / 2
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == dim * (dim - 1) / 2
 
         @test Set(MOI.get(bridge, MOI.ListOfVariableIndices())) == Set([vec(collect(values(bridge.vars_compare)))..., vec(collect(values(bridge.vars_different)))...])
-        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}())) == Set([vec(collect(values(bridge.vars_compare_bin)))..., vec(collect(values(bridge.vars_different_bin)))...])
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}())) == Set([vec(collect(values(bridge.vars_compare_bin)))..., vec(collect(values(bridge.vars_different_bin)))...])
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}())) == Set(vec(bridge.cons_compare_reif))
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, CP.Reification{CP.DifferentFrom{T}}}())) == Set(collect(values(bridge.cons_different_reif)))
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}())) == Set(collect(values(bridge.cons)))

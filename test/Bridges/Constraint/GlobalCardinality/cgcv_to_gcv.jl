@@ -2,7 +2,7 @@
     mock = MOIU.MockOptimizer(GlobalCardinalityVariableModel{T}())
     model = COIB.GlobalCardinalityVariableClosed2GlobalCardinalityVariableOpen{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
@@ -32,7 +32,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_array..., x_counts..., x_sought...])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.([x_array..., x_counts..., x_sought...]))
+        MOIU.vectorize(MOI.VariableIndex.([x_array..., x_counts..., x_sought...]))
     else
         @assert false
     end

@@ -4,10 +4,10 @@ function antidomain_singlevariable_test(
 )
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Interval{Int})
-    @test MOI.supports_constraint(model, MOI.SingleVariable, CP.AntiDomain{Int})
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.EqualTo{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Interval{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, CP.AntiDomain{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{Int})
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -44,7 +44,7 @@ function antidomain_scalaraffinefunction_test(
 )
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     @test MOI.supports_constraint(
         model,
         MOI.ScalarAffineFunction{Int},
@@ -67,7 +67,7 @@ function antidomain_scalaraffinefunction_test(
     c1 = MOI.add_constraint(model, x1, MOI.EqualTo(1))
     c2 = MOI.add_constraint(model, x2, MOI.GreaterThan(1))
     c3 = MOI.add_constraint(model, x2, MOI.LessThan(3))
-    c4 = MOI.add_constraint(model, MOIU.vectorize(1 * MOI.SingleVariable.([x1, x2])), CP.AllDifferent(2))
+    c4 = MOI.add_constraint(model, MOIU.vectorize(1 * MOI.VariableIndex.([x1, x2])), CP.AllDifferent(2))
 
     c5 = MOI.add_constraint(
         model,

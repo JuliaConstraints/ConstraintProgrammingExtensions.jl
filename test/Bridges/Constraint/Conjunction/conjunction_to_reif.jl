@@ -9,7 +9,7 @@
     mock = MOIU.MockOptimizer(base_model)
     model = COIB.Conjunction2Reification{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.ZeroOne)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
@@ -30,7 +30,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x_array)
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x_array))
+        MOIU.vectorize(MOI.VariableIndex.(x_array))
     else
         @assert false
     end
@@ -50,18 +50,18 @@
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.VectorAffineFunction{T}, CP.Reification),
-            (MOI.SingleVariable, MOI.EqualTo{T}),
+            (MOI.VariableIndex, MOI.EqualTo{T}),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 1
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == 1
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reification}()) == array_size
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.EqualTo{T}}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.EqualTo{T}}()) == 1
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.var]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == [bridge.var_bin]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}()) == [bridge.var_bin]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reification}()) == bridge.cons_reif
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.EqualTo{T}}()) == [bridge.con_conjunction]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.EqualTo{T}}()) == [bridge.con_conjunction]
     end
 
     @testset "Set of variables" begin
@@ -93,7 +93,7 @@
 
     @testset "Sum" begin
         @test MOI.is_valid(model, bridge.con_conjunction)
-        @test MOI.get(model, MOI.ConstraintFunction(), bridge.con_conjunction) == MOI.SingleVariable(bridge.var)
+        @test MOI.get(model, MOI.ConstraintFunction(), bridge.con_conjunction) == bridge.var
         @test MOI.get(model, MOI.ConstraintSet(), bridge.con_conjunction) == MOI.EqualTo(one(T))
     end
 end

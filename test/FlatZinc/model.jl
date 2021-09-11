@@ -9,23 +9,23 @@
 
         @test MOI.supports_constraint(
             m,
-            MOI.SingleVariable,
+            MOI.VariableIndex,
             MOI.LessThan{Int},
         )
         @test MOI.supports_constraint(
             m,
-            MOI.SingleVariable,
+            MOI.VariableIndex,
             MOI.LessThan{Float64},
         )
         @test MOI.supports_constraint(
             m,
-            MOI.SingleVariable,
+            MOI.VariableIndex,
             CP.Strictly{MOI.LessThan{Float64}},
         )
-        @test MOI.supports_constraint(m, MOI.SingleVariable, CP.Domain{Int})
+        @test MOI.supports_constraint(m, MOI.VariableIndex, CP.Domain{Int})
         @test MOI.supports_constraint(
             m,
-            MOI.SingleVariable,
+            MOI.VariableIndex,
             MOI.Interval{Float64},
         )
         @test MOI.supports_constraint(

@@ -3,7 +3,7 @@
     model = COIB.StrictlyLessThan2StrictlyGreaterThan{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -22,7 +22,7 @@
         x = MOI.add_variable(model)
     end
 
-    fct = one(T) * MOI.SingleVariable(x)
+    fct = one(T) * x
     c = MOI.add_constraint(model, fct, CP.Strictly(MOI.LessThan(one(T))))
 
     @test MOI.is_valid(model, x)

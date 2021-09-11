@@ -8,7 +8,7 @@ a `Strictly(GreaterThan(0.0))`.
 """
 struct IndicatorDifferentFrom2PseudoMILPBridge{T <: Real, A} <: MOIBC.AbstractBridge
     var_abs::Union{Nothing, MOI.VariableIndex}
-    con_abs::Union{Nothing, MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}, MOI.ConstraintIndex{MOI.SingleVariable, CP.AbsoluteValue}}
+    con_abs::Union{Nothing, MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}, MOI.ConstraintIndex{MOI.VariableIndex, CP.AbsoluteValue}}
     con_indic::Union{
         MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, CP.Strictly{MOI.GreaterThan{T}, T}}},
         MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.GreaterThan{T}}},
@@ -59,7 +59,7 @@ function MOIBC.bridge_constraint(
         MOIU.vectorize(
             [
                 f_scalars[1],
-                one(T) * MOI.SingleVariable(var_abs)
+                one(T) * var_abs
             ]
         ), 
         MOI.IndicatorSet{A}(CP.Strictly(MOI.GreaterThan(zero(T))))
@@ -80,7 +80,7 @@ function MOIBC.bridge_constraint(
     var_abs = MOI.add_variable(model)
     con_abs = MOI.add_constraint(
         model, 
-        MOIU.vectorize([one(T) * MOI.SingleVariable(var_abs), f_scalars[2] - s.set.value]),
+        MOIU.vectorize([one(T) * var_abs, f_scalars[2] - s.set.value]),
         CP.AbsoluteValue(),
     )
 
@@ -91,7 +91,7 @@ function MOIBC.bridge_constraint(
         MOIU.vectorize(
             [
                 f_scalars[1],
-                one(T) * MOI.SingleVariable(var_abs)
+                one(T) * var_abs
             ]
         ), 
         MOI.IndicatorSet{A}(MOI.GreaterThan(one(T)))

@@ -3,11 +3,11 @@
         model = MOI.Utilities.Model{Float64}()
         x = MOI.add_variable(model)
         @test !CP.is_binary(model, x)
-        @test !CP.is_binary(model, MOI.SingleVariable(x))
+        @test !CP.is_binary(model, x)
 
         MOI.add_constraint(model, x, MOI.ZeroOne())
         @test CP.is_binary(model, x)
-        @test CP.is_binary(model, MOI.SingleVariable(x))
+        @test CP.is_binary(model, x)
     end
 
     @testset "is_binary{$(T)}" for T in [Float64, Int]
@@ -55,11 +55,11 @@
         x = MOI.add_variable(model)
 
         @test !CP.is_integer(model, x)
-        @test !CP.is_integer(model, MOI.SingleVariable(x))
+        @test !CP.is_integer(model, x)
 
         MOI.add_constraint(model, x, MOI.Integer())
         @test CP.is_integer(model, x)
-        @test CP.is_integer(model, MOI.SingleVariable(x))
+        @test CP.is_integer(model, x)
     end
 
     @testset "is_integer{$(T)}" for T in [Float64, Int]
@@ -119,7 +119,7 @@
 
         # Booleans are implicitly bounded.
         @test CP.has_lower_bound(model, x)
-        @test CP.has_lower_bound(model, MOI.SingleVariable(x))
+        @test CP.has_lower_bound(model, x)
         @test CP.has_lower_bound(model, aff)
         @test CP.has_lower_bound(model, aff2)
     end
@@ -150,14 +150,14 @@
 
         # So far, variables are unbounded.
         @test !CP.has_lower_bound(model, x)
-        @test !CP.has_lower_bound(model, MOI.SingleVariable(x))
+        @test !CP.has_lower_bound(model, x)
         @test !CP.has_lower_bound(model, aff)
         @test !CP.has_lower_bound(model, aff2)
 
         # One variable has a lower bound. 
         MOI.add_constraint(model, x, MOI.GreaterThan(zero(T)))
         @test CP.has_lower_bound(model, x)
-        @test CP.has_lower_bound(model, MOI.SingleVariable(x))
+        @test CP.has_lower_bound(model, x)
         @test CP.has_lower_bound(model, aff) # The other variable has a zero coefficient.
         @test !CP.has_lower_bound(model, aff2)
 
@@ -165,14 +165,14 @@
         # impact on the results.
         MOI.add_constraint(model, y, MOI.LessThan(zero(T)))
         @test CP.has_lower_bound(model, x)
-        @test CP.has_lower_bound(model, MOI.SingleVariable(x))
+        @test CP.has_lower_bound(model, x)
         @test CP.has_lower_bound(model, aff)
         @test !CP.has_lower_bound(model, aff2)
 
         # Use an interval for the third variable.
         MOI.add_constraint(model, z, MOI.Interval(zero(T), one(T)))
         @test CP.has_lower_bound(model, z)
-        @test CP.has_lower_bound(model, MOI.SingleVariable(z))
+        @test CP.has_lower_bound(model, z)
     end
 
     @testset "get_lower_bound{Bool}" begin
@@ -192,7 +192,7 @@
 
         # Booleans are implicitly bounded.
         @test CP.get_lower_bound(model, x) == 0
-        @test CP.get_lower_bound(model, MOI.SingleVariable(x)) == 0
+        @test CP.get_lower_bound(model, x) == 0
         @test CP.get_lower_bound(model, aff) == 0
         @test CP.get_lower_bound(model, aff2) == 0
     end
@@ -223,14 +223,14 @@
 
         # So far, variables are unbounded.
         @test CP.get_lower_bound(model, x) === typemin(T)
-        @test CP.get_lower_bound(model, MOI.SingleVariable(x)) === typemin(T)
+        @test CP.get_lower_bound(model, x) === typemin(T)
         @test CP.get_lower_bound(model, aff) === typemin(T)
         @test CP.get_lower_bound(model, aff2) === typemin(T)
 
         # One variable has a lower bound. 
         MOI.add_constraint(model, x, MOI.GreaterThan(zero(T)))
         @test CP.get_lower_bound(model, x) === zero(T)
-        @test CP.get_lower_bound(model, MOI.SingleVariable(x)) === zero(T)
+        @test CP.get_lower_bound(model, x) === zero(T)
         @test CP.get_lower_bound(model, aff) === zero(T) # The other variable has a zero coefficient.
         @test CP.get_lower_bound(model, aff2) === typemin(T)
 
@@ -238,14 +238,14 @@
         # impact on the results.
         MOI.add_constraint(model, y, MOI.LessThan(zero(T)))
         @test CP.get_lower_bound(model, x) === zero(T)
-        @test CP.get_lower_bound(model, MOI.SingleVariable(x)) === zero(T)
+        @test CP.get_lower_bound(model, x) === zero(T)
         @test CP.get_lower_bound(model, aff) === zero(T)
         @test CP.get_lower_bound(model, aff2) === typemin(T)
 
         # Use an interval for the third variable.
         MOI.add_constraint(model, z, MOI.Interval(zero(T), one(T)))
         @test CP.get_lower_bound(model, z) === zero(T)
-        @test CP.get_lower_bound(model, MOI.SingleVariable(z)) === zero(T)
+        @test CP.get_lower_bound(model, z) === zero(T)
     end
 
     @testset "has_upper_bound{Bool}" begin
@@ -265,7 +265,7 @@
 
         # Booleans are implicitly bounded.
         @test CP.has_upper_bound(model, x)
-        @test CP.has_upper_bound(model, MOI.SingleVariable(x))
+        @test CP.has_upper_bound(model, x)
         @test CP.has_upper_bound(model, aff)
         @test CP.has_upper_bound(model, aff2)
     end
@@ -296,14 +296,14 @@
 
         # So far, variables are unbounded.
         @test !CP.has_upper_bound(model, x)
-        @test !CP.has_upper_bound(model, MOI.SingleVariable(x))
+        @test !CP.has_upper_bound(model, x)
         @test !CP.has_upper_bound(model, aff)
         @test !CP.has_upper_bound(model, aff2)
 
         # One variable has an upper bound. 
         MOI.add_constraint(model, x, MOI.LessThan(zero(T)))
         @test CP.has_upper_bound(model, x)
-        @test CP.has_upper_bound(model, MOI.SingleVariable(x))
+        @test CP.has_upper_bound(model, x)
         @test CP.has_upper_bound(model, aff) # The other variable has a zero coefficient.
         @test !CP.has_upper_bound(model, aff2)
 
@@ -311,14 +311,14 @@
         # impact on the results.
         MOI.add_constraint(model, y, MOI.GreaterThan(zero(T)))
         @test CP.has_upper_bound(model, x)
-        @test CP.has_upper_bound(model, MOI.SingleVariable(x))
+        @test CP.has_upper_bound(model, x)
         @test CP.has_upper_bound(model, aff)
         @test !CP.has_upper_bound(model, aff2)
 
         # Use an interval for the third variable.
         MOI.add_constraint(model, z, MOI.Interval(zero(T), one(T)))
         @test CP.has_upper_bound(model, z)
-        @test CP.has_upper_bound(model, MOI.SingleVariable(z))
+        @test CP.has_upper_bound(model, z)
     end
 
     @testset "get_upper_bound{Bool}" begin
@@ -338,7 +338,7 @@
 
         # Booleans are implicitly bounded.
         @test CP.get_upper_bound(model, x) == 1
-        @test CP.get_upper_bound(model, MOI.SingleVariable(x)) == 1
+        @test CP.get_upper_bound(model, x) == 1
         @test CP.get_upper_bound(model, aff) == 1
         @test CP.get_upper_bound(model, aff2) == 2 # TODO: is this wanted? a ScalarAffineFunction cannot really be a Boolean formula (1+1=1), so it makes sense.
     end
@@ -369,14 +369,14 @@
 
         # So far, variables are unbounded.
         @test CP.get_upper_bound(model, x) === typemax(T)
-        @test CP.get_upper_bound(model, MOI.SingleVariable(x)) === typemax(T)
+        @test CP.get_upper_bound(model, x) === typemax(T)
         @test CP.get_upper_bound(model, aff) === typemax(T)
         @test CP.get_upper_bound(model, aff2) === typemax(T)
 
         # One variable has an upper bound. 
         MOI.add_constraint(model, x, MOI.LessThan(zero(T)))
         @test CP.get_upper_bound(model, x) === zero(T)
-        @test CP.get_upper_bound(model, MOI.SingleVariable(x)) === zero(T)
+        @test CP.get_upper_bound(model, x) === zero(T)
         @test CP.get_upper_bound(model, aff) === zero(T) # The other variable has a zero coefficient.
         @test CP.get_upper_bound(model, aff2) === typemax(T)
 
@@ -384,13 +384,13 @@
         # impact on the results.
         MOI.add_constraint(model, y, MOI.GreaterThan(zero(T)))
         @test CP.get_upper_bound(model, x) === zero(T)
-        @test CP.get_upper_bound(model, MOI.SingleVariable(x)) === zero(T)
+        @test CP.get_upper_bound(model, x) === zero(T)
         @test CP.get_upper_bound(model, aff) === zero(T)
         @test CP.get_upper_bound(model, aff2) === typemax(T)
 
         # Use an interval for the third variable.
         MOI.add_constraint(model, z, MOI.Interval(zero(T), one(T)))
         @test CP.get_upper_bound(model, z) === one(T)
-        @test CP.get_upper_bound(model, MOI.SingleVariable(z)) === one(T)
+        @test CP.get_upper_bound(model, z) === one(T)
     end
 end

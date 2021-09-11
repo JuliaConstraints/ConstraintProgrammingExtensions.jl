@@ -8,16 +8,16 @@ a `Strictly(GreaterThan(0.0))`.
 """
 struct DifferentFrom2PseudoMILPBridge{T <: Real} <: MOIBC.AbstractBridge
     var_abs::Union{Nothing, MOI.VariableIndex}
-    con_abs::Union{Nothing, MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}, MOI.ConstraintIndex{MOI.SingleVariable, CP.AbsoluteValue}}
-    con_abs_strictly::Union{Nothing, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, CP.Strictly{MOI.GreaterThan{T}, T}}, MOI.ConstraintIndex{MOI.SingleVariable, CP.Strictly{MOI.GreaterThan{T}, T}}}
-    con_abs_gt::Union{Nothing, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}, MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{T}}}
-    con_eq::Union{Nothing, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}, MOI.ConstraintIndex{MOI.SingleVariable, MOI.EqualTo{T}}}
+    con_abs::Union{Nothing, MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}, MOI.ConstraintIndex{MOI.VariableIndex, CP.AbsoluteValue}}
+    con_abs_strictly::Union{Nothing, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, CP.Strictly{MOI.GreaterThan{T}, T}}, MOI.ConstraintIndex{MOI.VariableIndex, CP.Strictly{MOI.GreaterThan{T}, T}}}
+    con_abs_gt::Union{Nothing, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}, MOI.ConstraintIndex{MOI.VariableIndex, MOI.GreaterThan{T}}}
+    con_eq::Union{Nothing, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}, MOI.ConstraintIndex{MOI.VariableIndex, MOI.EqualTo{T}}}
 end
 
 function MOIBC.bridge_constraint(
     ::Type{DifferentFrom2PseudoMILPBridge{T}},
     model,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::CP.DifferentFrom{T},
 ) where {T <: Real}
     return MOIBC.bridge_constraint(
@@ -51,7 +51,7 @@ function MOIBC.bridge_constraint(
     # encoded as-is.
     con_abs_strictly = MOI.add_constraint(
         model, 
-        one(T) * MOI.SingleVariable(var_abs),
+        one(T) * var_abs,
         CP.Strictly(MOI.GreaterThan(zero(T)))
     )
 
@@ -67,14 +67,14 @@ function MOIBC.bridge_constraint(
     var_abs = MOI.add_variable(model)
     con_abs = MOI.add_constraint(
         model, 
-        MOIU.vectorize([one(T) * MOI.SingleVariable(var_abs), f - s.value]),
+        MOIU.vectorize([one(T) * var_abs, f - s.value]),
         CP.AbsoluteValue(),
     )
 
     # For integers, the difference takes an integer value: > 0 is equivalent to >= 1.
     con_abs_gt = MOI.add_constraint(
         model, 
-        MOI.SingleVariable(var_abs),
+        var_abs,
         MOI.GreaterThan(one(T))
     )
 
@@ -100,7 +100,7 @@ end
 
 function MOI.supports_constraint(
     ::Type{DifferentFrom2PseudoMILPBridge{T}},
-    ::Union{Type{MOI.SingleVariable}, Type{MOI.ScalarAffineFunction{T}}},
+    ::Union{Type{MOI.VariableIndex}, Type{MOI.ScalarAffineFunction{T}}},
     ::Type{CP.DifferentFrom{T}},
 ) where {T <: Real}
     return true
@@ -113,14 +113,14 @@ end
 function MOIB.added_constraint_types(::Type{DifferentFrom2PseudoMILPBridge{T}}) where {T <: AbstractFloat}
     return [
         (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
-        (MOI.SingleVariable, CP.Strictly{MOI.GreaterThan{T}}),
+        (MOI.VariableIndex, CP.Strictly{MOI.GreaterThan{T}}),
     ]
 end
 
 function MOIB.added_constraint_types(::Type{DifferentFrom2PseudoMILPBridge{T}}) where {T <: Integer}
     return [
         (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
-        (MOI.SingleVariable, MOI.GreaterThan{T}),
+        (MOI.VariableIndex, MOI.GreaterThan{T}),
     ]
 end
 

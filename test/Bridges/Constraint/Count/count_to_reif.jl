@@ -10,8 +10,8 @@
     mock = MOIU.MockOptimizer(base_model)
     model = COIB.CountEqualTo2Reification{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.ZeroOne)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
@@ -34,7 +34,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_count, x_array...])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.([x_count, x_array...]))
+        MOIU.vectorize(MOI.VariableIndex.([x_count, x_array...]))
     else
         @assert false
     end
@@ -57,12 +57,12 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == array_size
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == array_size
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == array_size
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}()) == array_size
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == 1
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == bridge.vars
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == bridge.vars_bin
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}()) == bridge.vars_bin
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}()) == bridge.cons
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.con_sum]
     end

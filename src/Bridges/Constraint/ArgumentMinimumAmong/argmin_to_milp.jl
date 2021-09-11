@@ -4,11 +4,11 @@ constraints.
 """
 struct ArgumentMinimumAmong2MILPBridge{T} <: MOIBC.AbstractBridge
     vars::Vector{MOI.VariableIndex}
-    vars_bin::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    vars_bin::Vector{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     var_max::MOI.VariableIndex
     var_max_con::Union{
-        MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}, 
-        MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer},
+        MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}, 
+        MOI.ConstraintIndex{MOI.VariableIndex, MOI.Integer},
         Nothing
     }
     cons_lt::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}}
@@ -64,7 +64,7 @@ function MOIBC.bridge_constraint(
     cons_lt = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}[
         MOI.add_constraint(
             model, 
-            MOI.SingleVariable(var_max) - f_scalars[i + 1], 
+            var_max - f_scalars[i + 1], 
             MOI.LessThan(zero(T))
         )
         for i in 1:n_array
@@ -81,7 +81,7 @@ function MOIBC.bridge_constraint(
     cons_gt = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}[
         MOI.add_constraint(
             model, 
-            MOI.SingleVariable(var_max) - f_scalars[i + 1] - big_m[i] * (one(T) - MOI.SingleVariable(vars[i])), 
+            var_max - f_scalars[i + 1] - big_m[i] * (one(T) - vars[i]), 
             MOI.GreaterThan(zero(T))
         )
         for i in 1:n_array
@@ -90,14 +90,14 @@ function MOIBC.bridge_constraint(
     # At most one such inequality holds.
     con_choose_one = MOI.add_constraint(
         model, 
-        sum(one(T) * MOI.SingleVariable.(vars)), 
+        sum(one(T) * MOI.VariableIndex.(vars)), 
         MOI.EqualTo(one(T))
     )
 
     # Relate the index to the chosen value.
     con_index = MOI.add_constraint(
         model, 
-        f_scalars[1] - sum(T.(collect(1:n_array)) .* MOI.SingleVariable.(vars)), 
+        f_scalars[1] - sum(T.(collect(1:n_array)) .* MOI.VariableIndex.(vars)), 
         MOI.EqualTo(zero(T))
     )
 
@@ -135,7 +135,7 @@ end
 function MOI.get(
     b::ArgumentMinimumAmong2MILPBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return length(b.vars_bin)
@@ -178,7 +178,7 @@ end
 function MOI.get(
     b::ArgumentMinimumAmong2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return copy(b.vars_bin)

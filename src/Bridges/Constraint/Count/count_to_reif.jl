@@ -3,7 +3,7 @@ Bridges `CP.Count` to reification.
 """
 struct Count2ReificationBridge{T, S <: MOI.AbstractScalarSet} <: MOIBC.AbstractBridge
     vars::Vector{MOI.VariableIndex}
-    vars_bin::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    vars_bin::Vector{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     cons::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{S}}}
     con_sum::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
 end
@@ -36,7 +36,7 @@ function MOIBC.bridge_constraint(
             model,
             MOIU.vectorize(
                 MOI.ScalarAffineFunction{T}[
-                    one(T) * MOI.SingleVariable(vars[i]), 
+                    one(T) * vars[i], 
                     f_scalars[1 + i],
                 ]
             ),
@@ -47,7 +47,7 @@ function MOIBC.bridge_constraint(
 
     con_sum = MOI.add_constraint(
         model, 
-        sum(one(T) .* MOI.SingleVariable.(vars)) - f_scalars[1],
+        sum(one(T) .* MOI.VariableIndex.(vars)) - f_scalars[1],
         MOI.EqualTo(zero(T))
     )
 
@@ -80,7 +80,7 @@ end
 function MOI.get(
     b::Count2ReificationBridge{T, S},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T, S <: MOI.AbstractScalarSet}
     return length(b.vars_bin)
@@ -114,7 +114,7 @@ end
 function MOI.get(
     b::Count2ReificationBridge{T, S},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T, S <: MOI.AbstractScalarSet}
     return copy(b.vars_bin)

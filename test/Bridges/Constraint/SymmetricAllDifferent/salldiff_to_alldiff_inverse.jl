@@ -3,7 +3,7 @@
     model = COIB.SymmetricAllDifferent2AllDifferentInverse{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -30,7 +30,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x)
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x))
+        MOIU.vectorize(MOI.VariableIndex.(x))
     else
         @assert false
     end
@@ -44,7 +44,7 @@
     bridge = first(MOIBC.bridges(model))[2]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.SingleVariable, CP.SymmetricAllDifferent) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VariableIndex, CP.SymmetricAllDifferent) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.VectorAffineFunction{T}, CP.AllDifferent),

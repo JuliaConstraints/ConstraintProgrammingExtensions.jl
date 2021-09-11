@@ -3,7 +3,7 @@ Bridges `CP.Disjunction` to reification.
 """
 struct Disjunction2ReificationBridge{T} <: MOIBC.AbstractBridge
     vars::Vector{MOI.VariableIndex}
-    vars_bin::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    vars_bin::Vector{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     cons_reif::Vector{MOI.ConstraintIndex}
     # Ideally, Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{<: MOI.AbstractSet}}}, 
     # but Julia has no notion of type erasure.
@@ -40,7 +40,7 @@ function MOIBC.bridge_constraint(
             model,
             MOIU.vectorize(
                 [
-                    one(T) * MOI.SingleVariable(vars[i]),
+                    one(T) * vars[i],
                     f_scalars[cur_dim : (cur_dim + MOI.dimension(s.constraints[i]) - 1)]...,
                 ]
             ),
@@ -51,7 +51,7 @@ function MOIBC.bridge_constraint(
 
     con_disjunction = MOI.add_constraint(
         model, 
-        sum(one(T) .* MOI.SingleVariable.(vars)),
+        sum(one(T) .* MOI.VariableIndex.(vars)),
         MOI.GreaterThan(one(T))
     )
 
@@ -87,7 +87,7 @@ end
 function MOI.get(
     b::Disjunction2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return length(b.vars_bin)
@@ -121,7 +121,7 @@ end
 function MOI.get(
     b::Disjunction2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return copy(b.vars_bin)

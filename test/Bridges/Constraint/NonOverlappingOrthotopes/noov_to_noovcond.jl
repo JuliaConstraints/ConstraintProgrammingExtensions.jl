@@ -2,7 +2,7 @@
     mock = MOIU.MockOptimizer(ConditionallyNonOverlappingOrthotopesModel{T}())
     model = COIB.NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopes{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.ZeroOne)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
@@ -63,7 +63,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x)
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x))
+        MOIU.vectorize(MOI.VariableIndex.(x))
     else
         @assert false
     end
@@ -85,11 +85,11 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 1
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.EqualTo{T}}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.EqualTo{T}}()) == 1
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.NonOverlappingOrthotopes{CP.CONDITIONAL_NONVERLAPPING_ORTHOTOPES}}()) == 1
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.var]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.EqualTo{T}}()) == [bridge.var_con]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.EqualTo{T}}()) == [bridge.var_con]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.NonOverlappingOrthotopes{CP.CONDITIONAL_NONVERLAPPING_ORTHOTOPES}}()) == [bridge.con]
     end
 
@@ -97,7 +97,7 @@
         @test MOI.is_valid(model, bridge.var)
         @test MOI.is_valid(model, bridge.var_con)
         @test MOI.get(model, MOI.ConstraintSet(), bridge.var_con) == MOI.EqualTo(one(T))
-        @test MOI.get(model, MOI.ConstraintFunction(), bridge.var_con) == MOI.SingleVariable(bridge.var)
+        @test MOI.get(model, MOI.ConstraintFunction(), bridge.var_con) == bridge.var
     end
 
     @testset "New constraint" begin

@@ -9,7 +9,7 @@
     mock = MOIU.MockOptimizer(base_model)
     model = COIB.ValuePrecedence2Reification{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T}, 
@@ -35,7 +35,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x)
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x))
+        MOIU.vectorize(MOI.VariableIndex.(x))
     else
         @assert false
     end
@@ -49,7 +49,7 @@
     bridge = first(MOIBC.bridges(model))[2]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.SingleVariable, CP.SymmetricAllDifferent) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VariableIndex, CP.SymmetricAllDifferent) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.ZeroOne,)]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}),
@@ -57,12 +57,12 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 2 * (dim - 1)
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == 2 * (dim - 1)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == 2 * (dim - 1)
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}()) == 2 * (dim - 1)
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == dim - 1
 
         @test Set(MOI.get(bridge, MOI.ListOfVariableIndices())) == Set([bridge.vars_reif_precv..., bridge.vars_reif_value...])
-        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}())) == Set([bridge.vars_reif_precv_bin..., bridge.vars_reif_value_bin...])
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}())) == Set([bridge.vars_reif_precv_bin..., bridge.vars_reif_value_bin...])
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}())) == Set([bridge.cons_reif_value..., bridge.cons_reif_precv...])
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}())) == Set(bridge.cons_implication)
     end
@@ -80,10 +80,10 @@
             @test MOI.is_valid(model, bridge.vars_reif_value_bin[i])
 
             @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_reif_precv_bin[i]) == MOI.ZeroOne()
-            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_reif_precv_bin[i]) == MOI.SingleVariable(bridge.vars_reif_precv[i])
+            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_reif_precv_bin[i]) == bridge.vars_reif_precv[i]
 
             @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_reif_value_bin[i]) == MOI.ZeroOne()
-            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_reif_value_bin[i]) == MOI.SingleVariable(bridge.vars_reif_value[i])
+            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_reif_value_bin[i]) == bridge.vars_reif_value[i]
         end
     end
 

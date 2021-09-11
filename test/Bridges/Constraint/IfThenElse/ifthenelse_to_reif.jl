@@ -9,7 +9,7 @@
     mock = MOIU.MockOptimizer(base_model)
     model = COIB.IfThenElse2Reification{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.ZeroOne)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
@@ -34,7 +34,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_1, x_2, x_3])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.([x_1, x_2, x_3]))
+        MOIU.vectorize(MOI.VariableIndex.([x_1, x_2, x_3]))
     else
         @assert false
     end
@@ -56,12 +56,12 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 3
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == 3
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == 3
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reification}()) == 3
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == 2
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.var_condition, bridge.var_true, bridge.var_false]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == [bridge.var_condition_bin, bridge.var_true_bin, bridge.var_false_bin]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}()) == [bridge.var_condition_bin, bridge.var_true_bin, bridge.var_false_bin]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reification}()) == [bridge.con_reif_condition, bridge.con_reif_true, bridge.con_reif_false]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == [bridge.con_if, bridge.con_else]
     end

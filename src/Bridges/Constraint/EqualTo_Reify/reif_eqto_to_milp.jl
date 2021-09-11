@@ -5,7 +5,7 @@ Bridges `CP.Reification{MOI.EqualTo}` to MILP constraints.
 """
 struct ReificationEqualTo2MILPBridge{T <: Real} <: MOIBC.AbstractBridge
     var_abs::MOI.VariableIndex
-    var_abs_int::Union{Nothing, MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}}
+    var_abs_int::Union{Nothing, MOI.ConstraintIndex{MOI.VariableIndex, MOI.Integer}}
     con_abs::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}
     con_bigm::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}
     con_smallm::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}
@@ -54,7 +54,7 @@ function MOIBC.bridge_constraint(
         model, 
         MOIU.vectorize(
             MOI.ScalarAffineFunction{T}[
-                one(T) * MOI.SingleVariable(var_abs),
+                one(T) * var_abs,
                 f_scalars[2] - s.set.value
             ]
         ), 
@@ -67,7 +67,7 @@ function MOIBC.bridge_constraint(
     ))
     con_bigm = MOI.add_constraint(
         model, 
-        MOI.SingleVariable(var_abs) - bigm * (one(T) - f_scalars[1]), 
+        var_abs - bigm * (one(T) - f_scalars[1]), 
         MOI.LessThan(zero(T))
     )
 
@@ -80,7 +80,7 @@ function MOIBC.bridge_constraint(
 
     con_smallm = MOI.add_constraint(
         model, 
-        f_scalars[1] - MOI.SingleVariable(var_abs) / smallm,
+        f_scalars[1] - var_abs / smallm,
         MOI.LessThan(zero(T))
     )
 
@@ -124,7 +124,7 @@ end
 function MOI.get(
     ::ReificationEqualTo2MILPBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.Integer,
+        MOI.VariableIndex, MOI.Integer,
     },
 ) where {T <: Real}
     return 0
@@ -133,7 +133,7 @@ end
 function MOI.get(
     ::ReificationEqualTo2MILPBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.Integer,
+        MOI.VariableIndex, MOI.Integer,
     },
 ) where {T <: Integer}
     return 1
@@ -167,7 +167,7 @@ end
 function MOI.get(
     b::ReificationEqualTo2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.Integer,
+        MOI.VariableIndex, MOI.Integer,
     },
 ) where {T <: Integer}
     return [b.var_abs_int]

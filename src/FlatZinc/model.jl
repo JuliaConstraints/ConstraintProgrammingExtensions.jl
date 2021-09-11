@@ -39,7 +39,7 @@ mutable struct Model <: MOI.AbstractOptimizer
     # Memorise the objective sense and the function separately.
     # The function can only be a single variable, as per FlatZinc limitations.
     objective_sense::MOI.OptimizationSense
-    objective_function::Union{Nothing, MOI.SingleVariable}
+    objective_function::Union{Nothing, MOI.VariableIndex}
 
     # Map names to MOI variable indices.
     name_to_var::Dict{String, MOI.VariableIndex}
@@ -98,14 +98,14 @@ end
 
 # Set the objective.
 
-function MOI.get(model::Model, ::MOI.ObjectiveFunction{MOI.SingleVariable})
+function MOI.get(model::Model, ::MOI.ObjectiveFunction{MOI.VariableIndex})
     return model.objective_function
 end
 
 function MOI.set(
     model::Model,
-    ::MOI.ObjectiveFunction{MOI.SingleVariable},
-    f::MOI.SingleVariable,
+    ::MOI.ObjectiveFunction{MOI.VariableIndex},
+    f::MOI.VariableIndex,
 )
     model.objective_function = f
     return nothing
@@ -242,7 +242,7 @@ function MOI.add_constrained_variables(
     # require that all sets are identical, though.
     vidx = [_create_variable(model, sets[i]) for i in 1:length(sets)]
     cidx = [
-        _create_constraint(model, MOI.SingleVariable(vidx[i]), sets[i], true) for i in 1:length(sets)
+        _create_constraint(model, vidx[i], sets[i], true) for i in 1:length(sets)
     ]
     return vidx, cidx
 end
@@ -254,7 +254,7 @@ function MOI.add_constrained_variable(
     # Unlike FZN, MOI does not assume that a variable >= 0.0 is any different 
     # from a >= 0 (int).
     vidx = _create_variable(model, set)
-    cidx = _create_constraint(model, MOI.SingleVariable(vidx), set, true)
+    cidx = _create_constraint(model, vidx, set, true)
     return vidx, cidx
 end
 
@@ -308,35 +308,35 @@ end
 
 function MOI.supports_constraint(
     ::Model,
-    ::Type{MOI.SingleVariable},
+    ::Type{MOI.VariableIndex},
     ::Type{MOI.LessThan{Int}},
 )
     return true
 end
 function MOI.supports_constraint(
     ::Model,
-    ::Type{MOI.SingleVariable},
+    ::Type{MOI.VariableIndex},
     ::Type{MOI.LessThan{Float64}},
 )
     return true
 end
 function MOI.supports_constraint(
     ::Model,
-    ::Type{MOI.SingleVariable},
+    ::Type{MOI.VariableIndex},
     ::Type{CP.Strictly{MOI.LessThan{Float64}}},
 )
     return true
 end
 function MOI.supports_constraint(
     ::Model,
-    ::Type{MOI.SingleVariable},
+    ::Type{MOI.VariableIndex},
     ::Type{CP.Domain{Int}},
 )
     return true
 end
 function MOI.supports_constraint(
     ::Model,
-    ::Type{MOI.SingleVariable},
+    ::Type{MOI.VariableIndex},
     ::Type{MOI.Interval{Float64}},
 )
     return true

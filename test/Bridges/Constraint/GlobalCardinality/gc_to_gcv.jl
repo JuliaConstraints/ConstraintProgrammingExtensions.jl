@@ -2,7 +2,7 @@
     mock = MOIU.MockOptimizer(GlobalCardinalityVariableModel{T}())
     model = COIB.GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpen{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
@@ -26,7 +26,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_array..., x_counts...])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.([x_array..., x_counts...]))
+        MOIU.vectorize(MOI.VariableIndex.([x_array..., x_counts...]))
     else
         @assert false
     end
@@ -52,18 +52,18 @@
             @assert false
         end
         @test MOIB.added_constraint_types(typeof(bridge)) == [
-            (MOI.SingleVariable, MOI.EqualTo{T}),
+            (MOI.VariableIndex, MOI.EqualTo{T}),
             (MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == sought_size
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == ((T == Int) ? sought_size : 0)
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.EqualTo{T}}()) == sought_size
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.Integer}()) == ((T == Int) ? sought_size : 0)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.EqualTo{T}}()) == sought_size
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}}()) == 1
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == bridge.vars
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.Integer}()) == bridge.vars_int
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.EqualTo{T}}()) == bridge.cons_eq
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.Integer}()) == bridge.vars_int
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.EqualTo{T}}()) == bridge.cons_eq
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}}()) == [bridge.con_gcv]
     end
 
@@ -74,7 +74,7 @@
                 
             if T == Int
                 @test MOI.is_valid(model, bridge.vars_int[i])
-                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_int[i]) == MOI.SingleVariable(bridge.vars[i])
+                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_int[i]) == bridge.vars[i]
                 @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_int[i]) == MOI.Integer()
             end
         end
@@ -84,7 +84,7 @@
         @test length(bridge.cons_eq) == sought_size
         for i in 1:sought_size
             @test MOI.is_valid(model, bridge.cons_eq[i])
-            @test MOI.get(model, MOI.ConstraintFunction(), bridge.cons_eq[i]) == MOI.SingleVariable(bridge.vars[i])
+            @test MOI.get(model, MOI.ConstraintFunction(), bridge.cons_eq[i]) == bridge.vars[i]
             @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_eq[i]) == MOI.EqualTo(sought_values[i])
         end
     end

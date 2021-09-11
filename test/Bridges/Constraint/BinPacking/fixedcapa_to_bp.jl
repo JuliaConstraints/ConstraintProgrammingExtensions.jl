@@ -3,7 +3,7 @@
     model = COIB.FixedCapacityBinPacking2BinPacking{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -57,9 +57,9 @@
         end
     elseif fct_type == "vector affine function"
         if n_bins == 1
-            MOIU.vectorize(MOI.SingleVariable.([x_load_1, x_bin_1, x_bin_2]))
+            MOIU.vectorize(MOI.VariableIndex.([x_load_1, x_bin_1, x_bin_2]))
         elseif n_bins == 2
-            MOIU.vectorize(MOI.SingleVariable.([x_load_1, x_load_2, x_bin_1, x_bin_2]))
+            MOIU.vectorize(MOI.VariableIndex.([x_load_1, x_load_2, x_bin_1, x_bin_2]))
         else
             @assert false
         end

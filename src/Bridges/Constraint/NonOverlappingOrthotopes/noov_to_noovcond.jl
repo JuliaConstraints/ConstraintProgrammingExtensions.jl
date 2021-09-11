@@ -4,7 +4,7 @@ Bridges `CP.NonOverlappingOrthotopes{CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES}`
 """
 struct NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopesBridge{T} <: MOIBC.AbstractBridge
     var::MOI.VariableIndex
-    var_con::MOI.ConstraintIndex{MOI.SingleVariable, MOI.EqualTo{T}}
+    var_con::MOI.ConstraintIndex{MOI.VariableIndex, MOI.EqualTo{T}}
     con::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.NonOverlappingOrthotopes{CP.CONDITIONAL_NONVERLAPPING_ORTHOTOPES}}
 end
 
@@ -43,7 +43,7 @@ function MOIBC.bridge_constraint(
             push!(new_f, f_scalars[j])
             j += 1
         end
-        push!(new_f, one(T) * MOI.SingleVariable(var))
+        push!(new_f, one(T) * var)
     end
     new_f = MOIU.vectorize(new_f)
 
@@ -81,7 +81,7 @@ end
 function MOI.get(
     ::NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopesBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.EqualTo{T},
+        MOI.VariableIndex, MOI.EqualTo{T},
     },
 ) where {T}
     return 1
@@ -106,7 +106,7 @@ end
 function MOI.get(
     b::NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopesBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.EqualTo{T},
+        MOI.VariableIndex, MOI.EqualTo{T},
     },
 ) where {T}
     return [b.var_con]

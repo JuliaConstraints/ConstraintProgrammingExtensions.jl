@@ -3,8 +3,8 @@ Bridges `CP.GlobalCardinality` to `CP.GlobalCardinalityVariable`.
 """
 struct GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T} <: MOIBC.AbstractBridge
     vars::Vector{MOI.VariableIndex}
-    vars_int::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}}
-    cons_eq::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.EqualTo{T}}}
+    vars_int::Vector{MOI.ConstraintIndex{MOI.VariableIndex, MOI.Integer}}
+    cons_eq::Vector{MOI.ConstraintIndex{MOI.VariableIndex, MOI.EqualTo{T}}}
     con_gcv::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}}
 end
 
@@ -36,14 +36,14 @@ function MOIBC.bridge_constraint(
         )
     else
         vars = MOI.add_variables(model, length(s.values))
-        vars_int = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}[]
+        vars_int = MOI.ConstraintIndex{MOI.VariableIndex, MOI.Integer}[]
     end
 
     # Constrain these variables to take the sought (fixed) values.
     cons_eq = [
         MOI.add_constraint(
             model,
-            MOI.SingleVariable(vars[i]),
+            vars[i],
             MOI.EqualTo(s.values[i])
         ) 
         for i in 1:length(s.values)
@@ -56,7 +56,7 @@ function MOIBC.bridge_constraint(
         MOIU.vectorize(
             [
                 f_scalars...,
-                (one(T) .* MOI.SingleVariable.(vars))...
+                (one(T) .* MOI.VariableIndex.(vars))...
             ]
         ),
         CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}(s.dimension, length(s.values))
@@ -83,7 +83,7 @@ end
 
 function MOIB.added_constraint_types(::Type{GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T}}) where {T}
     return [
-        (MOI.SingleVariable, MOI.EqualTo{T}),
+        (MOI.VariableIndex, MOI.EqualTo{T}),
         (MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}),
     ]
 end
@@ -95,7 +95,7 @@ end
 function MOI.get(
     b::GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.Integer,
+        MOI.VariableIndex, MOI.Integer,
     },
 ) where {T}
     return length(b.vars_int)
@@ -104,7 +104,7 @@ end
 function MOI.get(
     b::GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.EqualTo{T},
+        MOI.VariableIndex, MOI.EqualTo{T},
     },
 ) where {T}
     return length(b.cons_eq)
@@ -129,7 +129,7 @@ end
 function MOI.get(
     b::GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.Integer,
+        MOI.VariableIndex, MOI.Integer,
     },
 ) where {T}
     return copy(b.vars_int)
@@ -138,7 +138,7 @@ end
 function MOI.get(
     b::GlobalCardinalityFixedOpen2GlobalCardinalityVariableOpenBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.EqualTo{T},
+        MOI.VariableIndex, MOI.EqualTo{T},
     },
 ) where {T}
     return copy(b.cons_eq)

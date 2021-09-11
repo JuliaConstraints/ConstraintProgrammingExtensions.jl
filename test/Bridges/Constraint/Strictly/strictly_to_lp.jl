@@ -3,7 +3,7 @@
     model = COIB.Strictly2LP{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -23,7 +23,7 @@
     end
 
     fct = if fct_type == "single variable"
-        MOI.SingleVariable(x)
+        x
     elseif fct_type == "scalar affine function"
         MOI.ScalarAffineFunction(
             [MOI.ScalarAffineTerm(one(T), x)], 
@@ -40,7 +40,7 @@
     bridge = first(MOIBC.bridges(model))[2]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.SingleVariable, CP.Strictly{set_type, T}) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VariableIndex, CP.Strictly{set_type, T}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),

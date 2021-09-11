@@ -4,10 +4,10 @@ function alldifferent_vectorofvariables_test(
 )
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Interval{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Interval{Int})
     @test MOI.supports_constraint(model, MOI.VectorOfVariables, CP.AllDifferent)
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.EqualTo{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{Int})
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -40,8 +40,8 @@ function alldifferent_vectoraffinefunction_test(
 )
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Interval{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Interval{Int})
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{Int},
@@ -59,8 +59,8 @@ function alldifferent_vectoraffinefunction_test(
     c1 = MOI.add_constraint(model, x1, MOI.Interval(1, 2))
     c2 = MOI.add_constraint(model, x2, MOI.Interval(1, 2))
 
-    c3 = MOI.add_constraint(model, MOIU.vectorize(1 * MOI.SingleVariable.([x1, x2])), CP.AllDifferent(2))
-    c4 = MOI.add_constraint(model, 1 * MOI.SingleVariable(x1), MOI.EqualTo(1))
+    c3 = MOI.add_constraint(model, MOIU.vectorize(1 * MOI.VariableIndex.([x1, x2])), CP.AllDifferent(2))
+    c4 = MOI.add_constraint(model, 1 * x1, MOI.EqualTo(1))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)

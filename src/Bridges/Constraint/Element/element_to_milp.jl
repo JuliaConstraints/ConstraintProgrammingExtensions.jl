@@ -4,7 +4,7 @@ index in the array.
 """
 struct Element2MILPBridge{T} <: MOIBC.AbstractBridge
     vars::Vector{MOI.VariableIndex}
-    vars_bin::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    vars_bin::Vector{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     con_unary::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
     con_choose_one::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
     con_value::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
@@ -38,19 +38,19 @@ function MOIBC.bridge_constraint(
 
     con_unary = MOI.add_constraint(
         model, 
-        sum(T(i) * MOI.SingleVariable(vars[i]) for i in 1:length(s.values)) - f_index,
+        sum(T(i) * vars[i] for i in 1:length(s.values)) - f_index,
         MOI.EqualTo(zero(T))
     )
 
     con_choose_one = MOI.add_constraint(
         model, 
-        sum(one(T) .* MOI.SingleVariable.(vars)),
+        sum(one(T) .* MOI.VariableIndex.(vars)),
         MOI.EqualTo(one(T))
     )
 
     con_value = MOI.add_constraint(
         model, 
-        sum(s.values[i] * MOI.SingleVariable(vars[i]) for i in 1:length(s.values)) - f_value,
+        sum(s.values[i] * vars[i] for i in 1:length(s.values)) - f_value,
         MOI.EqualTo(zero(T))
     )
 
@@ -82,7 +82,7 @@ end
 function MOI.get(
     b::Element2MILPBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return length(b.vars_bin)
@@ -107,7 +107,7 @@ end
 function MOI.get(
     b::Element2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return copy(b.vars_bin)

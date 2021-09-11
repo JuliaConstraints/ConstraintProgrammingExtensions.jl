@@ -10,7 +10,7 @@
     model = COIB.ReificationDifferentFrom2Indicator{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -38,7 +38,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x, y])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.([x, y]))
+        MOIU.vectorize(MOI.VariableIndex.([x, y]))
     else
         @assert false
     end

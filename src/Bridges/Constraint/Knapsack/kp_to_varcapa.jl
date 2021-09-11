@@ -7,7 +7,7 @@ capacity variables.
 """
 struct Knapsack2VariableCapacityKnapsackBridge{T} <: MOIBC.AbstractBridge
     capa_var::MOI.VariableIndex
-    capa_con::Union{MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}, Nothing}
+    capa_con::Union{MOI.ConstraintIndex{MOI.VariableIndex, MOI.Integer}, Nothing}
     kp::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}}
 end
 
@@ -97,7 +97,7 @@ MOI.get(b::Knapsack2VariableCapacityKnapsackBridge, ::MOI.NumberOfVariables) = 1
 function MOI.get(
     ::Knapsack2VariableCapacityKnapsackBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable,
+        MOI.VariableIndex,
         MOI.Integer,
     },
 ) where {T <: Integer}
@@ -107,7 +107,7 @@ end
 function MOI.get(
     ::Knapsack2VariableCapacityKnapsackBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable,
+        MOI.VariableIndex,
         MOI.Integer,
     },
 ) where {T <: Real}
@@ -144,7 +144,7 @@ end
 function MOI.get(
     b::Knapsack2VariableCapacityKnapsackBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable,
+        MOI.VariableIndex,
         MOI.Integer,
     },
 ) where {T <: Integer}

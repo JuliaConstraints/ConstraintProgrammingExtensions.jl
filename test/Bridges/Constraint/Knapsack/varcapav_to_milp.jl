@@ -3,7 +3,7 @@
     model = COIB.ValuedVariableCapacityKnapsack2MILP{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -40,7 +40,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_1, x_2, x_capa, x_value])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.([x_1, x_2, x_capa, x_value]))
+        MOIU.vectorize(MOI.VariableIndex.([x_1, x_2, x_capa, x_value]))
     else
         @assert false
     end

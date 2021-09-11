@@ -14,7 +14,7 @@ end
 function MOIBC.bridge_constraint(
     ::Type{Strictly2LPBridge{T}},
     model,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::Union{CP.Strictly{MOI.LessThan{T}, T}, CP.Strictly{MOI.GreaterThan{T}, T}},
 ) where {T}
     return MOIBC.bridge_constraint(
@@ -87,7 +87,7 @@ end
 
 function MOI.supports_constraint(
     ::Type{Strictly2LPBridge{T}},
-    ::Union{Type{MOI.SingleVariable}, Type{MOI.ScalarAffineFunction{T}}},
+    ::Union{Type{MOI.VariableIndex}, Type{MOI.ScalarAffineFunction{T}}},
     ::Union{Type{CP.Strictly{MOI.LessThan{T}, T}}, Type{CP.Strictly{MOI.GreaterThan{T}, T}}},
 ) where {T}
     return true

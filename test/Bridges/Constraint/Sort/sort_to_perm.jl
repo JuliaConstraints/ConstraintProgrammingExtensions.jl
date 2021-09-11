@@ -4,7 +4,7 @@
     model = COIB.Sort2SortPermutation{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -26,7 +26,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x)
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x))
+        MOIU.vectorize(MOI.VariableIndex.(x))
     else
         @assert false
     end
@@ -48,11 +48,11 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == array_dim
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == array_dim
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.Integer}()) == array_dim
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.SortPermutation}()) == 1
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == bridge.vars
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.Integer}()) == bridge.vars_int
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.Integer}()) == bridge.vars_int
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.SortPermutation}()) == [bridge.con_perm]
     end
 
@@ -85,7 +85,7 @@
         for i in 1:array_dim
             @test MOI.is_valid(model, bridge.vars[i])
             @test MOI.is_valid(model, bridge.vars_int[i])
-            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_int[i]) == MOI.SingleVariable(bridge.vars[i])
+            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_int[i]) == bridge.vars[i]
             @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_int[i]) == MOI.Integer()
         end
     end

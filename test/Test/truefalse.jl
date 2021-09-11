@@ -13,8 +13,8 @@ end
 function true_test(model::MOI.ModelLike, config::MOIT.Config)
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.EqualTo{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{Int})
     @test MOI.supports_constraint(model, MOI.VectorOfVariables, CP.True)
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -41,8 +41,8 @@ end
 function false_test(model::MOI.ModelLike, config::MOIT.Config)
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.EqualTo{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{Int})
     @test MOI.supports_constraint(model, MOI.VectorOfVariables, CP.False)
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())

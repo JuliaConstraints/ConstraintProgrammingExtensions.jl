@@ -9,7 +9,7 @@
     mock = MOIU.MockOptimizer(base_model)
     model = COIB.Inverse2Reification{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.ZeroOne)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
@@ -32,7 +32,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x..., y...])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.([x..., y...]))
+        MOIU.vectorize(MOI.VariableIndex.([x..., y...]))
     else
         @assert false
     end
@@ -55,12 +55,12 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 2 * dim ^ 2
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == 2 * dim ^ 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == 2 * dim ^ 2
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}()) == 2 * dim ^ 2
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == dim ^ 2
 
         @test Set(MOI.get(bridge, MOI.ListOfVariableIndices())) == Set([bridge.vars_first..., bridge.vars_second...])
-        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}())) == Set([bridge.vars_first_bin..., bridge.vars_second_bin...])
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}())) == Set([bridge.vars_first_bin..., bridge.vars_second_bin...])
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}())) == Set([bridge.cons_first_reif..., bridge.cons_second_reif...])
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == bridge.cons_equivalence
     end

@@ -4,9 +4,9 @@ encoding of the index in the array.
 """
 struct ElementVariableArray2MILPBridge{T} <: MOIBC.AbstractBridge
     vars_unary::Vector{MOI.VariableIndex}
-    vars_unary_bin::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    vars_unary_bin::Vector{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     vars_product::Vector{MOI.VariableIndex}
-    vars_product_int::Vector{MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}}
+    vars_product_int::Vector{MOI.ConstraintIndex{MOI.VariableIndex, MOI.Integer}}
 
     con_unary::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
     con_choose_one::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
@@ -52,19 +52,19 @@ function MOIBC.bridge_constraint(
         vars_product, vars_product_int = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:s.dimension])
     else
         vars_product = MOI.add_variables(model, s.dimension)
-        vars_product_int = MOI.ConstraintIndex{MOI.SingleVariable, MOI.Integer}[]
+        vars_product_int = MOI.ConstraintIndex{MOI.VariableIndex, MOI.Integer}[]
     end
 
     # Unary decomposition of the index.
     con_unary = MOI.add_constraint(
         model, 
-        sum(T(i) * MOI.SingleVariable(vars_unary[i]) for i in 1:s.dimension) - f_index,
+        sum(T(i) * vars_unary[i] for i in 1:s.dimension) - f_index,
         MOI.EqualTo(zero(T))
     )
 
     con_choose_one = MOI.add_constraint(
         model, 
-        sum(one(T) .* MOI.SingleVariable.(vars_unary)),
+        sum(one(T) .* MOI.VariableIndex.(vars_unary)),
         MOI.EqualTo(one(T))
     )
 
@@ -74,7 +74,7 @@ function MOIBC.bridge_constraint(
     #                       vars_product[i]
     con_value = MOI.add_constraint(
         model, 
-        sum(one(T) .* MOI.SingleVariable.(vars_product)) - f_value,
+        sum(one(T) .* MOI.VariableIndex.(vars_product)) - f_value,
         MOI.EqualTo(zero(T))
     )
 
@@ -90,7 +90,7 @@ function MOIBC.bridge_constraint(
     con_product_lt = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}[
         MOI.add_constraint(
             model, 
-            MOI.SingleVariable(vars_product[i]) - big_m[i] * MOI.SingleVariable(vars_unary[i]),
+            vars_product[i]) - big_m[i] * vars_unary[i]),
             MOI.LessThan(zero(T))
         )
         for i in 1:s.dimension
@@ -99,7 +99,7 @@ function MOIBC.bridge_constraint(
     con_product_gt = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}[
         MOI.add_constraint(
             model, 
-            MOI.SingleVariable(vars_product[i]) - f_array[i] + big_m[i] * MOI.SingleVariable(vars_unary[i]),
+            vars_product[i]) - f_array[i] + big_m[i] * vars_unary[i]),
             MOI.GreaterThan(big_m[i])
         )
         for i in 1:s.dimension
@@ -147,7 +147,7 @@ end
 function MOI.get(
     b::ElementVariableArray2MILPBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return length(b.vars_unary_bin)
@@ -156,7 +156,7 @@ end
 function MOI.get(
     b::ElementVariableArray2MILPBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.Integer,
+        MOI.VariableIndex, MOI.Integer,
     },
 ) where {T}
     return length(b.vars_product_int)
@@ -199,7 +199,7 @@ end
 function MOI.get(
     b::ElementVariableArray2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return copy(b.vars_unary_bin)
@@ -208,7 +208,7 @@ end
 function MOI.get(
     b::ElementVariableArray2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.Integer,
+        MOI.VariableIndex, MOI.Integer,
     },
 ) where {T}
     return copy(b.vars_product_int)

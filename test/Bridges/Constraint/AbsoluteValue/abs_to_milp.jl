@@ -3,7 +3,7 @@
     model = COIB.AbsoluteValue2MILP{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -32,7 +32,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_abs, x])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.([x_abs, x]))
+        MOIU.vectorize(MOI.VariableIndex.([x_abs, x]))
     else
         @assert false
     end
@@ -59,14 +59,14 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 3
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == 1
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.GreaterThan{T}}()) == 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.GreaterThan{T}}()) == 2
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == 2
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == 2
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.var_bin, bridge.var_pos, bridge.var_neg]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}()) == [bridge.var_bin_con]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.GreaterThan{T}}()) == [bridge.var_pos_con, bridge.var_neg_con]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}()) == [bridge.var_bin_con]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.GreaterThan{T}}()) == [bridge.var_pos_con, bridge.var_neg_con]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.con_original_var, bridge.con_abs_var]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == [bridge.con_pos_var_big_m, bridge.con_neg_var_big_m]
     end

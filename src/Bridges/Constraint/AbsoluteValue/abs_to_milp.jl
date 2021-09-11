@@ -14,11 +14,11 @@ computed based on the bounds for each variable](https://github.com/yalmip/YALMIP
 """
 struct AbsoluteValue2MILPBridge{T} <: MOIBC.AbstractBridge
     var_bin::MOI.VariableIndex
-    var_bin_con::MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}
+    var_bin_con::MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}
     var_pos::MOI.VariableIndex
-    var_pos_con::MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{T}}
+    var_pos_con::MOI.ConstraintIndex{MOI.VariableIndex, MOI.GreaterThan{T}}
     var_neg::MOI.VariableIndex
-    var_neg_con::MOI.ConstraintIndex{MOI.SingleVariable, MOI.GreaterThan{T}}
+    var_neg_con::MOI.ConstraintIndex{MOI.VariableIndex, MOI.GreaterThan{T}}
 
     con_original_var::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
     con_abs_var::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
@@ -61,12 +61,12 @@ function MOIBC.bridge_constraint(
     # Relate the positive and negative parts to the set variables.
     con_original_var = MOI.add_constraint(
         model, 
-        f_scalars[2] - MOI.SingleVariable(var_pos) + MOI.SingleVariable(var_neg),
+        f_scalars[2] - var_pos + var_neg,
         MOI.EqualTo(zero(T))
     )
     con_abs_var = MOI.add_constraint(
         model, 
-        f_scalars[1] - MOI.SingleVariable(var_pos) - MOI.SingleVariable(var_neg),
+        f_scalars[1] - var_pos - var_neg,
         MOI.EqualTo(zero(T))
     )
 
@@ -79,12 +79,12 @@ function MOIBC.bridge_constraint(
     # Big-M constraints.
     con_pos_var_big_m = MOI.add_constraint(
         model, 
-        MOI.SingleVariable(var_pos) - M * MOI.SingleVariable(var_bin), 
+        var_pos - M * var_bin, 
         MOI.LessThan(zero(T))
     )
     con_neg_var_big_m = MOI.add_constraint(
         model, 
-        MOI.SingleVariable(var_neg) - M * (1 - MOI.SingleVariable(var_bin)), 
+        var_neg - M * (1 - var_bin), 
         MOI.LessThan(zero(T))
     )    
 
@@ -120,7 +120,7 @@ end
 function MOI.get(
     ::AbsoluteValue2MILPBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return 1
@@ -129,7 +129,7 @@ end
 function MOI.get(
     ::AbsoluteValue2MILPBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.GreaterThan{T},
+        MOI.VariableIndex, MOI.GreaterThan{T},
     },
 ) where {T}
     return 2
@@ -163,7 +163,7 @@ end
 function MOI.get(
     b::AbsoluteValue2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return [b.var_bin_con]
@@ -172,7 +172,7 @@ end
 function MOI.get(
     b::AbsoluteValue2MILPBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.GreaterThan{T},
+        MOI.VariableIndex, MOI.GreaterThan{T},
     },
 ) where {T}
     return [b.var_pos_con, b.var_neg_con]

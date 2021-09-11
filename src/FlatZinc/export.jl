@@ -262,7 +262,7 @@ function write_constraint(
     io::IO,
     model::Model,
     index::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::Union{
         MOI.EqualTo{T},
         MOI.LessThan{T},
@@ -434,7 +434,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::MOI.LessThan{Int},
     ::Val{:int},
 )
@@ -447,7 +447,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::MOI.LessThan{Bool},
     ::Val{:bool},
 )
@@ -480,7 +480,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::MOI.EqualTo{Int},
     ::Val{:int},
 )
@@ -573,7 +573,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::CP.DifferentFrom{Int},
 )
     @assert CP.is_integer(model, f.variable) || CP.is_binary(model, f.variable)
@@ -585,7 +585,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::CP.DifferentFrom{Bool},
 )
     @assert CP.is_binary(model, f.variable)
@@ -684,7 +684,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::CP.Strictly{MOI.LessThan{Int}},
 )
     @assert CP.is_integer(model, f) || CP.is_binary(model, f)
@@ -696,7 +696,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::CP.Strictly{MOI.LessThan{Bool}},
 )
     @assert CP.is_binary(model, f)
@@ -765,7 +765,7 @@ function write_constraint(
     io::IO,
     model::Model,
     index::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     ::CP.Domain{Int},
 )
     print(io, "set_in($(_fzn_f(model, f)), $(model.sets_id[index]))")
@@ -814,7 +814,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::MOI.EqualTo{T},
     ::Val{:bool},
 ) where {T <: Union{Int, Bool}}
@@ -935,7 +935,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::MOI.EqualTo{Float64},
     ::Val{:float},
 )
@@ -968,7 +968,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::MOI.Interval{Float64},
 )
     print(io, "float_in($(_fzn_f(model, f)), $(s.lower), $(s.upper))")
@@ -1026,7 +1026,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::MOI.LessThan{Float64},
     ::Val{:float},
 )
@@ -1038,7 +1038,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::CP.Strictly{MOI.LessThan{Float64}, Float64},
     ::Val{:float},
 )
@@ -1212,7 +1212,7 @@ function write_constraint(
     io::IO,
     model::Model,
     ::MOI.ConstraintIndex,
-    f::MOI.SingleVariable,
+    f::MOI.VariableIndex,
     s::CP.DifferentFrom{Float64},
 )
     print(io, "float_ne($(_fzn_f(model, f.variable)), $(s.value))")
@@ -1321,7 +1321,7 @@ end
 
 # Function printing.
 
-_fzn_f(model::Model, f::MOI.SingleVariable) = _fzn_f(model, f.variable)
+_fzn_f(model::Model, f::MOI.VariableIndex) = _fzn_f(model, f.variable)
 _fzn_f(model::Model, f::MOI.VariableIndex) = model.variable_info[f].name
 function _fzn_f(model::Model, fs::Vector{MOI.VariableIndex})
     return join([_fzn_f(model, f) for f in fs], ", ")

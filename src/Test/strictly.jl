@@ -4,8 +4,8 @@ function strictly_lessthan_singlevariable_test(
 )
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
-    @test MOI.supports_constraint(model, MOI.SingleVariable, CP.Domain{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, CP.Domain{Int})
     @test MOI.supports_constraint(
         model,
         MOI.ScalarAffineFunction{Int},
@@ -20,7 +20,7 @@ function strictly_lessthan_singlevariable_test(
 
     c3 = MOI.add_constraint(
         model,
-        1 * MOI.SingleVariable(x1) - 1 * MOI.SingleVariable(x2),
+        1 * x1 - 1 * x2,
         CP.Strictly(MOI.LessThan(0)),
     )
 
@@ -46,8 +46,8 @@ function strictly_greaterthan_singlevariable_test(
 )
     MOI.empty!(model)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
-    @test MOI.supports_constraint(model, MOI.SingleVariable, CP.Domain{Int})
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, CP.Domain{Int})
     @test MOI.supports_constraint(
         model,
         MOI.ScalarAffineFunction{Int},
@@ -62,7 +62,7 @@ function strictly_greaterthan_singlevariable_test(
 
     c3 = MOI.add_constraint(
         model,
-        1 * MOI.SingleVariable(x1) - 1 * MOI.SingleVariable(x2),
+        1 * x1 - 1 * x2,
         CP.Strictly(MOI.GreaterThan(0)),
     )
 

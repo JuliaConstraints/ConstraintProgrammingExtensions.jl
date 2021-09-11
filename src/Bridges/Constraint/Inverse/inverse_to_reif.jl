@@ -3,9 +3,9 @@ Bridges `CP.Inverse` to reification.
 """
 struct Inverse2ReificationBridge{T} <: MOIBC.AbstractBridge
     vars_first::Matrix{MOI.VariableIndex}
-    vars_first_bin::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    vars_first_bin::Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     vars_second::Matrix{MOI.VariableIndex}
-    vars_second_bin::Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}
+    vars_second_bin::Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     cons_first_reif::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}}
     cons_second_reif::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}}
     cons_equivalence::Matrix{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
@@ -36,9 +36,9 @@ function MOIBC.bridge_constraint(
     f_y = f_scalars[(s.dimension + 1):(2 * s.dimension)]
 
     vars_first = Matrix{MOI.VariableIndex}(undef, s.dimension, s.dimension)
-    vars_first_bin = Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}(undef, s.dimension, s.dimension)
+    vars_first_bin = Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}(undef, s.dimension, s.dimension)
     vars_second = Matrix{MOI.VariableIndex}(undef, s.dimension, s.dimension)
-    vars_second_bin = Matrix{MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}}(undef, s.dimension, s.dimension)
+    vars_second_bin = Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}(undef, s.dimension, s.dimension)
 
     for i in 1:s.dimension
         vars_first[i, :], vars_first_bin[i, :] = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:s.dimension])
@@ -58,7 +58,7 @@ function MOIBC.bridge_constraint(
                 model, 
                 MOIU.vectorize(
                     [
-                        one(T) * MOI.SingleVariable(vars_first[i, j]), 
+                        one(T) * vars_first[i, j], 
                         f_x[i] - T(j)
                     ]
                 ),
@@ -69,7 +69,7 @@ function MOIBC.bridge_constraint(
                 model, 
                 MOIU.vectorize(
                     [
-                        one(T) * MOI.SingleVariable(vars_second[i, j]), 
+                        one(T) * vars_second[i, j], 
                         f_y[j] - T(i)
                     ]
                 ),
@@ -78,7 +78,7 @@ function MOIBC.bridge_constraint(
 
             cons_equivalence[i, j] = MOI.add_constraint(
                 model, 
-                one(T) * MOI.SingleVariable(vars_first[i, j]) - one(T) * MOI.SingleVariable(vars_second[i, j]),
+                one(T) * vars_first[i, j] - one(T) * vars_second[i, j],
                 MOI.EqualTo(zero(T))
             )
         end
@@ -115,7 +115,7 @@ end
 function MOI.get(
     b::Inverse2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
 return length(b.vars_first_bin) + length(b.vars_second_bin)
@@ -149,7 +149,7 @@ end
 function MOI.get(
     b::Inverse2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return vcat(b.vars_first_bin, b.vars_second_bin)

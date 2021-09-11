@@ -3,7 +3,7 @@
     model = COIB.Knapsack2VariableCapacityKnapsack{T}(mock)
 
     if T == Int
-        @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
+        @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
     end
     @test MOI.supports_constraint(
         model,
@@ -31,7 +31,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_1, x_2])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.([x_1, x_2]))
+        MOIU.vectorize(MOI.VariableIndex.([x_1, x_2]))
     else
         @assert false
     end
@@ -58,12 +58,12 @@
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 1
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}}()) == 1
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.Integer}()) == ((T == Int) ? 1 : 0)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.Integer}()) == ((T == Int) ? 1 : 0)
 
         @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.capa_var]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}}()) == [bridge.kp]
         if T == Int
-            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.Integer}()) == [bridge.capa_con]
+            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.Integer}()) == [bridge.capa_con]
         end
     end
 

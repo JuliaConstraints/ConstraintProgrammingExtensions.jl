@@ -3,11 +3,11 @@ Bridges `CP.Conjunction` to reification.
 """
 struct Conjunction2ReificationBridge{T} <: MOIBC.AbstractBridge
     var::MOI.VariableIndex
-    var_bin::MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}
+    var_bin::MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}
     cons_reif::Vector{MOI.ConstraintIndex}
     # Ideally, Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{<: MOI.AbstractSet}}}, 
     # but Julia has no notion of type erasure.
-    con_conjunction::MOI.ConstraintIndex{MOI.SingleVariable, MOI.EqualTo{T}}
+    con_conjunction::MOI.ConstraintIndex{MOI.VariableIndex, MOI.EqualTo{T}}
 end
 
 function MOIBC.bridge_constraint(
@@ -40,7 +40,7 @@ function MOIBC.bridge_constraint(
             model,
             MOIU.vectorize(
                 [
-                    one(T) * MOI.SingleVariable(var),
+                    one(T) * var,
                     f_scalars[cur_dim : (cur_dim + MOI.dimension(s.constraints[i]) - 1)]...,
                 ]
             ),
@@ -51,7 +51,7 @@ function MOIBC.bridge_constraint(
 
     con_conjunction = MOI.add_constraint(
         model, 
-        MOI.SingleVariable(var),
+        var,
         MOI.EqualTo(one(T))
     )
 
@@ -76,7 +76,7 @@ end
 function MOIB.added_constraint_types(::Type{Conjunction2ReificationBridge{T}}) where {T}
     return [
         (MOI.VectorAffineFunction{T}, CP.Reification), # TODO: how to be more precise?
-        (MOI.SingleVariable, MOI.EqualTo{T}),
+        (MOI.VariableIndex, MOI.EqualTo{T}),
     ]
 end
 
@@ -87,7 +87,7 @@ end
 function MOI.get(
     ::Conjunction2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return 1
@@ -105,7 +105,7 @@ end
 function MOI.get(
     ::Conjunction2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.EqualTo{T},
+        MOI.VariableIndex, MOI.EqualTo{T},
     },
 ) where {T}
     return 1
@@ -121,7 +121,7 @@ end
 function MOI.get(
     b::Conjunction2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return [b.var_bin]
@@ -139,7 +139,7 @@ end
 function MOI.get(
     b::Conjunction2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.EqualTo{T},
+        MOI.VariableIndex, MOI.EqualTo{T},
     },
 ) where {T}
     return [b.con_conjunction]

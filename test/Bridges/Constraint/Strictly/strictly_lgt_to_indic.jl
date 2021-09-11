@@ -2,7 +2,7 @@
     mock = MOIU.MockOptimizer(IndicatorMILPModel{T}())
     model = COIB.StrictlyLexicographicallyGreaterThan2Indicator{T}(mock)
 
-    @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.ZeroOne)
+    @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.ZeroOne)
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
@@ -24,7 +24,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables(x_array)
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.SingleVariable.(x_array))
+        MOIU.vectorize(MOI.VariableIndex.(x_array))
     else
         @assert false
     end
@@ -47,13 +47,13 @@
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 2 * (x_size - 1) * y_size
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.SingleVariable, MOI.ZeroOne}()) == 2 * (x_size - 1) * y_size
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == 2 * (x_size - 1) * y_size
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == x_size - 1 + (x_size - 1) * (y_size - 1)
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}()) == (x_size - 1) * y_size
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}}()) == (x_size - 1) * y_size
 
         @test Set(MOI.get(bridge, MOI.ListOfVariableIndices())) == Set([bridge.vars_eq..., bridge.vars_gt...])
-        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.SingleVariable, MOI.ZeroOne}())) == Set([bridge.vars_eq_bin..., bridge.vars_gt_bin...])
+        @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}())) == Set([bridge.vars_eq_bin..., bridge.vars_gt_bin...])
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}())) == Set([vec(bridge.cons_move)..., bridge.cons_one_gt...])
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}())) == Set(bridge.cons_indic_eq)
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}}())) == Set(bridge.cons_indic_gt)
@@ -77,8 +77,8 @@
                 
                 @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_eq_bin[i, j]) == MOI.ZeroOne()
                 @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_gt_bin[i, j]) == MOI.ZeroOne()
-                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_eq_bin[i, j]) == MOI.SingleVariable(bridge.vars_eq[i, j])
-                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_gt_bin[i, j]) == MOI.SingleVariable(bridge.vars_gt[i, j])
+                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_eq_bin[i, j]) == bridge.vars_eq[i, j]
+                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_gt_bin[i, j]) == bridge.vars_gt[i, j]
             end
         end
     end

@@ -4,8 +4,8 @@ Bridges `CP.Implication` to reification.
 struct Implication2ReificationBridge{T} <: MOIBC.AbstractBridge
     var_antecedent::MOI.VariableIndex
     var_consequent::MOI.VariableIndex
-    var_antecedent_bin::MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}
-    var_consequent_bin::MOI.ConstraintIndex{MOI.SingleVariable, MOI.ZeroOne}
+    var_antecedent_bin::MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}
+    var_consequent_bin::MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}
     con_reif_antecedent::MOI.ConstraintIndex
     con_reif_consequent::MOI.ConstraintIndex
     # Ideally, Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{<: MOI.AbstractSet}}}, 
@@ -41,7 +41,7 @@ function MOIBC.bridge_constraint(
         model,
         MOIU.vectorize(
             [
-                one(T) * MOI.SingleVariable(var_antecedent),
+                one(T) * var_antecedent,
                 f_scalars[1 : MOI.dimension(s.antecedent)]...,
             ]
         ),
@@ -52,7 +52,7 @@ function MOIBC.bridge_constraint(
         model,
         MOIU.vectorize(
             [
-                one(T) * MOI.SingleVariable(var_consequent),
+                one(T) * var_consequent,
                 f_scalars[(MOI.dimension(s.antecedent) + 1) : (MOI.dimension(s.antecedent) + MOI.dimension(s.consequent))]...,
             ]
         ),
@@ -64,7 +64,7 @@ function MOIBC.bridge_constraint(
     #     var_consequent - var_antecedent ≥ 0
     con_implication = MOI.add_constraint(
         model, 
-        one(T) * MOI.SingleVariable(var_consequent) - one(T) * MOI.SingleVariable(var_antecedent),
+        one(T) * var_consequent - one(T) * var_antecedent,
         MOI.GreaterThan(zero(T))
     )
 
@@ -99,7 +99,7 @@ end
 function MOI.get(
     ::Implication2ReificationBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return 2
@@ -133,7 +133,7 @@ end
 function MOI.get(
     b::Implication2ReificationBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.SingleVariable, MOI.ZeroOne,
+        MOI.VariableIndex, MOI.ZeroOne,
     },
 ) where {T}
     return [b.var_antecedent_bin, b.var_consequent_bin]
