@@ -888,9 +888,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].f.terms[2].coefficient === -1
-            @test m.constraint_info[nc].f.terms[2].variable_index == x4
+            @test m.constraint_info[nc].f.terms[2].variabl == x4
             @test m.constraint_info[nc].s == MOI.EqualTo(0)
 
             CP.FlatZinc.parse_constraint!("constraint int_eq(3, x4);", m)
@@ -900,7 +900,7 @@
                   MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x4
+            @test m.constraint_info[nc].f.terms[1].variabl == x4
             @test m.constraint_info[nc].s == MOI.EqualTo(3)
 
             CP.FlatZinc.parse_constraint!("constraint int_eq(x3, 4);", m)
@@ -910,7 +910,7 @@
                   MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].s == MOI.EqualTo(4)
 
             CP.FlatZinc.parse_constraint!(
@@ -926,17 +926,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   -1
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(0))
 
@@ -953,12 +953,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(3))
 
@@ -975,12 +975,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(4))
 
@@ -992,9 +992,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].f.terms[2].coefficient === -1
-            @test m.constraint_info[nc].f.terms[2].variable_index == x4
+            @test m.constraint_info[nc].f.terms[2].variabl == x4
             @test m.constraint_info[nc].s == MOI.LessThan(0)
 
             CP.FlatZinc.parse_constraint!("constraint int_le(3, x4);", m)
@@ -1005,7 +1005,7 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === -1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x4
+            @test m.constraint_info[nc].f.terms[1].variabl == x4
             @test m.constraint_info[nc].s == MOI.LessThan(-3)
 
             CP.FlatZinc.parse_constraint!("constraint int_le(x3, 4);", m)
@@ -1016,7 +1016,7 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].s == MOI.LessThan(4)
 
             CP.FlatZinc.parse_constraint!(
@@ -1032,17 +1032,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   -1
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(0))
 
@@ -1059,12 +1059,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   -1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(-3))
 
@@ -1081,12 +1081,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(4))
 
@@ -1101,9 +1101,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 2
-            @test m.constraint_info[nc].f.terms[1].variable_index == x1
+            @test m.constraint_info[nc].f.terms[1].variabl == x1
             @test m.constraint_info[nc].f.terms[2].coefficient === 3
-            @test m.constraint_info[nc].f.terms[2].variable_index == x2
+            @test m.constraint_info[nc].f.terms[2].variabl == x2
             @test m.constraint_info[nc].s == MOI.EqualTo(5)
 
             CP.FlatZinc.parse_constraint!(
@@ -1119,17 +1119,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   2
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   3
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x2
             @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(5))
 
@@ -1144,9 +1144,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 2
-            @test m.constraint_info[nc].f.terms[1].variable_index == x1
+            @test m.constraint_info[nc].f.terms[1].variabl == x1
             @test m.constraint_info[nc].f.terms[2].coefficient === 3
-            @test m.constraint_info[nc].f.terms[2].variable_index == x2
+            @test m.constraint_info[nc].f.terms[2].variabl == x2
             @test m.constraint_info[nc].s == MOI.LessThan(5)
 
             CP.FlatZinc.parse_constraint!(
@@ -1162,17 +1162,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   2
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   3
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x2
             @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(5))
 
@@ -1187,9 +1187,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 2
-            @test m.constraint_info[nc].f.terms[1].variable_index == x1
+            @test m.constraint_info[nc].f.terms[1].variabl == x1
             @test m.constraint_info[nc].f.terms[2].coefficient === 3
-            @test m.constraint_info[nc].f.terms[2].variable_index == x2
+            @test m.constraint_info[nc].f.terms[2].variabl == x2
             @test m.constraint_info[nc].s == CP.DifferentFrom(5)
 
             CP.FlatZinc.parse_constraint!(
@@ -1205,17 +1205,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   2
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   3
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x2
             @test m.constraint_info[nc].s == CP.Reification(CP.DifferentFrom(5))
 
@@ -1227,9 +1227,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].f.terms[2].coefficient === -1
-            @test m.constraint_info[nc].f.terms[2].variable_index == x4
+            @test m.constraint_info[nc].f.terms[2].variabl == x4
             @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(0))
 
             CP.FlatZinc.parse_constraint!("constraint int_lt(3, x4);", m)
@@ -1240,7 +1240,7 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === -1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x4
+            @test m.constraint_info[nc].f.terms[1].variabl == x4
             @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(-3))
 
             CP.FlatZinc.parse_constraint!("constraint int_lt(x3, 4);", m)
@@ -1251,7 +1251,7 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(4))
 
             CP.FlatZinc.parse_constraint!(
@@ -1267,17 +1267,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   -1
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.Strictly(MOI.LessThan(0)))
@@ -1295,12 +1295,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   -1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.Strictly(MOI.LessThan(-3)))
@@ -1318,12 +1318,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.Strictly(MOI.LessThan(4)))
@@ -1360,9 +1360,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].f.terms[2].coefficient === -1
-            @test m.constraint_info[nc].f.terms[2].variable_index == x4
+            @test m.constraint_info[nc].f.terms[2].variabl == x4
             @test m.constraint_info[nc].s == CP.DifferentFrom(0)
 
             CP.FlatZinc.parse_constraint!("constraint int_ne(3, x4);", m)
@@ -1372,7 +1372,7 @@
                   MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x4
+            @test m.constraint_info[nc].f.terms[1].variabl == x4
             @test m.constraint_info[nc].s == CP.DifferentFrom(3)
 
             CP.FlatZinc.parse_constraint!("constraint int_ne(x3, 4);", m)
@@ -1382,7 +1382,7 @@
                   MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].s == CP.DifferentFrom(4)
 
             CP.FlatZinc.parse_constraint!(
@@ -1398,17 +1398,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   -1
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(CP.DifferentFrom(0))
 
@@ -1425,12 +1425,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(CP.DifferentFrom(3))
 
@@ -1447,12 +1447,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].s == CP.Reification(CP.DifferentFrom(4))
 
@@ -1466,11 +1466,11 @@
                   MOI.ScalarAffineFunction
             @test length(m.constraint_info[nc].f.terms) == 3
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x1
+            @test m.constraint_info[nc].f.terms[1].variabl == x1
             @test m.constraint_info[nc].f.terms[2].coefficient === 1
-            @test m.constraint_info[nc].f.terms[2].variable_index == x2
+            @test m.constraint_info[nc].f.terms[2].variabl == x2
             @test m.constraint_info[nc].f.terms[3].coefficient === -1
-            @test m.constraint_info[nc].f.terms[3].variable_index == x3
+            @test m.constraint_info[nc].f.terms[3].variabl == x3
             @test m.constraint_info[nc].s == MOI.EqualTo(0)
 
             CP.FlatZinc.parse_constraint!(
@@ -1501,9 +1501,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x1
+            @test m.constraint_info[nc].f.terms[1].variabl == x1
             @test m.constraint_info[nc].f.terms[2].coefficient === -1
-            @test m.constraint_info[nc].f.terms[2].variable_index == x3
+            @test m.constraint_info[nc].f.terms[2].variabl == x3
             @test m.constraint_info[nc].s == MOI.EqualTo(0)
 
             CP.FlatZinc.parse_constraint!("constraint bool_eq(x3, x4);", m)
@@ -1514,9 +1514,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].f.terms[2].coefficient === -1
-            @test m.constraint_info[nc].f.terms[2].variable_index == x4
+            @test m.constraint_info[nc].f.terms[2].variabl == x4
             @test m.constraint_info[nc].s == MOI.EqualTo(0)
 
             CP.FlatZinc.parse_constraint!("constraint bool_eq(3, x4);", m)
@@ -1526,7 +1526,7 @@
                   MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x4
+            @test m.constraint_info[nc].f.terms[1].variabl == x4
             @test m.constraint_info[nc].s == MOI.EqualTo(3)
 
             CP.FlatZinc.parse_constraint!("constraint bool_eq(x3, 4);", m)
@@ -1536,7 +1536,7 @@
                   MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].s == MOI.EqualTo(4)
 
             CP.FlatZinc.parse_constraint!(
@@ -1552,17 +1552,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   -1
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(0))
 
@@ -1579,12 +1579,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(3))
 
@@ -1601,12 +1601,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(4))
 
@@ -1618,9 +1618,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].f.terms[2].coefficient === -1
-            @test m.constraint_info[nc].f.terms[2].variable_index == x4
+            @test m.constraint_info[nc].f.terms[2].variabl == x4
             @test m.constraint_info[nc].s == MOI.LessThan(0)
 
             CP.FlatZinc.parse_constraint!("constraint bool_le(3, x4);", m)
@@ -1631,7 +1631,7 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === -1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x4
+            @test m.constraint_info[nc].f.terms[1].variabl == x4
             @test m.constraint_info[nc].s == MOI.LessThan(-3)
 
             CP.FlatZinc.parse_constraint!("constraint bool_le(x3, 4);", m)
@@ -1642,7 +1642,7 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].s == MOI.LessThan(4)
 
             CP.FlatZinc.parse_constraint!(
@@ -1658,17 +1658,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   -1
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(0))
 
@@ -1685,12 +1685,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   -1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(-3))
 
@@ -1707,12 +1707,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(4))
 
@@ -1727,9 +1727,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 2
-            @test m.constraint_info[nc].f.terms[1].variable_index == x1
+            @test m.constraint_info[nc].f.terms[1].variabl == x1
             @test m.constraint_info[nc].f.terms[2].coefficient === 3
-            @test m.constraint_info[nc].f.terms[2].variable_index == x2
+            @test m.constraint_info[nc].f.terms[2].variabl == x2
             @test m.constraint_info[nc].s == MOI.EqualTo(5)
 
             CP.FlatZinc.parse_constraint!(
@@ -1743,9 +1743,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 2
-            @test m.constraint_info[nc].f.terms[1].variable_index == x1
+            @test m.constraint_info[nc].f.terms[1].variabl == x1
             @test m.constraint_info[nc].f.terms[2].coefficient === 3
-            @test m.constraint_info[nc].f.terms[2].variable_index == x2
+            @test m.constraint_info[nc].f.terms[2].variabl == x2
             @test m.constraint_info[nc].s == MOI.LessThan(5)
 
             CP.FlatZinc.parse_constraint!("constraint bool_lt(x3, x4);", m)
@@ -1756,9 +1756,9 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].f.terms[2].coefficient === -1
-            @test m.constraint_info[nc].f.terms[2].variable_index == x4
+            @test m.constraint_info[nc].f.terms[2].variabl == x4
             @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(0))
 
             CP.FlatZinc.parse_constraint!("constraint bool_lt(3, x4);", m)
@@ -1769,7 +1769,7 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === -1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x4
+            @test m.constraint_info[nc].f.terms[1].variabl == x4
             @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(-3))
 
             CP.FlatZinc.parse_constraint!("constraint bool_lt(x3, 4);", m)
@@ -1780,7 +1780,7 @@
             @test m.constraint_info[nc].f.constant === 0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(4))
 
             CP.FlatZinc.parse_constraint!(
@@ -1796,17 +1796,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   -1
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.Strictly(MOI.LessThan(0)))
@@ -1824,12 +1824,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   -1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.Strictly(MOI.LessThan(-3)))
@@ -1847,12 +1847,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.Strictly(MOI.LessThan(4)))
@@ -1938,9 +1938,9 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x5
+            @test m.constraint_info[nc].f.terms[1].variabl == x5
             @test m.constraint_info[nc].f.terms[2].coefficient === -1.0
-            @test m.constraint_info[nc].f.terms[2].variable_index == x6
+            @test m.constraint_info[nc].f.terms[2].variabl == x6
             @test m.constraint_info[nc].s == MOI.EqualTo(0.0)
 
             CP.FlatZinc.parse_constraint!("constraint float_eq(3, x4);", m)
@@ -1950,7 +1950,7 @@
                   MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x4
+            @test m.constraint_info[nc].f.terms[1].variabl == x4
             @test m.constraint_info[nc].s == MOI.EqualTo(3.0)
 
             CP.FlatZinc.parse_constraint!("constraint float_eq(x3, 4);", m)
@@ -1960,7 +1960,7 @@
                   MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].s == MOI.EqualTo(4.0)
 
             CP.FlatZinc.parse_constraint!(
@@ -1976,17 +1976,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   -1.0
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(0.0))
 
@@ -2003,12 +2003,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(3.0))
 
@@ -2025,12 +2025,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(4.0))
 
@@ -2061,9 +2061,9 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].f.terms[2].coefficient === -1.0
-            @test m.constraint_info[nc].f.terms[2].variable_index == x4
+            @test m.constraint_info[nc].f.terms[2].variabl == x4
             @test m.constraint_info[nc].s == MOI.LessThan(0.0)
 
             CP.FlatZinc.parse_constraint!("constraint float_le(3, x4);", m)
@@ -2074,7 +2074,7 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === -1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x4
+            @test m.constraint_info[nc].f.terms[1].variabl == x4
             @test m.constraint_info[nc].s == MOI.LessThan(-3.0)
 
             CP.FlatZinc.parse_constraint!("constraint float_le(x3, 4);", m)
@@ -2085,7 +2085,7 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].s == MOI.LessThan(4.0)
 
             CP.FlatZinc.parse_constraint!(
@@ -2101,17 +2101,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   -1.0
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(0.0))
 
@@ -2128,12 +2128,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   -1.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(-3.0))
 
@@ -2150,12 +2150,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(4.0))
 
@@ -2170,9 +2170,9 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 2.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x1
+            @test m.constraint_info[nc].f.terms[1].variabl == x1
             @test m.constraint_info[nc].f.terms[2].coefficient === 3.0
-            @test m.constraint_info[nc].f.terms[2].variable_index == x2
+            @test m.constraint_info[nc].f.terms[2].variabl == x2
             @test m.constraint_info[nc].s == MOI.EqualTo(5.0)
 
             CP.FlatZinc.parse_constraint!(
@@ -2188,17 +2188,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   2.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   3.0
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x2
             @test m.constraint_info[nc].s == CP.Reification(MOI.EqualTo(5.0))
 
@@ -2213,9 +2213,9 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 2.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x1
+            @test m.constraint_info[nc].f.terms[1].variabl == x1
             @test m.constraint_info[nc].f.terms[2].coefficient === 3.0
-            @test m.constraint_info[nc].f.terms[2].variable_index == x2
+            @test m.constraint_info[nc].f.terms[2].variabl == x2
             @test m.constraint_info[nc].s == MOI.LessThan(5.0)
 
             CP.FlatZinc.parse_constraint!(
@@ -2231,17 +2231,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   2.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   3.0
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x2
             @test m.constraint_info[nc].s == CP.Reification(MOI.LessThan(5.0))
 
@@ -2256,9 +2256,9 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 2.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x1
+            @test m.constraint_info[nc].f.terms[1].variabl == x1
             @test m.constraint_info[nc].f.terms[2].coefficient === 3.0
-            @test m.constraint_info[nc].f.terms[2].variable_index == x2
+            @test m.constraint_info[nc].f.terms[2].variabl == x2
             @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(5.0))
 
             CP.FlatZinc.parse_constraint!(
@@ -2274,17 +2274,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   2.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   3.0
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x2
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.Strictly(MOI.LessThan(5.0)))
@@ -2300,9 +2300,9 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 2.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x1
+            @test m.constraint_info[nc].f.terms[1].variabl == x1
             @test m.constraint_info[nc].f.terms[2].coefficient === 3.0
-            @test m.constraint_info[nc].f.terms[2].variable_index == x2
+            @test m.constraint_info[nc].f.terms[2].variabl == x2
             @test m.constraint_info[nc].s == CP.DifferentFrom(5.0)
 
             CP.FlatZinc.parse_constraint!(
@@ -2318,17 +2318,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   2.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   3.0
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x2
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.DifferentFrom(5.0))
@@ -2341,9 +2341,9 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].f.terms[2].coefficient === -1.0
-            @test m.constraint_info[nc].f.terms[2].variable_index == x4
+            @test m.constraint_info[nc].f.terms[2].variabl == x4
             @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(0.0))
 
             CP.FlatZinc.parse_constraint!(
@@ -2357,7 +2357,7 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === -1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x4
+            @test m.constraint_info[nc].f.terms[1].variabl == x4
             @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(-3.0))
 
             CP.FlatZinc.parse_constraint!(
@@ -2371,7 +2371,7 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].s == CP.Strictly(MOI.LessThan(4.0))
 
             CP.FlatZinc.parse_constraint!(
@@ -2387,17 +2387,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   -1.0
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.Strictly(MOI.LessThan(0.0)))
@@ -2415,12 +2415,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   -1.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.Strictly(MOI.LessThan(-3.0)))
@@ -2438,12 +2438,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.Strictly(MOI.LessThan(4.0)))
@@ -2480,9 +2480,9 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].f.terms[2].coefficient === -1.0
-            @test m.constraint_info[nc].f.terms[2].variable_index == x4
+            @test m.constraint_info[nc].f.terms[2].variabl == x4
             @test m.constraint_info[nc].s == CP.DifferentFrom(0.0)
 
             CP.FlatZinc.parse_constraint!(
@@ -2495,7 +2495,7 @@
                   MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x4)
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x4
+            @test m.constraint_info[nc].f.terms[1].variabl == x4
             @test m.constraint_info[nc].s == CP.DifferentFrom(3.0)
 
             CP.FlatZinc.parse_constraint!(
@@ -2508,7 +2508,7 @@
                   MOI.ScalarAffineFunction # Equivalent to: MOI.SingleVariable(x3)
             @test length(m.constraint_info[nc].f.terms) == 1
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].s == CP.DifferentFrom(4.0)
 
             CP.FlatZinc.parse_constraint!(
@@ -2524,17 +2524,17 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].f.terms[3].output_index == 2
             @test m.constraint_info[nc].f.terms[3].scalar_term.coefficient ===
                   -1.0
-            @test m.constraint_info[nc].f.terms[3].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[3].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.DifferentFrom(0.0))
@@ -2552,12 +2552,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x4
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.DifferentFrom(3.0))
@@ -2575,12 +2575,12 @@
             @test m.constraint_info[nc].f.terms[1].output_index == 1
             @test m.constraint_info[nc].f.terms[1].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[1].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[1].scalar_term.variabl ==
                   x1
             @test m.constraint_info[nc].f.terms[2].output_index == 2
             @test m.constraint_info[nc].f.terms[2].scalar_term.coefficient ===
                   1.0
-            @test m.constraint_info[nc].f.terms[2].scalar_term.variable_index ==
+            @test m.constraint_info[nc].f.terms[2].scalar_term.variabl ==
                   x3
             @test m.constraint_info[nc].s ==
                   CP.Reification(CP.DifferentFrom(4.0))
@@ -2595,11 +2595,11 @@
                   MOI.ScalarAffineFunction
             @test length(m.constraint_info[nc].f.terms) == 3
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x1
+            @test m.constraint_info[nc].f.terms[1].variabl == x1
             @test m.constraint_info[nc].f.terms[2].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[2].variable_index == x2
+            @test m.constraint_info[nc].f.terms[2].variabl == x2
             @test m.constraint_info[nc].f.terms[3].coefficient === -1.0
-            @test m.constraint_info[nc].f.terms[3].variable_index == x3
+            @test m.constraint_info[nc].f.terms[3].variabl == x3
             @test m.constraint_info[nc].s == MOI.EqualTo(0.0)
 
             CP.FlatZinc.parse_constraint!(
@@ -2613,9 +2613,9 @@
             @test m.constraint_info[nc].f.constant === 0.0
             @test length(m.constraint_info[nc].f.terms) == 2
             @test m.constraint_info[nc].f.terms[1].coefficient === 1.0
-            @test m.constraint_info[nc].f.terms[1].variable_index == x3
+            @test m.constraint_info[nc].f.terms[1].variabl == x3
             @test m.constraint_info[nc].f.terms[2].coefficient === -1.0
-            @test m.constraint_info[nc].f.terms[2].variable_index == x5
+            @test m.constraint_info[nc].f.terms[2].variabl == x5
             @test m.constraint_info[nc].s == MOI.EqualTo(0.0)
         end
     end

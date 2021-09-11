@@ -101,12 +101,12 @@
             t1 = f.terms[1]
             @test t1.output_index == 1
             @test t1.scalar_term.coefficient === one(T)
-            @test t1.scalar_term.variable_index == bridge.vars_reif_value[i]
+            @test t1.scalar_term.variabl == bridge.vars_reif_value[i]
 
             t2 = f.terms[2]
             @test t2.output_index == 2
             @test t2.scalar_term.coefficient === one(T)
-            @test t2.scalar_term.variable_index == x[i + 1]
+            @test t2.scalar_term.variabl == x[i + 1]
         end
     end
 
@@ -124,12 +124,12 @@
             t1 = f.terms[1]
             @test t1.output_index == 1
             @test t1.scalar_term.coefficient === one(T)
-            @test t1.scalar_term.variable_index == bridge.vars_reif_precv[i]
+            @test t1.scalar_term.variabl == bridge.vars_reif_precv[i]
 
             t2 = f.terms[2]
             @test t2.output_index == 2
             @test t2.scalar_term.coefficient === one(T)
-            @test t2.scalar_term.variable_index == x[i]
+            @test t2.scalar_term.variabl == x[i]
         end
     end
 
@@ -145,12 +145,12 @@
 
             t1 = f.terms[1]
             t1.coefficient === one(T)
-            t1.variable_index == bridge.vars_reif_value[i - 1]
+            t1.variabl == bridge.vars_reif_value[i - 1]
 
             for j in 2:i
                 t = f.terms[j]
                 @test t.coefficient === -one(T)
-                @test t.variable_index == bridge.vars_reif_precv[j - 1]
+                @test t.variabl == bridge.vars_reif_precv[j - 1]
             end
         end
     end

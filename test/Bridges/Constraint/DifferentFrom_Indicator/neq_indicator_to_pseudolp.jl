@@ -45,7 +45,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.DifferentFrom{T}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
 
         if T == Int
             @test MOIB.added_constraint_types(typeof(bridge)) == [
@@ -98,12 +98,12 @@
             t1 = f.terms[1]
             @test t1.output_index == 1
             @test t1.scalar_term.coefficient === one(T)
-            @test t1.scalar_term.variable_index == bridge.var_abs
+            @test t1.scalar_term.variabl == bridge.var_abs
             
             t1 = f.terms[2]
             @test t1.output_index == 2
             @test t1.scalar_term.coefficient === one(T)
-            @test t1.scalar_term.variable_index == y
+            @test t1.scalar_term.variabl == y
         end
     end
     
@@ -117,12 +117,12 @@
             t1 = f.terms[1]
             @test t1.output_index == 1
             @test t1.scalar_term.coefficient == one(T)
-            @test t1.scalar_term.variable_index == x
+            @test t1.scalar_term.variabl == x
 
             t2 = f.terms[2]
             @test t2.output_index == 2
             @test t2.scalar_term.coefficient == one(T)
-            @test t2.scalar_term.variable_index == bridge.var_abs
+            @test t2.scalar_term.variabl == bridge.var_abs
         end
     end
     
@@ -136,12 +136,12 @@
             t1 = f.terms[1]
             @test t1.output_index == 1
             @test t1.scalar_term.coefficient == one(T)
-            @test t1.scalar_term.variable_index == x
+            @test t1.scalar_term.variabl == x
 
             t2 = f.terms[2]
             @test t2.output_index == 2
             @test t2.scalar_term.coefficient == one(T)
-            @test t2.scalar_term.variable_index == bridge.var_abs
+            @test t2.scalar_term.variabl == bridge.var_abs
         end
     end
     
@@ -155,12 +155,12 @@
             t1 = f.terms[1]
             @test t1.output_index == 1
             @test t1.scalar_term.coefficient == one(T)
-            @test t1.scalar_term.variable_index == x
+            @test t1.scalar_term.variabl == x
 
             t2 = f.terms[2]
             @test t2.output_index == 2
             @test t2.scalar_term.coefficient == one(T)
-            @test t2.scalar_term.variable_index == y
+            @test t2.scalar_term.variabl == y
         end
     end
 end

@@ -1331,7 +1331,7 @@ end
 
 function _saf_to_coef_vars(f::MOI.ScalarAffineFunction)
     MOIU.canonicalize!(f)
-    variables = MOI.VariableIndex[t.variable_index for t in f.terms]
+    variables = MOI.VariableIndex[t.variabl for t in f.terms]
     coefficients = [t.coefficient for t in f.terms]
 
     return variables, coefficients
@@ -1339,14 +1339,14 @@ end
 
 function _vaf_to_vars(f::MOI.VectorAffineFunction)
     MOIU.canonicalize!(f)
-    variables = MOI.VariableIndex[t.scalar_term.variable_index for t in f.terms]
+    variables = MOI.VariableIndex[t.scalar_term.variabl for t in f.terms]
     return variables
 end
 
 function _vaf_to_vars(f::MOI.VectorAffineFunction, dim::Int)
     MOIU.canonicalize!(f)
     variables = MOI.VariableIndex[
-        t.scalar_term.variable_index for t in f.terms if t.output_index == dim
+        t.scalar_term.variabl for t in f.terms if t.output_index == dim
     ]
     return variables
 end
@@ -1354,7 +1354,7 @@ end
 function _vaf_to_coef_vars(f::MOI.VectorAffineFunction, dim::Int)
     MOIU.canonicalize!(f)
     variables = MOI.VariableIndex[
-        t.scalar_term.variable_index for t in f.terms if t.output_index == dim
+        t.scalar_term.variabl for t in f.terms if t.output_index == dim
     ]
     coefficients =
         [t.scalar_term.coefficient for t in f.terms if t.output_index == dim]

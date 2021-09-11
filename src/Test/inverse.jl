@@ -1,6 +1,6 @@
 function inverse_vectorofvariables_test(
     model::MOI.ModelLike,
-    config::MOIT.TestConfig,
+    config::MOIT.Config,
 )
     MOI.empty!(model)
 
@@ -41,7 +41,7 @@ end
 
 function inverse_vectoraffinefunction_test(
     model::MOI.ModelLike,
-    config::MOIT.TestConfig,
+    config::MOIT.Config,
 )
     MOI.empty!(model)
 

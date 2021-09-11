@@ -124,7 +124,7 @@
             for bin in 1:n_bins
                 t = f.terms[bin]
                 @test t.coefficient === one(T)
-                @test t.variable_index == bridge.assign_var[item, bin]
+                @test t.variabl == bridge.assign_var[item, bin]
             end
         end
     end
@@ -139,12 +139,12 @@
 
             t = f.terms[1]
             @test t.coefficient === -one(T)
-            @test t.variable_index == ((item == 1) ? x_bin_1 : x_bin_2)
+            @test t.variabl == ((item == 1) ? x_bin_1 : x_bin_2)
 
             for bin in 1:n_bins
                 t = f.terms[1 + bin]
                 @test t.coefficient === T(bin)
-                @test t.variable_index == bridge.assign_var[item, bin]
+                @test t.variabl == bridge.assign_var[item, bin]
             end
         end
     end
@@ -159,12 +159,12 @@
 
             t = f.terms[1]
             @test t.coefficient === -one(T)
-            @test t.variable_index == ((bin == 1) ? x_load_1 : x_load_2)
+            @test t.variabl == ((bin == 1) ? x_load_1 : x_load_2)
 
             for item in 1:n_items
                 t = f.terms[1 + item]
                 @test t.coefficient === weights[item]
-                @test t.variable_index == bridge.assign_var[item, bin]
+                @test t.variabl == bridge.assign_var[item, bin]
             end
         end
     end
@@ -179,11 +179,11 @@
 
             t = f.terms[1]
             @test t.coefficient === one(T)
-            @test t.variable_index == ((bin == 1) ? x_load_1 : x_load_2)
+            @test t.variabl == ((bin == 1) ? x_load_1 : x_load_2)
 
             t = f.terms[2]
             @test t.coefficient === -one(T)
-            @test t.variable_index == ((bin == 1) ? x_capa_1 : x_capa_2)
+            @test t.variabl == ((bin == 1) ? x_capa_1 : x_capa_2)
         end
     end
 end

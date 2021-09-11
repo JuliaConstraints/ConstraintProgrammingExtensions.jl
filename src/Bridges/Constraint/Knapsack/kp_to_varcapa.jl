@@ -77,7 +77,7 @@ function MOIB.added_constrained_variable_types(::Type{<:Knapsack2VariableCapacit
 end
 
 function MOIB.added_constrained_variable_types(::Type{<:Knapsack2VariableCapacityKnapsackBridge{T}}) where {T <: Real}
-    return Tuple{DataType}[]
+    return Tuple{Type}[]
 end
 
 function MOIB.added_constraint_types(::Type{Knapsack2VariableCapacityKnapsackBridge{T}}) where {T <: Integer}

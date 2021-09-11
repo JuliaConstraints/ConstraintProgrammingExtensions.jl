@@ -80,7 +80,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.BinPacking{CP.FIXED_CAPACITY_BINPACKING, T}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test Set(MOIB.added_constraint_types(typeof(bridge))) == Set([
             (MOI.VectorAffineFunction{T}, CP.BinPacking{CP.NO_CAPACITY_BINPACKING, T}),
             (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
@@ -102,14 +102,14 @@
             @test f.terms[i].output_index == i
             @test f.terms[i].scalar_term.coefficient == 1
         end
-        @test f.terms[1].scalar_term.variable_index == x_load_1
+        @test f.terms[1].scalar_term.variabl == x_load_1
         if n_bins == 1
-            @test f.terms[2].scalar_term.variable_index == x_bin_1
-            @test f.terms[3].scalar_term.variable_index == x_bin_2
+            @test f.terms[2].scalar_term.variabl == x_bin_1
+            @test f.terms[3].scalar_term.variabl == x_bin_2
         elseif n_bins == 2
-            @test f.terms[2].scalar_term.variable_index == x_load_2
-            @test f.terms[3].scalar_term.variable_index == x_bin_1
-            @test f.terms[4].scalar_term.variable_index == x_bin_2
+            @test f.terms[2].scalar_term.variabl == x_load_2
+            @test f.terms[3].scalar_term.variabl == x_bin_1
+            @test f.terms[4].scalar_term.variabl == x_bin_2
         else
             @assert false
         end
@@ -123,7 +123,7 @@
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.capa[i])
             @test length(f.terms) == 1
             @test f.terms[1].coefficient == 1
-            @test f.terms[1].variable_index == ((i == 1) ? x_load_1 : x_load_2)
+            @test f.terms[1].variabl == ((i == 1) ? x_load_1 : x_load_2)
             @test MOI.get(model, MOI.ConstraintSet(), bridge.capa[i]) == MOI.LessThan(capas[i])
         end
     end

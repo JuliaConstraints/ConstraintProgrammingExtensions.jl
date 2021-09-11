@@ -67,7 +67,7 @@ function MOI.supports_constraint(
 end
 
 function MOIB.added_constrained_variable_types(::Type{<:Knapsack2MILPBridge{KCT, KVT, T}}) where {KCT, KVT, T}
-    return Tuple{DataType}[]
+    return Tuple{Type}[]
 end
 
 function MOIB.added_constraint_types(::Type{Knapsack2MILPBridge{KCT, CP.UNVALUED_KNAPSACK, T}}) where {KCT, T}

@@ -44,7 +44,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.VectorAffineFunction{T}, CP.Count{MOI.EqualTo{T}}),
         ]
@@ -67,9 +67,9 @@
                 @test f.terms[i].output_index == i
                 @test f.terms[i].scalar_term.coefficient === one(T)
             end
-            @test f.terms[1].scalar_term.variable_index === x_counts[i]
+            @test f.terms[1].scalar_term.variabl === x_counts[i]
             for i in 1:array_size
-                @test f.terms[1 + i].scalar_term.variable_index === x_array[i]
+                @test f.terms[1 + i].scalar_term.variabl === x_array[i]
             end
         end
     end

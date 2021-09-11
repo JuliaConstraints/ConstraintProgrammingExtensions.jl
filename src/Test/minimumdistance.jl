@@ -1,6 +1,6 @@
 function minimumdistance_vectorofvariables_test(
     model::MOI.ModelLike,
-    config::MOIT.TestConfig,
+    config::MOIT.Config,
 )
     MOI.empty!(model)
 
@@ -40,7 +40,7 @@ end
 
 function minimumdistance_vectoraffinefunction_test(
     model::MOI.ModelLike,
-    config::MOIT.TestConfig,
+    config::MOIT.Config,
 )
     MOI.empty!(model)
 

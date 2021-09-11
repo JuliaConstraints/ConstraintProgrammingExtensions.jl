@@ -45,7 +45,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.SingleVariable, CP.SymmetricAllDifferent) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.VectorAffineFunction{T}, CP.AllDifferent),
             (MOI.VectorAffineFunction{T}, CP.Inverse),
@@ -69,7 +69,7 @@
             t = f.terms[i]
             @test t.output_index == i
             @test t.scalar_term.coefficient === one(T)
-            @test t.scalar_term.variable_index == x[i]
+            @test t.scalar_term.variabl == x[i]
         end
     end
 
@@ -83,12 +83,12 @@
             t = f.terms[i]
             @test t.output_index == i
             @test t.scalar_term.coefficient === one(T)
-            @test t.scalar_term.variable_index == x[i]
+            @test t.scalar_term.variabl == x[i]
 
             t = f.terms[dim + i]
             @test t.output_index == dim + i
             @test t.scalar_term.coefficient === one(T)
-            @test t.scalar_term.variable_index == x[i]
+            @test t.scalar_term.variabl == x[i]
         end
     end
 end

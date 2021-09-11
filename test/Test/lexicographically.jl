@@ -1,6 +1,6 @@
 @testset "Lexicographically" begin
     mock = MOIU.MockOptimizer(MOIU.UniversalFallback(MOIU.Model{Int}()))
-    config = MOIT.TestConfig()
+    config = MOIT.Config()
 
     MOIU.set_mock_optimize!(
         mock,

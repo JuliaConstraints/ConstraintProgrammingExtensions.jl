@@ -1,6 +1,6 @@
 function strictly_lessthan_singlevariable_test(
     model::MOI.ModelLike,
-    config::MOIT.TestConfig,
+    config::MOIT.Config,
 )
     MOI.empty!(model)
 
@@ -42,7 +42,7 @@ end
 
 function strictly_greaterthan_singlevariable_test(
     model::MOI.ModelLike,
-    config::MOIT.TestConfig,
+    config::MOIT.Config,
 )
     MOI.empty!(model)
 

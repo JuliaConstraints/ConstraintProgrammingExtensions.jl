@@ -1,6 +1,6 @@
 function countdistinct_vectorofvariables_test(
     model::MOI.ModelLike,
-    config::MOIT.TestConfig,
+    config::MOIT.Config,
 )
     MOI.empty!(model)
 
@@ -47,7 +47,7 @@ end
 
 function countdistinct_vectoraffinefunction_test(
     model::MOI.ModelLike,
-    config::MOIT.TestConfig,
+    config::MOIT.Config,
 )
     MOI.empty!(model)
 

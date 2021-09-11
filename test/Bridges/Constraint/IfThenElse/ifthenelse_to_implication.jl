@@ -41,7 +41,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.IfThenElse{MOI.LessThan{T}, MOI.LessThan{T}, MOI.LessThan{T}}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.VectorAffineFunction{T}, CP.Implication),
         ]
@@ -61,12 +61,12 @@
         t1 = f.terms[1]
         @test t1.output_index == 1
         @test t1.scalar_term.coefficient === one(T)
-        @test t1.scalar_term.variable_index == x_1
+        @test t1.scalar_term.variabl == x_1
 
         t2 = f.terms[2]
         @test t2.output_index == 2
         @test t2.scalar_term.coefficient === one(T)
-        @test t2.scalar_term.variable_index == x_2
+        @test t2.scalar_term.variabl == x_2
     end
 
     @testset "Else" begin
@@ -78,12 +78,12 @@
         t1 = f.terms[1]
         @test t1.output_index == 1
         @test t1.scalar_term.coefficient === one(T)
-        @test t1.scalar_term.variable_index == x_1
+        @test t1.scalar_term.variabl == x_1
 
         t2 = f.terms[2]
         @test t2.output_index == 2
         @test t2.scalar_term.coefficient === one(T)
-        @test t2.scalar_term.variable_index == x_3
+        @test t2.scalar_term.variabl == x_3
     end
 end
     

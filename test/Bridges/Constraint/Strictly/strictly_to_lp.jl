@@ -41,7 +41,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.SingleVariable, CP.Strictly{set_type, T}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
             (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
@@ -81,6 +81,6 @@
 
         t1 = f.terms[1]
         @test t1.coefficient === one(T)
-        @test t1.variable_index == x
+        @test t1.variabl == x
     end
 end

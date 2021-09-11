@@ -102,7 +102,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.NonOverlappingOrthotopes{CP.UNCONDITIONAL_NONVERLAPPING_ORTHOTOPES}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
             (MOI.VectorAffineFunction{T}, CP.Disjunction{NTuple{n, MOI.LessThan{T}} where n}),
@@ -128,15 +128,15 @@
 
                 t1 = f.terms[1]
                 @test t1.coefficient === one(T)
-                @test t1.variable_index === x_pos[(i - 1) * dim + d]
+                @test t1.variabl === x_pos[(i - 1) * dim + d]
 
                 t2 = f.terms[2]
                 @test t2.coefficient === one(T)
-                @test t2.variable_index === x_sze[(i - 1) * dim + d]
+                @test t2.variabl === x_sze[(i - 1) * dim + d]
 
                 t3 = f.terms[3]
                 @test t3.coefficient === -one(T)
-                @test t3.variable_index === x_end[(i - 1) * dim + d]
+                @test t3.variabl === x_end[(i - 1) * dim + d]
             end
         end
     end
@@ -165,27 +165,27 @@
 
                         t = f1.terms[1]
                         @test t.coefficient === one(T)
-                        @test t.variable_index === x_pos[(i - 1) * dim + d]
+                        @test t.variabl === x_pos[(i - 1) * dim + d]
 
                         t = f1.terms[2]
                         @test t.coefficient === -one(T)
-                        @test t.variable_index === x_pos[(j - 1) * dim + d]
+                        @test t.variabl === x_pos[(j - 1) * dim + d]
 
                         t = f1.terms[3]
                         @test t.coefficient === one(T)
-                        @test t.variable_index === x_sze[(i - 1) * dim + d]
+                        @test t.variabl === x_sze[(i - 1) * dim + d]
 
                         t = f2.terms[1]
                         @test t.coefficient === -one(T)
-                        @test t.variable_index === x_pos[(i - 1) * dim + d]
+                        @test t.variabl === x_pos[(i - 1) * dim + d]
 
                         t = f2.terms[2]
                         @test t.coefficient === one(T)
-                        @test t.variable_index === x_pos[(j - 1) * dim + d]
+                        @test t.variabl === x_pos[(j - 1) * dim + d]
 
                         t = f2.terms[3]
                         @test t.coefficient === one(T)
-                        @test t.variable_index === x_sze[(j - 1) * dim + d]
+                        @test t.variabl === x_sze[(j - 1) * dim + d]
                     end
                 end
             end

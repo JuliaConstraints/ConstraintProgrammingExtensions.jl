@@ -1,6 +1,6 @@
 function ifthenelse_singlevariable_test(
     model::MOI.ModelLike,
-    config::MOIT.TestConfig,
+    config::MOIT.Config,
 )
     MOI.empty!(model)
 
@@ -42,7 +42,7 @@ end
 
 function ifthenelse_scalaraffinefunction_test(
     model::MOI.ModelLike,
-    config::MOIT.TestConfig,
+    config::MOIT.Config,
 )
     MOI.empty!(model)
 

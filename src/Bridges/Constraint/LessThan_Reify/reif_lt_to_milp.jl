@@ -75,7 +75,7 @@ function MOI.supports_constraint(
 end
 
 function MOIB.added_constrained_variable_types(::Type{ReificationLessThan2MILPBridge{T}}) where {T}
-    return Tuple{DataType}[]
+    return Tuple{Type}[]
 end
 
 function MOIB.added_constraint_types(::Type{ReificationLessThan2MILPBridge{T}}) where {T}

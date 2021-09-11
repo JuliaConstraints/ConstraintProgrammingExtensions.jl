@@ -1,6 +1,6 @@
 function domain_singlevariable_test(
     model::MOI.ModelLike,
-    config::MOIT.TestConfig,
+    config::MOIT.Config,
 )
     MOI.empty!(model)
 
@@ -38,7 +38,7 @@ end
 
 function domain_scalaraffinefunction_test(
     model::MOI.ModelLike,
-    config::MOIT.TestConfig,
+    config::MOIT.Config,
 )
     MOI.empty!(model)
 

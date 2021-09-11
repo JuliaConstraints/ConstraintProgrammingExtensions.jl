@@ -51,7 +51,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES, T}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.VectorAffineFunction{T}, CP.Membership),
             (MOI.VectorAffineFunction{T}, CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}),
@@ -76,12 +76,12 @@
 
             @test f.terms[1].output_index == 1
             @test f.terms[1].scalar_term.coefficient === one(T)
-            @test f.terms[1].scalar_term.variable_index === x_array[i]
+            @test f.terms[1].scalar_term.variabl === x_array[i]
 
             for j in 1:sought_size
                 @test f.terms[1 + j].output_index == 1 + j
                 @test f.terms[1 + j].scalar_term.coefficient === one(T)
-                @test f.terms[1 + j].scalar_term.variable_index === x_sought[j]
+                @test f.terms[1 + j].scalar_term.variabl === x_sought[j]
             end
         end
     end
@@ -102,11 +102,11 @@
             @test t.scalar_term.coefficient === one(T)
 
             if 1 <= i <= array_size
-                @test t.scalar_term.variable_index == x_array[i]
+                @test t.scalar_term.variabl == x_array[i]
             elseif array_size + 1 <= i <= array_size + sought_size
-                @test t.scalar_term.variable_index == x_counts[i - array_size]
+                @test t.scalar_term.variabl == x_counts[i - array_size]
             else
-                @test t.scalar_term.variable_index == x_sought[i - array_size - sought_size]
+                @test t.scalar_term.variabl == x_sought[i - array_size - sought_size]
             end
         end
     end

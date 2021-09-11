@@ -110,12 +110,12 @@
                 t1 = f.terms[1]
                 @test t1.output_index == 1
                 @test t1.scalar_term.coefficient === one(T)
-                @test t1.scalar_term.variable_index == bridge.vars_compare[i, j]
+                @test t1.scalar_term.variabl == bridge.vars_compare[i, j]
 
                 t2 = f.terms[2]
                 @test t2.output_index == 2
                 @test t2.scalar_term.coefficient === one(T)
-                @test t2.scalar_term.variable_index == x[i]
+                @test t2.scalar_term.variabl == x[i]
             end
         end
     end
@@ -133,17 +133,17 @@
                 t1 = f.terms[1]
                 @test t1.output_index == 1
                 @test t1.scalar_term.coefficient === one(T)
-                @test t1.scalar_term.variable_index == bridge.vars_different[i, j]
+                @test t1.scalar_term.variabl == bridge.vars_different[i, j]
 
                 t2 = f.terms[2]
                 @test t2.output_index == 2
                 @test t2.scalar_term.coefficient === one(T)
-                @test t2.scalar_term.variable_index == x[i]
+                @test t2.scalar_term.variabl == x[i]
 
                 t3 = f.terms[3]
                 @test t3.output_index == 2
                 @test t3.scalar_term.coefficient === -one(T)
-                @test t3.scalar_term.variable_index == x[j]
+                @test t3.scalar_term.variabl == x[j]
             end
         end
     end
@@ -161,16 +161,16 @@
                 for k in 1:length(values_set)
                     t1 = f.terms[k]
                     @test t1.coefficient === one(T)
-                    @test t1.variable_index == bridge.vars_compare[i, k]
+                    @test t1.variabl == bridge.vars_compare[i, k]
 
                     t2 = f.terms[length(values_set) + k]
                     @test t2.coefficient === one(T)
-                    @test t2.variable_index == bridge.vars_compare[j, k]
+                    @test t2.variabl == bridge.vars_compare[j, k]
                 end
 
                 t = f.terms[2 * length(values_set) + 1]
                 @test t.coefficient === one(T)
-                @test t.variable_index == bridge.vars_different[i, j]
+                @test t.variabl == bridge.vars_different[i, j]
             end
         end
     end

@@ -114,7 +114,7 @@
 # function MOI.ScalarAffineTerm{Int}(t::MOI.ScalarAffineTerm{Bool})
 #     return MOI.ScalarAffineTerm{Int}(
 #         Int(t.coefficient),
-#         t.variable_index,
+#         t.variabl,
 #     )
 # end
 

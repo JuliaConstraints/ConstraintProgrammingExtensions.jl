@@ -49,7 +49,7 @@ function MOI.supports_constraint(
 end
 
 function MOIB.added_constrained_variable_types(::Type{Decreasing2LPBridge{T}}) where {T}
-    return Tuple{DataType}[]
+    return Tuple{Type}[]
 end
 
 function MOIB.added_constraint_types(::Type{Decreasing2LPBridge{T}}) where {T}

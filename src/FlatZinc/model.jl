@@ -154,10 +154,10 @@ end
 
 # Fallback for copying operations.
 function MOI.copy_to(dest::Model, src::MOI.ModelLike; kwargs...)
-    return MOUI.automatic_copy_to(dest, src; kwargs...)
+    return MOIU.default_copy_to(dest, src; kwargs...)
 end
 
-function MOIU.supports_default_copy_to(::Model, ::Bool)
+function supports_incremental_interface(::Model, ::Bool)
     return true
 end
 
@@ -446,7 +446,7 @@ function MOI.get(model::Model, ::MOI.NumberOfConstraints{F, S}) where {F, S}
     return count
 end
 
-function MOI.get(model::Model, ::MOI.ListOfConstraints)
+function MOI.get(model::Model, ::MOI.ListOfConstraintTypesPresent)
     types = Set{Tuple{Any, Any}}()
     for info in model.constraint_info
         push!(types, (typeof(info.f), typeof(info.s)))

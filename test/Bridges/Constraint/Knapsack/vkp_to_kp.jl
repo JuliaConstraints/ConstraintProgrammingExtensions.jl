@@ -54,7 +54,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.VALUED_KNAPSACK, T}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test Set(MOIB.added_constraint_types(typeof(bridge))) == Set([
             (MOI.VectorAffineFunction{T}, CP.Knapsack{CP.FIXED_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}),
             (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
@@ -77,9 +77,9 @@
         end
         @test f.terms[end].coefficient === -one(T)
 
-        @test f.terms[1].variable_index == x_1
-        @test f.terms[2].variable_index == x_2
-        @test f.terms[3].variable_index == x_value
+        @test f.terms[1].variabl == x_1
+        @test f.terms[2].variabl == x_2
+        @test f.terms[3].variabl == x_value
         @test MOI.get(model, MOI.ConstraintSet(), bridge.value) == MOI.EqualTo(zero(T))
     end
 
@@ -91,8 +91,8 @@
             @test f.terms[i].output_index == i
             @test f.terms[i].scalar_term.coefficient === one(T)
         end
-        @test f.terms[1].scalar_term.variable_index == x_1
-        @test f.terms[2].scalar_term.variable_index == x_2
+        @test f.terms[1].scalar_term.variabl == x_1
+        @test f.terms[2].scalar_term.variabl == x_2
         @test MOI.get(model, MOI.ConstraintSet(), bridge.kp) == CP.Knapsack(weights, capacity)
     end
 end

@@ -54,7 +54,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Knapsack{T}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
             (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
@@ -78,7 +78,7 @@
         for item in 1:n_items
             t = f.terms[item]
             @test t.coefficient === weights[item]
-            @test t.variable_index == ((item == 1) ? x_1 : x_2)
+            @test t.variabl == ((item == 1) ? x_1 : x_2)
         end
     end
 
@@ -93,11 +93,11 @@
         for item in 1:n_items
             t = f.terms[item]
             @test t.coefficient === values[item]
-            @test t.variable_index == ((item == 1) ? x_1 : x_2)
+            @test t.variabl == ((item == 1) ? x_1 : x_2)
         end
         
         t = f.terms[end]
         @test t.coefficient === -one(T)
-        @test t.variable_index == x_value
+        @test t.variabl == x_value
     end
 end

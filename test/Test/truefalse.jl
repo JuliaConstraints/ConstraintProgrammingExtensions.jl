@@ -1,6 +1,6 @@
 @testset "True and False" begin
     mock = MOIU.MockOptimizer(MOIU.UniversalFallback(MOIU.Model{Int}()))
-    config = MOIT.TestConfig()
+    config = MOIT.Config()
 
     MOIU.set_mock_optimize!(
         mock,
@@ -10,7 +10,7 @@
     COIT.truefalsetest(mock, config)
 end
 
-function true_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function true_test(model::MOI.ModelLike, config::MOIT.Config)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)
@@ -38,7 +38,7 @@ function true_test(model::MOI.ModelLike, config::MOIT.TestConfig)
     end
 end
 
-function false_test(model::MOI.ModelLike, config::MOIT.TestConfig)
+function false_test(model::MOI.ModelLike, config::MOIT.Config)
     MOI.empty!(model)
 
     @test MOI.supports_constraint(model, MOI.SingleVariable, MOI.Integer)

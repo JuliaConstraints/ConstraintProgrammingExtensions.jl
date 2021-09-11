@@ -113,7 +113,7 @@
                 CP.MaximumAmong,
             }(),
         ) == [c1, c3]
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 3
+        @test length(MOI.get(m, MOI.ListOfConstraintTypesPresent())) == 3
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
@@ -203,7 +203,7 @@
                 CP.Element{Int},
             }(),
         ) == [c1]
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 5
+        @test length(MOI.get(m, MOI.ListOfConstraintTypesPresent())) == 5
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
@@ -274,7 +274,7 @@
         @test MOI.is_valid(m, c2)
 
         # Test some attributes for these constraints.
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 3
+        @test length(MOI.get(m, MOI.ListOfConstraintTypesPresent())) == 3
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
@@ -319,7 +319,7 @@
         @test MOI.is_valid(m, c)
 
         # Test some attributes for this constraint.
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 2
+        @test length(MOI.get(m, MOI.ListOfConstraintTypesPresent())) == 2
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
@@ -358,7 +358,7 @@
         @test MOI.is_valid(m, c)
 
         # Test some attributes for this constraint.
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 1
+        @test length(MOI.get(m, MOI.ListOfConstraintTypesPresent())) == 1
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
@@ -484,7 +484,7 @@
         @test MOI.is_valid(m, c11)
 
         # Test some attributes for these constraints.
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 11
+        @test length(MOI.get(m, MOI.ListOfConstraintTypesPresent())) == 11
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
@@ -561,7 +561,7 @@
         @test MOI.is_valid(m, c9)
 
         # Test some attributes for these constraints.
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 10
+        @test length(MOI.get(m, MOI.ListOfConstraintTypesPresent())) == 10
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
@@ -618,7 +618,7 @@
         @test MOI.is_valid(m, c4)
 
         # Test some attributes for these constraints.
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 4
+        @test length(MOI.get(m, MOI.ListOfConstraintTypesPresent())) == 4
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
@@ -677,7 +677,7 @@
         @test MOI.is_valid(m, c4)
 
         # Test some attributes for these constraints.
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 6
+        @test length(MOI.get(m, MOI.ListOfConstraintTypesPresent())) == 6
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
@@ -737,7 +737,7 @@
         @test MOI.is_valid(m, c4)
 
         # Test some attributes for these constraints.
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 5
+        @test length(MOI.get(m, MOI.ListOfConstraintTypesPresent())) == 5
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
@@ -811,7 +811,7 @@
         @test MOI.is_valid(m, c4)
 
         # Test some attributes for these constraints.
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 6
+        @test length(MOI.get(m, MOI.ListOfConstraintTypesPresent())) == 6
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)
@@ -886,7 +886,7 @@
         @test MOI.is_valid(m, c4)
 
         # Test some attributes for these constraints.
-        @test length(MOI.get(m, MOI.ListOfConstraints())) == 6
+        @test length(MOI.get(m, MOI.ListOfConstraintTypesPresent())) == 6
 
         # Generate the FZN file.
         io = IOBuffer(truncate=true)

@@ -59,7 +59,7 @@
         if T == Int
             @test MOIB.added_constrained_variable_types(typeof(bridge)) == [(MOI.Integer,)]
         elseif T == Float64
-            @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+            @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         else
             @assert false
         end
@@ -90,12 +90,12 @@
         t1 = f.terms[1]
         @test t1.output_index == 1
         @test t1.scalar_term.coefficient === one(T)
-        @test t1.scalar_term.variable_index == bridge.var_abs
+        @test t1.scalar_term.variabl == bridge.var_abs
 
         t2 = f.terms[2]
         @test t2.output_index == 2
         @test t2.scalar_term.coefficient === one(T)
-        @test t2.scalar_term.variable_index == y
+        @test t2.scalar_term.variabl == y
     end
 
     @testset "Constraint: big-M" begin
@@ -106,11 +106,11 @@
 
         t1 = f.terms[1]
         @test t1.coefficient === 5 * one(T)
-        @test t1.variable_index == x
+        @test t1.variabl == x
 
         t2 = f.terms[2]
         @test t2.coefficient === one(T)
-        @test t2.variable_index == bridge.var_abs
+        @test t2.variabl == bridge.var_abs
     end
 
     @testset "Constraint: small-M" begin
@@ -121,7 +121,7 @@
 
         t1 = f.terms[1]
         @test t1.coefficient === one(T)
-        @test t1.variable_index == x
+        @test t1.variabl == x
 
         smallm = if T == Int
             -1
@@ -133,6 +133,6 @@
 
         t2 = f.terms[2]
         @test t2.coefficient ≈ smallm
-        @test t2.variable_index == bridge.var_abs
+        @test t2.variabl == bridge.var_abs
     end
 end

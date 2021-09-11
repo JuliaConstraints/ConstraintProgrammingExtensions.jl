@@ -51,7 +51,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Reification{MOI.GreaterThan{T}}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.VectorAffineFunction{T}, MOI.GreaterThan{T}),
             (MOI.VectorAffineFunction{T}, MOI.LessThan{T}),
@@ -73,11 +73,11 @@
 
         t1 = f.terms[1]
         @test t1.coefficient === 5 * one(T)
-        @test t1.variable_index == x
+        @test t1.variabl == x
 
         t2 = f.terms[2]
         @test t2.coefficient === one(T)
-        @test t2.variable_index == y
+        @test t2.variabl == y
     end
 
     @testset "Constraint: small-M" begin
@@ -96,10 +96,10 @@
 
         t1 = f.terms[1]
         @test t1.coefficient === -5 * one(T)
-        @test t1.variable_index == x
+        @test t1.variabl == x
 
         t2 = f.terms[2]
         @test t2.coefficient === one(T)
-        @test t2.variable_index == y
+        @test t2.variabl == y
     end
 end

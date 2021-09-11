@@ -39,7 +39,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Count{MOI.EqualTo{T}}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.ScalarAffineFunction{T}, MOI.Interval{T}),
         ]
@@ -64,7 +64,7 @@
             for j in 1:slide_length
                 t = f.terms[j]
                 @test t.coefficient === one(T)
-                @test t.variable_index == x_array[i + j - 1]
+                @test t.variabl == x_array[i + j - 1]
             end
         end
     end

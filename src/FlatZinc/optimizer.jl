@@ -119,8 +119,8 @@ to the FlatZinc-compatible CLI of the solver or a `Cmd` object to call the
 solver (typically, this is useful to set environment variables).
 
 `solver_args` is a vector of `String` arguments passed solver executable.
-However, prefer passing `key=value` options via `MOI.RawParameter`. These 
-arguments are passed to `Base.pipeline`. 
+However, prefer passing `key=value` options via `MOI.RawOptimizerAttribute`. 
+These arguments are passed to `Base.pipeline`. 
 [See the Julia documentation for more details](https://docs.julialang.org/en/v1/base/base/#Base.pipeline-Tuple{Base.AbstractCmd}).
 
 ## Examples
@@ -200,10 +200,10 @@ function MOI.add_constraint(model::Optimizer, f::MOI.AbstractFunction, s::MOI.Ab
 end
 
 function MOI.copy_to(dest::Optimizer, src::MOI.ModelLike; kwargs...)
-    return MOIU.automatic_copy_to(dest, src; kwargs...)
+    return MOIU.default_copy_to(dest, src; kwargs...)
 end
 
-function MOIU.supports_default_copy_to(::Optimizer, ::Bool)
+function supports_incremental_interface(::Optimizer, ::Bool)
     return true
 end
 
@@ -283,8 +283,8 @@ function MOI.get(model::Optimizer, ::MOI.TerminationStatus)
 end
 
 function MOI.get(model::Optimizer, attr::MOI.VariablePrimal, vi::MOI.VariableIndex)
-    if length(model.results.primal_solutions) >= attr.N
-        return model.results.primal_solutions[attr.N][vi]
+    if length(model.results.primal_solutions) >= attr.result_index
+        return model.results.primal_solutions[attr.result_index][vi]
     else
         # No solution with this number. In particular, with infeasibility,
         # there is no solution, and this always returns nothing.
@@ -292,8 +292,8 @@ function MOI.get(model::Optimizer, attr::MOI.VariablePrimal, vi::MOI.VariableInd
     end
 end
 
-MOI.supports(::Optimizer, ::MOI.SolveTime) = true
-MOI.get(model::Optimizer, ::MOI.SolveTime) = model.solve_time
+MOI.supports(::Optimizer, ::MOI.SolveTimeSec) = true
+MOI.get(model::Optimizer, ::MOI.SolveTimeSec) = model.solve_time
 
 MOI.supports(::Optimizer, ::MOI.TimeLimitSec) = true
 MOI.get(model::Optimizer, ::MOI.TimeLimitSec) = model.time_limit_ms / 1_000.0

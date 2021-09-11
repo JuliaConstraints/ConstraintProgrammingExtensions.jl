@@ -84,12 +84,12 @@
         t1 = f.terms[1]
         @test t1.output_index == 1
         @test t1.scalar_term.coefficient === one(T)
-        @test t1.scalar_term.variable_index == bridge.var_antecedent
+        @test t1.scalar_term.variabl == bridge.var_antecedent
 
         t2 = f.terms[2]
         @test t2.output_index == 2
         @test t2.scalar_term.coefficient === one(T)
-        @test t2.scalar_term.variable_index == x_1
+        @test t2.scalar_term.variabl == x_1
     end 
 
     @testset "Reification of the consequent" begin
@@ -101,12 +101,12 @@
         t1 = f.terms[1]
         @test t1.output_index == 1
         @test t1.scalar_term.coefficient === one(T)
-        @test t1.scalar_term.variable_index == bridge.var_consequent
+        @test t1.scalar_term.variabl == bridge.var_consequent
 
         t2 = f.terms[2]
         @test t2.output_index == 2
         @test t2.scalar_term.coefficient === one(T)
-        @test t2.scalar_term.variable_index == x_2
+        @test t2.scalar_term.variabl == x_2
     end 
 
     @testset "Implication" begin
@@ -117,11 +117,11 @@
 
         t1 = f.terms[1]
         @test t1.coefficient === -one(T)
-        @test t1.variable_index == bridge.var_antecedent
+        @test t1.variabl == bridge.var_antecedent
 
         t2 = f.terms[2]
         @test t2.coefficient === one(T)
-        @test t2.variable_index == bridge.var_consequent
+        @test t2.variabl == bridge.var_consequent
     end
 end
     

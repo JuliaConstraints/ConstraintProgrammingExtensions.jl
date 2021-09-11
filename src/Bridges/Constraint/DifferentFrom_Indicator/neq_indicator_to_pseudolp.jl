@@ -126,7 +126,7 @@ function MOI.supports_constraint(
 end
 
 function MOIB.added_constrained_variable_types(::Type{IndicatorDifferentFrom2PseudoMILPBridge{T, A}}) where {T <: Real, A}
-    return Tuple{DataType}[]
+    return Tuple{Type}[]
 end
 
 function MOIB.added_constraint_types(::Type{IndicatorDifferentFrom2PseudoMILPBridge{T, A}}) where {T <: AbstractFloat, A}

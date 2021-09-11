@@ -52,7 +52,7 @@
 
     @testset "Bridge properties" begin
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Reification{MOI.EqualTo{T}}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{DataType}[]
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
             (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}),
             (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{T}}),
@@ -76,12 +76,12 @@
         t1 = f.terms[1]
         @test t1.output_index == 1
         @test t1.scalar_term.coefficient === one(T)
-        @test t1.scalar_term.variable_index == x
+        @test t1.scalar_term.variabl == x
 
         t2 = f.terms[2]
         @test t2.output_index == 2
         @test t2.scalar_term.coefficient === one(T)
-        @test t2.scalar_term.variable_index == y
+        @test t2.scalar_term.variabl == y
     end
 
     @testset "Constraint: indicator if false" begin
@@ -94,11 +94,11 @@
         t1 = f.terms[1]
         @test t1.output_index == 1
         @test t1.scalar_term.coefficient === one(T)
-        @test t1.scalar_term.variable_index == x
+        @test t1.scalar_term.variabl == x
 
         t2 = f.terms[2]
         @test t2.output_index == 2
         @test t2.scalar_term.coefficient === one(T)
-        @test t2.scalar_term.variable_index == y
+        @test t2.scalar_term.variabl == y
     end
 end

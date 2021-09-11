@@ -30,7 +30,7 @@ function MOIB.added_constrained_variable_types(::Type{FunctionBridge{T}}) where 
     # The bridge creates variables:
     return [(MOI.ZeroOne,)]
     # The bridge does not create variables: 
-    return Tuple{DataType}[]
+    return Tuple{Type}[]
 end
 
 function MOIB.added_constraint_types(::Type{FunctionBridge{T}}) where {T}

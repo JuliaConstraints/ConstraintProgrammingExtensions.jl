@@ -94,12 +94,12 @@
 
             t1 = f.terms[1]
             @test t1.coefficient === one(T)
-            @test t1.variable_index == x[i]
+            @test t1.variabl == x[i]
 
             for j in 1:array_dim
                 t = f.terms[1 + j]
                 @test t.coefficient === -one(T)
-                @test t.variable_index == bridge.vars_flow[i, j]
+                @test t.variabl == bridge.vars_flow[i, j]
             end
         end
         
@@ -114,12 +114,12 @@
 
             t1 = f.terms[1]
             @test t1.coefficient === one(T)
-            @test t1.variable_index == x[array_dim + j]
+            @test t1.variabl == x[array_dim + j]
 
             for i in 1:array_dim
                 t = f.terms[1 + i]
                 @test t.coefficient === -one(T)
-                @test t.variable_index == bridge.vars_flow[i, j]
+                @test t.variabl == bridge.vars_flow[i, j]
             end
         end
     end
@@ -140,7 +140,7 @@
             for j in 1:array_dim
                 t = f.terms[j]
                 @test t.coefficient === one(T)
-                @test t.variable_index == bridge.vars_unicity[i, j]
+                @test t.variabl == bridge.vars_unicity[i, j]
             end
         end
         
@@ -156,7 +156,7 @@
             for i in 1:array_dim
                 t = f.terms[i]
                 @test t.coefficient === one(T)
-                @test t.variable_index == bridge.vars_unicity[i, j]
+                @test t.variabl == bridge.vars_unicity[i, j]
             end
         end
     end
@@ -186,19 +186,19 @@
                 
                 t1lt = flt.terms[1]
                 @test t1lt.coefficient === one(T)
-                @test t1lt.variable_index == bridge.vars_flow[i, j]
+                @test t1lt.variabl == bridge.vars_flow[i, j]
                 
                 t1gt = fgt.terms[1]
                 @test t1gt.coefficient === one(T)
-                @test t1gt.variable_index == bridge.vars_flow[i, j]
+                @test t1gt.variabl == bridge.vars_flow[i, j]
                 
                 t2lt = flt.terms[2]
                 @test t2lt.coefficient === one(T) * 4
-                @test t2lt.variable_index == bridge.vars_unicity[i, j]
+                @test t2lt.variabl == bridge.vars_unicity[i, j]
                 
                 t2gt = fgt.terms[2]
                 @test t2gt.coefficient === one(T) * -4
-                @test t2gt.variable_index == bridge.vars_unicity[i, j]
+                @test t2gt.variabl == bridge.vars_unicity[i, j]
             end
         end
     end
@@ -217,11 +217,11 @@
                 
             t1 = f.terms[1]
             @test t1.coefficient === one(T)
-            @test t1.variable_index == x[i]
+            @test t1.variabl == x[i]
             
             t2 = f.terms[2]
             @test t2.coefficient === -one(T)
-            @test t2.variable_index == x[i + 1]
+            @test t2.variabl == x[i + 1]
         end
     end
 
@@ -239,12 +239,12 @@
                 
             t1 = f.terms[1]
             @test t1.coefficient === one(T)
-            @test t1.variable_index == x[2 * array_dim + i]
+            @test t1.variabl == x[2 * array_dim + i]
             
             for j in 1:array_dim
                 t = f.terms[1 + j]
                 @test t.coefficient === -T(j)
-                @test t.variable_index == bridge.vars_unicity[i, j]
+                @test t.variabl == bridge.vars_unicity[i, j]
             end
         end
     end
