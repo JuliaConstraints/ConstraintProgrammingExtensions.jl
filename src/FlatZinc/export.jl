@@ -1321,7 +1321,6 @@ end
 
 # Function printing.
 
-_fzn_f(model::Model, f::MOI.VariableIndex) = _fzn_f(model, f.variable)
 _fzn_f(model::Model, f::MOI.VariableIndex) = model.variable_info[f].name
 function _fzn_f(model::Model, fs::Vector{MOI.VariableIndex})
     return join([_fzn_f(model, f) for f in fs], ", ")
