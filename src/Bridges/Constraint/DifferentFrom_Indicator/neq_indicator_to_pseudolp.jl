@@ -1,5 +1,5 @@
 """
-Bridges `MOI.IndicatorSet{A, CP.DifferentFrom}` to linear constraints 
+Bridges `MOI.Indicator{A, CP.DifferentFrom}` to linear constraints 
 (including, possibly, strict inequalities). This constraint adds one variable
 to store the absolute value of the difference, and uses it for the indicator.
 
@@ -10,9 +10,9 @@ struct IndicatorDifferentFrom2PseudoMILPBridge{T <: Real, A} <: MOIBC.AbstractBr
     var_abs::Union{Nothing, MOI.VariableIndex}
     con_abs::Union{Nothing, MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}, MOI.ConstraintIndex{MOI.VariableIndex, CP.AbsoluteValue}}
     con_indic::Union{
-        MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, CP.Strictly{MOI.GreaterThan{T}, T}}},
-        MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.GreaterThan{T}}},
-        MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.EqualTo{T}}},
+        MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.Indicator{A, CP.Strictly{MOI.GreaterThan{T}, T}}},
+        MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.GreaterThan{T}}},
+        MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.EqualTo{T}}},
     }
 end
 
@@ -20,7 +20,7 @@ function MOIBC.bridge_constraint(
     ::Type{IndicatorDifferentFrom2PseudoMILPBridge{T, A}},
     model,
     f::MOI.VectorOfVariables,
-    s::MOI.IndicatorSet{A, CP.DifferentFrom{T}},
+    s::MOI.Indicator{A, CP.DifferentFrom{T}},
 ) where {T <: Real, A}
     return MOIBC.bridge_constraint(
         IndicatorDifferentFrom2PseudoMILPBridge{T, A},
@@ -34,7 +34,7 @@ function MOIBC.bridge_constraint(
     ::Type{IndicatorDifferentFrom2PseudoMILPBridge{T, A}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::MOI.IndicatorSet{A, CP.DifferentFrom{T}},
+    s::MOI.Indicator{A, CP.DifferentFrom{T}},
 ) where {T <: Real, A}
     f_scalars = MOIU.scalarize(f)
 
@@ -62,7 +62,7 @@ function MOIBC.bridge_constraint(
                 one(T) * var_abs
             ]
         ), 
-        MOI.IndicatorSet{A}(CP.Strictly(MOI.GreaterThan(zero(T))))
+        MOI.Indicator{A}(CP.Strictly(MOI.GreaterThan(zero(T))))
     )
 
     return IndicatorDifferentFrom2PseudoMILPBridge{T, A}(var_abs, con_abs, con_indic)
@@ -72,7 +72,7 @@ function MOIBC.bridge_constraint(
     ::Type{IndicatorDifferentFrom2PseudoMILPBridge{T, A}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::MOI.IndicatorSet{A, CP.DifferentFrom{T}},
+    s::MOI.Indicator{A, CP.DifferentFrom{T}},
 ) where {T <: Integer, A}
     f_scalars = MOIU.scalarize(f)
 
@@ -94,7 +94,7 @@ function MOIBC.bridge_constraint(
                 one(T) * var_abs
             ]
         ), 
-        MOI.IndicatorSet{A}(MOI.GreaterThan(one(T)))
+        MOI.Indicator{A}(MOI.GreaterThan(one(T)))
     )
 
     return IndicatorDifferentFrom2PseudoMILPBridge{T, A}(var_abs, con_abs, con_indic)
@@ -104,14 +104,14 @@ function MOIBC.bridge_constraint(
     ::Type{IndicatorDifferentFrom2PseudoMILPBridge{Bool, A}},
     model,
     f::MOI.VectorAffineFunction{Bool},
-    s::MOI.IndicatorSet{A, CP.DifferentFrom{Bool}},
+    s::MOI.Indicator{A, CP.DifferentFrom{Bool}},
 ) where {A}
     # New indicator. For Booleans, no need to have an absolute value: 
     # != 0 is equivalent to == 1, and vice-versa.
     con_indic = MOI.add_constraint(
         model, 
         f,
-        MOI.IndicatorSet{A}(MOI.EqualTo{Bool}(1 - s.set.value))
+        MOI.Indicator{A}(MOI.EqualTo{Bool}(1 - s.set.value))
     )
 
     return IndicatorDifferentFrom2PseudoMILPBridge{Bool, A}(nothing, nothing, con_indic)
@@ -120,7 +120,7 @@ end
 function MOI.supports_constraint(
     ::Type{IndicatorDifferentFrom2PseudoMILPBridge{T, A}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{MOI.IndicatorSet{A, CP.DifferentFrom{T}}},
+    ::Type{MOI.Indicator{A, CP.DifferentFrom{T}}},
 ) where {T <: Real, A}
     return true
 end
@@ -132,20 +132,20 @@ end
 function MOIB.added_constraint_types(::Type{IndicatorDifferentFrom2PseudoMILPBridge{T, A}}) where {T <: AbstractFloat, A}
     return [
         (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
-        (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, CP.Strictly{MOI.GreaterThan{T}}}),
+        (MOI.VectorAffineFunction{T}, MOI.Indicator{A, CP.Strictly{MOI.GreaterThan{T}}}),
     ]
 end
 
 function MOIB.added_constraint_types(::Type{IndicatorDifferentFrom2PseudoMILPBridge{T, A}}) where {T <: Integer, A}
     return [
         (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
-        (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.GreaterThan{T}}),
+        (MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.GreaterThan{T}}),
     ]
 end
 
 function MOIB.added_constraint_types(::Type{IndicatorDifferentFrom2PseudoMILPBridge{Bool, A}}) where {A}
     return [
-        (MOI.VectorAffineFunction{Bool}, MOI.IndicatorSet{A, MOI.EqualTo{Bool}}),
+        (MOI.VectorAffineFunction{Bool}, MOI.Indicator{A, MOI.EqualTo{Bool}}),
     ]
 end
 
@@ -178,7 +178,7 @@ end
 function MOI.get(
     ::IndicatorDifferentFrom2PseudoMILPBridge{T, A},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, CP.Strictly{MOI.GreaterThan{T}}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{A, CP.Strictly{MOI.GreaterThan{T}}},
     },
 ) where {T <: AbstractFloat, A}
     return 1
@@ -187,7 +187,7 @@ end
 function MOI.get(
     ::IndicatorDifferentFrom2PseudoMILPBridge{T, A},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, CP.Strictly{MOI.GreaterThan{T}}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{A, CP.Strictly{MOI.GreaterThan{T}}},
     },
 ) where {T <: Real, A}
     return 0
@@ -196,7 +196,7 @@ end
 function MOI.get(
     ::IndicatorDifferentFrom2PseudoMILPBridge{T, A},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.GreaterThan{T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.GreaterThan{T}},
     },
 ) where {T <: AbstractFloat, A}
     return 0
@@ -205,7 +205,7 @@ end
 function MOI.get(
     ::IndicatorDifferentFrom2PseudoMILPBridge{T, A},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.GreaterThan{T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.GreaterThan{T}},
     },
 ) where {T <: Real, A}
     return 1
@@ -214,7 +214,7 @@ end
 function MOI.get(
     ::IndicatorDifferentFrom2PseudoMILPBridge{Bool, A},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{Bool}, MOI.IndicatorSet{A, MOI.GreaterThan{Bool}},
+        MOI.VectorAffineFunction{Bool}, MOI.Indicator{A, MOI.GreaterThan{Bool}},
     },
 ) where {A}
     return 0
@@ -223,7 +223,7 @@ end
 function MOI.get(
     ::IndicatorDifferentFrom2PseudoMILPBridge{T, A},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.EqualTo{T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.EqualTo{T}},
     },
 ) where {T <: Real, A}
     return 0
@@ -232,7 +232,7 @@ end
 function MOI.get(
     ::IndicatorDifferentFrom2PseudoMILPBridge{Bool, A},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{Bool}, MOI.IndicatorSet{A, MOI.EqualTo{Bool}},
+        MOI.VectorAffineFunction{Bool}, MOI.Indicator{A, MOI.EqualTo{Bool}},
     },
 ) where {A}
     return 1
@@ -257,7 +257,7 @@ end
 function MOI.get(
     b::IndicatorDifferentFrom2PseudoMILPBridge{T, A},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, CP.Strictly{MOI.GreaterThan{T}}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{A, CP.Strictly{MOI.GreaterThan{T}}},
     },
 ) where {T <: Real, A}
     return [b.con_indic]
@@ -266,7 +266,7 @@ end
 function MOI.get(
     b::IndicatorDifferentFrom2PseudoMILPBridge{T, A},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.GreaterThan{T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.GreaterThan{T}},
     },
 ) where {T <: Real, A}
     return [b.con_indic]
@@ -275,7 +275,7 @@ end
 function MOI.get(
     b::IndicatorDifferentFrom2PseudoMILPBridge{T, A},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.EqualTo{T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.EqualTo{T}},
     },
 ) where {T <: Real, A}
     return [b.con_indic]

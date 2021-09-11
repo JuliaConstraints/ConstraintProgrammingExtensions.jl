@@ -110,25 +110,25 @@ MOIU.@model(
 )
 
 const EqualToIndicatorOne{T} =
-    MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}
+    MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}
 const EqualToIndicatorZero{T} =
-    MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.EqualTo{T}}
+    MOI.Indicator{MOI.ACTIVATE_ON_ZERO, MOI.EqualTo{T}}
 const GreaterThanIndicatorOne{T} =
-    MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}
+    MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}
 const GreaterThanIndicatorZero{T} =
-    MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.GreaterThan{T}}
+    MOI.Indicator{MOI.ACTIVATE_ON_ZERO, MOI.GreaterThan{T}}
 const LessThanIndicatorOne{T} =
-    MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}
+    MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}
 const LessThanIndicatorZero{T} =
-    MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.LessThan{T}}
+    MOI.Indicator{MOI.ACTIVATE_ON_ZERO, MOI.LessThan{T}}
 const StrictlyGreaterThanIndicatorOne{T} =
-    MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, CP.Strictly{MOI.GreaterThan{T}, T}}
+    MOI.Indicator{MOI.ACTIVATE_ON_ONE, CP.Strictly{MOI.GreaterThan{T}, T}}
 const StrictlyGreaterThanIndicatorZero{T} =
-    MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.Strictly{MOI.GreaterThan{T}, T}}
+    MOI.Indicator{MOI.ACTIVATE_ON_ZERO, CP.Strictly{MOI.GreaterThan{T}, T}}
 const StrictlyLessThanIndicatorOne{T} =
-    MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, CP.Strictly{MOI.LessThan{T}, T}}
+    MOI.Indicator{MOI.ACTIVATE_ON_ONE, CP.Strictly{MOI.LessThan{T}, T}}
 const StrictlyLessThanIndicatorZero{T} =
-    MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.Strictly{MOI.LessThan{T}, T}}
+    MOI.Indicator{MOI.ACTIVATE_ON_ZERO, CP.Strictly{MOI.LessThan{T}, T}}
 
 MOIU.@model(
     IndicatorMILPModel,
@@ -744,14 +744,14 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{Float64}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{Float64}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{Float64}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, CP.DifferentFrom{Float64}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.EqualTo{Float64}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.LessThan{Float64}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.GreaterThan{Float64}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{Float64}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{Float64}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.LessThan{Float64}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{Float64}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ONE, CP.DifferentFrom{Float64}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ZERO, MOI.EqualTo{Float64}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ZERO, MOI.LessThan{Float64}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ZERO, MOI.GreaterThan{Float64}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{Float64}},
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),
@@ -778,14 +778,14 @@ MOIU.@model(
         MOI.NormNuclearCone,
         MOI.PositiveSemidefiniteConeTriangle,
         MOI.ExponentialCone,
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{Int}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{Int}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{Int}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, CP.DifferentFrom{Int}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.EqualTo{Int}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.LessThan{Int}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, MOI.GreaterThan{Int}},
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{Int}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{Int}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.LessThan{Int}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{Int}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ONE, CP.DifferentFrom{Int}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ZERO, MOI.EqualTo{Int}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ZERO, MOI.LessThan{Int}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ZERO, MOI.GreaterThan{Int}},
+        MOI.Indicator{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{Int}},
     ),
     (MOI.PowerCone, MOI.DualPowerCone),
     (),

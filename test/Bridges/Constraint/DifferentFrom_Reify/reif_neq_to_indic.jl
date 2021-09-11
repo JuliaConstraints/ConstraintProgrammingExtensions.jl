@@ -54,23 +54,23 @@
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Reification{CP.DifferentFrom{T}}) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
-            (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}),
-            (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{T}}),
+            (MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}),
+            (MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{T}}),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}()) == 1
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{T}}}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{T}}}()) == 1
 
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}()) == [bridge.indic_true]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{T}}}()) == [bridge.indic_false]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}()) == [bridge.indic_true]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ZERO, CP.DifferentFrom{T}}}()) == [bridge.indic_false]
     end
 
     @testset "Constraint: indicator if true" begin
         @test MOI.is_valid(model, bridge.indic_true)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.indic_true)
         @test length(f.terms) == 2
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.indic_true) == MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE}(MOI.EqualTo(zero(T)))
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.indic_true) == MOI.Indicator{MOI.ACTIVATE_ON_ONE}(MOI.EqualTo(zero(T)))
         @test f.constants == [one(T), zero(T)]
 
         t1 = f.terms[1]
@@ -88,7 +88,7 @@
         @test MOI.is_valid(model, bridge.indic_false)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.indic_false)
         @test length(f.terms) == 2
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.indic_false) == MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO}(CP.DifferentFrom(zero(T)))
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.indic_false) == MOI.Indicator{MOI.ACTIVATE_ON_ZERO}(CP.DifferentFrom(zero(T)))
         @test f.constants == [one(T), zero(T)]
 
         t1 = f.terms[1]

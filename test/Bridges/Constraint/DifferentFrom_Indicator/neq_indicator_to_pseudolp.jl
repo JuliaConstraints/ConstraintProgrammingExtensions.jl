@@ -10,12 +10,12 @@
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        MOI.IndicatorSet{A, MOI.EqualTo{T}},
+        MOI.Indicator{A, MOI.EqualTo{T}},
     )
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        MOI.IndicatorSet{A, CP.DifferentFrom{T}},
+        MOI.Indicator{A, CP.DifferentFrom{T}},
     )
 
     x, _ = MOI.add_constrained_variable(model, MOI.ZeroOne())
@@ -36,7 +36,7 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, MOI.IndicatorSet{A}(CP.DifferentFrom(zero(T))))
+    c = MOI.add_constraint(model, fct, MOI.Indicator{A}(CP.DifferentFrom(zero(T))))
 
     @test MOI.is_valid(model, x)
     @test MOI.is_valid(model, c)
@@ -50,16 +50,16 @@
         if T == Int
             @test MOIB.added_constraint_types(typeof(bridge)) == [
                 (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
-                (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.GreaterThan{T}}),
+                (MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.GreaterThan{T}}),
             ]
         elseif T == Bool
             @test MOIB.added_constraint_types(typeof(bridge)) == [
-                (MOI.VectorAffineFunction{Bool}, MOI.IndicatorSet{A, MOI.EqualTo{Bool}}),
+                (MOI.VectorAffineFunction{Bool}, MOI.Indicator{A, MOI.EqualTo{Bool}}),
             ]
         elseif T == Float64
             @test MOIB.added_constraint_types(typeof(bridge)) == [
                 (MOI.VectorAffineFunction{T}, CP.AbsoluteValue),
-                (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, CP.Strictly{MOI.GreaterThan{T}}}),
+                (MOI.VectorAffineFunction{T}, MOI.Indicator{A, CP.Strictly{MOI.GreaterThan{T}}}),
             ]
         else
             @assert false
@@ -67,9 +67,9 @@
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == ((T == Bool) ? 0 : 1)
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}()) == ((T == Bool) ? 0 : 1)
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, CP.Strictly{MOI.GreaterThan{T}}}}()) == ((T == Float64) ? 1 : 0)
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.GreaterThan{T}}}()) == ((T == Int) ? 1 : 0)
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.EqualTo{T}}}()) == ((T == Bool) ? 1 : 0)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.Indicator{A, CP.Strictly{MOI.GreaterThan{T}}}}()) == ((T == Float64) ? 1 : 0)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.GreaterThan{T}}}()) == ((T == Int) ? 1 : 0)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.EqualTo{T}}}()) == ((T == Bool) ? 1 : 0)
 
         if T != Bool
             @test MOI.get(bridge, MOI.ListOfVariableIndices()) == [bridge.var_abs]
@@ -78,13 +78,13 @@
             @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.AbsoluteValue}()) == [bridge.con_abs]
         end
         if T == Float64
-            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, CP.Strictly{MOI.GreaterThan{T}}}}()) == [bridge.con_indic]
+            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.Indicator{A, CP.Strictly{MOI.GreaterThan{T}}}}()) == [bridge.con_indic]
         end
         if T == Int
-            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.GreaterThan{T}}}()) == [bridge.con_indic]
+            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.GreaterThan{T}}}()) == [bridge.con_indic]
         end
         if T == Bool
-            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{A, MOI.EqualTo{T}}}()) == [bridge.con_indic]
+            @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.Indicator{A, MOI.EqualTo{T}}}()) == [bridge.con_indic]
         end
     end
 
@@ -112,7 +112,7 @@
             @test MOI.is_valid(model, bridge.con_indic)
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_indic)
             @test length(f.terms) == 2
-            @test MOI.get(model, MOI.ConstraintSet(), bridge.con_indic) == MOI.IndicatorSet{A}(CP.Strictly(MOI.GreaterThan(zero(T))))
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.con_indic) == MOI.Indicator{A}(CP.Strictly(MOI.GreaterThan(zero(T))))
 
             t1 = f.terms[1]
             @test t1.output_index == 1
@@ -129,7 +129,7 @@
     if T == Int
         @testset "Greater than" begin
             @test MOI.is_valid(model, bridge.con_indic)
-            @test MOI.get(model, MOI.ConstraintSet(), bridge.con_indic) == MOI.IndicatorSet{A}(MOI.GreaterThan(one(T)))
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.con_indic) == MOI.Indicator{A}(MOI.GreaterThan(one(T)))
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_indic)
             @test length(f.terms) == 2
 
@@ -150,7 +150,7 @@
             @test MOI.is_valid(model, bridge.con_indic)
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_indic)
             @test length(f.terms) == 2
-            @test MOI.get(model, MOI.ConstraintSet(), bridge.con_indic) == MOI.IndicatorSet{A}(MOI.EqualTo(one(T)))
+            @test MOI.get(model, MOI.ConstraintSet(), bridge.con_indic) == MOI.Indicator{A}(MOI.EqualTo(one(T)))
             
             t1 = f.terms[1]
             @test t1.output_index == 1

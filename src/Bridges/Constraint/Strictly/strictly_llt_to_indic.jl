@@ -14,8 +14,8 @@ struct StrictlyLexicographicallyLessThan2IndicatorBridge{T} <: MOIBC.AbstractBri
     vars_lt_bin::Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}
     cons_one_lt::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
     cons_move::Matrix{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}
-    cons_indic_eq::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}}
-    cons_indic_lt::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}}}
+    cons_indic_eq::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}}
+    cons_indic_lt::Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}}}
 end
 
 function MOIBC.bridge_constraint(
@@ -47,8 +47,8 @@ function MOIBC.bridge_constraint(
     vars_lt_bin = Matrix{MOI.ConstraintIndex{MOI.VariableIndex, MOI.ZeroOne}}(undef, s.set.column_dim - 1, s.set.row_dim)
     cons_one_lt = Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}(undef, s.set.column_dim - 1)
     cons_move = Matrix{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}}(undef, s.set.column_dim - 1, s.set.row_dim - 1)
-    cons_indic_eq = Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}}(undef, s.set.column_dim - 1, s.set.row_dim)
-    cons_indic_lt = Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}}}(undef, s.set.column_dim - 1, s.set.row_dim)
+    cons_indic_eq = Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}}(undef, s.set.column_dim - 1, s.set.row_dim)
+    cons_indic_lt = Matrix{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}}}(undef, s.set.column_dim - 1, s.set.row_dim)
 
     f_scalars = MOIU.scalarize(f)
     f_matrix = reshape(f_scalars, s.set.column_dim, s.set.row_dim) 
@@ -75,7 +75,7 @@ function MOIBC.bridge_constraint(
             for j in 2:s.set.row_dim
         ]
 
-        cons_indic_eq[i, :] = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}[
+        cons_indic_eq[i, :] = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}}[
             MOI.add_constraint(
                 model,
                 MOIU.vectorize(
@@ -84,12 +84,12 @@ function MOIBC.bridge_constraint(
                         f_matrix[i, j] - f_matrix[i + 1, j],
                     ]
                 ),
-                MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE}(MOI.EqualTo(zero(T))),
+                MOI.Indicator{MOI.ACTIVATE_ON_ONE}(MOI.EqualTo(zero(T))),
             )            
             for j in 1:s.set.row_dim
         ]
 
-        cons_indic_lt[i, :] = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}}[
+        cons_indic_lt[i, :] = MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}}[
             MOI.add_constraint(
                 model,
                 MOIU.vectorize(
@@ -98,7 +98,7 @@ function MOIBC.bridge_constraint(
                         f_matrix[i, j] - f_matrix[i + 1, j],
                     ]
                 ),
-                MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE}(MOI.LessThan(zero(T))),
+                MOI.Indicator{MOI.ACTIVATE_ON_ONE}(MOI.LessThan(zero(T))),
             )            
             for j in 1:s.set.row_dim
         ]
@@ -122,8 +122,8 @@ end
 function MOIB.added_constraint_types(::Type{StrictlyLexicographicallyLessThan2IndicatorBridge{T}}) where {T}
     return [
         (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
-        (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}),
-        (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}),
+        (MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}}),
+        (MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}}),
     ]
 end
 
@@ -152,7 +152,7 @@ end
 function MOI.get(
     b::StrictlyLexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}},
     },
 ) where {T}
     return length(b.cons_indic_eq)
@@ -161,7 +161,7 @@ end
 function MOI.get(
     b::StrictlyLexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}},
     },
 ) where {T}
     return length(b.cons_indic_lt)
@@ -192,7 +192,7 @@ end
 function MOI.get(
     b::StrictlyLexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.EqualTo{T}},
     },
 ) where {T}
     return vec(b.cons_indic_eq)
@@ -201,7 +201,7 @@ end
 function MOI.get(
     b::StrictlyLexicographicallyLessThan2IndicatorBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.LessThan{T}},
     },
 ) where {T}
     return vec(b.cons_indic_lt)

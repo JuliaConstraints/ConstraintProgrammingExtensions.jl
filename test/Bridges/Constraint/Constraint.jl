@@ -102,7 +102,7 @@
         include("Increasing/inc_to_lp.jl")
     end
 
-    @testset "IndicatorSet{DifferentFrom}" begin
+    @testset "Indicator{DifferentFrom}" begin
         include("DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl")
     end
 

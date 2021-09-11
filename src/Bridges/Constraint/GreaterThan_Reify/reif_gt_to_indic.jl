@@ -3,8 +3,8 @@ Bridges `CP.Reification{MOI.GreaterThan}` to indicator constraints with (strict)
 inequalities.
 """
 struct ReificationGreaterThan2IndicatorBridge{T <: Real} <: MOIBC.AbstractBridge
-    indic_true::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}}
-    indic_false::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.Strictly{MOI.LessThan{T}, T}}}
+    indic_true::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}}
+    indic_false::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ZERO, CP.Strictly{MOI.LessThan{T}, T}}}
 end
 
 function MOIBC.bridge_constraint(
@@ -30,12 +30,12 @@ function MOIBC.bridge_constraint(
     indic_true = MOI.add_constraint(
         model, 
         f,
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE}(s.set)
+        MOI.Indicator{MOI.ACTIVATE_ON_ONE}(s.set)
     )
     indic_false = MOI.add_constraint(
         model, 
         f,
-        MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO}(CP.Strictly(MOI.LessThan(s.set.lower)))
+        MOI.Indicator{MOI.ACTIVATE_ON_ZERO}(CP.Strictly(MOI.LessThan(s.set.lower)))
         # TODO: helper to build CP.\neq from MOI.EqTo, CP.Strictly from inequalities, like `!()`? 
     )
 
@@ -56,15 +56,15 @@ end
 
 function MOIB.added_constraint_types(::Type{ReificationGreaterThan2IndicatorBridge{T}}) where {T <: Real}
     return [
-        (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}),
-        (MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.Strictly{MOI.LessThan{T}, T}}),
+        (MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}}),
+        (MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ZERO, CP.Strictly{MOI.LessThan{T}, T}}),
     ]
 end
 
 function MOI.get(
     ::ReificationGreaterThan2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}},
     },
 ) where {T <: Real}
     return 1
@@ -73,7 +73,7 @@ end
 function MOI.get(
     ::ReificationGreaterThan2IndicatorBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.Strictly{MOI.LessThan{T}, T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ZERO, CP.Strictly{MOI.LessThan{T}, T}},
     },
 ) where {T <: Real}
     return 1
@@ -82,7 +82,7 @@ end
 function MOI.get(
     b::ReificationGreaterThan2IndicatorBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ONE, MOI.GreaterThan{T}},
     },
 ) where {T <: Real}
     return [b.indic_true]
@@ -91,7 +91,7 @@ end
 function MOI.get(
     b::ReificationGreaterThan2IndicatorBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, MOI.IndicatorSet{MOI.ACTIVATE_ON_ZERO, CP.Strictly{MOI.LessThan{T}, T}},
+        MOI.VectorAffineFunction{T}, MOI.Indicator{MOI.ACTIVATE_ON_ZERO, CP.Strictly{MOI.LessThan{T}, T}},
     },
 ) where {T <: Real}
     return [b.indic_false]
