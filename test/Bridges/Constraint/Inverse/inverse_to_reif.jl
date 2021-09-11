@@ -103,12 +103,12 @@
                 t1 = f1.terms[1]
                 @test t1.output_index == 1
                 @test t1.scalar_term.coefficient === one(T)
-                @test t1.scalar_term.variabl == bridge.vars_first[i, j]
+                @test t1.scalar_term.variable == bridge.vars_first[i, j]
 
                 t2 = f1.terms[2]
                 @test t2.output_index == 2
                 @test t2.scalar_term.coefficient === one(T)
-                @test t2.scalar_term.variabl == x[i]
+                @test t2.scalar_term.variable == x[i]
                 
                 f2 = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_second_reif[i, j])
                 @test length(f2.terms) == 2
@@ -118,12 +118,12 @@
                 t1 = f2.terms[1]
                 @test t1.output_index == 1
                 @test t1.scalar_term.coefficient === one(T)
-                @test t1.scalar_term.variabl == bridge.vars_second[i, j]
+                @test t1.scalar_term.variable == bridge.vars_second[i, j]
 
                 t2 = f2.terms[2]
                 @test t2.output_index == 2
                 @test t2.scalar_term.coefficient === one(T)
-                @test t2.scalar_term.variabl == y[j]
+                @test t2.scalar_term.variable == y[j]
             end
         end
     end 
@@ -141,11 +141,11 @@
         
                 t1 = f.terms[1]
                 @test t1.coefficient === one(T)
-                @test t1.variabl == bridge.vars_first[i, j]
+                @test t1.variable == bridge.vars_first[i, j]
         
                 t2 = f.terms[2]
                 @test t2.coefficient === -one(T)
-                @test t2.variabl == bridge.vars_second[i, j]
+                @test t2.variable == bridge.vars_second[i, j]
             end
         end
     end

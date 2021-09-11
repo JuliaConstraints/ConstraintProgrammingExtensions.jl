@@ -101,12 +101,12 @@
             t1 = f.terms[1]
             @test t1.output_index == 1
             @test t1.scalar_term.coefficient === one(T)
-            @test t1.scalar_term.variabl == bridge.var_abs
+            @test t1.scalar_term.variable == bridge.var_abs
             
             t1 = f.terms[2]
             @test t1.output_index == 2
             @test t1.scalar_term.coefficient === one(T)
-            @test t1.scalar_term.variabl == x
+            @test t1.scalar_term.variable == x
         end
     end
     
@@ -119,7 +119,7 @@
             
             t1 = f.terms[1]
             @test t1.coefficient === one(T)
-            @test t1.variabl == bridge.var_abs
+            @test t1.variable == bridge.var_abs
         end
     end
     
@@ -141,7 +141,7 @@
             
             t1 = f.terms[1]
             @test t1.coefficient === one(T)
-            @test t1.variabl == x
+            @test t1.variable == x
         end
     end
 end

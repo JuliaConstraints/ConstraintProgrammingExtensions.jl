@@ -63,7 +63,7 @@
                 t = f.terms[idx[i, j]]
                 @test t.output_index == idx[i, j]
                 @test t.scalar_term.coefficient === one(T)
-                @test t.scalar_term.variabl === x_array[idx[i, j]]
+                @test t.scalar_term.variable === x_array[idx[i, j]]
             end
         end
     end
@@ -82,7 +82,7 @@
                 t = f.terms[idx[j, i]]
                 @test t.output_index == idx[j, i]
                 @test t.scalar_term.coefficient === one(T)
-                @test t.scalar_term.variabl === x_array[idx[j, i]]
+                @test t.scalar_term.variable === x_array[idx[j, i]]
             end
         end
     end

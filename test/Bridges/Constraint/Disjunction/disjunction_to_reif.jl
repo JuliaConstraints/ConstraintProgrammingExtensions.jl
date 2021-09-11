@@ -86,12 +86,12 @@
             t1 = f.terms[1]
             @test t1.output_index == 1
             @test t1.scalar_term.coefficient === one(T)
-            @test t1.scalar_term.variabl == bridge.vars[i]
+            @test t1.scalar_term.variable == bridge.vars[i]
 
             t2 = f.terms[2]
             @test t2.output_index == 2
             @test t2.scalar_term.coefficient === one(T)
-            @test t2.scalar_term.variabl == x_array[i]
+            @test t2.scalar_term.variable == x_array[i]
         end
     end 
 
@@ -104,7 +104,7 @@
         for i in 1:array_size
             t = f.terms[i]
             @test t.coefficient === one(T)
-            @test t.variabl == bridge.vars[i]
+            @test t.variable == bridge.vars[i]
         end
     end
 end

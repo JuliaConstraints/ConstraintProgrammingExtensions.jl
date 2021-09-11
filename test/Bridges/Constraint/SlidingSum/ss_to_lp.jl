@@ -64,7 +64,7 @@
             for j in 1:slide_length
                 t = f.terms[j]
                 @test t.coefficient === one(T)
-                @test t.variabl == x_array[i + j - 1]
+                @test t.variable == x_array[i + j - 1]
             end
         end
     end

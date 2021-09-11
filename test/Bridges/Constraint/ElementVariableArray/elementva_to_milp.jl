@@ -111,12 +111,12 @@
 
         t = f.terms[1]
         @test t.coefficient === -one(T)
-        @test t.variabl == x_index
+        @test t.variable == x_index
 
         for i in 1:dim
             t = f.terms[i + 1]
             @test t.coefficient === T(i)
-            @test t.variabl == bridge.vars_unary[i]
+            @test t.variable == bridge.vars_unary[i]
         end
     end
 
@@ -129,7 +129,7 @@
         for i in 1:dim
             t = f.terms[i]
             @test t.coefficient === one(T)
-            @test t.variabl == bridge.vars_unary[i]
+            @test t.variable == bridge.vars_unary[i]
         end
     end
 
@@ -141,12 +141,12 @@
 
         t = f.terms[1]
         @test t.coefficient === -one(T)
-        @test t.variabl == x_value
+        @test t.variable == x_value
 
         for i in 1:dim
             t = f.terms[i + 1]
             @test t.coefficient === one(T)
-            @test t.variabl == bridge.vars_product[i]
+            @test t.variable == bridge.vars_product[i]
         end
     end
 
@@ -162,11 +162,11 @@
             
             t1 = flt.terms[1]
             @test t1.coefficient === -one(T)
-            @test t1.variabl == bridge.vars_unary[i]
+            @test t1.variable == bridge.vars_unary[i]
             
             t2 = flt.terms[2]
             @test t2.coefficient === one(T)
-            @test t2.variabl == bridge.vars_product[i]
+            @test t2.variable == bridge.vars_product[i]
 
             @test MOI.is_valid(model, bridge.con_product_gt[i])
             fgt = MOI.get(model, MOI.ConstraintFunction(), bridge.con_product_gt[i])
@@ -175,15 +175,15 @@
             
             t1 = fgt.terms[1]
             @test t1.coefficient === -one(T)
-            @test t1.variabl == x_array[i]
+            @test t1.variable == x_array[i]
             
             t2 = fgt.terms[2]
             @test t2.coefficient === one(T)
-            @test t2.variabl == bridge.vars_unary[i]
+            @test t2.variable == bridge.vars_unary[i]
             
             t3 = fgt.terms[3]
             @test t3.coefficient === one(T)
-            @test t3.variabl == bridge.vars_product[i]
+            @test t3.variable == bridge.vars_product[i]
         end
     end
 end

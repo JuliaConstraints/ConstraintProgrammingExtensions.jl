@@ -61,22 +61,22 @@
                 t1 = f.terms[1]
                 @test t1.output_index == 1
                 @test t1.scalar_term.coefficient === one(T)
-                @test t1.scalar_term.variabl == x[i]
+                @test t1.scalar_term.variable == x[i]
 
                 t2 = f.terms[2]
                 @test t2.output_index == 2
                 @test t2.scalar_term.coefficient === one(T)
-                @test t2.scalar_term.variabl == x[j]
+                @test t2.scalar_term.variable == x[j]
 
                 t3 = f.terms[3]
                 @test t3.output_index == 3
                 @test t3.scalar_term.coefficient === one(T)
-                @test t3.scalar_term.variabl == x[i]
+                @test t3.scalar_term.variable == x[i]
 
                 t4 = f.terms[4]
                 @test t4.output_index == 3
                 @test t4.scalar_term.coefficient === -one(T)
-                @test t4.scalar_term.variabl == x[j]
+                @test t4.scalar_term.variable == x[j]
             end
         end
     end

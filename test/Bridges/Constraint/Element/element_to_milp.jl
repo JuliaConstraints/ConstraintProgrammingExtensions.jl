@@ -71,12 +71,12 @@
 
         t = f.terms[1]
         @test t.coefficient === -one(T)
-        @test t.variabl == x_index
+        @test t.variable == x_index
 
         for i in 1:dim
             t = f.terms[i + 1]
             @test t.coefficient === T(i)
-            @test t.variabl == bridge.vars[i]
+            @test t.variable == bridge.vars[i]
         end
     end
 
@@ -89,7 +89,7 @@
         for i in 1:dim
             t = f.terms[i]
             @test t.coefficient === one(T)
-            @test t.variabl == bridge.vars[i]
+            @test t.variable == bridge.vars[i]
         end
     end
 
@@ -101,12 +101,12 @@
 
         t = f.terms[1]
         @test t.coefficient === -one(T)
-        @test t.variabl == x_value
+        @test t.variable == x_value
 
         for i in 1:dim
             t = f.terms[i + 1]
             @test t.coefficient === values[i]
-            @test t.variabl == bridge.vars[i]
+            @test t.variable == bridge.vars[i]
         end
     end
 end

@@ -77,7 +77,7 @@
             t = f.terms[i]
             @test t.output_index === i
             @test t.scalar_term.coefficient === one(T)
-            @test t.scalar_term.variabl == x[2 * array_dim + i]
+            @test t.scalar_term.variable == x[2 * array_dim + i]
         end
     end
 
@@ -95,11 +95,11 @@
             
             t1 = f.terms[1]
             @test t1.coefficient === one(T)
-            @test t1.variabl == x[i]
+            @test t1.variable == x[i]
             
             t2 = f.terms[2]
             @test t2.coefficient === -one(T)
-            @test t2.variabl == x[i + 1]
+            @test t2.variable == x[i + 1]
         end
     end
 
@@ -117,22 +117,22 @@
             t1 = f.terms[1]
             @test t1.output_index === 1
             @test t1.scalar_term.coefficient === one(T)
-            @test t1.scalar_term.variabl == x[i]
+            @test t1.scalar_term.variable == x[i]
             
             t2 = f.terms[2]
             @test t2.output_index === 2
             @test t2.scalar_term.coefficient === one(T)
-            @test t2.scalar_term.variabl == x[2 * array_dim + i]
+            @test t2.scalar_term.variable == x[2 * array_dim + i]
             
             t3 = f.terms[3]
             @test t3.output_index === 3
             @test t3.scalar_term.coefficient === one(T)
-            @test t3.scalar_term.variabl == x[array_dim + 1]
+            @test t3.scalar_term.variable == x[array_dim + 1]
             
             t4 = f.terms[4]
             @test t4.output_index === 4
             @test t4.scalar_term.coefficient === one(T)
-            @test t4.scalar_term.variabl == x[array_dim + 2]
+            @test t4.scalar_term.variable == x[array_dim + 2]
         end
     end
 end

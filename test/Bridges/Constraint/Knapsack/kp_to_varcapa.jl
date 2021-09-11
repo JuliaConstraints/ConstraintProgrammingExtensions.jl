@@ -75,9 +75,9 @@
             @test f.terms[i].output_index == i
             @test f.terms[i].scalar_term.coefficient === one(T)
         end
-        @test f.terms[1].scalar_term.variabl == x_1
-        @test f.terms[2].scalar_term.variabl == x_2
-        @test f.terms[3].scalar_term.variabl == bridge.capa_var
+        @test f.terms[1].scalar_term.variable == x_1
+        @test f.terms[2].scalar_term.variable == x_2
+        @test f.terms[3].scalar_term.variable == bridge.capa_var
         @test MOI.get(model, MOI.ConstraintSet(), bridge.kp) == CP.Knapsack(weights)
     end
 end

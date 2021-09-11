@@ -68,16 +68,16 @@
 
             @test f.terms[1].output_index == 1
             @test f.terms[1].scalar_term.coefficient === one(T)
-            @test f.terms[1].scalar_term.variabl === x_counts[i]
+            @test f.terms[1].scalar_term.variable === x_counts[i]
 
             for j in 1:array_size
                 @test f.terms[2 + (j - 1) * 2].output_index == j + 1
                 @test f.terms[2 + (j - 1) * 2].scalar_term.coefficient === one(T)
-                @test f.terms[2 + (j - 1) * 2].scalar_term.variabl === x_array[j]
+                @test f.terms[2 + (j - 1) * 2].scalar_term.variable === x_array[j]
 
                 @test f.terms[3 + (j - 1) * 2].output_index == j + 1
                 @test f.terms[3 + (j - 1) * 2].scalar_term.coefficient === -one(T)
-                @test f.terms[3 + (j - 1) * 2].scalar_term.variabl === x_sought[i]
+                @test f.terms[3 + (j - 1) * 2].scalar_term.variable === x_sought[i]
             end
         end
     end

@@ -78,7 +78,7 @@
         for item in 1:n_items
             t = f.terms[item]
             @test t.coefficient === weights[item]
-            @test t.variabl == ((item == 1) ? x_1 : x_2)
+            @test t.variable == ((item == 1) ? x_1 : x_2)
         end
     end
 
@@ -93,11 +93,11 @@
         for item in 1:n_items
             t = f.terms[item]
             @test t.coefficient === values[item]
-            @test t.variabl == ((item == 1) ? x_1 : x_2)
+            @test t.variable == ((item == 1) ? x_1 : x_2)
         end
         
         t = f.terms[end]
         @test t.coefficient === -one(T)
-        @test t.variabl == x_value
+        @test t.variable == x_value
     end
 end

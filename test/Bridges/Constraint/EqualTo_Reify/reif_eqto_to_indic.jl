@@ -76,12 +76,12 @@
         t1 = f.terms[1]
         @test t1.output_index == 1
         @test t1.scalar_term.coefficient === one(T)
-        @test t1.scalar_term.variabl == x
+        @test t1.scalar_term.variable == x
 
         t2 = f.terms[2]
         @test t2.output_index == 2
         @test t2.scalar_term.coefficient === one(T)
-        @test t2.scalar_term.variabl == y
+        @test t2.scalar_term.variable == y
     end
 
     @testset "Constraint: indicator if false" begin
@@ -94,11 +94,11 @@
         t1 = f.terms[1]
         @test t1.output_index == 1
         @test t1.scalar_term.coefficient === one(T)
-        @test t1.scalar_term.variabl == x
+        @test t1.scalar_term.variable == x
 
         t2 = f.terms[2]
         @test t2.output_index == 2
         @test t2.scalar_term.coefficient === one(T)
-        @test t2.scalar_term.variabl == y
+        @test t2.scalar_term.variable == y
     end
 end

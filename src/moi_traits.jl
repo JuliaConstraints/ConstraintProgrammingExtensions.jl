@@ -19,7 +19,7 @@ end
 function is_integer(model::MOI.ModelLike, f::MOI.ScalarAffineFunction{T}) where {T <: Real}
     v = MOIU.canonical(f)
     for t in v.terms
-        if !isinteger(t.coefficient) || !is_integer(model, t.variabl)
+        if !isinteger(t.coefficient) || !is_integer(model, t.variable)
             return false
         end
     end
@@ -43,9 +43,9 @@ function is_binary(model::MOI.ModelLike, f::MOI.ScalarAffineFunction{T}) where {
     # Two cases: either just a binary variable, or its complement.
     t = v.terms[1]
     if t.coefficient === one(T)
-        return f.constant == zero(T) && is_binary(model, t.variabl)
+        return f.constant == zero(T) && is_binary(model, t.variable)
     elseif t.coefficient === -one(T)
-        return f.constant == one(T) && is_binary(model, t.variabl)
+        return f.constant == one(T) && is_binary(model, t.variable)
     else
         return false
     end
@@ -56,7 +56,7 @@ function has_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) w
         if t.coefficient == zero(T)
             continue
         end
-        if !has_lower_bound(model, t.variabl)
+        if !has_lower_bound(model, t.variable)
             return false
         end
     end
@@ -93,7 +93,7 @@ function has_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) w
         if t.coefficient == zero(T)
             continue
         end
-        if !has_upper_bound(model, t.variabl)
+        if !has_upper_bound(model, t.variable)
             return false
         end
     end
@@ -159,8 +159,8 @@ function get_lower_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) w
 
     lb = zero(T)
     for t in v.terms
-        var_lb = get_lower_bound(model, t.variabl)
-        var_ub = get_upper_bound(model, t.variabl)
+        var_lb = get_lower_bound(model, t.variable)
+        var_ub = get_upper_bound(model, t.variable)
 
         if t.coefficient == zero(T)
             continue
@@ -209,8 +209,8 @@ function get_upper_bound(model::MOI.ModelLike, v::MOI.ScalarAffineFunction{T}) w
 
     ub = zero(T)
     for t in v.terms
-        var_lb = get_lower_bound(model, t.variabl)
-        var_ub = get_upper_bound(model, t.variabl)
+        var_lb = get_lower_bound(model, t.variable)
+        var_ub = get_upper_bound(model, t.variable)
 
         if t.coefficient == zero(T)
             continue

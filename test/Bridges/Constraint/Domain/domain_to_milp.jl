@@ -86,7 +86,7 @@
         for i in 1:n_values
             t = f.terms[i]
             @test t.coefficient === one(T)
-            @test t.variabl == bridge.vars[i]
+            @test t.variable == bridge.vars[i]
         end
     end
 
@@ -100,12 +100,12 @@
 
         t1 = f.terms[1]
         @test t1.coefficient === one(T)
-        @test t1.variabl == x
+        @test t1.variable == x
 
         for j in 1:n_values
             t = f.terms[1 + j]
             @test t.coefficient === -x_vector[j]
-            @test t.variabl == bridge.vars[j]
+            @test t.variable == bridge.vars[j]
         end
     end
 end

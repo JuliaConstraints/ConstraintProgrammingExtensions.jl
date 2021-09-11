@@ -67,9 +67,9 @@
                 @test f.terms[i].output_index == i
                 @test f.terms[i].scalar_term.coefficient === one(T)
             end
-            @test f.terms[1].scalar_term.variabl === x_counts[i]
+            @test f.terms[1].scalar_term.variable === x_counts[i]
             for i in 1:array_size
-                @test f.terms[1 + i].scalar_term.variabl === x_array[i]
+                @test f.terms[1 + i].scalar_term.variable === x_array[i]
             end
         end
     end

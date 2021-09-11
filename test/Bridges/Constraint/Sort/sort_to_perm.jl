@@ -69,14 +69,14 @@
             t = f.terms[i]
             @test t.output_index === i
             @test t.scalar_term.coefficient === one(T)
-            @test t.scalar_term.variabl == x[i]
+            @test t.scalar_term.variable == x[i]
         end
         for i0 in 1:array_dim # Indices.
             i = 2 * array_dim + i0
             t = f.terms[i]
             @test t.output_index === i
             @test t.scalar_term.coefficient === one(T)
-            @test t.scalar_term.variabl == bridge.vars[i0]
+            @test t.scalar_term.variable == bridge.vars[i0]
         end
     end
 

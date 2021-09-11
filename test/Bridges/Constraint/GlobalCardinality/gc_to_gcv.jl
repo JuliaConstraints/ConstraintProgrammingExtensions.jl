@@ -99,21 +99,21 @@
             t = f.terms[i]
             @test t.output_index == i
             @test t.scalar_term.coefficient === one(T)
-            @test t.scalar_term.variabl === x_array[i]
+            @test t.scalar_term.variable === x_array[i]
         end
 
         for i in 1:sought_size
             t = f.terms[array_size + i]
             @test t.output_index == array_size + i
             @test t.scalar_term.coefficient === one(T)
-            @test t.scalar_term.variabl === x_counts[i]
+            @test t.scalar_term.variable === x_counts[i]
         end
 
         for i in 1:sought_size
             t = f.terms[array_size + sought_size + i]
             @test t.output_index == array_size + sought_size + i
             @test t.scalar_term.coefficient === one(T)
-            @test t.scalar_term.variabl === bridge.vars[i]
+            @test t.scalar_term.variable === bridge.vars[i]
         end
     end
 end

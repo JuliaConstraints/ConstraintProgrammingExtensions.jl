@@ -69,7 +69,7 @@
             t = f.terms[i]
             @test t.output_index == i
             @test t.scalar_term.coefficient === one(T)
-            @test t.scalar_term.variabl == x[i]
+            @test t.scalar_term.variable == x[i]
         end
     end
 
@@ -83,12 +83,12 @@
             t = f.terms[i]
             @test t.output_index == i
             @test t.scalar_term.coefficient === one(T)
-            @test t.scalar_term.variabl == x[i]
+            @test t.scalar_term.variable == x[i]
 
             t = f.terms[dim + i]
             @test t.output_index == dim + i
             @test t.scalar_term.coefficient === one(T)
-            @test t.scalar_term.variabl == x[i]
+            @test t.scalar_term.variable == x[i]
         end
     end
 end

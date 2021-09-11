@@ -77,9 +77,9 @@
         end
         @test f.terms[end].coefficient === -one(T)
 
-        @test f.terms[1].variabl == x_1
-        @test f.terms[2].variabl == x_2
-        @test f.terms[3].variabl == x_value
+        @test f.terms[1].variable == x_1
+        @test f.terms[2].variable == x_2
+        @test f.terms[3].variable == x_value
         @test MOI.get(model, MOI.ConstraintSet(), bridge.value) == MOI.EqualTo(zero(T))
     end
 
@@ -91,8 +91,8 @@
             @test f.terms[i].output_index == i
             @test f.terms[i].scalar_term.coefficient === one(T)
         end
-        @test f.terms[1].scalar_term.variabl == x_1
-        @test f.terms[2].scalar_term.variabl == x_2
+        @test f.terms[1].scalar_term.variable == x_1
+        @test f.terms[2].scalar_term.variable == x_2
         @test MOI.get(model, MOI.ConstraintSet(), bridge.kp) == CP.Knapsack(weights, capacity)
     end
 end

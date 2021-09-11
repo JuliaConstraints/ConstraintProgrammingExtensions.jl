@@ -65,18 +65,18 @@
         t = f.terms[1]
         @test t.output_index == 1
         @test t.scalar_term.coefficient === one(T)
-        @test t.scalar_term.variabl == x_count
+        @test t.scalar_term.variable == x_count
 
         for i in 1:array_size
             t1 = f.terms[2 + 2 * (i - 1)]
             @test t1.output_index == 1 + i
             @test t1.scalar_term.coefficient === one(T)
-            @test t1.scalar_term.variabl == x_array_1[i]
+            @test t1.scalar_term.variable == x_array_1[i]
 
             t2 = f.terms[3 + 2 * (i - 1)]
             @test t2.output_index == 1 + i
             @test t2.scalar_term.coefficient === -one(T)
-            @test t2.scalar_term.variabl == x_array_2[i]
+            @test t2.scalar_term.variable == x_array_2[i]
         end
     end
 end

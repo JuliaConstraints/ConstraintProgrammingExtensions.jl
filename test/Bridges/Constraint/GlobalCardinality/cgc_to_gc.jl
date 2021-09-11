@@ -78,7 +78,7 @@
             @test length(f.terms) == 1
 
             @test f.terms[1].coefficient === one(T)
-            @test f.terms[1].variabl === x_array[i]
+            @test f.terms[1].variable === x_array[i]
         end
     end
 
@@ -98,9 +98,9 @@
             @test t.scalar_term.coefficient === one(T)
 
             if 1 <= i <= array_size
-                @test t.scalar_term.variabl == x_array[i]
+                @test t.scalar_term.variable == x_array[i]
             else
-                @test t.scalar_term.variabl == x_counts[i - array_size]
+                @test t.scalar_term.variable == x_counts[i - array_size]
             end
         end
     end

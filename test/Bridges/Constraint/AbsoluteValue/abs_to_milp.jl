@@ -99,13 +99,13 @@
         @test length(f.terms) == 3
         t1 = f.terms[1]
         @test t1.coefficient === one(T)
-        @test t1.variabl == x
+        @test t1.variable == x
         t2 = f.terms[2]
         @test t2.coefficient === -one(T)
-        @test t2.variabl == bridge.var_pos
+        @test t2.variable == bridge.var_pos
         t3 = f.terms[3]
         @test t3.coefficient === one(T)
-        @test t3.variabl == bridge.var_neg
+        @test t3.variable == bridge.var_neg
         @test MOI.get(model, MOI.ConstraintSet(), bridge.con_original_var) == MOI.EqualTo(zero(T))
 
         @test MOI.is_valid(model, bridge.con_abs_var)
@@ -114,13 +114,13 @@
         @test length(f.terms) == 3
         t1 = f.terms[1]
         @test t1.coefficient === one(T)
-        @test t1.variabl == x_abs
+        @test t1.variable == x_abs
         t2 = f.terms[2]
         @test t2.coefficient === -one(T)
-        @test t2.variabl == bridge.var_pos
+        @test t2.variable == bridge.var_pos
         t3 = f.terms[3]
         @test t3.coefficient === -one(T)
-        @test t3.variabl == bridge.var_neg
+        @test t3.variable == bridge.var_neg
         @test MOI.get(model, MOI.ConstraintSet(), bridge.con_abs_var) == MOI.EqualTo(zero(T))
 
         @test MOI.is_valid(model, bridge.con_pos_var_big_m)
@@ -129,10 +129,10 @@
         @test length(f.terms) == 2
         t1 = f.terms[1]
         @test t1.coefficient === -5 * one(T)
-        @test t1.variabl == bridge.var_bin
+        @test t1.variable == bridge.var_bin
         t2 = f.terms[2]
         @test t2.coefficient === one(T)
-        @test t2.variabl == bridge.var_pos
+        @test t2.variable == bridge.var_pos
         @test MOI.get(model, MOI.ConstraintSet(), bridge.con_pos_var_big_m) == MOI.LessThan(zero(T))
 
         @test MOI.is_valid(model, bridge.con_neg_var_big_m)
@@ -141,10 +141,10 @@
         @test length(f.terms) == 2
         t1 = f.terms[1]
         @test t1.coefficient === 5 * one(T)
-        @test t1.variabl == bridge.var_bin
+        @test t1.variable == bridge.var_bin
         t2 = f.terms[2]
         @test t2.coefficient === one(T)
-        @test t2.variabl == bridge.var_neg
+        @test t2.variable == bridge.var_neg
         @test MOI.get(model, MOI.ConstraintSet(), bridge.con_neg_var_big_m) == MOI.LessThan(zero(T))
     end
 end

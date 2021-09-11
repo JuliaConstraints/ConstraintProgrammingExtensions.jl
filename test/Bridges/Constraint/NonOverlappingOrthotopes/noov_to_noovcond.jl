@@ -111,7 +111,7 @@
             @test t.scalar_term.coefficient === one(T)
         end
 
-        f_vars = [t.scalar_term.variabl for t in f.terms]
+        f_vars = [t.scalar_term.variable for t in f.terms]
         @test length(f_vars) == 3 * dim * n_ortho + n_ortho
 
         if n_ortho >= 1

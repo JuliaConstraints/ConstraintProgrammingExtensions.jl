@@ -73,11 +73,11 @@
 
         t1 = f.terms[1]
         @test t1.coefficient === 5 * one(T)
-        @test t1.variabl == x
+        @test t1.variable == x
 
         t2 = f.terms[2]
         @test t2.coefficient === one(T)
-        @test t2.variabl == y
+        @test t2.variable == y
     end
 
     @testset "Constraint: small-M" begin
@@ -96,10 +96,10 @@
 
         t1 = f.terms[1]
         @test t1.coefficient === -5 * one(T)
-        @test t1.variabl == x
+        @test t1.variable == x
 
         t2 = f.terms[2]
         @test t2.coefficient === one(T)
-        @test t2.variabl == y
+        @test t2.variable == y
     end
 end

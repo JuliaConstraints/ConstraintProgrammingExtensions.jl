@@ -81,6 +81,6 @@
 
         t1 = f.terms[1]
         @test t1.coefficient === one(T)
-        @test t1.variabl == x
+        @test t1.variable == x
     end
 end

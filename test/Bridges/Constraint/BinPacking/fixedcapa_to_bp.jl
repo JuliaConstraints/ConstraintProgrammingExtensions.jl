@@ -102,14 +102,14 @@
             @test f.terms[i].output_index == i
             @test f.terms[i].scalar_term.coefficient == 1
         end
-        @test f.terms[1].scalar_term.variabl == x_load_1
+        @test f.terms[1].scalar_term.variable == x_load_1
         if n_bins == 1
-            @test f.terms[2].scalar_term.variabl == x_bin_1
-            @test f.terms[3].scalar_term.variabl == x_bin_2
+            @test f.terms[2].scalar_term.variable == x_bin_1
+            @test f.terms[3].scalar_term.variable == x_bin_2
         elseif n_bins == 2
-            @test f.terms[2].scalar_term.variabl == x_load_2
-            @test f.terms[3].scalar_term.variabl == x_bin_1
-            @test f.terms[4].scalar_term.variabl == x_bin_2
+            @test f.terms[2].scalar_term.variable == x_load_2
+            @test f.terms[3].scalar_term.variable == x_bin_1
+            @test f.terms[4].scalar_term.variable == x_bin_2
         else
             @assert false
         end
@@ -123,7 +123,7 @@
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.capa[i])
             @test length(f.terms) == 1
             @test f.terms[1].coefficient == 1
-            @test f.terms[1].variabl == ((i == 1) ? x_load_1 : x_load_2)
+            @test f.terms[1].variable == ((i == 1) ? x_load_1 : x_load_2)
             @test MOI.get(model, MOI.ConstraintSet(), bridge.capa[i]) == MOI.LessThan(capas[i])
         end
     end

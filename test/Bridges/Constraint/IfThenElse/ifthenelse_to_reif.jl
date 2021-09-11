@@ -92,12 +92,12 @@
         t1 = f.terms[1]
         @test t1.output_index == 1
         @test t1.scalar_term.coefficient === one(T)
-        @test t1.scalar_term.variabl == bridge.var_condition
+        @test t1.scalar_term.variable == bridge.var_condition
 
         t2 = f.terms[2]
         @test t2.output_index == 2
         @test t2.scalar_term.coefficient === one(T)
-        @test t2.scalar_term.variabl == x_1
+        @test t2.scalar_term.variable == x_1
     end 
 
     @testset "Reification of the true constraint" begin
@@ -109,12 +109,12 @@
         t1 = f.terms[1]
         @test t1.output_index == 1
         @test t1.scalar_term.coefficient === one(T)
-        @test t1.scalar_term.variabl == bridge.var_true
+        @test t1.scalar_term.variable == bridge.var_true
 
         t2 = f.terms[2]
         @test t2.output_index == 2
         @test t2.scalar_term.coefficient === one(T)
-        @test t2.scalar_term.variabl == x_2
+        @test t2.scalar_term.variable == x_2
     end 
 
     @testset "Reification of the false constraint" begin
@@ -126,12 +126,12 @@
         t1 = f.terms[1]
         @test t1.output_index == 1
         @test t1.scalar_term.coefficient === one(T)
-        @test t1.scalar_term.variabl == bridge.var_false
+        @test t1.scalar_term.variable == bridge.var_false
 
         t2 = f.terms[2]
         @test t2.output_index == 2
         @test t2.scalar_term.coefficient === one(T)
-        @test t2.scalar_term.variabl == x_3
+        @test t2.scalar_term.variable == x_3
     end 
 
     @testset "If" begin
@@ -142,11 +142,11 @@
 
         t1 = f.terms[1]
         @test t1.coefficient === -one(T)
-        @test t1.variabl == bridge.var_condition
+        @test t1.variable == bridge.var_condition
 
         t2 = f.terms[2]
         @test t2.coefficient === one(T)
-        @test t2.variabl == bridge.var_true
+        @test t2.variable == bridge.var_true
     end
 
     @testset "Else" begin
@@ -157,11 +157,11 @@
 
         t1 = f.terms[1]
         @test t1.coefficient === one(T)
-        @test t1.variabl == bridge.var_condition
+        @test t1.variable == bridge.var_condition
 
         t2 = f.terms[2]
         @test t2.coefficient === one(T)
-        @test t2.variabl == bridge.var_false
+        @test t2.variable == bridge.var_false
     end
 end
     

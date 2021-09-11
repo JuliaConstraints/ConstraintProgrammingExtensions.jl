@@ -106,7 +106,7 @@
             for j in 1:y_size
                 t = f.terms[j]
                 @test t.coefficient === one(T)
-                @test t.variabl == bridge.vars_gt[i, j]
+                @test t.variable == bridge.vars_gt[i, j]
             end
         end
     end
@@ -129,15 +129,15 @@
 
                 t1 = f.terms[1]
                 @test t1.coefficient === one(T)
-                @test t1.variabl == bridge.vars_eq[i, j]
+                @test t1.variable == bridge.vars_eq[i, j]
 
                 t2 = f.terms[2]
                 @test t2.coefficient === -one(T)
-                @test t2.variabl == bridge.vars_eq[i, j + 1]
+                @test t2.variable == bridge.vars_eq[i, j + 1]
 
                 t3 = f.terms[3]
                 @test t3.coefficient === -one(T)
-                @test t3.variabl == bridge.vars_gt[i, j + 1]
+                @test t3.variable == bridge.vars_gt[i, j + 1]
             end
         end
     end
@@ -161,17 +161,17 @@
                 t1 = f.terms[1]
                 @test t1.output_index == 1
                 @test t1.scalar_term.coefficient === one(T)
-                @test t1.scalar_term.variabl == bridge.vars_eq[i, j]
+                @test t1.scalar_term.variable == bridge.vars_eq[i, j]
 
                 t2 = f.terms[2]
                 @test t2.output_index == 2
                 @test t2.scalar_term.coefficient === one(T)
-                @test t2.scalar_term.variabl == x_matrix[i, j]
+                @test t2.scalar_term.variable == x_matrix[i, j]
 
                 t3 = f.terms[3]
                 @test t3.output_index == 2
                 @test t3.scalar_term.coefficient === -one(T)
-                @test t3.scalar_term.variabl == x_matrix[i + 1, j]
+                @test t3.scalar_term.variable == x_matrix[i + 1, j]
             end
         end
     end
@@ -195,17 +195,17 @@
                 t1 = f.terms[1]
                 @test t1.output_index == 1
                 @test t1.scalar_term.coefficient === one(T)
-                @test t1.scalar_term.variabl == bridge.vars_gt[i, j]
+                @test t1.scalar_term.variable == bridge.vars_gt[i, j]
 
                 t2 = f.terms[2]
                 @test t2.output_index == 2
                 @test t2.scalar_term.coefficient === one(T)
-                @test t2.scalar_term.variabl == x_matrix[i, j]
+                @test t2.scalar_term.variable == x_matrix[i, j]
 
                 t3 = f.terms[3]
                 @test t3.output_index == 2
                 @test t3.scalar_term.coefficient === -one(T)
-                @test t3.scalar_term.variabl == x_matrix[i + 1, j]
+                @test t3.scalar_term.variable == x_matrix[i + 1, j]
             end
         end
     end
