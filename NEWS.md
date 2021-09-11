@@ -1,6 +1,21 @@
 Release Notes
 =============
 
+Version 0.5.0
+-------------
+
+Add infrastructure to create FlatZinc-based solver, using `FlatZinc.Optimizer`.
+
+Add the `ExclusiveDisjunction` set.
+
+FlatZinc parsing can handle several annotations; they are still ignored after
+parsing and not passed to the MOI model.
+
+Breaking change: FlatZinc output is now controlled by `FlatZinc.Model`, whereas
+`FlatZinc.Optimizer` is used for optimising models using a FlatZinc 
+communication with the solver.
+
+
 Version 0.4.3
 -------------
 
