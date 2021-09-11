@@ -127,7 +127,7 @@
         @testset "Greater than" begin
             @test MOI.is_valid(model, bridge.con_abs_gt)
             f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_abs_gt)
-            @test f.variable == bridge.var_abs
+            @test f == bridge.var_abs
             @test MOI.get(model, MOI.ConstraintSet(), bridge.con_abs_gt) == MOI.GreaterThan(one(T))
         end
     end

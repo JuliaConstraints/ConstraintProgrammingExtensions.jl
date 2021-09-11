@@ -56,7 +56,7 @@ function MOIBC.bridge_constraint(
         MOIU.vectorize(
             [
                 f_scalars...,
-                (one(T) .* MOI.VariableIndex.(vars))...
+                (one(T) .* vars)...
             ]
         ),
         CP.GlobalCardinality{CP.VARIABLE_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}(s.dimension, length(s.values))

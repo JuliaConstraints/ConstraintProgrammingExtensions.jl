@@ -25,7 +25,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_value, x_index])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.VariableIndex.([x_value, x_index]))
+        MOIU.vectorize([x_value, x_index])
     else
         @assert false
     end

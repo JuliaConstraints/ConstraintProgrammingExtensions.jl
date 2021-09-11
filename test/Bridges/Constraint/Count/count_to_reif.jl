@@ -34,7 +34,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_count, x_array...])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.VariableIndex.([x_count, x_array...]))
+        MOIU.vectorize([x_count, x_array...])
     else
         @assert false
     end
@@ -73,7 +73,7 @@
         for i in 1:array_size
             @test MOI.is_valid(model, bridge.vars[i])
             @test MOI.is_valid(model, bridge.vars_bin[i])
-            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_bin[i]).variable == bridge.vars[i]
+            @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_bin[i]) == bridge.vars[i]
             @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_bin[i]) == MOI.ZeroOne()
         end
     end

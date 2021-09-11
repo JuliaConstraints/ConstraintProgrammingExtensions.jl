@@ -34,7 +34,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_1, x_2, x_3])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.VariableIndex.([x_1, x_2, x_3]))
+        MOIU.vectorize([x_1, x_2, x_3])
     else
         @assert false
     end
@@ -69,17 +69,17 @@
     @testset "Set of variables" begin
         @test MOI.is_valid(model, bridge.var_condition)
         @test MOI.is_valid(model, bridge.var_condition_bin)
-        @test MOI.get(model, MOI.ConstraintFunction(), bridge.var_condition_bin).variable == bridge.var_condition
+        @test MOI.get(model, MOI.ConstraintFunction(), bridge.var_condition_bin) == bridge.var_condition
         @test MOI.get(model, MOI.ConstraintSet(), bridge.var_condition_bin) == MOI.ZeroOne()
 
         @test MOI.is_valid(model, bridge.var_true)
         @test MOI.is_valid(model, bridge.var_true_bin)
-        @test MOI.get(model, MOI.ConstraintFunction(), bridge.var_true_bin).variable == bridge.var_true
+        @test MOI.get(model, MOI.ConstraintFunction(), bridge.var_true_bin) == bridge.var_true
         @test MOI.get(model, MOI.ConstraintSet(), bridge.var_true_bin) == MOI.ZeroOne()
 
         @test MOI.is_valid(model, bridge.var_false)
         @test MOI.is_valid(model, bridge.var_false_bin)
-        @test MOI.get(model, MOI.ConstraintFunction(), bridge.var_false_bin).variable == bridge.var_false
+        @test MOI.get(model, MOI.ConstraintFunction(), bridge.var_false_bin) == bridge.var_false
         @test MOI.get(model, MOI.ConstraintSet(), bridge.var_false_bin) == MOI.ZeroOne()
     end
 

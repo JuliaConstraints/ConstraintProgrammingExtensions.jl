@@ -77,7 +77,7 @@ function lexicographicallylessthan_vectoraffinefunction_test(
 
     c5 = MOI.add_constraint(
         model,
-        MOIU.vectorize(MOI.VariableIndex.([x1, x2, x3, x4])),
+        MOIU.vectorize([x1, x2, x3, x4]),
         CP.LexicographicallyLessThan(2),
     )
 

@@ -51,7 +51,7 @@ function MOIBC.bridge_constraint(
 
     con_disjunction = MOI.add_constraint(
         model, 
-        sum(one(T) .* MOI.VariableIndex.(vars)),
+        sum(one(T) .* vars),
         MOI.GreaterThan(one(T))
     )
 

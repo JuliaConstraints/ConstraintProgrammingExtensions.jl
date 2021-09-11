@@ -65,7 +65,7 @@ function MOIBC.bridge_constraint(
     cons_transportation_x = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
         MOI.add_constraint(
             model, 
-            f_sorted[i] - sum(one(T) .* MOI.VariableIndex.(vars_flow[i, :])),
+            f_sorted[i] - sum(one(T) .* vars_flow[i, :]),
             MOI.EqualTo(zero(T))
         )
         for i in 1:dim
@@ -73,7 +73,7 @@ function MOIBC.bridge_constraint(
     cons_transportation_y = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
         MOI.add_constraint(
             model, 
-            f_to_sort[j] - sum(one(T) .* MOI.VariableIndex.(vars_flow[:, j])),
+            f_to_sort[j] - sum(one(T) .* vars_flow[:, j]),
             MOI.EqualTo(zero(T))
         )
         for j in 1:dim
@@ -83,7 +83,7 @@ function MOIBC.bridge_constraint(
     cons_unicity_x = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
         MOI.add_constraint(
             model, 
-            sum(one(T) .* MOI.VariableIndex.(vars_unicity[i, :])),
+            sum(one(T) .* vars_unicity[i, :]),
             MOI.EqualTo(one(T))
         )
         for i in 1:dim
@@ -91,7 +91,7 @@ function MOIBC.bridge_constraint(
     cons_unicity_y = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
         MOI.add_constraint(
             model, 
-            sum(one(T) .* MOI.VariableIndex.(vars_unicity[:, j])),
+            sum(one(T) .* vars_unicity[:, j]),
             MOI.EqualTo(one(T))
         )
         for j in 1:dim

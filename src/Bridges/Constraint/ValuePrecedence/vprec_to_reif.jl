@@ -68,7 +68,7 @@ function MOIBC.bridge_constraint(
     cons_implication = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}[
         MOI.add_constraint(
             model,
-            vars_reif_value[i - 1] - sum(one(T) .* MOI.VariableIndex.(vars_reif_precv[1:(i - 1)])),
+            vars_reif_value[i - 1] - sum(one(T) .* vars_reif_precv[1:(i - 1)]),
             MOI.LessThan(zero(T))
         )
         for i in 2:s.dimension

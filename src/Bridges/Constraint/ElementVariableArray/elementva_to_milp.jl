@@ -64,7 +64,7 @@ function MOIBC.bridge_constraint(
 
     con_choose_one = MOI.add_constraint(
         model, 
-        sum(one(T) .* MOI.VariableIndex.(vars_unary)),
+        sum(one(T) .* vars_unary),
         MOI.EqualTo(one(T))
     )
 
@@ -74,7 +74,7 @@ function MOIBC.bridge_constraint(
     #                       vars_product[i]
     con_value = MOI.add_constraint(
         model, 
-        sum(one(T) .* MOI.VariableIndex.(vars_product)) - f_value,
+        sum(one(T) .* vars_product) - f_value,
         MOI.EqualTo(zero(T))
     )
 

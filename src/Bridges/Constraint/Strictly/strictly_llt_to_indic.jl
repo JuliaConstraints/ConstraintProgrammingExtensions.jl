@@ -62,7 +62,7 @@ function MOIBC.bridge_constraint(
 
         cons_one_lt[i] = MOI.add_constraint(
             model,
-            sum(one(T) .* MOI.VariableIndex.(vars_lt[i, :])),
+            sum(one(T) .* vars_lt[i, :]),
             MOI.EqualTo(one(T)),
         )
 

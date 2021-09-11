@@ -32,7 +32,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x..., y...])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.VariableIndex.([x..., y...]))
+        MOIU.vectorize([x..., y...])
     else
         @assert false
     end
@@ -77,10 +77,10 @@
                 @test MOI.is_valid(model, bridge.vars_first_bin[i, j])
                 @test MOI.is_valid(model, bridge.vars_second_bin[i, j])
                 
-                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_first_bin[i, j]).variable == bridge.vars_first[i, j]
+                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_first_bin[i, j]) == bridge.vars_first[i, j]
                 @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_first_bin[i, j]) == MOI.ZeroOne()
                 
-                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_second_bin[i, j]).variable == bridge.vars_second[i, j]
+                @test MOI.get(model, MOI.ConstraintFunction(), bridge.vars_second_bin[i, j]) == bridge.vars_second[i, j]
                 @test MOI.get(model, MOI.ConstraintSet(), bridge.vars_second_bin[i, j]) == MOI.ZeroOne()
             end
         end

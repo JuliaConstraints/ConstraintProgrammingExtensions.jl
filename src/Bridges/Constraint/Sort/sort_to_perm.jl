@@ -42,7 +42,7 @@ function MOIBC.bridge_constraint(
         MOIU.vectorize(
             MOI.ScalarAffineFunction{T}[
                 f_scalars...,
-                (one(T) .* MOI.VariableIndex.(vars))...
+                (one(T) .* vars)...
             ]
         ),
         CP.SortPermutation(dim)

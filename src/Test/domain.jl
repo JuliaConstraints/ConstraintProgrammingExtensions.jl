@@ -15,7 +15,7 @@ function domain_singlevariable_test(
     c1 = MOI.add_constraint(model, x1, CP.Domain(Set([1, 2])))
     c2 = MOI.add_constraint(model, x2, CP.Domain(Set([1, 2])))
 
-    c3 = MOI.add_constraint(model, MOIU.vectorize(MOI.VariableIndex.([x1, x2])), CP.AllDifferent(2))
+    c3 = MOI.add_constraint(model, MOIU.vectorize([x1, x2]), CP.AllDifferent(2))
     c4 = MOI.add_constraint(model, x1, MOI.EqualTo(1))
 
     @test MOI.is_valid(model, x1)

@@ -90,14 +90,14 @@ function MOIBC.bridge_constraint(
     # At most one such inequality holds.
     con_choose_one = MOI.add_constraint(
         model, 
-        sum(one(T) * MOI.VariableIndex.(vars)), 
+        sum(one(T) * vars), 
         MOI.EqualTo(one(T))
     )
 
     # Relate the index to the chosen value.
     con_index = MOI.add_constraint(
         model, 
-        f_scalars[1] - sum(T.(collect(1:n_array)) .* MOI.VariableIndex.(vars)), 
+        f_scalars[1] - sum(T.(collect(1:n_array)) .* vars), 
         MOI.EqualTo(zero(T))
     )
 

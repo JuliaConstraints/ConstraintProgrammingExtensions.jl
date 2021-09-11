@@ -68,7 +68,7 @@ function count_vectoraffinefunction_test(
     c2 = MOI.add_constraint(model, 1 * x2, MOI.EqualTo(1))
     c3 = MOI.add_constraint(model, 1 * x3, MOI.EqualTo(2))
 
-    c4 = MOI.add_constraint(model, MOIU.vectorize(MOI.VariableIndex.([x4, x1, x2, x3])), CP.Count(3, 1))
+    c4 = MOI.add_constraint(model, MOIU.vectorize([x4, x1, x2, x3]), CP.Count(3, 1))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)

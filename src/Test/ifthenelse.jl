@@ -65,7 +65,7 @@ function ifthenelse_scalaraffinefunction_test(
     c1 = MOI.add_constraint(model, 1 * x1, MOI.EqualTo(1))
     c2 = MOI.add_constraint(
         model,
-        MOIU.vectorize(MOI.VariableIndex.([x1, x2, x3])),
+        MOIU.vectorize([x1, x2, x3]),
         CP.IfThenElse(MOI.EqualTo(1), MOI.EqualTo(1), MOI.EqualTo(0)),
     )
 

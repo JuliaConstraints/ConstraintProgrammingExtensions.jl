@@ -277,7 +277,7 @@ function write_constraint(
         index,
         f,
         s,
-        Val(_promote_type(model, [f.variable])),
+        Val(_promote_type(model, [f])),
     )
     return nothing
 end
@@ -576,8 +576,8 @@ function write_constraint(
     f::MOI.VariableIndex,
     s::CP.DifferentFrom{Int},
 )
-    @assert CP.is_integer(model, f.variable) || CP.is_binary(model, f.variable)
-    print(io, "int_ne($(_fzn_f(model, f.variable)), $(s.value))")
+    @assert CP.is_integer(model, f) || CP.is_binary(model, f)
+    print(io, "int_ne($(_fzn_f(model, f)), $(s.value))")
     return nothing
 end
 
@@ -588,8 +588,8 @@ function write_constraint(
     f::MOI.VariableIndex,
     s::CP.DifferentFrom{Bool},
 )
-    @assert CP.is_binary(model, f.variable)
-    print(io, "int_ne($(_fzn_f(model, f.variable)), $(s.value))")
+    @assert CP.is_binary(model, f)
+    print(io, "int_ne($(_fzn_f(model, f)), $(s.value))")
     return nothing
 end
 
@@ -940,7 +940,7 @@ function write_constraint(
     ::Val{:float},
 )
     # Hypothesis: !cons.output_as_part_of_variable.
-    print(io, "float_eq($(_fzn_f(model, f.variable)), $(s.value))")
+    print(io, "float_eq($(_fzn_f(model, f)), $(s.value))")
     return nothing
 end
 
@@ -1215,7 +1215,7 @@ function write_constraint(
     f::MOI.VariableIndex,
     s::CP.DifferentFrom{Float64},
 )
-    print(io, "float_ne($(_fzn_f(model, f.variable)), $(s.value))")
+    print(io, "float_ne($(_fzn_f(model, f)), $(s.value))")
     return nothing
 end
 

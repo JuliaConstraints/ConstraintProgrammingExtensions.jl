@@ -49,7 +49,7 @@ function MOIBC.bridge_constraint(
     new_f = MOIU.vectorize(
         MOI.ScalarAffineFunction{T}[
             f_scalars[1:s.n_bins]...,
-            MOI.VariableIndex.(capa_var)...,
+            capa_var...,
             f_scalars[s.n_bins+1:end]...
         ]
     )
@@ -84,7 +84,7 @@ function MOIBC.bridge_constraint(
     new_f = MOIU.vectorize(
         MOI.ScalarAffineFunction{T}[
             f_scalars[1:s.n_bins]...,
-            MOI.VariableIndex.(capa_var)...,
+            capa_var...,
             f_scalars[s.n_bins+1:end]...
         ]
     )

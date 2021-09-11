@@ -52,9 +52,9 @@
         end
     elseif fct_type == "vector affine function"
         if n_bins == 1
-            MOIU.vectorize(MOI.VariableIndex.([x_load_1, x_bin_1, x_bin_2]))
+            MOIU.vectorize([x_load_1, x_bin_1, x_bin_2])
         elseif n_bins == 2
-            MOIU.vectorize(MOI.VariableIndex.([x_load_1, x_load_2, x_bin_1, x_bin_2]))
+            MOIU.vectorize([x_load_1, x_load_2, x_bin_1, x_bin_2])
         else
             @assert false
         end
@@ -101,7 +101,7 @@
         @test length(bridge.assign_con) == n_items * n_bins
         for i in 1:(n_items * n_bins)
             @test MOI.is_valid(model, bridge.assign_con[i])
-            @test MOI.get(model, MOI.ConstraintFunction(), bridge.assign_con[i]).variable == bridge.assign_var[i]
+            @test MOI.get(model, MOI.ConstraintFunction(), bridge.assign_con[i]) == bridge.assign_var[i]
             @test MOI.get(model, MOI.ConstraintSet(), bridge.assign_con[i]) == MOI.ZeroOne()
         end
     end

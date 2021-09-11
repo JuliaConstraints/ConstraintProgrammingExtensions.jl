@@ -57,9 +57,9 @@
         end
     elseif fct_type == "vector affine function"
         if n_bins == 1
-            MOIU.vectorize(MOI.VariableIndex.([x_load_1, x_bin_1, x_bin_2]))
+            MOIU.vectorize([x_load_1, x_bin_1, x_bin_2])
         elseif n_bins == 2
-            MOIU.vectorize(MOI.VariableIndex.([x_load_1, x_load_2, x_bin_1, x_bin_2]))
+            MOIU.vectorize([x_load_1, x_load_2, x_bin_1, x_bin_2])
         else
             @assert false
         end

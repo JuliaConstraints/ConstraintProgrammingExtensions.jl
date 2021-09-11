@@ -26,7 +26,7 @@
     fct = if fct_type == "vector of variables"
         MOI.VectorOfVariables([x_array..., x_counts...])
     elseif fct_type == "vector affine function"
-        MOIU.vectorize(MOI.VariableIndex.([x_array..., x_counts...]))
+        MOIU.vectorize([x_array..., x_counts...])
     else
         @assert false
     end
