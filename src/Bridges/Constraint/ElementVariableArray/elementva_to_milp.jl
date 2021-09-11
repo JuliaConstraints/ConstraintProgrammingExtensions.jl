@@ -90,7 +90,7 @@ function MOIBC.bridge_constraint(
     con_product_lt = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}[
         MOI.add_constraint(
             model, 
-            vars_product[i]) - big_m[i] * vars_unary[i]),
+            vars_product[i] - big_m[i] * vars_unary[i],
             MOI.LessThan(zero(T))
         )
         for i in 1:s.dimension
@@ -99,7 +99,7 @@ function MOIBC.bridge_constraint(
     con_product_gt = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}[
         MOI.add_constraint(
             model, 
-            vars_product[i]) - f_array[i] + big_m[i] * vars_unary[i]),
+            vars_product[i] - f_array[i] + big_m[i] * vars_unary[i],
             MOI.GreaterThan(big_m[i])
         )
         for i in 1:s.dimension
