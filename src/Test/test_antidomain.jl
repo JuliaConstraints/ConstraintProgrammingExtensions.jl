@@ -2,12 +2,12 @@ function test_antidomain_singlevariable(
     model::MOI.ModelLike,
     config::MOIT.Config{T},
 ) where {T}
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c1
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.GreaterThan{T}) # c2
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.LessThan{T}) # c3
-    @requires MOI.supports_constraint(model, MOI.VectorOfVariables, CP.AllDifferent) # c4
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, CP.AntiDomain{T}) # c5
+    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
+    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c1
+    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.GreaterThan{T}) # c2
+    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.LessThan{T}) # c3
+    @MOIT.requires MOI.supports_constraint(model, MOI.VectorOfVariables, CP.AllDifferent) # c4
+    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, CP.AntiDomain{T}) # c5
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -55,16 +55,12 @@ function test_antidomain_scalaraffinefunction(
     model::MOI.ModelLike,
     config::MOIT.Config,
 )
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{Int}) # c1
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.GreaterThan{Int}) # c2
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.LessThan{Int}) # c3
-    @requires MOI.supports_constraint(model, MOI.ScalarAffineFunction{Int}, CP.AllDifferent) # c4
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, CP.AntiDomain{Int}) # c5
-    
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Interval{Int})
-    @requires MOI.supports_constraint(model, MOI.VectorAffineFunction{Int}, CP.AllDifferent)
-    @requires MOI.supports_constraint(model, MOI.ScalarAffineFunction{Int}, MOI.EqualTo{Int})
+    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
+    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{Int}) # c1
+    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.GreaterThan{Int}) # c2
+    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.LessThan{Int}) # c3
+    @MOIT.requires MOI.supports_constraint(model, MOI.ScalarAffineFunction{Int}, CP.AllDifferent) # c4
+    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, CP.AntiDomain{Int}) # c5
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
