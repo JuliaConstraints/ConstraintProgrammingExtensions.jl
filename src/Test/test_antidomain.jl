@@ -1,23 +1,23 @@
 function test_antidomain_singlevariable(
     model::MOI.ModelLike,
-    config::MOIT.Config,
-)
+    config::MOIT.Config{T},
+) where {T}
     @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{Int}) # c1
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.GreaterThan{Int}) # c2
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.LessThan{Int}) # c3
+    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c1
+    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.GreaterThan{T}) # c2
+    @requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.LessThan{T}) # c3
     @requires MOI.supports_constraint(model, MOI.VectorOfVariables, CP.AllDifferent) # c4
-    @requires MOI.supports_constraint(model, MOI.VariableIndex, CP.AntiDomain{Int}) # c5
+    @requires MOI.supports_constraint(model, MOI.VariableIndex, CP.AntiDomain{T}) # c5
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
 
-    c1 = MOI.add_constraint(model, x1, MOI.EqualTo(1))
-    c2 = MOI.add_constraint(model, x2, MOI.GreaterThan(1))
-    c3 = MOI.add_constraint(model, x2, MOI.LessThan(3))
+    c1 = MOI.add_constraint(model, x1, MOI.EqualTo(T(1)))
+    c2 = MOI.add_constraint(model, x2, MOI.GreaterThan(T(1)))
+    c3 = MOI.add_constraint(model, x2, MOI.LessThan(T(3)))
     c4 = MOI.add_constraint(model, MOI.VectorOfVariables([x1, x2]), CP.AllDifferent(2))
 
-    c5 = MOI.add_constraint(model, x2, CP.AntiDomain(Set([3])))
+    c5 = MOI.add_constraint(model, x2, CP.AntiDomain(Set(T[3])))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)
@@ -57,14 +57,14 @@ function test_antidomain_scalaraffinefunction(
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
 
-    c1 = MOI.add_constraint(model, x1, MOI.EqualTo(1))
-    c2 = MOI.add_constraint(model, x2, MOI.GreaterThan(1))
-    c3 = MOI.add_constraint(model, x2, MOI.LessThan(3))
-    c4 = MOI.add_constraint(model, MOIU.vectorize(1 .* [x1, x2]), CP.AllDifferent(2))
+    c1 = MOI.add_constraint(model, x1, MOI.EqualTo(T(1)))
+    c2 = MOI.add_constraint(model, x2, MOI.GreaterThan(T(1)))
+    c3 = MOI.add_constraint(model, x2, MOI.LessThan(T(3)))
+    c4 = MOI.add_constraint(model, MOIU.vectorize(one(T) .* [x1, x2]), CP.AllDifferent(2))
 
     c5 = MOI.add_constraint(
         model,
-        MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1], [x2]), 0),
+        one(T) * x2,
         CP.AntiDomain(Set([3])),
     )
 
