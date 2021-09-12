@@ -33,6 +33,18 @@ function test_alldifferent_vectorofvariables(
     end
 end
 
+function setup_test(
+    ::typeof(test_alldifferent_vectorofvariables),
+    mock::MOIU.MockOptimizer,
+    ::Config{T},
+) where {T}
+    MOIU.set_mock_optimize!(
+        mock,
+        (mock::MOIU.MockOptimizer) -> MOIU.mock_optimize!(mock, T[1, 2]),
+    )
+    return
+end
+
 function test_alldifferent_vectoraffinefunction(
     model::MOI.ModelLike,
     config::MOIT.Config,
@@ -68,4 +80,16 @@ function test_alldifferent_vectoraffinefunction(
         @test MOI.get(model, MOI.VariablePrimal(), x1) == 1
         @test MOI.get(model, MOI.VariablePrimal(), x2) == 2
     end
+end
+
+function setup_test(
+    ::typeof(test_alldifferent_vectoraffinefunction),
+    mock::MOIU.MockOptimizer,
+    ::Config{T},
+) where {T}
+    MOIU.set_mock_optimize!(
+        mock,
+        (mock::MOIU.MockOptimizer) -> MOIU.mock_optimize!(mock, T[1, 2]),
+    )
+    return
 end
