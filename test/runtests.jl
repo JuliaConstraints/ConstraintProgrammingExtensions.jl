@@ -18,6 +18,6 @@ include("Bridges/models.jl")
     include("moi_traits.jl")
     include("Bridges/Bridges.jl")
     include("FlatZinc/FlatZinc.jl")
-    include("DeprecatedTest/DeprecatedTest.jl")
+    # include("DeprecatedTest/DeprecatedTest.jl")
     include("Test/Test.jl")
 end
