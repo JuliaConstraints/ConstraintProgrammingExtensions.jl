@@ -1,7 +1,7 @@
 function test_antidomain_singlevariable(
     model::MOI.ModelLike,
     config::MOIT.Config{T},
-) where {T}
+) where {T <: Real}
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c1
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.GreaterThan{T}) # c2
@@ -39,11 +39,11 @@ function test_antidomain_singlevariable(
     end
 end
 
-function setup_test(
+function MOIT.setup_test(
     ::typeof(test_antidomain_singlevariable),
     mock::MOIU.MockOptimizer,
     ::Config{T},
-) where {T}
+) where {T <: Real}
     MOIU.set_mock_optimize!(
         mock,
         (mock::MOIU.MockOptimizer) -> MOIU.mock_optimize!(mock, T[1, 2]),
@@ -53,8 +53,8 @@ end
 
 function test_antidomain_scalaraffinefunction(
     model::MOI.ModelLike,
-    config::MOIT.Config,
-)
+    config::MOIT.Config{T},
+) where {T <: Real}
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{Int}) # c1
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.GreaterThan{Int}) # c2
@@ -96,11 +96,11 @@ function test_antidomain_scalaraffinefunction(
     end
 end
 
-function setup_test(
+function MOIT.setup_test(
     ::typeof(test_antidomain_scalaraffinefunction),
     mock::MOIU.MockOptimizer,
     ::Config{T},
-) where {T}
+) where {T <: Real}
     MOIU.set_mock_optimize!(
         mock,
         (mock::MOIU.MockOptimizer) -> MOIU.mock_optimize!(mock, T[1, 2]),

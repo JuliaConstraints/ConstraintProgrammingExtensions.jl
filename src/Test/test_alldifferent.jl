@@ -1,7 +1,7 @@
 function test_alldifferent_vectorofvariables(
     model::MOI.ModelLike,
     config::MOIT.Config{T},
-) where {T}
+) where {T <: Real}
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c1
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Interval{T}) # c2
@@ -33,11 +33,11 @@ function test_alldifferent_vectorofvariables(
     end
 end
 
-function setup_test(
+function MOIT.setup_test(
     ::typeof(test_alldifferent_vectorofvariables),
     mock::MOIU.MockOptimizer,
     ::Config{T},
-) where {T}
+) where {T <: Real}
     MOIU.set_mock_optimize!(
         mock,
         (mock::MOIU.MockOptimizer) -> MOIU.mock_optimize!(mock, T[1, 2]),
@@ -47,8 +47,8 @@ end
 
 function test_alldifferent_vectoraffinefunction(
     model::MOI.ModelLike,
-    config::MOIT.Config,
-    )
+    config::MOIT.Config{T},
+) where {T <: Real}
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Interval{Int}) # c1, c2
     @MOIT.requires MOI.supports_constraint(model, MOI.VectorAffineFunction{Int}, CP.AllDifferent) # c3
@@ -82,11 +82,11 @@ function test_alldifferent_vectoraffinefunction(
     end
 end
 
-function setup_test(
+function MOIT.setup_test(
     ::typeof(test_alldifferent_vectoraffinefunction),
     mock::MOIU.MockOptimizer,
     ::Config{T},
-) where {T}
+) where {T <: Real}
     MOIU.set_mock_optimize!(
         mock,
         (mock::MOIU.MockOptimizer) -> MOIU.mock_optimize!(mock, T[1, 2]),

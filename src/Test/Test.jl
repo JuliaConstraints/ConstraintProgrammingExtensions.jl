@@ -34,13 +34,13 @@ function runtests(
         @testset "$(name)" begin
             test_function = getfield(@__MODULE__, name_sym)
             c = copy(config)
-            tear_down = setup_test(test_function, model, c)
+            tear_down = MOIT.setup_test(test_function, model, c)
             # Make sure to empty the model before every test!
             MOI.empty!(model)
             try
                 test_function(model, c)
             catch err
-                _error_handler(err, name, warn_unsupported)
+                MOIT._error_handler(err, name, warn_unsupported)
             end
             if tear_down !== nothing
                 tear_down()
