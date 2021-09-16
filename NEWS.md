@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.6.0
+-------------
+
+Update to MOI 0.10.0. The only breaking change due to this package is in the 
+test suite for solvers, where the same refactoring as MOI 0.10.0 was included:
+the old test suite is in the `DeprecatedTest` submodule and the new one in 
+`Test`. Updating solvers could simply change their import to `DeprecatedTest`
+when starting the update, and then move on to `Test`.
+
+
 Version 0.5.0
 -------------
 
