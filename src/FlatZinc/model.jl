@@ -157,7 +157,7 @@ function MOI.copy_to(dest::Model, src::MOI.ModelLike)
     return MOIU.default_copy_to(dest, src)
 end
 
-function supports_incremental_interface(::Model, ::Bool)
+function MOI.supports_incremental_interface(::Model)
     return true
 end
 

@@ -203,7 +203,7 @@ function MOI.copy_to(dest::Optimizer, src::MOI.ModelLike)
     return MOIU.default_copy_to(dest, src)
 end
 
-function supports_incremental_interface(::Optimizer, ::Bool)
+function MOI.supports_incremental_interface(::Optimizer)
     return true
 end
 
