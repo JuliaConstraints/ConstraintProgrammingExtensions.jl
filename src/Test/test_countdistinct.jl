@@ -1,10 +1,10 @@
-function test_count_vectorofvariables(
+function test_countdistinct_vectorofvariables(
     model::MOI.ModelLike,
     config::MOIT.Config{T},
 ) where {T <: Real}
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2, x3, x4
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c1, c2, c3
-    @MOIT.requires MOI.supports_constraint(model, MOI.VectorOfVariables, CP.Count{MOI.EqualTo{T}}) # c4
+    @MOIT.requires MOI.supports_constraint(model, MOI.VectorOfVariables, CP.CountDistinct) # c4
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -15,7 +15,7 @@ function test_count_vectorofvariables(
     c2 = MOI.add_constraint(model, x2, MOI.EqualTo(1))
     c3 = MOI.add_constraint(model, x3, MOI.EqualTo(2))
 
-    c4 = MOI.add_constraint(model, MOI.VectorOfVariables([x4, x1, x2, x3]), CP.Count(3, 1))
+    c4 = MOI.add_constraint(model, MOI.VectorOfVariables([x4, x1, x2, x3]), CP.CountDistinct(3))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)
@@ -40,7 +40,7 @@ function test_count_vectorofvariables(
 end
 
 function MOIT.setup_test(
-    ::typeof(test_count_vectorofvariables),
+    ::typeof(test_countdistinct_vectorofvariables),
     mock::MOIU.MockOptimizer,
     ::Config{T},
 ) where {T <: Real}
@@ -51,13 +51,13 @@ function MOIT.setup_test(
     return
 end
 
-function test_count_vectoraffinefunction(
+function test_countdistinct_vectoraffinefunction(
     model::MOI.ModelLike,
     config::MOIT.Config{T},
 ) where {T <: Real}
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2, x3, x4
     @MOIT.requires MOI.supports_constraint(model, MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}) # c1, c2, c3
-    @MOIT.requires MOI.supports_constraint(model, MOI.VectorAffineFunction{T}, CP.Count{MOI.EqualTo{T}}) # c4
+    @MOIT.requires MOI.supports_constraint(model, MOI.VectorAffineFunction{T}, CP.CountDistinct) # c4
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -68,7 +68,7 @@ function test_count_vectoraffinefunction(
     c2 = MOI.add_constraint(model, one(T) * x2, MOI.EqualTo(1))
     c3 = MOI.add_constraint(model, one(T) * x3, MOI.EqualTo(2))
 
-    c4 = MOI.add_constraint(model, MOIU.vectorize(one(T) .* [x4, x1, x2, x3]), CP.Count(3, 1))
+    c4 = MOI.add_constraint(model, MOIU.vectorize(one(T) .* [x4, x1, x2, x3]), CP.CountDistinct(3))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)
@@ -93,7 +93,7 @@ function test_count_vectoraffinefunction(
 end
 
 function MOIT.setup_test(
-    ::typeof(test_count_vectoraffinefunction),
+    ::typeof(test_countdistinct_vectoraffinefunction),
     mock::MOIU.MockOptimizer,
     ::Config{T},
 ) where {T <: Real}
