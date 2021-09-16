@@ -35,8 +35,5 @@ makedocs(
 
 deploydocs(
     push_preview = true,
-    # forcepush = true,
-    versions = "v#.#",
     repo = "github.com/dourouc05/ConstraintProgrammingExtensions.jl.git",
-    devbranch = "master",
 )
