@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.6.2
+-------------
+
+Hotfix: test `test_strictly_greaterthan_singlevariable` was wrong.
+
+
 Version 0.6.1
 -------------
 

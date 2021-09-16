@@ -61,7 +61,7 @@ function test_strictly_greaterthan_singlevariable(
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
 
     c1 = MOI.add_constraint(model, one(T) * x1, CP.Domain(Set([1, 2])))
-    c2 = MOI.add_constraint(model, one(T) * x2, MOI.EqualTo(2))
+    c2 = MOI.add_constraint(model, one(T) * x2, MOI.EqualTo(1))
 
     c3 = MOI.add_constraint(
         model,
@@ -81,8 +81,8 @@ function test_strictly_greaterthan_singlevariable(
         @test MOI.get(model, MOI.PrimalStatus()) == MOI.FEASIBLE_POINT
 
         @test MOI.get(model, MOI.ResultCount()) >= 1
-        @test MOI.get(model, MOI.VariablePrimal(), x1) == 1
-        @test MOI.get(model, MOI.VariablePrimal(), x2) == 2
+        @test MOI.get(model, MOI.VariablePrimal(), x1) == 2
+        @test MOI.get(model, MOI.VariablePrimal(), x2) == 1
     end
 end
 
@@ -93,7 +93,7 @@ function MOIT.setup_test(
 ) where {T <: Real}
     MOIU.set_mock_optimize!(
         mock,
-        (mock::MOIU.MockOptimizer) -> MOIU.mock_optimize!(mock, T[1, 2]),
+        (mock::MOIU.MockOptimizer) -> MOIU.mock_optimize!(mock, T[2, 1]),
     )
     return
 end
