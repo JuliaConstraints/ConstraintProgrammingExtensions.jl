@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.6.1
+-------------
+
+Hotfix: FlatZinc `Model` and `Optimizer` could no more be copied.
+
+
 Version 0.6.0
 -------------
 
