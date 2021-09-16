@@ -7,5 +7,5 @@
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [1, 2])),
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [1, 2])),
     )
-    COIT.indicatortest(mock, config)
+    COIDT.indicatortest(mock, config)
 end

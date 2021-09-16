@@ -7,5 +7,5 @@
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [2, 2, 2, 2])),
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [2, 2, 2, 2])),
     )
-    COIT.lexicographicallytest(mock, config)
+    COIDT.lexicographicallytest(mock, config)
 end

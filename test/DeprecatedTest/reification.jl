@@ -7,5 +7,5 @@
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [0, 1])),
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [0, 1])),
     )
-    COIT.reificationtest(mock, config)
+    COIDT.reificationtest(mock, config)
 end

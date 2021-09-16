@@ -7,5 +7,5 @@
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [4, 0, 0])),
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [4, 0, 0])),
     )
-    COIT.binpackingtest(mock, config)
+    COIDT.binpackingtest(mock, config)
 end

@@ -7,5 +7,5 @@
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [1, 1, 2, 2])),
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [1, 1, 2, 2])),
     )
-    COIT.counttest(mock, config)
+    COIDT.counttest(mock, config)
 end

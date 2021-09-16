@@ -7,7 +7,7 @@
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [1])),
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [0])),
     )
-    COIT.truefalsetest(mock, config)
+    COIDT.truefalsetest(mock, config)
 end
 
 function true_test(model::MOI.ModelLike, config::MOIT.Config)

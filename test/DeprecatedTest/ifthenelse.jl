@@ -7,5 +7,5 @@
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [1, 1, 0])),
         (mock::MOIU.MockOptimizer) -> (MOIU.mock_optimize!(mock, [1, 1, 0])),
     )
-    COIT.ifthenelsetest(mock, config)
+    COIDT.ifthenelsetest(mock, config)
 end
