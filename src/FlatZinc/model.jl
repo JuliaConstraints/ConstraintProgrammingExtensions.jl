@@ -153,8 +153,8 @@ function _create_constraint(
 end
 
 # Fallback for copying operations.
-function MOI.copy_to(dest::Model, src::MOI.ModelLike; kwargs...)
-    return MOIU.default_copy_to(dest, src; kwargs...)
+function MOI.copy_to(dest::Model, src::MOI.ModelLike)
+    return MOIU.default_copy_to(dest, src)
 end
 
 function supports_incremental_interface(::Model, ::Bool)

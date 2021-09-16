@@ -199,8 +199,8 @@ function MOI.add_constraint(model::Optimizer, f::MOI.AbstractFunction, s::MOI.Ab
     return MOI.add_constraint(model.inner, f, s)
 end
 
-function MOI.copy_to(dest::Optimizer, src::MOI.ModelLike; kwargs...)
-    return MOIU.default_copy_to(dest, src; kwargs...)
+function MOI.copy_to(dest::Optimizer, src::MOI.ModelLike)
+    return MOIU.default_copy_to(dest, src)
 end
 
 function supports_incremental_interface(::Optimizer, ::Bool)
