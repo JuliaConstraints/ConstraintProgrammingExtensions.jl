@@ -58,9 +58,9 @@ function MOIT.setup_test(
     belgium = 1
     denmark = 2
     france = 0
-    germany, _ = 3
-    luxembourg, _ = 2
-    netherlands, _ = 2
+    germany = 3
+    luxembourg = 2
+    netherlands = 2
 
     MOIU.set_mock_optimize!(
         mock,
