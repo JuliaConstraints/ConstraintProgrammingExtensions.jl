@@ -31,6 +31,13 @@ Currently, the following solvers are using this interface:
 For instance, you can use this package [to formulate a colouring problem on a map](https://github.com/dourouc05/ConstraintProgrammingExtensions.jl/blob/master/src/Test/test_integration.jl#L9-L32): 
 
 ```julia
+using MathOptInterface
+using ConstraintProgrammingExtensions
+using … # Import your solver.
+
+const MOI = MathOptInterface
+const CP = ConstraintProgrammingExtensions
+
 model = … # Depending on the solver you want to use.
 
 # Create the variables: six countriers; the value is the colour number for each country
