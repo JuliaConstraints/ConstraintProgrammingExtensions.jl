@@ -25,3 +25,53 @@ Currently, the following solvers are using this interface:
 * [Chuffed.jl](https://github.com/dourouc05/Chuffed.jl), wrapper for the open-source [Chuffed](https://github.com/chuffed/chuffed) solver
 * [ConstraintSolver.jl](https://github.com/Wikunia/ConstraintSolver.jl), a native Julia open-source solver
 * [CPLEXCP.jl](https://github.com/dourouc05/CPLEXCP.jl), wrapper for the commercial [CPLEX CP Optimizer](https://www.ibm.com/analytics/cplex-cp-optimizer) solver
+
+## An example
+
+For instance, you can use this package [to formulate a colouring problem on a map](https://github.com/dourouc05/ConstraintProgrammingExtensions.jl/blob/master/src/Test/test_integration.jl#L9-L32): 
+
+```julia
+model = … # Depending on the solver you want to use.
+
+# Create the variables: six countriers; the value is the colour number for each country
+belgium, _ = MOI.add_constrained_variable(model, MOI.Integer())
+denmark, _ = MOI.add_constrained_variable(model, MOI.Integer())
+france, _ = MOI.add_constrained_variable(model, MOI.Integer())
+germany, _ = MOI.add_constrained_variable(model, MOI.Integer())
+luxembourg, _ = MOI.add_constrained_variable(model, MOI.Integer())
+netherlands, _ = MOI.add_constrained_variable(model, MOI.Integer())
+
+# Constrain the colours to be in {0, 1, 2, 3}
+MOI.add_constraint(model, belgium, MOI.Interval(0, 3))
+MOI.add_constraint(model, denmark, MOI.Interval(0, 3))
+MOI.add_constraint(model, france, MOI.Interval(0, 3))
+MOI.add_constraint(model, germany, MOI.Interval(0, 3))
+MOI.add_constraint(model, luxembourg, MOI.Interval(0, 3))
+MOI.add_constraint(model, netherlands, MOI.Interval(0, 3))
+
+# Two adjacent countries must have different colours.
+countries(c1, c2) = MOI.ScalarAffineFunction(MOI.ScalarAffineTerm.([1, -1], [c1, c2]), 0)
+MOI.add_constraint(model, countries(belgium, france), CP.DifferentFrom(0))
+MOI.add_constraint(model, countries(belgium, germany), CP.DifferentFrom(0))
+MOI.add_constraint(model, countries(belgium, netherlands), CP.DifferentFrom(0))
+MOI.add_constraint(model, countries(belgium, luxembourg), CP.DifferentFrom(0))
+MOI.add_constraint(model, countries(denmark, germany), CP.DifferentFrom(0))
+MOI.add_constraint(model, countries(france, germany), CP.DifferentFrom(0))
+MOI.add_constraint(model, countries(france, luxembourg), CP.DifferentFrom(0))
+MOI.add_constraint(model, countries(germany, luxembourg), CP.DifferentFrom(0))
+MOI.add_constraint(model, countries(germany, netherlands), CP.DifferentFrom(0))
+
+# Solve the model.
+MOI.optimize!(model)
+
+# Check if the solution is optimum.
+@assert MOI.get(model, MOI.TerminationStatus()) == MOI.OPTIMAL
+
+# Get the solution
+@show MOI.get(model, MOI.VariablePrimal(), belgium)
+@show MOI.get(model, MOI.VariablePrimal(), denmark)
+@show MOI.get(model, MOI.VariablePrimal(), france)
+@show MOI.get(model, MOI.VariablePrimal(), germany)
+@show MOI.get(model, MOI.VariablePrimal(), luxembourg)
+@show MOI.get(model, MOI.VariablePrimal(), netherlands)
+```
