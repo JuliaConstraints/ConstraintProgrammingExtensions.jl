@@ -54,7 +54,7 @@ function MOIT.setup_test(
     mock::MOIU.MockOptimizer,
     ::Config{T},
 ) where {T <: Real}
-    # One feasible solution.
+    # One feasible solution (among the many).
     belgium = 1
     denmark = 2
     france = 0
