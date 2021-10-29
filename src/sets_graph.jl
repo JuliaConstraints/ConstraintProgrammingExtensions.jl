@@ -74,10 +74,19 @@ struct HamiltonianCycle{HCWT, T <: Real} <: MOI.AbstractVectorSet
 end
 
 HamiltonianCycle(n_nodes::Int, weights::AbstractMatrix{T}) where {T} = HamiltonianCycle{FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}(n_nodes, weights)
+HamiltonianCycle{HCWT, T}(n_nodes::Int) where {HCWT, T} = HamiltonianCycle{HCWT, T}(n_nodes, zeros(T, 0, 0))
 
 MOI.dimension(set::HamiltonianCycle{FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}) where {T <: Real} = set.n_nodes + 1
-MOI.dimension(set::HamiltonianCycle{VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}) where {T <: Real} = 2 * set.n_nodes + 1
+MOI.dimension(set::HamiltonianCycle{VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}) where {T <: Real} = set.n_nodes + set.n_nodes^2 + 1
 MOI.dimension(set::HamiltonianCycle{UNWEIGHTED_HAMILTONIAN_CYCLE, T}) where {T <: Real} = set.n_nodes
+
+function copy(set::HamiltonianCycle{HCWT, T}) where {HCWT, T}
+    return HamiltonianCycle{HCWT, T}(set.n_nodes, copy(set.weights))
+end
+
+function Base.:(==)(x::HamiltonianCycle{HCWT, T}, y::HamiltonianCycle{HCWT, T}) where {HCWT, T}
+    return x.n_nodes == y.n_nodes && x.weights == y.weights
+end
 
 """
     HamiltonianPathWeightedType
@@ -92,6 +101,7 @@ Whether a Hamiltonian path has a weight:
 * or it only includes the next vertices: `UNWEIGHTED_HAMILTONIAN_PATH`
 """
 @enum HamiltonianPathWeightedType begin
+    # TODO: does it need to be separate from the cycle enum?
     FIXED_WEIGHT_HAMILTONIAN_PATH
     VARIABLE_WEIGHT_HAMILTONIAN_PATH
     UNWEIGHTED_HAMILTONIAN_PATH
@@ -149,7 +159,7 @@ total weight.
 
 ``\\mathtt{tw} = \\sum_{i=1}^{n} \\mathtt{w[i, x[i]]}``
 """
-struct HamiltonianPath{HCWT, T <: Real} <: MOI.AbstractVectorSet
+struct HamiltonianPath{HPWT, T <: Real} <: MOI.AbstractVectorSet
     n_nodes::Int
     s::Int
     t::Int
@@ -157,7 +167,16 @@ struct HamiltonianPath{HCWT, T <: Real} <: MOI.AbstractVectorSet
 end
 
 HamiltonianPath(n_nodes::Int, s::Int, t::Int, weights::AbstractMatrix{T}) where {T} = HamiltonianPath{FIXED_WEIGHT_HAMILTONIAN_PATH, T}(n_nodes, s, t, weights)
+HamiltonianPath{HPWT, T}(n_nodes::Int, s::Int, t::Int) where {HPWT, T} = HamiltonianPath{HPWT, T}(n_nodes, s, t, zeros(T, 0, 0))
 
 MOI.dimension(set::HamiltonianPath{FIXED_WEIGHT_HAMILTONIAN_PATH, T}) where {T <: Real} = set.n_nodes + 1
-MOI.dimension(set::HamiltonianPath{VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}) where {T <: Real} = 2 * set.n_nodes + 1
+MOI.dimension(set::HamiltonianPath{VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}) where {T <: Real} = set.n_nodes + set.n_nodes^2 + 1
 MOI.dimension(set::HamiltonianPath{UNWEIGHTED_HAMILTONIAN_PATH, T}) where {T <: Real} = set.n_nodes
+
+function copy(set::HamiltonianPath{HPWT, T}) where {HPWT, T}
+    return HamiltonianPath{HPWT, T}(set.n_nodes, set.s, set.t, copy(set.weights))
+end
+
+function Base.:(==)(x::HamiltonianPath{HPWT, T}, y::HamiltonianPath{HPWT, T}) where {HPWT, T}
+    return x.n_nodes == y.n_nodes && x.s == y.s && x.t == y.t && x.weights == y.weights
+end
