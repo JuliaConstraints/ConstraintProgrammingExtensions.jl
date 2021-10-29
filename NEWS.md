@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.7.0
+-------------
+
+The constraints `Circuit`, `CircuitPath`, and their weighted variants have
+been merged into `HamiltonianCycle` and `HamiltonianPath`.
+
+
 Version 0.6.2
 -------------
 
