@@ -1,165 +1,217 @@
-## Hamiltonian cycles/paths
-
 """
-    HamiltonianWeightedType
+    VertexWeightedType
 
-Whether a Hamiltonian cycle/path constraint has a weight:
+Whether a cycle/path constraint has a weight for vertices:
 
-* either the constraint also includes a variable for the total weight:
-  `FIXED_WEIGHT_HAMILTONIAN_CYCLE`
-* or the constraint also includes a variable for the total weight and one
-  variable giving the weight of each vertex: 
-  `VARIABLE_WEIGHT_HAMILTONIAN_CYCLE`
-* or it only includes the next vertices: `UNWEIGHTED_HAMILTONIAN_CYCLE`
+* the constraint has a fixed weight for each vertex: `FIXED_WEIGHT_VERTEX`
+* the constraint has a variable weight for each vertex: 
+  `VARIABLE_WEIGHT_VERTEX` (typically, such a constraint has a dimension for
+  each vertex to give its weight)
+* the constraint does not have a notion of per-vertex weight: 
+  `UNWEIGHTED_VERTEX`
+
+Typically, constraints with a type other than `UNWEIGHTED_VERTEX` have a
+dimension for the total weight due to vertices.
 """
-@enum HamiltonianWeightedType begin
-    FIXED_WEIGHT_HAMILTONIAN_CYCLE
-    VARIABLE_WEIGHT_HAMILTONIAN_CYCLE
-    UNWEIGHTED_HAMILTONIAN_CYCLE
+@enum VertexWeightedType begin
+    FIXED_WEIGHT_VERTEX
+    VARIABLE_WEIGHT_VERTEX
+    UNWEIGHTED_VERTEX
 end
 
 """
-    HamiltonianCycle{HWCT, T}(n_nodes::Int)
+    EdgeWeightedType
 
-A Hamiltonian cycle (i.e. a cycle in a graph that visits each vertex once).
-If the vector `x` is constrained within a `HamiltonianCycle`, each `x[i]` denotes
-the next vertex in the graph, for `i ∈ [1, n]`. 
+Whether a cycle/path constraint has a weight for edges:
+
+* the constraint has a fixed weight for each edge: `FIXED_WEIGHT_EDGE`
+* the constraint has a variable weight for each edge: 
+  `VARIABLE_WEIGHT_EDGE` (typically, such a constraint has a dimension for
+  each edge to give its weight)
+* the constraint does not have a notion of per-edge weight: 
+  `UNWEIGHTED_EDGE`
+
+Typically, constraints with a type other than `UNWEIGHTED_EDGE` have a
+dimension for the total weight due to edges.
+"""
+@enum EdgeWeightedType begin
+    FIXED_WEIGHT_EDGE
+    VARIABLE_WEIGHT_EDGE
+    UNWEIGHTED_EDGE
+end
+
+"""
+    WalkType
+
+The type of walk implemented by the constraint. In graph theory, a walk is a
+sequence of edges that join vertices (also called nodes): a walk starts at some
+vertex, then uses an edge to get to a second vertex, etc.
+
+The possible values are:
+
+* a trail (walk whose edges are distinct, but not necessarily the vertices):
+  `TRAIL_WALK`
+* a cycle (walk whose edges are distinct, starting and ending at the same
+  vertex): `CYCLE_WALK`
+* a path (walk whose edges and vertices are distinct; sometimes called a 
+  "simple path"): `PATH_WALK`
+
+Although each walk is supposed to have a first vertex `s` (often called the
+source vertex) and a last vertex `t` (often called the destination vertex),
+this distinction does not make sense for cycles.
+"""
+@enum WalkType begin
+    TRAIL_WALK
+    CYCLE_WALK
+    PATH_WALK
+end
+
+"""
+    WalkSubType
+
+The specific type of walk (e.g., a path or a cycle) implemented by the
+constraint:
+
+* a simple walk: `NO_SPECIFIC_WALK`
+* a Eulerian walk (every edge is visited exactly once): `EULERIAN_WALK`
+* a Hamiltonian walk (every vertex is visited exactly once): `EULERIAN_WALK`
+
+Subtypes can be thought of as adjectives for the walk types of `WalkType`.
+"""
+@enum WalkSubType begin
+    EULERIAN_WALK
+    HAMILTONIAN_WALK
+    NO_SPECIFIC_WALK
+end
+
+"""
+    WalkSourceType
+
+The way the source vertex is given:
+
+* no source node (typically, only for cycles): `NO_SOURCE_VERTEX`
+* a fixed source vertex: `FIXED_SOURCE_VERTEX`
+* a variable source vertex: `VARIABLE_SOURCE_VERTEX`
+"""
+@enum WalkSourceType begin
+    NO_SOURCE_VERTEX
+    FIXED_SOURCE_VERTEX
+    VARIABLE_SOURCE_VERTEX
+end
+
+"""
+    WalkDestinationType
+
+The way the destination vertex is given:
+
+* no destination node (typically, only for cycles): `NO_DESTINATION_VERTEX`
+* a fixed destination vertex: `FIXED_DESTINATION_VERTEX`
+* a variable destination vertex: `VARIABLE_DESTINATION_VERTEX`
+"""
+@enum WalkDestinationType begin
+    NO_DESTINATION_VERTEX
+    FIXED_DESTINATION_VERTEX
+    VARIABLE_DESTINATION_VERTEX
+end
+
+"""
+    Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int)
+
+A walk in an undirected graph.
+
+If the vector `x` describes the walk within a `Walk` constraint, each `x[i]`
+denotes the next vertex in the `n`-vertex graph, for `i ∈ [1, n]`.
 
 The considered graph is an undirected complete graph with `n` vertices.
-To model a Hamiltonian cycle in a noncomplete graph, you can add constraints
-on the variables: if the vertex `i` only has edges towards `j` and `k`, then
-`x[i]` should only have the possible values `j` and `k`.
+To model a walk in a noncomplete graph, you can add constraints on the
+variables: if the vertex `i` only has edges towards `j` and `k`, then `x[i]`
+should only have the possible values `j` and `k`.
 
-Also called `circuit` or `atour`.
+The dimensions of this set are as follows:
+
+* first, the description of the walk, typically denoted by `x`
+* second, the source vertex, depending on `WsT`
+* third, the destination vertex, depending on `WtT`
+* fourth, the individual weights, depending on `VWT` and `EWT` -- vertices
+  (`VWT`) come before edges (`EWT`)
+* fifth, the total weights, depending on `VWT` and `EWT` -- vertices (`VWT`)
+  come before edges (`EWT`)
+* sixth, the total weight, depending on `VWT` and `EWT` (sum of the weight over
+  the vertices [`VWT`] and the edges [`EWT`])
+
+For cycles, all the variables describing the cycle are implied to have an
+integer value between `1` and `n`. For other walks, the walk-description
+variables
+
+Some variants are called `circuit` or `atour`.
 
 GCC: https://sofdem.github.io/gccat/gccat/Ccircuit.html
 
-## Unweighted cycle
+## Unweighted walk
 
-`HamiltonianCycle{UNWEIGHTED_HAMILTONIAN_CYCLE}` considers an unweighted
-Hamiltonian cycle.
+`Walk{UNWEIGHTED_VERTEX, UNWEIGHTED_EDGE, WalkType, WalkSubType,
+WalkSourceType, WalkDestinationType, T}` considers an unweighted walk, for all
+`WalkType`, `WalkSubType`, `WalkSourceType`, `WalkDestinationType`, and
+`T <: Real`.
 
-`x`-in-`HamiltonianCycle{UNWEIGHTED_HAMILTONIAN_CYCLE}(n)`:
-a Hamiltonian cycle in the complete graph of `n` vertices.
-`x[i]` is the index of the next vertex in the cycle.
+`x`-in-`Walk{UNWEIGHTED_VERTEX, UNWEIGHTED_EDGE, WT, WST, WsT, WtT, T}(n)`:
+a walk in the complete graph of `n` vertices. `x[i]` is the index of the next
+vertex after `i` in the walk.
 
-## Fixed-weight cycle
+## Fixed-edge-weight cycle
 
-`HamiltonianCycle{FIXED_WEIGHT_HAMILTONIAN_CYCLE}` considers an Hamiltonian
-cycle whose weights are fixed. Having an edge in the cycle increases the
-total weight.
+`Walk{UNWEIGHTED_VERTEX, FIXED_WEIGHT_EDGE, CYCLE_WALK, NO_SPECIFIC_WALK,
+NO_SOURCE_VERTEX, NO_DESTINATION_VERTEX, T}` considers a cycle whose edge
+weights are fixed: having an edge in the cycle increases the total weight.
+Vertices are unweighted, because all of them must be included in a cycle.
 
-`[x, tw]`-in-`HamiltonianCycle{FIXED_WEIGHT_HAMILTONIAN_CYCLE}(n, weights)`:
-`x` is a Hamiltonian cycle in the complete graph of `n` vertices.
-`x[i]` is the index of the next vertex in the cycle. 
-`tw` is the total weight of the cycle, with `weights` being indexed by the 
-vertices: 
+`[x, tw]`-in-`Walk{UNWEIGHTED_VERTEX, FIXED_WEIGHT_EDGE, CYCLE_WALK, 
+NO_SPECIFIC_WALK, NO_SOURCE_VERTEX, NO_DESTINATION_VERTEX, T}(n, 
+edge_weights)` where the elements of `edge_weights` have type `T`:
 
-``\\mathtt{tw} = \\sum_{i=1}^{n} \\mathtt{weights[i, x[i]]}``
+* `x` is a cycle in the complete graph of `n` vertices, 
+  `x[i]` is the index of the next vertex in the cycle
+* `tw` is the total weight of the cycle, with `edge_weights` being indexed by
+  the vertices: 
 
-## Variable-weight cycle
+  ``\\mathtt{tw} = \\sum_{i=1}^{n} \\mathtt{edge_weights[i, x[i]]}``
 
-`HamiltonianCycle{VARIABLE_WEIGHT_HAMILTONIAN_CYCLE}` considers an Hamiltonian
-cycle whose weights are variable. Having an edge in the cycle increases the
-total weight.
+## Variable-vertex-weight path
 
-`[x, w, tw]`-in-`HamiltonianCycle{VARIABLE_WEIGHT_HAMILTONIAN_CYCLE}(n)`:
-`x` is a Hamiltonian cycle in the complete graph of `n` vertices.
-`x[i]` is the index of the next vertex in the cycle. 
-`tw` is the total weight of the cycle, with `w` being indexed by the vertices:
+`Walk{VARIABLE_WEIGHT_VERTEX, UNWEIGHTED_EDGE, PATH_WALK, NO_SPECIFIC_WALK,
+FIXED_SOURCE_VERTEX, FIXED_DESTINATION_VERTEX, T}` considers a path whose
+vertex weights are variable. Having a vertex in the cycle increases the total
+weight, but edges do not contribute in this case (although there is no reason
+why they could not).
 
-``\\mathtt{tw} = \\sum_{i=1}^{n} \\mathtt{w[i, x[i]]}``
+`[x, w, tw]`-in-`Walk{VARIABLE_WEIGHT_VERTEX, UNWEIGHTED_EDGE, PATH_WALK, 
+NO_SPECIFIC_WALK, FIXED_SOURCE_VERTEX, FIXED_DESTINATION_VERTEX, T}(n)`:
+
+* `x` is a path in the complete graph of `n` vertices, 
+  `x[i]` is the index of the next vertex in the path
+* `w` is the weight of each vertex (a vector indexed by the vertex indices)
+* `tw` is the total vertex weight of the path:
+
+  ``\\mathtt{tw} = \\sum_{i=1}^{n} \\mathtt{w[x[i]]}``
 """
-struct HamiltonianCycle{HWT, T <: Real} <: MOI.AbstractVectorSet
+struct Walk{VWT, EWT, WT, WST, WsT, WtT, T <: Real} <: MOI.AbstractVectorSet
     n_nodes::Int
-    weights::AbstractMatrix{T}
+    s::Int
+    t::Int
+    vertex_weights::AbstractVector{T}
+    edge_weights::AbstractMatrix{T}
 end
 
-HamiltonianCycle(n_nodes::Int, weights::AbstractMatrix{T}) where {T} = HamiltonianCycle{FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}(n_nodes, weights)
-HamiltonianCycle{HWT, T}(n_nodes::Int) where {HWT, T} = HamiltonianCycle{HWT, T}(n_nodes, zeros(T, 0, 0))
+Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int, s::Int, t::Int) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, zeros(T, 0, 0))
 
 MOI.dimension(set::HamiltonianCycle{FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}) where {T <: Real} = set.n_nodes + 1
 MOI.dimension(set::HamiltonianCycle{VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}) where {T <: Real} = set.n_nodes + set.n_nodes^2 + 1
 MOI.dimension(set::HamiltonianCycle{UNWEIGHTED_HAMILTONIAN_CYCLE, T}) where {T <: Real} = set.n_nodes
 
-function copy(set::HamiltonianCycle{HWT, T}) where {HWT, T}
-    return HamiltonianCycle{HWT, T}(set.n_nodes, copy(set.weights))
+function copy(set::HamiltonianCycle{VWT, EWT, WT, WST, WsT, WtT, T}) where {VWT, EWT, WT, WST, WsT, WtT, T}
+    return Walk{VWT, EWT, WT, WST, WsT, WtT, T}(set.n_nodes, set.s, set.t, copy(set.edge_weights), copy(set.edge_weights))
 end
 
-function Base.:(==)(x::HamiltonianCycle{HWT, T}, y::HamiltonianCycle{HWT, T}) where {HWT, T}
-    return x.n_nodes == y.n_nodes && x.weights == y.weights
-end
-
-"""
-    HamiltonianPath{HPWT, T}(n_nodes::Int, s::Int, t::Int)
-
-A Hamiltonian path (i.e. a path in a graph that visits each vertex once) from
-`s` to `t`. If the vector `x` is constrained within a `HamiltonianPath`, each
-`x[i]` denotes the next vertex in the graph, for `i ∈ [1, n]`. The successor
-of `t`, i.e. the value of `x[t]`, is undefined and might be different from
-solver to solver.
-
-The considered graph is an undirected complete graph with `n` vertices.
-To model a Hamiltonian path in a noncomplete graph, you can add constraints
-on the variables: if the vertex `i` only has edges towards `j` and `k`, then
-`x[i]` should only have the possible values `j` and `k`.
-
-No GCC link?
-
-## Unweighted path
-
-`HamiltonianPath{UNWEIGHTED_HAMILTONIAN_PATH}` considers an unweighted
-Hamiltonian path.
-
-`x`-in-`HamiltonianPath{UNWEIGHTED_HAMILTONIAN_PATH}(n)`:
-a Hamiltonian path in the complete graph of `n` vertices.
-`x[i]` is the index of the next vertex in the path.
-
-## Fixed-weight path
-
-`HamiltonianPath{FIXED_WEIGHT_HAMILTONIAN_PATH}` considers an Hamiltonian
-path whose weights are fixed. Having an edge in the path increases the
-total weight.
-
-`[x, tw]`-in-`HamiltonianPath{FIXED_WEIGHT_HAMILTONIAN_PATH}(n, weights)`:
-`x` is a Hamiltonian path in the complete graph of `n` vertices.
-`x[i]` is the index of the next vertex in the path. 
-`tw` is the total weight of the path, with `weights` being indexed by the 
-vertices: 
-
-``\\mathtt{tw} = \\sum_{i=1}^{n} \\mathtt{weights[i, x[i]]} 1_{i \\neq t}``
-
-## Variable-weight path
-
-`HamiltonianPath{VARIABLE_WEIGHT_HAMILTONIAN_PATH}` considers an Hamiltonian
-path whose weights are variable. Having an edge in the path increases the
-total weight.
-
-`[x, w, tw]`-in-`HamiltonianPath{VARIABLE_WEIGHT_HAMILTONIAN_PATH}(n)`:
-`x` is a Hamiltonian path in the complete graph of `n` vertices.
-`x[i]` is the index of the next vertex in the path. 
-`tw` is the total weight of the path, with `w` being indexed by the vertices:
-
-``\\mathtt{tw} = \\sum_{i=1}^{n} \\mathtt{w[i, x[i]]}``
-"""
-struct HamiltonianPath{HPWT, T <: Real} <: MOI.AbstractVectorSet
-    n_nodes::Int
-    s::Int
-    t::Int
-    weights::AbstractMatrix{T}
-end
-
-HamiltonianPath(n_nodes::Int, s::Int, t::Int, weights::AbstractMatrix{T}) where {T} = HamiltonianPath{FIXED_WEIGHT_HAMILTONIAN_PATH, T}(n_nodes, s, t, weights)
-HamiltonianPath{HPWT, T}(n_nodes::Int, s::Int, t::Int) where {HPWT, T} = HamiltonianPath{HPWT, T}(n_nodes, s, t, zeros(T, 0, 0))
-
-MOI.dimension(set::HamiltonianPath{FIXED_WEIGHT_HAMILTONIAN_PATH, T}) where {T <: Real} = set.n_nodes + 1
-MOI.dimension(set::HamiltonianPath{VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}) where {T <: Real} = set.n_nodes + set.n_nodes^2 + 1
-MOI.dimension(set::HamiltonianPath{UNWEIGHTED_HAMILTONIAN_PATH, T}) where {T <: Real} = set.n_nodes
-
-function copy(set::HamiltonianPath{HPWT, T}) where {HPWT, T}
-    return HamiltonianPath{HPWT, T}(set.n_nodes, set.s, set.t, copy(set.weights))
-end
-
-function Base.:(==)(x::HamiltonianPath{HPWT, T}, y::HamiltonianPath{HPWT, T}) where {HPWT, T}
-    return x.n_nodes == y.n_nodes && x.s == y.s && x.t == y.t && x.weights == y.weights
+function Base.:(==)(x::Walk{VWT, EWT, WT, WST, WsT, WtT, T}, y::Walk{VWT, EWT, WT, WST, WsT, WtT, T}) where {VWT, EWT, WT, WST, WsT, WtT, T}
+    return x.n_nodes == y.n_nodes && x.s == y.s && x.t == y.t && x.vertex_weights == y.vertex_weights && x.edge_weights == y.edge_weights
 end

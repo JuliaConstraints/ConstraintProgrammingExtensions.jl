@@ -5,7 +5,7 @@ Version 0.7.0
 -------------
 
 The constraints `Circuit`, `CircuitPath`, and their weighted variants have
-been merged into `HamiltonianCycle` and `HamiltonianPath`.
+been merged into a more generic `Walk`.
 
 
 Version 0.6.2
