@@ -688,6 +688,19 @@
 
             @test MOI.dimension(CP.VariableWeightEulerianPath{T}(20, 1, 2)) == 20 + 20 + 1
         end
+
+        @testset "Variable-weight Eulerian path with variable source and destination" begin
+            VWEPVSD = CP.Walk{CP.VARIABLE_WEIGHT_VERTEX, CP.UNWEIGHTED_EDGE, CP.PATH_WALK, CP.EULERIAN_WALK, CP.VARIABLE_SOURCE_VERTEX, CP.VARIABLE_DESTINATION_VERTEX, T}
+            @test VWEPVSD(20) == VWEPVSD(20)
+            @test VWEPVSD(20) != VWEPVSD(30)
+            @test VWEPVSD(30) != VWEPVSD(20)
+
+            s = VWEPVSD(20)
+            @test typeof(copy(s)) <: VWEPVSD
+            @test copy(s) == s
+
+            @test MOI.dimension(VWEPVSD(20)) == 20 + 20 + 1 + 1
+        end
     end
 
     @testset "GlobalCardinality family" begin
