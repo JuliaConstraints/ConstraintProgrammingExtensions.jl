@@ -79,10 +79,7 @@ CountedValuesClosureType
 ## Graph constraints
 
 ```@docs
-Circuit
-CircuitPath
-WeightedCircuit
-WeightedCircuitPath
+Walk
 ```
 
 ## Reification constraints
