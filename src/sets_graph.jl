@@ -208,7 +208,13 @@ struct Walk{VWT, EWT, WT, WST, WsT, WtT, T <: Real} <: MOI.AbstractVectorSet
 end
 
 Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, 0, 0, zeros(T, 0), zeros(T, 0, 0))
+Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int, vertex_weights::AbstractVector{T}) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, 0, 0, vertex_weights, zeros(T, 0, 0))
+Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int, edge_weights::AbstractMatrix{T}) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, 0, 0, zeros(T, 0), edge_weights)
+Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int, vertex_weights::AbstractVector{T}, edge_weights::AbstractMatrix{T}) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, 0, 0, vertex_weights, edge_weights)
 Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int, s::Int, t::Int) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, s, t, zeros(T, 0), zeros(T, 0, 0))
+Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int, vertex_weights::AbstractVector{T}, s::Int, t::Int) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, s, t, vertex_weights, zeros(T, 0, 0))
+Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int, edge_weights::AbstractMatrix{T}, s::Int, t::Int) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, s, t, zeros(T, 0), edge_weights)
+Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int, vertex_weights::AbstractVector{T}, edge_weights::AbstractMatrix{T}, s::Int, t::Int) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, s, t, vertex_weights, edge_weights)
 
 function MOI.dimension(set::Walk{VWT, EWT, WT, WST, WsT, WtT, T}) where {VWT, EWT, WT, WST, WsT, WtT, T}
     dim = set.n_nodes
@@ -222,7 +228,7 @@ function MOI.dimension(set::Walk{VWT, EWT, WT, WST, WsT, WtT, T}) where {VWT, EW
     if EWT == FIXED_WEIGHT_EDGE
         dim += 1
     elseif EWT == VARIABLE_WEIGHT_EDGE
-        dim += set.n_nodes ^ 2
+        dim += set.n_nodes ^ 2 + 1
     end
 
     if WsT == VARIABLE_SOURCE_VERTEX

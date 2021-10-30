@@ -526,87 +526,142 @@
         @test MOI.dimension(CP.ValuePrecedence(2, 4, 20)) == 20
     end
 
-    @testset "Hamiltonian family" begin
+    @testset "Graph walk" begin
         T = Int
 
         @testset "Unweighted Hamiltonian cycle" begin
-            @test CP.HamiltonianCycle{CP.UNWEIGHTED_HAMILTONIAN_CYCLE, T}(20) == CP.HamiltonianCycle{CP.UNWEIGHTED_HAMILTONIAN_CYCLE, T}(20)
-            @test CP.HamiltonianCycle{CP.UNWEIGHTED_HAMILTONIAN_CYCLE, T}(20) != CP.HamiltonianCycle{CP.UNWEIGHTED_HAMILTONIAN_CYCLE, T}(30)
-            @test CP.HamiltonianCycle{CP.UNWEIGHTED_HAMILTONIAN_CYCLE, T}(30) != CP.HamiltonianCycle{CP.UNWEIGHTED_HAMILTONIAN_CYCLE, T}(20)
+            @test CP.HamiltonianCycle{T}(20) == CP.HamiltonianCycle{T}(20)
+            @test CP.HamiltonianCycle{T}(20) != CP.HamiltonianCycle{T}(30)
+            @test CP.HamiltonianCycle{T}(30) != CP.HamiltonianCycle{T}(20)
 
-            s = CP.HamiltonianCycle{CP.UNWEIGHTED_HAMILTONIAN_CYCLE, T}(20)
-            @test typeof(copy(s)) <: CP.HamiltonianCycle{CP.UNWEIGHTED_HAMILTONIAN_CYCLE, T}
+            s = CP.HamiltonianCycle{T}(20)
+            @test typeof(copy(s)) <: CP.HamiltonianCycle{T}
             @test copy(s) == s
 
-            @test MOI.dimension(CP.HamiltonianCycle{CP.UNWEIGHTED_HAMILTONIAN_CYCLE, T}(20)) == 20
+            @test MOI.dimension(CP.HamiltonianCycle{T}(20)) == 20
         end
 
         @testset "Unweighted Hamiltonian path" begin
-            @test CP.HamiltonianPath{CP.UNWEIGHTED_HAMILTONIAN_PATH, T}(20, 1, 2) == CP.HamiltonianPath{CP.UNWEIGHTED_HAMILTONIAN_PATH, T}(20, 1, 2)
-            @test CP.HamiltonianPath{CP.UNWEIGHTED_HAMILTONIAN_PATH, T}(20, 1, 2) != CP.HamiltonianPath{CP.UNWEIGHTED_HAMILTONIAN_PATH, T}(20, 1, 3)
-            @test CP.HamiltonianPath{CP.UNWEIGHTED_HAMILTONIAN_PATH, T}(20, 1, 2) != CP.HamiltonianPath{CP.UNWEIGHTED_HAMILTONIAN_PATH, T}(30, 1, 2)
-            @test CP.HamiltonianPath{CP.UNWEIGHTED_HAMILTONIAN_PATH, T}(30, 1, 2) != CP.HamiltonianPath{CP.UNWEIGHTED_HAMILTONIAN_PATH, T}(20, 1, 2)
+            @test CP.HamiltonianPath{T}(20, 1, 2) == CP.HamiltonianPath{T}(20, 1, 2)
+            @test CP.HamiltonianPath{T}(20, 1, 2) != CP.HamiltonianPath{T}(20, 1, 3)
+            @test CP.HamiltonianPath{T}(20, 1, 2) != CP.HamiltonianPath{T}(30, 1, 2)
+            @test CP.HamiltonianPath{T}(30, 1, 2) != CP.HamiltonianPath{T}(20, 1, 2)
 
-            s = CP.HamiltonianPath{CP.UNWEIGHTED_HAMILTONIAN_PATH, T}(20, 1, 2)
-            @test typeof(copy(s)) <: CP.HamiltonianPath{CP.UNWEIGHTED_HAMILTONIAN_PATH, T}
+            s = CP.HamiltonianPath{T}(20, 1, 2)
+            @test typeof(copy(s)) <: CP.HamiltonianPath{T}
             @test copy(s) == s
 
-            @test MOI.dimension(CP.HamiltonianPath{CP.UNWEIGHTED_HAMILTONIAN_PATH, T}(20, 1, 2)) == 20
+            @test MOI.dimension(CP.HamiltonianPath{T}(20, 1, 2)) == 20
+        end
+
+        @testset "Unweighted Eulerian cycle" begin
+            @test CP.EulerianCycle{T}(20) == CP.EulerianCycle{T}(20)
+            @test CP.EulerianCycle{T}(20) != CP.EulerianCycle{T}(30)
+            @test CP.EulerianCycle{T}(30) != CP.EulerianCycle{T}(20)
+
+            s = CP.EulerianCycle{T}(20)
+            @test typeof(copy(s)) <: CP.EulerianCycle{T}
+            @test copy(s) == s
+
+            @test MOI.dimension(CP.EulerianCycle{T}(20)) == 20
+        end
+
+        @testset "Unweighted Eulerian path" begin
+            @test CP.EulerianPath{T}(20, 1, 2) == CP.EulerianPath{T}(20, 1, 2)
+            @test CP.EulerianPath{T}(20, 1, 2) != CP.EulerianPath{T}(20, 1, 3)
+            @test CP.EulerianPath{T}(20, 1, 2) != CP.EulerianPath{T}(30, 1, 2)
+            @test CP.EulerianPath{T}(30, 1, 2) != CP.EulerianPath{T}(20, 1, 2)
+
+            s = CP.EulerianPath{T}(20, 1, 2)
+            @test typeof(copy(s)) <: CP.EulerianPath{T}
+            @test copy(s) == s
+
+            @test MOI.dimension(CP.EulerianPath{T}(20, 1, 2)) == 20
         end
 
         @testset "Fixed-weight Hamiltonian cycle" begin
             weights = rand(Int, 20, 20)
 
-            @test CP.HamiltonianCycle{CP.FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}(20, weights) == CP.HamiltonianCycle{CP.FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}(20, weights)
-            @test CP.HamiltonianCycle{CP.FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}(20, weights) != CP.HamiltonianCycle{CP.FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}(20, weights .+ 1)
-            @test CP.HamiltonianCycle{CP.FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}(20, weights) != CP.HamiltonianCycle{CP.FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}(30, weights)
-            @test CP.HamiltonianCycle{CP.FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}(30, weights) != CP.HamiltonianCycle{CP.FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}(20, weights)
+            @test CP.FixedWeightHamiltonianCycle{T}(20, weights) == CP.FixedWeightHamiltonianCycle{T}(20, weights)
+            @test CP.FixedWeightHamiltonianCycle{T}(20, weights) != CP.FixedWeightHamiltonianCycle{T}(20, weights .+ 1)
+            @test CP.FixedWeightHamiltonianCycle{T}(20, weights) != CP.FixedWeightHamiltonianCycle{T}(30, weights)
+            @test CP.FixedWeightHamiltonianCycle{T}(30, weights) != CP.FixedWeightHamiltonianCycle{T}(20, weights)
 
-            s = CP.HamiltonianCycle{CP.FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}(20, weights)
-            @test typeof(copy(s)) <: CP.HamiltonianCycle{CP.FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}
+            s = CP.FixedWeightHamiltonianCycle{T}(20, weights)
+            @test typeof(copy(s)) <: CP.FixedWeightHamiltonianCycle{T}
             @test copy(s) == s
 
-            @test MOI.dimension(CP.HamiltonianCycle{CP.FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}(20, weights)) == 20 + 1
+            @test MOI.dimension(CP.FixedWeightHamiltonianCycle{T}(20, weights)) == 20 + 1
         end
 
         @testset "Fixed-weight Hamiltonian path" begin
             weights = rand(Int, 20, 20)
 
-            @test CP.HamiltonianPath{CP.FIXED_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2, weights) == CP.HamiltonianPath{CP.FIXED_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2, weights)
-            @test CP.HamiltonianPath{CP.FIXED_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2, weights) != CP.HamiltonianPath{CP.FIXED_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 3, weights)
-            @test CP.HamiltonianPath{CP.FIXED_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2, weights) != CP.HamiltonianPath{CP.FIXED_WEIGHT_HAMILTONIAN_PATH, T}(30, 1, 2, weights)
-            @test CP.HamiltonianPath{CP.FIXED_WEIGHT_HAMILTONIAN_PATH, T}(30, 1, 2, weights) != CP.HamiltonianPath{CP.FIXED_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2, weights)
+            @test CP.FixedWeightHamiltonianPath{T}(20, weights, 1, 2) == CP.FixedWeightHamiltonianPath{T}(20, weights, 1, 2)
+            @test CP.FixedWeightHamiltonianPath{T}(20, weights, 1, 2) != CP.FixedWeightHamiltonianPath{T}(20, weights, 1, 3)
+            @test CP.FixedWeightHamiltonianPath{T}(20, weights, 1, 2) != CP.FixedWeightHamiltonianPath{T}(30, weights, 1, 2)
+            @test CP.FixedWeightHamiltonianPath{T}(30, weights, 1, 2) != CP.FixedWeightHamiltonianPath{T}(20, weights, 1, 2)
 
-            s = CP.HamiltonianPath{CP.FIXED_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2, weights)
-            @test typeof(copy(s)) <: CP.HamiltonianPath{CP.FIXED_WEIGHT_HAMILTONIAN_PATH, T}
+            s = CP.FixedWeightHamiltonianPath{T}(20, weights, 1, 2)
+            @test typeof(copy(s)) <: CP.FixedWeightHamiltonianPath{T}
             @test copy(s) == s
 
-            @test MOI.dimension(CP.HamiltonianPath{CP.FIXED_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2, weights)) == 20 + 1
+            @test MOI.dimension(CP.FixedWeightHamiltonianPath{T}(20, weights, 1, 2)) == 20 + 1
+        end
+
+        @testset "Fixed-weight Eulerian cycle" begin
+            weights = rand(Int, 20, 20)
+
+            @test CP.FixedWeightEulerianCycle{T}(20, weights) == CP.FixedWeightEulerianCycle{T}(20, weights)
+            @test CP.FixedWeightEulerianCycle{T}(20, weights) != CP.FixedWeightEulerianCycle{T}(20, weights .+ 1)
+            @test CP.FixedWeightEulerianCycle{T}(20, weights) != CP.FixedWeightEulerianCycle{T}(30, weights)
+            @test CP.FixedWeightEulerianCycle{T}(30, weights) != CP.FixedWeightEulerianCycle{T}(20, weights)
+
+            s = CP.FixedWeightEulerianCycle{T}(20, weights)
+            @test typeof(copy(s)) <: CP.FixedWeightEulerianCycle{T}
+            @test copy(s) == s
+
+            @test MOI.dimension(CP.FixedWeightEulerianCycle{T}(20, weights)) == 20 + 1
+        end
+
+        @testset "Fixed-weight Eulerian path" begin
+            weights = rand(Int, 20, 20)
+
+            @test CP.FixedWeightEulerianPath{T}(20, weights, 1, 2) == CP.FixedWeightEulerianPath{T}(20, weights, 1, 2)
+            @test CP.FixedWeightEulerianPath{T}(20, weights, 1, 2) != CP.FixedWeightEulerianPath{T}(20, weights, 1, 3)
+            @test CP.FixedWeightEulerianPath{T}(20, weights, 1, 2) != CP.FixedWeightEulerianPath{T}(30, weights, 1, 2)
+            @test CP.FixedWeightEulerianPath{T}(30, weights, 1, 2) != CP.FixedWeightEulerianPath{T}(20, weights, 1, 2)
+
+            s = CP.FixedWeightEulerianPath{T}(20, weights, 1, 2)
+            @test typeof(copy(s)) <: CP.FixedWeightEulerianPath{T}
+            @test copy(s) == s
+
+            @test MOI.dimension(CP.FixedWeightEulerianPath{T}(20, weights, 1, 2)) == 20 + 1
         end
 
         @testset "Variable-weight Hamiltonian cycle" begin
-            @test CP.HamiltonianCycle{CP.VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}(20) == CP.HamiltonianCycle{CP.VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}(20)
-            @test CP.HamiltonianCycle{CP.VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}(20) != CP.HamiltonianCycle{CP.VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}(30)
-            @test CP.HamiltonianCycle{CP.VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}(30) != CP.HamiltonianCycle{CP.VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}(20)
+            @test CP.VariableWeightHamiltonianCycle{T}(20) == CP.VariableWeightHamiltonianCycle{T}(20)
+            @test CP.VariableWeightHamiltonianCycle{T}(20) != CP.VariableWeightHamiltonianCycle{T}(30)
+            @test CP.VariableWeightHamiltonianCycle{T}(30) != CP.VariableWeightHamiltonianCycle{T}(20)
 
-            s = CP.HamiltonianCycle{CP.VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}(20)
-            @test typeof(copy(s)) <: CP.HamiltonianCycle{CP.VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}
+            s = CP.VariableWeightHamiltonianCycle{T}(20)
+            @test typeof(copy(s)) <: CP.VariableWeightHamiltonianCycle{T}
             @test copy(s) == s
 
-            @test MOI.dimension(CP.HamiltonianCycle{CP.VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}(20)) == 20 + 20 * 20 + 1
+            @test MOI.dimension(CP.VariableWeightHamiltonianCycle{T}(20)) == 20 + 20 * 20 + 1
         end
 
         @testset "Variable-weight Hamiltonian path" begin
-            @test CP.HamiltonianPath{CP.VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2) == CP.HamiltonianPath{CP.VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2)
-            @test CP.HamiltonianPath{CP.VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2) != CP.HamiltonianPath{CP.VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 3)
-            @test CP.HamiltonianPath{CP.VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2) != CP.HamiltonianPath{CP.VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}(30, 1, 2)
-            @test CP.HamiltonianPath{CP.VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}(30, 1, 2) != CP.HamiltonianPath{CP.VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2)
+            @test CP.VariableWeightHamiltonianPath{T}(20, 1, 2) == CP.VariableWeightHamiltonianPath{T}(20, 1, 2)
+            @test CP.VariableWeightHamiltonianPath{T}(20, 1, 2) != CP.VariableWeightHamiltonianPath{T}(20, 1, 3)
+            @test CP.VariableWeightHamiltonianPath{T}(20, 1, 2) != CP.VariableWeightHamiltonianPath{T}(30, 1, 2)
+            @test CP.VariableWeightHamiltonianPath{T}(30, 1, 2) != CP.VariableWeightHamiltonianPath{T}(20, 1, 2)
 
-            s = CP.HamiltonianPath{CP.VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2)
-            @test typeof(copy(s)) <: CP.HamiltonianPath{CP.VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}
+            s = CP.VariableWeightHamiltonianPath{T}(20, 1, 2)
+            @test typeof(copy(s)) <: CP.VariableWeightHamiltonianPath{T}
             @test copy(s) == s
 
-            @test MOI.dimension(CP.HamiltonianPath{CP.VARIABLE_WEIGHT_HAMILTONIAN_PATH, T}(20, 1, 2)) == 20 + 20 * 20 + 1
+            @test MOI.dimension(CP.VariableWeightHamiltonianPath{T}(20, 1, 2)) == 20 + 20 * 20 + 1
         end
     end
 
