@@ -74,7 +74,7 @@ constraint:
 
 * a simple walk: `NO_SPECIFIC_WALK`
 * a Eulerian walk (every edge is visited exactly once): `EULERIAN_WALK`
-* a Hamiltonian walk (every vertex is visited exactly once): `EULERIAN_WALK`
+* a Hamiltonian walk (every vertex is visited exactly once): `HAMILTONIAN_WALK`
 
 Subtypes can be thought of as adjectives for the walk types of `WalkType`.
 """
@@ -207,7 +207,8 @@ struct Walk{VWT, EWT, WT, WST, WsT, WtT, T <: Real} <: MOI.AbstractVectorSet
     # - VARIABLE_*_VERTEX: no s or t
 end
 
-Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int, s::Int, t::Int) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, s, t, zeros(T, 0, 0), zeros(T, 0, 0))
+Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, 0, 0, zeros(T, 0), zeros(T, 0, 0))
+Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int, s::Int, t::Int) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, s, t, zeros(T, 0), zeros(T, 0, 0))
 
 function MOI.dimension(set::Walk{VWT, EWT, WT, WST, WsT, WtT, T}) where {VWT, EWT, WT, WST, WsT, WtT, T}
     dim = set.n_nodes
@@ -234,10 +235,29 @@ function MOI.dimension(set::Walk{VWT, EWT, WT, WST, WsT, WtT, T}) where {VWT, EW
     return dim
 end
 
-function copy(set::HamiltonianCycle{VWT, EWT, WT, WST, WsT, WtT, T}) where {VWT, EWT, WT, WST, WsT, WtT, T}
-    return Walk{VWT, EWT, WT, WST, WsT, WtT, T}(set.n_nodes, set.s, set.t, copy(set.edge_weights), copy(set.edge_weights))
+function copy(set::Walk{VWT, EWT, WT, WST, WsT, WtT, T}) where {VWT, EWT, WT, WST, WsT, WtT, T}
+    return Walk{VWT, EWT, WT, WST, WsT, WtT, T}(set.n_nodes, set.s, set.t, copy(set.vertex_weights), copy(set.edge_weights))
 end
 
 function Base.:(==)(x::Walk{VWT, EWT, WT, WST, WsT, WtT, T}, y::Walk{VWT, EWT, WT, WST, WsT, WtT, T}) where {VWT, EWT, WT, WST, WsT, WtT, T}
     return x.n_nodes == y.n_nodes && x.s == y.s && x.t == y.t && x.vertex_weights == y.vertex_weights && x.edge_weights == y.edge_weights
 end
+
+# Some shortcuts.
+const HamiltonianCycle{T} = Walk{UNWEIGHTED_VERTEX, UNWEIGHTED_EDGE, CYCLE_WALK, HAMILTONIAN_WALK, NO_SOURCE_VERTEX, NO_DESTINATION_VERTEX, T}
+const HamiltonianPath{T} = Walk{UNWEIGHTED_VERTEX, UNWEIGHTED_EDGE, PATH_WALK, HAMILTONIAN_WALK, FIXED_SOURCE_VERTEX, FIXED_DESTINATION_VERTEX, T}
+
+const FixedWeightHamiltonianCycle{T} = Walk{UNWEIGHTED_VERTEX, FIXED_WEIGHT_EDGE, CYCLE_WALK, HAMILTONIAN_WALK, NO_SOURCE_VERTEX, NO_DESTINATION_VERTEX, T}
+const FixedWeightHamiltonianPath{T} = Walk{UNWEIGHTED_VERTEX, FIXED_WEIGHT_EDGE, PATH_WALK, HAMILTONIAN_WALK, FIXED_SOURCE_VERTEX, FIXED_DESTINATION_VERTEX, T}
+
+const VariableWeightHamiltonianCycle{T} = Walk{UNWEIGHTED_VERTEX, VARIABLE_WEIGHT_EDGE, CYCLE_WALK, HAMILTONIAN_WALK, NO_SOURCE_VERTEX, NO_DESTINATION_VERTEX, T}
+const VariableWeightHamiltonianPath{T} = Walk{UNWEIGHTED_VERTEX, VARIABLE_WEIGHT_EDGE, PATH_WALK, HAMILTONIAN_WALK, FIXED_SOURCE_VERTEX, FIXED_DESTINATION_VERTEX, T}
+
+const EulerianCycle{T} = Walk{UNWEIGHTED_VERTEX, UNWEIGHTED_EDGE, CYCLE_WALK, EULERIAN_WALK, NO_SOURCE_VERTEX, NO_DESTINATION_VERTEX, T}
+const EulerianPath{T} = Walk{UNWEIGHTED_VERTEX, UNWEIGHTED_EDGE, PATH_WALK, EULERIAN_WALK, FIXED_SOURCE_VERTEX, FIXED_DESTINATION_VERTEX, T}
+
+const FixedWeightEulerianCycle{T} = Walk{FIXED_WEIGHT_VERTEX, UNWEIGHTED_EDGE, CYCLE_WALK, EULERIAN_WALK, NO_SOURCE_VERTEX, NO_DESTINATION_VERTEX, T}
+const FixedWeightEulerianPath{T} = Walk{FIXED_WEIGHT_VERTEX, UNWEIGHTED_EDGE, PATH_WALK, EULERIAN_WALK, FIXED_SOURCE_VERTEX, FIXED_DESTINATION_VERTEX, T}
+
+const VariableWeightEulerianCycle{T} = Walk{VARIABLE_WEIGHT_VERTEX, UNWEIGHTED_EDGE, CYCLE_WALK, EULERIAN_WALK, NO_SOURCE_VERTEX, NO_DESTINATION_VERTEX, T}
+const VariableWeightEulerianPath{T} = Walk{VARIABLE_WEIGHT_VERTEX, UNWEIGHTED_EDGE, PATH_WALK, EULERIAN_WALK, FIXED_SOURCE_VERTEX, FIXED_DESTINATION_VERTEX, T}
