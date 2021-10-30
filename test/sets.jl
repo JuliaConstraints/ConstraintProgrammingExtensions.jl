@@ -610,24 +610,6 @@
         end
     end
 
-    @testset "$(S)" for S in [CP.WeightedCircuit, CP.WeightedCircuitPath]
-        @test S(3, [1 2 3; 4 5 6; 7 8 9]) == S(3, [1 2 3; 4 5 6; 7 8 9])
-        @test S(3, [1 2 3; 4 5 6; 7 8 9]) != S(2, [1 2; 3 4])
-        @test S(2, [1 2; 3 4]) != S(3, [1 2 3; 4 5 6; 7 8 9])
-
-        s = S(3, [1 2 3; 4 5 6; 7 8 9])
-        @test typeof(copy(s)) <: S
-        @test copy(s) == s
-
-        if S == CP.WeightedCircuit
-            @test MOI.dimension(S(3, [1 2 3; 4 5 6; 7 8 9])) == 3 + 1
-        elseif S == CP.WeightedCircuitPath
-            @test MOI.dimension(S(3, [1 2 3; 4 5 6; 7 8 9])) == 3 * 2 + 1
-        else
-            error("$(S) not implemented")
-        end
-    end    
-
     @testset "GlobalCardinality family" begin
         @testset "Constructor" begin
             for CVCT in [CP.OPEN_COUNTED_VALUES, CP.CLOSED_COUNTED_VALUES]
