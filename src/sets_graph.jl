@@ -200,13 +200,39 @@ struct Walk{VWT, EWT, WT, WST, WsT, WtT, T <: Real} <: MOI.AbstractVectorSet
     t::Int
     vertex_weights::AbstractVector{T}
     edge_weights::AbstractMatrix{T}
+
+    # TODO: add a constructor to check if the parameters make sense.
+    # - VARIABLE_WEIGHT_* or UNWEIGHTED_*: no vertex_weights, edge_weights
+    # - cycle: no s or t
+    # - VARIABLE_*_VERTEX: no s or t
 end
 
-Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int, s::Int, t::Int) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, zeros(T, 0, 0))
+Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes::Int, s::Int, t::Int) where {VWT, EWT, WT, WST, WsT, WtT, T} = Walk{VWT, EWT, WT, WST, WsT, WtT, T}(n_nodes, s, t, zeros(T, 0, 0), zeros(T, 0, 0))
 
-MOI.dimension(set::HamiltonianCycle{FIXED_WEIGHT_HAMILTONIAN_CYCLE, T}) where {T <: Real} = set.n_nodes + 1
-MOI.dimension(set::HamiltonianCycle{VARIABLE_WEIGHT_HAMILTONIAN_CYCLE, T}) where {T <: Real} = set.n_nodes + set.n_nodes^2 + 1
-MOI.dimension(set::HamiltonianCycle{UNWEIGHTED_HAMILTONIAN_CYCLE, T}) where {T <: Real} = set.n_nodes
+function MOI.dimension(set::Walk{VWT, EWT, WT, WST, WsT, WtT, T}) where {VWT, EWT, WT, WST, WsT, WtT, T}
+    dim = set.n_nodes
+
+    if VWT == FIXED_WEIGHT_VERTEX
+        dim += 1
+    elseif VWT == VARIABLE_WEIGHT_VERTEX
+        dim += set.n_nodes
+    end
+
+    if EWT == FIXED_WEIGHT_EDGE
+        dim += 1
+    elseif EWT == VARIABLE_WEIGHT_EDGE
+        dim += set.n_nodes ^ 2
+    end
+
+    if WsT == VARIABLE_SOURCE_VERTEX
+        dim += 1
+    end
+    if WsT == VARIABLE_DESTINATION_VERTEX
+        dim += 1
+    end
+
+    return dim
+end
 
 function copy(set::HamiltonianCycle{VWT, EWT, WT, WST, WsT, WtT, T}) where {VWT, EWT, WT, WST, WsT, WtT, T}
     return Walk{VWT, EWT, WT, WST, WsT, WtT, T}(set.n_nodes, set.s, set.t, copy(set.edge_weights), copy(set.edge_weights))
