@@ -1,3 +1,36 @@
+[Major constraints](https://www.ibm.com/docs/en/icos/20.1.0?topic=constraints-available-in-constraint-programming): 
+
+* [`allDifferent`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplf_alldifferent.html): `AllDifferent`
+* [`allMinDistance`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplf_allmindistance.html): `MinimumDistance`
+* [`inverse`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplf_inverse.html): `Inverse`
+* [`lex`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplf_lex.html): `LexicographicallyLessThan`, `LexicographicallyGreaterThan`
+* [`pack`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplf_pack.html): `BinPacking`
+
+Those for scheduling, not yet implemented: 
+
+* [`endAtEnd`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_endAtEnd.html): 
+* [`endAtStart`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_endAtStart.html): 
+* [`endBeforeStart`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_endBeforeEnd.html): 
+* [`endBeforeStart`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_endBeforeStart.html): 
+* [`startAtEnd`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_startAtEnd.html): 
+* [`startAtStart`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_startAtStart.html): 
+* [`startBeforeEnd`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_startBeforeEnd.html): 
+* [`startBeforeStart`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_startBeforeStart.html): 
+* [`alternative`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_alternative.html): 
+* [`span`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_span.html): 
+* [`synchronize`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_synchronize.html): 
+* [`presenceOf`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_presenceOf.html): 
+* [`first`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_first.html): 
+* [`last`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_last.html): 
+* [`before`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_before.html): 
+* [`prev`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplf_prev.html): 
+* [`noOverlap`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_noOverlap.html): 
+* [`<=` for cumulative resources](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_inferiorOrEqual.html): 
+* [`alwaysIn`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_alwaysIn.html): 
+* [`alwaysConstant`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_alwaysConstant.html): 
+* [`alwaysEqual`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_alwaysEqual.html): 
+* [`alwaysNoState`](https://www.ibm.com/docs/en/SSSA5P_20.1.0/ilog.odms.ide.help/OPL_Studio/opllang_quickref/topics/tlr_oplsch_alwaysNoState.html): 
+
 Constraints removed/renamed between OPL 3 and OPL 6: 
 
 * [`sequence`](https://lost-contact.mit.edu/afs/pdc.kth.se/roots/ilse/v0.7/pdc/vol/cplex/12.5/amd64_co5/doc/html/en-US/OPL_Studio/oplmigration/topics/opl_mig_prev_3x4x_3xCP_constr_seq.html): what the heck!?
