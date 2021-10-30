@@ -222,7 +222,7 @@ function MOI.dimension(set::Walk{VWT, EWT, WT, WST, WsT, WtT, T}) where {VWT, EW
     if VWT == FIXED_WEIGHT_VERTEX
         dim += 1
     elseif VWT == VARIABLE_WEIGHT_VERTEX
-        dim += set.n_nodes
+        dim += set.n_nodes + 1
     end
 
     if EWT == FIXED_WEIGHT_EDGE
