@@ -21,6 +21,7 @@ makedocs(
         ],
         "Comparison to other CP packages" => [
             "mappings/constraintsolver.md",
+            "mappings/cplexcp.md",
             "mappings/disjunctive.md",
             "mappings/facile.md",
             "mappings/hakank.md",
