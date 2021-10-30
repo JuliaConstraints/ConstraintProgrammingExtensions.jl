@@ -663,6 +663,31 @@
 
             @test MOI.dimension(CP.VariableWeightHamiltonianPath{T}(20, 1, 2)) == 20 + 20 * 20 + 1
         end
+
+        @testset "Variable-weight Eulerian cycle" begin
+            @test CP.VariableWeightEulerianCycle{T}(20) == CP.VariableWeightEulerianCycle{T}(20)
+            @test CP.VariableWeightEulerianCycle{T}(20) != CP.VariableWeightEulerianCycle{T}(30)
+            @test CP.VariableWeightEulerianCycle{T}(30) != CP.VariableWeightEulerianCycle{T}(20)
+
+            s = CP.VariableWeightEulerianCycle{T}(20)
+            @test typeof(copy(s)) <: CP.VariableWeightEulerianCycle{T}
+            @test copy(s) == s
+
+            @test MOI.dimension(CP.VariableWeightEulerianCycle{T}(20)) == 20 + 20 * 20 + 1
+        end
+
+        @testset "Variable-weight Eulerian path" begin
+            @test CP.VariableWeightEulerianPath{T}(20, 1, 2) == CP.VariableWeightEulerianPath{T}(20, 1, 2)
+            @test CP.VariableWeightEulerianPath{T}(20, 1, 2) != CP.VariableWeightEulerianPath{T}(20, 1, 3)
+            @test CP.VariableWeightEulerianPath{T}(20, 1, 2) != CP.VariableWeightEulerianPath{T}(30, 1, 2)
+            @test CP.VariableWeightEulerianPath{T}(30, 1, 2) != CP.VariableWeightEulerianPath{T}(20, 1, 2)
+
+            s = CP.VariableWeightEulerianPath{T}(20, 1, 2)
+            @test typeof(copy(s)) <: CP.VariableWeightEulerianPath{T}
+            @test copy(s) == s
+
+            @test MOI.dimension(CP.VariableWeightEulerianPath{T}(20, 1, 2)) == 20 + 20 * 20 + 1
+        end
     end
 
     @testset "GlobalCardinality family" begin
