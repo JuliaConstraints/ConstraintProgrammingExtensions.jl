@@ -673,7 +673,7 @@
             @test typeof(copy(s)) <: CP.VariableWeightEulerianCycle{T}
             @test copy(s) == s
 
-            @test MOI.dimension(CP.VariableWeightEulerianCycle{T}(20)) == 20 + 20 * 20 + 1
+            @test MOI.dimension(CP.VariableWeightEulerianCycle{T}(20)) == 20 + 20 + 1
         end
 
         @testset "Variable-weight Eulerian path" begin
@@ -686,7 +686,7 @@
             @test typeof(copy(s)) <: CP.VariableWeightEulerianPath{T}
             @test copy(s) == s
 
-            @test MOI.dimension(CP.VariableWeightEulerianPath{T}(20, 1, 2)) == 20 + 20 * 20 + 1
+            @test MOI.dimension(CP.VariableWeightEulerianPath{T}(20, 1, 2)) == 20 + 20 + 1
         end
     end
 
