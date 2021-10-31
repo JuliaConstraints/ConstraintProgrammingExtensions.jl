@@ -12,7 +12,13 @@
         @test typeof(copy(s)) <: S
         @test copy(s) === s # Same object.
         
-        @test MOI.dimension(S()) == 2
+        if S == CP.AbsoluteValue
+            @test MOI.dimension(S()) == 2
+        elseif S == CP.Modulo
+            @test MOI.dimension(S()) == 3
+        else
+            error("$(S) not implemented")
+        end
     end
 
     # Just a dimension.
