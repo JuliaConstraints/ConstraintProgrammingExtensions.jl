@@ -7,6 +7,8 @@ Version 0.7.0
 The constraints `Circuit`, `CircuitPath`, and their weighted variants have
 been merged into a more generic `Walk`.
 
+Add the `Modulo` set.
+
 
 Version 0.6.2
 -------------

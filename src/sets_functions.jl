@@ -9,3 +9,17 @@ end
 MOI.dimension(set::AbsoluteValue) = 2
 copy(set::AbsoluteValue) = set
 Base.:(==)(::AbsoluteValue, ::AbsoluteValue) = true
+
+"""
+    Modulo()
+
+Ensures that the three variables are related as: 
+
+``x \\mod y \\equiv z``
+"""
+struct Modulo <: MOI.AbstractVectorSet
+end
+
+MOI.dimension(set::Modulo) = 3
+copy(set::Modulo) = set
+Base.:(==)(::Modulo, ::Modulo) = true

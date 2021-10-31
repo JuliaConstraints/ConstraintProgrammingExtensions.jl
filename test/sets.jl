@@ -2,6 +2,7 @@
     # No argument.
     @testset "$(S)" for S in [
         CP.AbsoluteValue,
+        CP.Modulo,
     ]
         @test isbitstype(S)
         
