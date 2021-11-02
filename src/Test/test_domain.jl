@@ -2,6 +2,13 @@ function test_domain_singlevariable(
     model::MOI.ModelLike,
     config::MOIT.Config{T},
 ) where {T <: Real}
+    @show model
+    @show MOI.supports_add_constrained_variable(model, MOI.Integer) # x1, x2
+    @show MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
+    @show MOI.supports_constraint(model, MOI.VariableIndex, CP.Domain{T}) # c1, c2
+    @show MOI.supports_constraint(model, MOI.VectorOfVariables, CP.AllDifferent) # c3
+    @show MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c4
+
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, CP.Domain{T}) # c1, c2
     @MOIT.requires MOI.supports_constraint(model, MOI.VectorOfVariables, CP.AllDifferent) # c3

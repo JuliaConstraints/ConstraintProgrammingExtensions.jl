@@ -2,9 +2,9 @@ function test_alldifferent_vectorofvariables(
     model::MOI.ModelLike,
     config::MOIT.Config{T},
 ) where {T <: Real}
-    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
-    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c1
-    @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Interval{T}) # c2
+    # @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
+    # @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c1
+    # @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Interval{T}) # c2
     @MOIT.requires MOI.supports_constraint(model, MOI.VectorOfVariables, CP.AllDifferent) # c3
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
