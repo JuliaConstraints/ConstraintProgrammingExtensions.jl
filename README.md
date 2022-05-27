@@ -1,6 +1,6 @@
 # ConstraintProgrammingExtensions.jl
 
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](http://tcuvelier.be/ConstraintProgrammingExtensions.jl/dev/)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://juliaconstraints.github.io/ConstraintProgrammingExtensions.jl/dev/)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![The MIT License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](http://opensource.org/licenses/MIT)
 [![version](https://juliahub.com/docs/ConstraintProgrammingExtensions/version.svg)](https://juliahub.com/ui/Packages/ConstraintProgrammingExtensions/3CBBH)
