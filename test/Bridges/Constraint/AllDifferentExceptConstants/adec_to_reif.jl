@@ -53,11 +53,11 @@
             (MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}),
         ]
 
-        @test MOI.get(bridge, MOI.NumberOfVariables()) == dim * length(values_set) + dim * (dim - 1) / 2
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == dim * length(values_set) + dim * (dim - 1) / 2
+        @test MOI.get(bridge, MOI.NumberOfVariables()) == dim * length(values_set) + div(dim * (dim - 1), 2)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VariableIndex, MOI.ZeroOne}()) == dim * length(values_set) + div(dim * (dim - 1), 2)
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Reification{MOI.EqualTo{T}}}()) == dim * length(values_set)
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, CP.Reification{CP.DifferentFrom{T}}}()) == dim * (dim - 1) / 2
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == dim * (dim - 1) / 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, CP.Reification{CP.DifferentFrom{T}}}()) == div(dim * (dim - 1), 2)
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}()) == div(dim * (dim - 1), 2)
 
         @test Set(MOI.get(bridge, MOI.ListOfVariableIndices())) == Set([vec(collect(values(bridge.vars_compare)))..., vec(collect(values(bridge.vars_different)))...])
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VariableIndex, MOI.ZeroOne}())) == Set([vec(collect(values(bridge.vars_compare_bin)))..., vec(collect(values(bridge.vars_different_bin)))...])
@@ -81,8 +81,8 @@
             end
         end
 
-        @test length(bridge.vars_different) == dim * (dim - 1) / 2
-        @test length(bridge.vars_different_bin) == dim * (dim - 1) / 2
+        @test length(bridge.vars_different) == div(dim * (dim - 1), 2)
+        @test length(bridge.vars_different_bin) == div(dim * (dim - 1), 2)
 
         for i in 1:dim
             for j in 1:i
@@ -121,7 +121,7 @@
     end
 
     @testset "Compare array variables" begin
-        @test length(bridge.cons_different_reif) == dim * (dim - 1) / 2
+        @test length(bridge.cons_different_reif) == div(dim * (dim - 1), 2)
 
         for i in 1:dim
             for j in (i+1):dim
@@ -149,7 +149,7 @@
     end
 
     @testset "Disjunction" begin
-        @test length(bridge.cons) == dim * (dim - 1) / 2
+        @test length(bridge.cons) == div(dim * (dim - 1), 2)
 
         for i in 1:dim
             for j in (i+1):dim

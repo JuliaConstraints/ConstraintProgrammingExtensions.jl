@@ -78,10 +78,10 @@ function MOIBC.bridge_constraint(
     cons_different_reif = Dict{Tuple{Int, Int}, MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Reification{CP.DifferentFrom{T}}}}()
     cons = Dict{Tuple{Int, Int}, MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}}()
 
-    sizehint!(vars_different, s.dimension * (s.dimension - 1) / 2)
-    sizehint!(vars_different_bin, s.dimension * (s.dimension - 1) / 2)
-    sizehint!(cons_different_reif, s.dimension * (s.dimension - 1) / 2)
-    sizehint!(cons, s.dimension * (s.dimension - 1) / 2)
+    sizehint!(vars_different, div(s.dimension * (s.dimension - 1), 2))
+    sizehint!(vars_different_bin, div(s.dimension * (s.dimension - 1), 2))
+    sizehint!(cons_different_reif, div(s.dimension * (s.dimension - 1), 2))
+    sizehint!(cons, div(s.dimension * (s.dimension - 1), 2))
 
     for i in 1:s.dimension
         for j in (i+1):s.dimension

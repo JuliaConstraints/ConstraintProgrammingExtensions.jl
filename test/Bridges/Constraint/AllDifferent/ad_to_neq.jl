@@ -44,13 +44,13 @@
         @test MOIB.added_constraint_types(typeof(bridge)) == [(MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T})]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T}}()) == dim * (dim - 1) / 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T}}()) == div(dim * (dim - 1), 2)
 
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T}}())) == Set(collect(values(bridge.cons)))
     end
 
     @testset "Set of constraints" begin
-        @test length(bridge.cons) == dim * (dim - 1) / 2
+        @test length(bridge.cons) == div(dim * (dim - 1), 2)
         for i in 1:dim
             for j in (i+1):dim
                 @test MOI.is_valid(model, bridge.cons[i, j])

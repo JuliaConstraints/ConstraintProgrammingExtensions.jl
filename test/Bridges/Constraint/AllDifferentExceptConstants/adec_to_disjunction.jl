@@ -44,13 +44,13 @@
         @test MOIB.added_constraint_types(typeof(bridge)) == [(MOI.VectorAffineFunction{T}, CP.Disjunction)]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Disjunction}()) == dim * (dim - 1) / 2
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Disjunction}()) == div(dim * (dim - 1), 2)
 
         @test Set(MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Disjunction}())) == Set(collect(values(bridge.cons)))
     end
 
     @testset "Set of constraints" begin
-        @test length(bridge.cons) == dim * (dim - 1) / 2
+        @test length(bridge.cons) == div(dim * (dim - 1), 2)
         for i in 1:dim
             for j in (i+1):dim
                 @test MOI.is_valid(model, bridge.cons[i, j])

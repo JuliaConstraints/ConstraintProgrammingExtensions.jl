@@ -4,12 +4,10 @@ using Test
 
 const CP = ConstraintProgrammingExtensions
 const COIT = CP.Test
-const COIDT = CP.DeprecatedTest
 const COIB = CP.Bridges
 const MOI = MathOptInterface
 const MOIB = MOI.Bridges
 const MOIBC = MOIB.Constraint
-const MOIT = MOI.DeprecatedTest
 const MOIU = MOI.Utilities
 
 include("Bridges/models.jl")
@@ -19,6 +17,5 @@ include("Bridges/models.jl")
     include("moi_traits.jl")
     include("Bridges/Bridges.jl")
     include("FlatZinc/FlatZinc.jl")
-    include("DeprecatedTest/DeprecatedTest.jl")
     include("Test/Test.jl")
 end

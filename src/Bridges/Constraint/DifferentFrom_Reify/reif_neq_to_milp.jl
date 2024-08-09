@@ -76,16 +76,14 @@ function MOIBC.bridge_constraint(
     )
 
     # If the constraint is satisfied, constrain the reified. 
-    smallm = if T <: Int
-        one(T)
-    else
-        T(_REIF_EQTO_FLOAT_EPSILON)
-    end
-
     con_smallm = MOI.add_constraint(
         model, 
-        f_scalars[1] - var_abs / smallm,
-        MOI.LessThan(zero(T))
+        if T <: Int
+            f_scalars[1] - var_abs
+        else
+            f_scalars[1] - var_abs / T(_REIF_EQTO_FLOAT_EPSILON)
+        end,
+        MOI.LessThan(zero(T)),
     )
 
     return ReificationDifferentFrom2MILPBridge{T}(var_abs, var_abs_int, con_abs, con_bigm, con_smallm)

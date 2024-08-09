@@ -39,7 +39,7 @@ function MOIBC.bridge_constraint(
     # Upper-triangular matrix of constraints: i >= j, i.e. d(d-1)/2 elements:
     #     \sum_{i=2}^{d} (n - i + 1) = d (d - 1) / 2
     cons = Dict{Tuple{Int, Int}, MOI.ConstraintIndex}()
-    sizehint!(cons, dim * (dim - 1) / 2)
+    sizehint!(cons, div(dim * (dim - 1), 2))
 
     for i in 1:dim
         for j in (i+1):dim

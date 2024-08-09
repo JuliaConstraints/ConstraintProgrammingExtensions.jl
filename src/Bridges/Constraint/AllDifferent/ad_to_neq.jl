@@ -41,7 +41,7 @@ function MOIBC.bridge_constraint(
         Tuple{Int, Int},
         MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T}}, 
     }()
-    sizehint!(cons, dim * (dim - 1) / 2)
+    sizehint!(cons, div(dim * (dim - 1), 2))
 
     for i in 1:dim
         for j in (i+1):dim
