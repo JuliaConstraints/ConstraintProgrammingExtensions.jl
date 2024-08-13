@@ -16,7 +16,7 @@
 
     n_vars_position = n_ortho * dim
     n_vars_size = n_ortho * dim
-    if T == Int
+    if T == Int64
         x_pos, _ = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:n_vars_position])
         x_sze, _ = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:n_vars_size])
         x_end, _ = MOI.add_constrained_variables(model, [MOI.Integer() for _ in 1:n_vars_position])
