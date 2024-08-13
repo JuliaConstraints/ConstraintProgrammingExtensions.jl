@@ -1,4 +1,4 @@
-@testset "NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopes: $(fct_type), orthotopes $(n_ortho), dimension $(dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], n_ortho in [2, 3], dim in [2, 3], T in [Int, Sys.WORD_SIZE == 64 ? Float64 : Float32]
+@testset "NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopes: $(fct_type), orthotopes $(n_ortho), dimension $(dim), $(T)" for fct_type in ["vector of variables", "vector affine function"], n_ortho in [2, 3], dim in [2, 3], T in [Int64, Sys.WORD_SIZE == 64 ? Float64 : Float32]
     mock = MOIU.MockOptimizer(ConditionallyNonOverlappingOrthotopesModel{T}())
     model = COIB.NonOverlappingOrthotopes2ConditionallyNonOverlappingOrthotopes{T}(mock)
 
