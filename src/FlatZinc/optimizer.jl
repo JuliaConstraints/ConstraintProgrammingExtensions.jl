@@ -21,7 +21,7 @@ function _FznResults()
 end
 
 function _parse_fzn_value(str::AbstractString)
-    # Heuristically guess the type of the output value: either integer or 
+    # Heuristically guess the type of the output value: either integer or
     # float.
     if '.' in str
         return parse(Float64, str)
@@ -38,7 +38,9 @@ mapping the name of the variables to their values (either a scalar or a vector
 of numbers). The values are automatically transformed into the closest type
 (integer or float).
 """
-function _parse_to_assignments(str::String)::Vector{Dict{String, Vector{Number}}}
+function _parse_to_assignments(
+    str::String,
+)::Vector{Dict{String, Vector{Number}}}
     results = Dict{String, Vector{Number}}[]
 
     # If the infeasibility marker is discovered, return an empty list.
@@ -49,16 +51,16 @@ function _parse_to_assignments(str::String)::Vector{Dict{String, Vector{Number}}
     # Remove comments from the output (starting with % and ending with a new line).
     str = replace(str, r"%(.*)(\\r|\\n|\\r\\n)" => s"")
 
-    # There may be several results returned by the solver. Each solution is 
+    # There may be several results returned by the solver. Each solution is
     # separated from the others by `'-' ^ 10`.
-    str_split = split(str, '-' ^ 10)[1:(end - 1)]
+    str_split = split(str, '-'^10)[1:(end-1)]
     n_results = length(str_split)
     sizehint!(results, n_results)
 
     for i in 1:n_results
         push!(results, Dict{String, Vector{Number}}())
 
-        # Each value is indicated in its own statement, separated by a 
+        # Each value is indicated in its own statement, separated by a
         # semi-colon.
         for part in split(strip(str_split[i]), ';')
             if isempty(part)
@@ -69,17 +71,18 @@ function _parse_to_assignments(str::String)::Vector{Dict{String, Vector{Number}}
             var = strip(var)
             val = strip(val)
 
-            # Either an array or a scalar. Always return an array for 
+            # Either an array or a scalar. Always return an array for
             # simplicity. A scalar is simply an array with one element.
             if !occursin("array", val)
                 # Scalar. Just a value: "1", "1.0".
                 results[i][var] = [_parse_fzn_value(val)]
             else
-                # Array. Several arguments: "array1d(1..2, [1, 2])", 
-                # "array2d(1..2, 1..2, [1, 2, 3, 4])". 
-                # TODO: should dimensions be preserved? (First argument[s] of arrayNd.)
+                # Array. Several arguments: "array1d(1..2, [1, 2])",
+                # "array2d(1..2, 1..2, [1, 2, 3, 4])".
+                # TODO: should dimensions be preserved? (First argument[s] of "arrayNd".)
                 val = split(split(val, '[')[2], ']')[1]
-                results[i][var] = map(_parse_fzn_value, map(strip, split(val, ',')))
+                results[i][var] =
+                    map(_parse_fzn_value, map(strip, split(val, ',')))
             end
         end
     end
@@ -88,7 +91,7 @@ function _parse_to_assignments(str::String)::Vector{Dict{String, Vector{Number}}
 end
 
 # MOI wrapper.
-# Based on AmplNLWriter.jl's _NLResults and Optimizer. 
+# Based on AmplNLWriter.jl's _NLResults and Optimizer.
 # The main difference is that typical solutions do not have a Float64 type,
 # but rather Int. However, it all depends on the actual FZN solver that is
 # used below (some of them can still deal with floats).
@@ -119,8 +122,8 @@ to the FlatZinc-compatible CLI of the solver or a `Cmd` object to call the
 solver (typically, this is useful to set environment variables).
 
 `solver_args` is a vector of `String` arguments passed solver executable.
-However, prefer passing `key=value` options via `MOI.RawOptimizerAttribute`. 
-These arguments are passed to `Base.pipeline`. 
+However, prefer passing `key=value` options via `MOI.RawOptimizerAttribute`.
+These arguments are passed to `Base.pipeline`.
 [See the Julia documentation for more details](https://docs.julialang.org/en/v1/base/base/#Base.pipeline-Tuple{Base.AbstractCmd}).
 
 ## Examples
@@ -146,7 +149,6 @@ function Optimizer(
         0.0,
         true,
         solver_args,
-
         _FznResults(),
         NaN,
         NaN,
@@ -154,27 +156,39 @@ function Optimizer(
     )
 end
 
-Base.show(io::IO, ::Optimizer) = print(io, "A FlatZinc (flattened MiniZinc) model")
+function Base.show(io::IO, ::Optimizer)
+    return print(io, "A FlatZinc (flattened MiniZinc) model")
+end
 
 MOI.get(model::Optimizer, ::MOI.SolverName) = "FlatZincWriter"
 
-function MOI.supports(model::Optimizer, attr::MOI.AnyAttribute, x...) 
+function MOI.supports(model::Optimizer, attr::MOI.AnyAttribute, x...)
     return MOI.supports(model.inner, attr, x...)::Bool
 end
 
-function MOI.supports_add_constrained_variable(model::Optimizer, x::Type{S}) where {S <: MOI.AbstractScalarSet}
+function MOI.supports_add_constrained_variable(
+    model::Optimizer,
+    x::Type{S},
+) where {S <: MOI.AbstractScalarSet}
     return MOI.supports_add_constrained_variable(model.inner, x)::Bool
 end
 
-function MOI.supports_add_constrained_variables(model::Optimizer, x::Type{S}) where {S <: MOI.AbstractScalarSet}
+function MOI.supports_add_constrained_variables(
+    model::Optimizer,
+    x::Type{S},
+) where {S <: MOI.AbstractScalarSet}
     return MOI.supports_add_constrained_variables(model.inner, x)::Bool
 end
 
-function MOI.supports_constraint(model::Optimizer, f::Type{F}, s::Type{S}) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
+function MOI.supports_constraint(
+    model::Optimizer,
+    f::Type{F},
+    s::Type{S},
+) where {F <: MOI.AbstractFunction, S <: MOI.AbstractSet}
     return MOI.supports_constraint(model.inner, f, s)::Bool
 end
 
-function MOI.get(model::Optimizer, attr::MOI.AnyAttribute, x...) 
+function MOI.get(model::Optimizer, attr::MOI.AnyAttribute, x...)
     return MOI.get(model.inner, attr, x...)
 end
 
@@ -182,20 +196,27 @@ function MOI.get(model::Optimizer, ::Type{MOI.VariableIndex}, name::String)
     return MOI.get(model.inner, MOI.VariableIndex, name)
 end
 
-function MOI.set(model::Optimizer, attr::MOI.AnyAttribute, x...) 
+function MOI.set(model::Optimizer, attr::MOI.AnyAttribute, x...)
     MOI.set(model.inner, attr, x...)
     return
 end
 
-function MOI.add_variable(model::Optimizer) 
+function MOI.add_variable(model::Optimizer)
     return MOI.add_variable(model.inner)
 end
 
-function MOI.add_constrained_variable(model::Optimizer, x::MOI.AbstractScalarSet) 
+function MOI.add_constrained_variable(
+    model::Optimizer,
+    x::MOI.AbstractScalarSet,
+)
     return MOI.add_constrained_variable(model.inner, x)
 end
 
-function MOI.add_constraint(model::Optimizer, f::MOI.AbstractFunction, s::MOI.AbstractSet) 
+function MOI.add_constraint(
+    model::Optimizer,
+    f::MOI.AbstractFunction,
+    s::MOI.AbstractSet,
+)
     return MOI.add_constraint(model.inner, f, s)
 end
 
@@ -224,10 +245,10 @@ function MOI.optimize!(model::Optimizer)
     temp_dir = mktempdir()
     fzn_file = joinpath(temp_dir, "model.fzn")
     open(io -> write(io, model.inner), fzn_file, "w")
-    
+
     model.fzn_time = time() - start_time
 
-    # Generate the list of options. Always put the user-defined options at 
+    # Generate the list of options. Always put the user-defined options at
     # the end.
     opts = copy(model.options)
     if !iszero(model.time_limit_ms)
@@ -242,11 +263,8 @@ function MOI.optimize!(model::Optimizer)
     try
         io = IOBuffer()
         ret = run(
-            pipeline(
-                `$(model.solver_command) $(opts) $(fzn_file)`,
-                stdout=io,
-            ),
-            wait=true
+            pipeline(`$(model.solver_command) $(opts) $(fzn_file)`, stdout=io),
+            wait=true,
         )
 
         if ret.exitcode != 0
@@ -282,7 +300,11 @@ function MOI.get(model::Optimizer, ::MOI.TerminationStatus)
     return model.results.termination_status
 end
 
-function MOI.get(model::Optimizer, attr::MOI.VariablePrimal, vi::MOI.VariableIndex)
+function MOI.get(
+    model::Optimizer,
+    attr::MOI.VariablePrimal,
+    vi::MOI.VariableIndex,
+)
     if length(model.results.primal_solutions) >= attr.result_index
         return model.results.primal_solutions[attr.result_index][vi]
     else
@@ -297,23 +319,25 @@ MOI.get(model::Optimizer, ::MOI.SolveTimeSec) = model.solve_time
 
 MOI.supports(::Optimizer, ::MOI.TimeLimitSec) = true
 MOI.get(model::Optimizer, ::MOI.TimeLimitSec) = model.time_limit_ms / 1_000.0
-function MOI.set(model::Optimizer, ::MOI.TimeLimitSec, limit::Real) 
-    model.time_limit_ms = limit * 1_000.0
+function MOI.set(model::Optimizer, ::MOI.TimeLimitSec, limit::Real)
+    return model.time_limit_ms = limit * 1_000.0
 end
-function MOI.set(model::Optimizer, ::MOI.TimeLimitSec, limit::Nothing) 
-    model.time_limit_ms = 0.0
+function MOI.set(model::Optimizer, ::MOI.TimeLimitSec, limit::Nothing)
+    return model.time_limit_ms = 0.0
 end
 
 MOI.supports(::Optimizer, ::MOI.Silent) = true
 MOI.get(model::Optimizer, ::MOI.Silent) = !model.verboseness
-function MOI.set(model::Optimizer, ::MOI.Silent, silentness::Bool) 
-    model.verboseness = !silentness
+function MOI.set(model::Optimizer, ::MOI.Silent, silentness::Bool)
+    return model.verboseness = !silentness
 end
 
 MOI.supports(::Optimizer, ::MOI.ResultCount) = true
-MOI.get(model::Optimizer, ::MOI.ResultCount) = length(model.results.primal_solutions)
+function MOI.get(model::Optimizer, ::MOI.ResultCount)
+    return length(model.results.primal_solutions)
+end
 
-# Specific case of dual solution: getting it must be supported (MOI 
+# Specific case of dual solution: getting it must be supported (MOI
 # requirement), but few CP solvers have it accessible (none?).
 # https://github.com/jump-dev/MathOptInterface.jl/pull/1561#pullrequestreview-740032701
 
@@ -325,10 +349,13 @@ MOI.get(::Optimizer, ::MOI.DualStatus) = MOI.NO_SOLUTION
 """
     _parse_to_assignments(sols::Vector{Dict{String, Vector{Number}}}, model::CP.FlatZinc.Model)
 
-Parses the output of `_parse_to_assignments` and stores the solutions into 
+Parses the output of `_parse_to_assignments` and stores the solutions into
 `model`. This function is responsible for filling `model.results`.
 """
-function _parse_to_moi_solutions(sols::Vector{Dict{String, Vector{Number}}}, model::Optimizer)
+function _parse_to_moi_solutions(
+    sols::Vector{Dict{String, Vector{Number}}},
+    model::Optimizer,
+)
     @assert length(model.results.primal_solutions) == 0
 
     for i in 1:length(sols)
@@ -336,18 +363,20 @@ function _parse_to_moi_solutions(sols::Vector{Dict{String, Vector{Number}}}, mod
         push!(model.results.primal_solutions, Dict{MOI.VariableIndex, Real}())
 
         for (var_name, val) in sol
-            # At least for now: no vector at the FlatZinc layer. Just ensure 
+            # At least for now: no vector at the FlatZinc layer. Just ensure
             # that this is consistent.
-            @assert length(val) == 1 
+            @assert length(val) == 1
 
             var_idx = MOI.get(model, MOI.VariableIndex, var_name)
             model.results.primal_solutions[i][var_idx] = val[1]
         end
     end
-    
-    model.results.termination_status = (length(sols) == 0) ? MOI.INFEASIBLE : MOI.OPTIMAL
-    model.results.primal_status = (length(sols) == 0) ? MOI.NO_SOLUTION : MOI.FEASIBLE_POINT
-    
+
+    model.results.termination_status =
+        (length(sols) == 0) ? MOI.INFEASIBLE : MOI.OPTIMAL
+    model.results.primal_status =
+        (length(sols) == 0) ? MOI.NO_SOLUTION : MOI.FEASIBLE_POINT
+
     @assert length(model.results.primal_solutions) == length(sols)
-    return 
+    return
 end

@@ -4,21 +4,18 @@ using Documenter, ConstraintProgrammingExtensions
 
 makedocs(
     sitename="ConstraintProgrammingExtensions",
-    format = Documenter.HTML(
+    format=Documenter.HTML(
         # See https://github.com/JuliaDocs/Documenter.jl/issues/868
-        prettyurls = get(ENV, "CI", nothing) == "true",
-        mathengine = Documenter.MathJax2(),
-        collapselevel = 1,
+        prettyurls=get(ENV, "CI", nothing) == "true",
+        mathengine=Documenter.MathJax2(),
+        collapselevel=1,
     ),
-    strict = true,
-    modules = [ConstraintProgrammingExtensions],
-    checkdocs = :exports,
-    pages = [
+    strict=true,
+    modules=[ConstraintProgrammingExtensions],
+    checkdocs=:exports,
+    pages=[
         "Introduction" => "index.md",
-        "Reference" => [
-            "reference/sets.md",
-            "reference/bridges_sets.md",
-        ],
+        "Reference" => ["reference/sets.md", "reference/bridges_sets.md"],
         "Comparison to other CP packages" => [
             "mappings/constraintsolver.md",
             "mappings/cplexcp.md",
@@ -30,11 +27,11 @@ makedocs(
             "mappings/numberjack.md",
             "mappings/sas.md",
             "mappings/yalmip.md",
-        ]
+        ],
     ],
 )
 
 deploydocs(
-    push_preview = true,
-    repo = "github.com/dourouc05/ConstraintProgrammingExtensions.jl.git",
+    push_preview=true,
+    repo="github.com/JuliaConstraints/ConstraintProgrammingExtensions.jl.git",
 )
