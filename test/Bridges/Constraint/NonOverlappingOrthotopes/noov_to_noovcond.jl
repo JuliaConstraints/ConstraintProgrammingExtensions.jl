@@ -107,7 +107,7 @@
 
         for i in 1:length(f.terms)
             t = f.terms[i]
-            @warn "Debug type" t.output_index i t.scalar_term.coefficient one(T)
+            @warn "Debug type" typeof(t.output_index) typeof(i) typeof(t.scalar_term.coefficient) typeof(one(T))
             @test t.output_index === i
             @test t.scalar_term.coefficient === one(T)
         end
