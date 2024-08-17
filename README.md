@@ -6,9 +6,9 @@
 [![version](https://juliahub.com/docs/ConstraintProgrammingExtensions/version.svg)](https://juliahub.com/ui/Packages/ConstraintProgrammingExtensions/3CBBH)
 [![DOI](https://zenodo.org/badge/240344723.svg)](https://zenodo.org/badge/latestdoi/240344723)
 
-[![Continuous integration](https://github.com/JuliaConstraints/ConstraintProgrammingExtensions.jl/actions/workflows/GitHubCI.yml/badge.svg)](https://github.com/dourouc05/ConstraintProgrammingExtensions.jl/actions/workflows/GitHubCI.yml/)
-[![Coverage Status](https://coveralls.io/repos/JuliaConstraints/ConstraintProgrammingExtensions.jl/badge.svg?branch=master)](https://coveralls.io/r/dourouc05/ConstraintProgrammingExtensions.jl?branch=master)
-[![codecov.io](http://codecov.io/github/JuliaConstraints/ConstraintProgrammingExtensions.jl/coverage.svg?branch=master)](http://codecov.io/github/dourouc05/ConstraintProgrammingExtensions.jl?branch=master)
+[![Continuous integration](https://github.com/JuliaConstraints/ConstraintProgrammingExtensions.jl/actions/workflows/GitHubCI.yml/badge.svg)](https://github.com/JuliaConstraints/ConstraintProgrammingExtensions.jl/actions/workflows/GitHubCI.yml/)
+[![Coverage Status](https://coveralls.io/repos/JuliaConstraints/ConstraintProgrammingExtensions.jl/badge.svg?branch=master)](https://coveralls.io/r/JuliaConstraints/ConstraintProgrammingExtensions.jl?branch=master)
+[![codecov.io](http://codecov.io/github/JuliaConstraints/ConstraintProgrammingExtensions.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaConstraints/ConstraintProgrammingExtensions.jl?branch=master)
 
 This package provides extensions to 
 [MathOptInterface](https://github.com/jump-dev/MathOptInterface.jl)
