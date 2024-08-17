@@ -1,6 +1,13 @@
-@testset "VariableCapacityValuedKnapsack2VariableCapacityKnapsackBrige: $(fct_type), 2 items, $(T)" for fct_type in ["vector of variables", "vector affine function"], T in [Int, Float64]
+@testset "VariableCapacityValuedKnapsack2VariableCapacityKnapsackBridge: $(fct_type), 2 items, $(T)" for fct_type in
+                                                                                                         [
+        "vector of variables",
+        "vector affine function",
+    ],
+    T in [Int, Float64]
+
     mock = MOIU.MockOptimizer(VariableCapacityKnapsackModel{T}())
-    model = COIB.VariableCapacityValuedKnapsack2VariableCapacityKnapsack{T}(mock)
+    model =
+        COIB.VariableCapacityValuedKnapsack2VariableCapacityKnapsack{T}(mock)
 
     if T == Int
         @test MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer)
@@ -51,22 +58,71 @@
     @test MOI.is_valid(model, x_value)
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.VALUED_KNAPSACK, T}}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{
+        MOI.VectorOfVariables,
+        CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.VALUED_KNAPSACK, T},
+    }(
+        -1,
+    )]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.VALUED_KNAPSACK, T}) == typeof(bridge)
-        @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
+        @test MOIBC.concrete_bridge_type(
+            typeof(bridge),
+            MOI.VectorOfVariables,
+            CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.VALUED_KNAPSACK, T},
+        ) == typeof(bridge)
+        @test MOIB.added_constrained_variable_types(typeof(bridge)) ==
+              Tuple{Type}[]
         @test Set(MOIB.added_constraint_types(typeof(bridge))) == Set([
-            (MOI.VectorAffineFunction{T}, CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}),
+            (
+                MOI.VectorAffineFunction{T},
+                CP.Knapsack{
+                    CP.VARIABLE_CAPACITY_KNAPSACK,
+                    CP.UNVALUED_KNAPSACK,
+                    T,
+                },
+            ),
             (MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}),
         ])
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}}()) == 1
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == 1
+        @test MOI.get(
+            bridge,
+            MOI.NumberOfConstraints{
+                MOI.VectorAffineFunction{T},
+                CP.Knapsack{
+                    CP.VARIABLE_CAPACITY_KNAPSACK,
+                    CP.UNVALUED_KNAPSACK,
+                    T,
+                },
+            }(),
+        ) == 1
+        @test MOI.get(
+            bridge,
+            MOI.NumberOfConstraints{
+                MOI.ScalarAffineFunction{T},
+                MOI.EqualTo{T},
+            }(),
+        ) == 1
 
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Knapsack{CP.VARIABLE_CAPACITY_KNAPSACK, CP.UNVALUED_KNAPSACK, T}}()) == [bridge.kp]
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}()) == [bridge.value]
+        @test MOI.get(
+            bridge,
+            MOI.ListOfConstraintIndices{
+                MOI.VectorAffineFunction{T},
+                CP.Knapsack{
+                    CP.VARIABLE_CAPACITY_KNAPSACK,
+                    CP.UNVALUED_KNAPSACK,
+                    T,
+                },
+            }(),
+        ) == [bridge.kp]
+        @test MOI.get(
+            bridge,
+            MOI.ListOfConstraintIndices{
+                MOI.ScalarAffineFunction{T},
+                MOI.EqualTo{T},
+            }(),
+        ) == [bridge.value]
     end
 
     @testset "Value constraint" begin
@@ -81,7 +137,8 @@
         @test f.terms[1].variable == x_1
         @test f.terms[2].variable == x_2
         @test f.terms[3].variable == x_value
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.value) == MOI.EqualTo(zero(T))
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.value) ==
+              MOI.EqualTo(zero(T))
     end
 
     @testset "BinPacking constraint" begin
@@ -95,6 +152,7 @@
         @test f.terms[1].scalar_term.variable == x_1
         @test f.terms[2].scalar_term.variable == x_2
         @test f.terms[3].scalar_term.variable == x_capa
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.kp) == CP.Knapsack(weights)
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.kp) ==
+              CP.Knapsack(weights)
     end
 end

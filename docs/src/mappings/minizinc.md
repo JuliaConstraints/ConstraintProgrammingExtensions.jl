@@ -2,19 +2,19 @@
 
 MiniZinc has a similar goal to this project: a common modelling interface for many underlying solvers. It is based on a similar concept to that of bridges, but with much less flexibility: each high-level constraint is mapped in a fixed way onto lower-level constraints.
 
-* Basic CP constraints: 
-    * Domain: 
+* Basic CP constraints:
+    * Domain:
         * Fixed: `CP.Domain`
         * Variable: `CP.Membership`
         * Multivalued: `CP.VectorDomain`
             * [`table`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/table.mzn): [one binary variable per possible combination](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/linear/fzn_table_int.mzn)
-    * All different: 
+    * All different:
         * Base: `CP.AllDifferent`
             * [`all_different`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/all_different.mzn): mapped onto [a MILP-like model](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_all_different_int.mzn).
             * [`all_different_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/all_different.mzn): similar, [with an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_all_different_int_reif.mzn).
-            * These constraints are available in two includes: `all_different.mzn` and `alldifferent.mzn`. 
+            * These constraints are available in two includes: `all_different.mzn` and `alldifferent.mzn`.
         * All different except constants: `CP.AllDifferentExceptConstants`
-            * [`alldifferent_except_0`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/alldifferent_except_0.mzn) (one excluded value: 0) and [`alldifferent_except`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/alldifferent_except.mzn) (set of excluded values): either mapped [onto neq and disjunctions or onto GCC](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_alldifferent_except.mzn). 
+            * [`alldifferent_except_0`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/alldifferent_except_0.mzn) (one excluded value: 0) and [`alldifferent_except`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/alldifferent_except.mzn) (set of excluded values): either mapped [onto neq and disjunctions or onto GCC](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_alldifferent_except.mzn).
             * [`alldifferent_except_0_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/alldifferent_except_0.mzn) (one excluded value: 0) and [`alldifferent_except_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/alldifferent_except.mzn) (set of excluded values): the reified versions are only mapped [onto neq and disjunctions](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_alldifferent_except_reif.mzn).
         * With symmetry: `SymmetricAllDifferent`
             * [`symmetric_all_different`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/symmetric_all_different.mzn): [`all_different` and `inverse`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_symmetric_all_different.mzn)
@@ -37,7 +37,7 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
         * [`nvalue_fn`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/nvalue_fn.mzn): function.
     * Inversion: `CP.Inverse`
         * [`inverse`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse.mzn): [index computations](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_inverse.mzn).
-        * [`inverse_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse.mzn): similar, [wih an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_inverse_reif.mzn).
+        * [`inverse_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse.mzn): similar, [with an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_inverse_reif.mzn).
         * Also available [as a function](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse_fn.mzn).
         * [`inverse_in_range`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/inverse_in_range.mzn): [?](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_inverse_in_range.mzn).
     * Sliding sum: `CP.SlidingSum`
@@ -47,9 +47,9 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
         * [`value_precede`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/value_precede.mzn): [several reifications)(https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_value_precede_int.mzn).
         * [No reified variant)(https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_value_precede_int_reif.mzn).
 * Combinatorial sets:
-    * Bin packing: 
+    * Bin packing:
         * Raw: `CP.BinPacking` (with supplementary load variables)
-            * [`bin_packing`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/bin_packing.mzn): mapped onto [a MILP-like model](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_bin_packing.mzn), but without binary variables (replaced by their definition in the capacity constraint: `bin[item] == value`). 
+            * [`bin_packing`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/bin_packing.mzn): mapped onto [a MILP-like model](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_bin_packing.mzn), but without binary variables (replaced by their definition in the capacity constraint: `bin[item] == value`).
             * [`bin_packing_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/bin_packing.mzn): similar, [with an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_bin_packing_reif.mzn).
         * Capacitated: `CP.FixedCapacityBinPacking` and `CP.VariableCapacityBinPacking` (with supplementary load variables)
             * [`bin_packing_capa`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/bin_packing_capa.mzn): same MILP-like model [with a linear capacity constraint](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_bin_packing_capa.mzn).
@@ -62,7 +62,7 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
     * Knapsack: `CP.Knapsack` with values
         * [`knapsack`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/knapsack.mzn): mapped onto [a MILP model](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_knapsack.mzn).
         * [`knapsack_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/knapsack.mzn): similar, [with an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_knapsack_reif.mzn).
-* Sorting: 
+* Sorting:
     * Maximum/minimum: `CP.MaximumAmong` and `CP.MinimumAmong`
         * [`maximum`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/maximum.mzn): built-in, [except for linear solvers](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/linear/redefinitions.mzn)
         * [`minimum`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/minimum.mzn): built-in, [except for linear solvers](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/linear/redefinitions.mzn)
@@ -90,7 +90,7 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
         * [`lex2`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/lex2.mzn): in a matrix, have both rows and columns lexicographically sorted, [mapped to two chains](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_lex2.mzn).
         * [`strict_lex2`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/strict_lex2.mzn): in a matrix, have both rows and columns strictly lexicographically sorted, [mapped to two chains](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_strict_lex2.mzn).
         * Reifications are available.
-* Scheduling: 
+* Scheduling:
     * Rectangle overlapping: `CP.NonOverlappingOrthotopes`
         * [`diffn`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/diffn.mzn): [mapped to a disjunction of linear inequalities](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_diffn.mzn).
         * [`diffn_k`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/diffn.mzn): generalisation to `k` dimensions.

@@ -1,0 +1,10 @@
+[default]
+extend-ignore-identifiers-re = [
+    # Match any identifier that contains "OT"
+    ".*OT.*"
+]
+
+[default.extend-identifiers]
+# Explicitly accept "OT"
+OT = "OT"
+arrayNd = "arrayNd"
