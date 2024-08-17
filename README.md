@@ -6,9 +6,9 @@
 [![version](https://juliahub.com/docs/ConstraintProgrammingExtensions/version.svg)](https://juliahub.com/ui/Packages/ConstraintProgrammingExtensions/3CBBH)
 [![DOI](https://zenodo.org/badge/240344723.svg)](https://zenodo.org/badge/latestdoi/240344723)
 
-[![Continuous integration](https://github.com/dourouc05/ConstraintProgrammingExtensions.jl/actions/workflows/GitHubCI.yml/badge.svg)](https://github.com/dourouc05/ConstraintProgrammingExtensions.jl/actions/workflows/GitHubCI.yml/)
-[![Coverage Status](https://coveralls.io/repos/dourouc05/ConstraintProgrammingExtensions.jl/badge.svg?branch=master)](https://coveralls.io/r/dourouc05/ConstraintProgrammingExtensions.jl?branch=master)
-[![codecov.io](http://codecov.io/github/dourouc05/ConstraintProgrammingExtensions.jl/coverage.svg?branch=master)](http://codecov.io/github/dourouc05/ConstraintProgrammingExtensions.jl?branch=master)
+[![Continuous integration](https://github.com/JuliaConstraints/ConstraintProgrammingExtensions.jl/actions/workflows/GitHubCI.yml/badge.svg)](https://github.com/dourouc05/ConstraintProgrammingExtensions.jl/actions/workflows/GitHubCI.yml/)
+[![Coverage Status](https://coveralls.io/repos/JuliaConstraints/ConstraintProgrammingExtensions.jl/badge.svg?branch=master)](https://coveralls.io/r/dourouc05/ConstraintProgrammingExtensions.jl?branch=master)
+[![codecov.io](http://codecov.io/github/JuliaConstraints/ConstraintProgrammingExtensions.jl/coverage.svg?branch=master)](http://codecov.io/github/dourouc05/ConstraintProgrammingExtensions.jl?branch=master)
 
 This package provides extensions to 
 [MathOptInterface](https://github.com/jump-dev/MathOptInterface.jl)
@@ -22,13 +22,13 @@ of bridges should make it possible to transform any CP model into a MIP model.
 
 Currently, the following solvers are using this interface: 
 
-* [Chuffed.jl](https://github.com/dourouc05/Chuffed.jl), wrapper for the open-source [Chuffed](https://github.com/chuffed/chuffed) solver
+* [Chuffed.jl](https://github.com/JuliaConstraints/Chuffed.jl), wrapper for the open-source [Chuffed](https://github.com/chuffed/chuffed) solver
 * [ConstraintSolver.jl](https://github.com/Wikunia/ConstraintSolver.jl), a native Julia open-source solver
-* [CPLEXCP.jl](https://github.com/dourouc05/CPLEXCP.jl), wrapper for the commercial [CPLEX CP Optimizer](https://www.ibm.com/analytics/cplex-cp-optimizer) solver
+* [CPLEXCP.jl](https://github.com/JuliaConstraints/CPLEXCP.jl), wrapper for the commercial [CPLEX CP Optimizer](https://www.ibm.com/analytics/cplex-cp-optimizer) solver
 
 ## An example
 
-For instance, you can use this package [to formulate a colouring problem on a map](https://github.com/dourouc05/ConstraintProgrammingExtensions.jl/blob/master/src/Test/test_integration.jl#L9-L32): 
+For instance, you can use this package [to formulate a colouring problem on a map](https://github.com/JuliaConstraints/ConstraintProgrammingExtensions.jl/blob/master/src/Test/test_integration.jl#L9-L32): 
 
 ```julia
 using MathOptInterface
