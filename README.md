@@ -8,7 +8,7 @@
 
 [![Continuous integration](https://github.com/JuliaConstraints/ConstraintProgrammingExtensions.jl/actions/workflows/GitHubCI.yml/badge.svg)](https://github.com/JuliaConstraints/ConstraintProgrammingExtensions.jl/actions/workflows/GitHubCI.yml/)
 [![Coverage Status](https://coveralls.io/repos/JuliaConstraints/ConstraintProgrammingExtensions.jl/badge.svg?branch=master)](https://coveralls.io/r/JuliaConstraints/ConstraintProgrammingExtensions.jl?branch=master)
-[![codecov.io](http://codecov.io/github/JuliaConstraints/ConstraintProgrammingExtensions.jl/coverage.svg?branch=master)](http://codecov.io/github/JuliaConstraints/ConstraintProgrammingExtensions.jl?branch=master)
+[![codecov](https://codecov.io/gh/JuliaConstraints/ConstraintProgrammingExtensions.jl/graph/badge.svg?token=watKBcsP59)](https://codecov.io/gh/JuliaConstraints/ConstraintProgrammingExtensions.jl)
 
 This package provides extensions to 
 [MathOptInterface](https://github.com/jump-dev/MathOptInterface.jl)
