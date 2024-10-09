@@ -27,7 +27,6 @@ ElementVariableArray
 
 ```@docs
 AllEqual
-AllDifferent
 AllDifferentExceptConstants
 AllDifferentExceptConstant
 SymmetricAllDifferent

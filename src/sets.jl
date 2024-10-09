@@ -15,26 +15,6 @@ struct AllEqual <: MOI.AbstractVectorSet
     dimension::Int
 end
 
-"""
-    AllDifferent(dimension::Int)
-
-The set corresponding to an all-different constraint.
-
-All expressions of a vector-valued function are enforced to take distinct
-values in the solution: for all pairs of expressions, their values must
-differ.
-
-This constraint is sometimes called `distinct`.
-
-## Example
-
-    [x, y, z] in AllDifferent(3)
-    # enforces `x != y` AND `x != z` AND `y != z`.
-"""
-struct AllDifferent <: MOI.AbstractVectorSet
-    dimension::Int
-end
-
 # https://sofdem.github.io/gccat/gccat/Calldifferent_cst.html should be modelled
 # with AllDifferent, because it is just shifting all expressions by constants, 
 # i.e. scalar affine expressions.
@@ -400,7 +380,7 @@ MOI.dimension(set::Inverse) = 2 * set.dimension
 
 # isbits types, nothing to copy
 function copy(
-    set::Union{AllEqual, AllDifferent, SymmetricAllDifferent, Membership, Inverse, SlidingSum,},
+    set::Union{AllEqual, SymmetricAllDifferent, Membership, Inverse, SlidingSum,},
 )
     return set
 end

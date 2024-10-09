@@ -5,7 +5,7 @@ function test_alldifferent_vectorofvariables(
     # @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
     # @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c1
     # @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Interval{T}) # c2
-    @MOIT.requires MOI.supports_constraint(model, MOI.VectorOfVariables, CP.AllDifferent) # c3
+    @MOIT.requires MOI.supports_constraint(model, MOI.VectorOfVariables, MOI.AllDifferent) # c3
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -13,7 +13,7 @@ function test_alldifferent_vectorofvariables(
     c1 = MOI.add_constraint(model, x1, MOI.EqualTo(T(1)))
     c2 = MOI.add_constraint(model, x2, MOI.Interval(T(1), T(2)))
 
-    c3 = MOI.add_constraint(model, MOI.VectorOfVariables([x1, x2]), CP.AllDifferent(2))
+    c3 = MOI.add_constraint(model, MOI.VectorOfVariables([x1, x2]), MOI.AllDifferent(2))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)
@@ -51,7 +51,7 @@ function test_alldifferent_vectoraffinefunction(
 ) where {T <: Real}
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Interval{Int}) # c1, c2
-    @MOIT.requires MOI.supports_constraint(model, MOI.VectorAffineFunction{Int}, CP.AllDifferent) # c3
+    @MOIT.requires MOI.supports_constraint(model, MOI.VectorAffineFunction{Int}, MOI.AllDifferent) # c3
     @MOIT.requires MOI.supports_constraint(model, MOI.ScalarAffineFunction{Int}, MOI.EqualTo{Int}) # c4
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -60,7 +60,7 @@ function test_alldifferent_vectoraffinefunction(
     c1 = MOI.add_constraint(model, x1, MOI.Interval(T(1), T(2)))
     c2 = MOI.add_constraint(model, x2, MOI.Interval(T(1), T(2)))
 
-    c3 = MOI.add_constraint(model, MOIU.vectorize(one(T) .* [x1, x2]), CP.AllDifferent(2))
+    c3 = MOI.add_constraint(model, MOIU.vectorize(one(T) .* [x1, x2]), MOI.AllDifferent(2))
     c4 = MOI.add_constraint(model, one(T) * x1, MOI.EqualTo(1))
 
     @test MOI.is_valid(model, x1)

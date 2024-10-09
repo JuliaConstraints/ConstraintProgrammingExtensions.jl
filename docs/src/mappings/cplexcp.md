@@ -35,7 +35,7 @@ Constraints removed/renamed between OPL 3 and OPL 6:
 
 * [`sequence`](https://lost-contact.mit.edu/afs/pdc.kth.se/roots/ilse/v0.7/pdc/vol/cplex/12.5/amd64_co5/doc/html/en-US/OPL_Studio/oplmigration/topics/opl_mig_prev_3x4x_3xCP_constr_seq.html): what the heck!?
 * [`circuit`](https://lost-contact.mit.edu/afs/pdc.kth.se/roots/ilse/v0.7/pdc/vol/cplex/12.5/amd64_co5/doc/html/en-US/OPL_Studio/oplmigration/topics/opl_mig_prev_3x4x_3xCP_constr_circuit.html): `CP.Walk` (Eulerian circuit)
-* [`alldifferent`](https://lost-contact.mit.edu/afs/pdc.kth.se/roots/ilse/v0.7/pdc/vol/cplex/12.5/amd64_co5/doc/html/en-US/OPL_Studio/oplmigration/topics/opl_mig_prev_3x4x_3xCP_constr_alldiff.html): `CP.AllDifferent`
+* [`alldifferent`](https://lost-contact.mit.edu/afs/pdc.kth.se/roots/ilse/v0.7/pdc/vol/cplex/12.5/amd64_co5/doc/html/en-US/OPL_Studio/oplmigration/topics/opl_mig_prev_3x4x_3xCP_constr_alldiff.html): `MOI.AllDifferent`
 * [`atleast`](https://lost-contact.mit.edu/afs/pdc.kth.se/roots/ilse/v0.7/pdc/vol/cplex/12.5/amd64_co5/doc/html/en-US/OPL_Studio/oplmigration/topics/opl_mig_prev_3x4x_3xCP_constr_atleast.html): `CP.Count` and `MOI.GreaterThan`
 * [`atleastatmost`](https://lost-contact.mit.edu/afs/pdc.kth.se/roots/ilse/v0.7/pdc/vol/cplex/12.5/amd64_co5/doc/html/en-US/OPL_Studio/oplmigration/topics/opl_mig_prev_3x4x_3xCP_constr_atleastmost.html): `CP.Count`, `MOI.GreaterThan`, and `MOI.LessThan`
 * [`atmost`](https://lost-contact.mit.edu/afs/pdc.kth.se/roots/ilse/v0.7/pdc/vol/cplex/12.5/amd64_co5/doc/html/en-US/OPL_Studio/oplmigration/topics/opl_mig_prev_3x4x_3xCP_constr_atmost.html): `CP.Count` and `MOI.LessThan`

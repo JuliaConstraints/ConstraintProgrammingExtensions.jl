@@ -8,7 +8,7 @@
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.AllDifferent,
+        MOI.AllDifferent,
     )
     @test MOI.supports_constraint(
         model,
@@ -47,15 +47,15 @@
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VariableIndex, CP.SymmetricAllDifferent) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
-            (MOI.VectorAffineFunction{T}, CP.AllDifferent),
+            (MOI.VectorAffineFunction{T}, MOI.AllDifferent),
             (MOI.VectorAffineFunction{T}, CP.Inverse),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.AllDifferent}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.AllDifferent}()) == 1
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.Inverse}()) == 1
 
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.AllDifferent}()) == [bridge.con_all_diff]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.AllDifferent}()) == [bridge.con_all_diff]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.Inverse}()) == [bridge.con_inverse]
     end
 
@@ -63,7 +63,7 @@
         @test MOI.is_valid(model, bridge.con_all_diff)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_all_diff)
         @test length(f.terms) == dim
-        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_all_diff) == CP.AllDifferent(dim)
+        @test MOI.get(model, MOI.ConstraintSet(), bridge.con_all_diff) == MOI.AllDifferent(dim)
 
         for i in 1:dim
             t = f.terms[i]

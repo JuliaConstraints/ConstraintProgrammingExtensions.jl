@@ -9,7 +9,7 @@
     @test MOI.supports_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.AllDifferent,
+        MOI.AllDifferent,
     )
     @test MOI.supports_constraint(
         model,
@@ -49,17 +49,17 @@
         @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.MinimumAmong) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [
-            (MOI.VectorAffineFunction{T}, CP.AllDifferent),
+            (MOI.VectorAffineFunction{T}, MOI.AllDifferent),
             (MOI.ScalarAffineFunction{T}, CP.ElementVariableArray),
             (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
         ]
 
         @test MOI.get(bridge, MOI.NumberOfVariables()) == 0
-        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, CP.AllDifferent}()) == 1
+        @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.VectorAffineFunction{T}, MOI.AllDifferent}()) == 1
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, CP.ElementVariableArray}()) == array_dim
         @test MOI.get(bridge, MOI.NumberOfConstraints{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == array_dim - 1
 
-        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, CP.AllDifferent}()) == [bridge.con_alldiff]
+        @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.VectorAffineFunction{T}, MOI.AllDifferent}()) == [bridge.con_alldiff]
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, CP.ElementVariableArray}()) == bridge.cons_value
         @test MOI.get(bridge, MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T}, MOI.LessThan{T}}()) == bridge.cons_sort
     end
@@ -69,7 +69,7 @@
         s = MOI.get(model, MOI.ConstraintSet(), bridge.con_alldiff)
         f = MOI.get(model, MOI.ConstraintFunction(), bridge.con_alldiff)
 
-        @test typeof(s) == CP.AllDifferent
+        @test typeof(s) == MOI.AllDifferent
         @test length(f.terms) == array_dim
         @test f.constants == zeros(T, array_dim)
         

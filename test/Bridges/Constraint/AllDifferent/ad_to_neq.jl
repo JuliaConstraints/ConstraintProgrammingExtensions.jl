@@ -13,7 +13,7 @@
     @test MOIB.supports_bridging_constraint(
         model,
         MOI.VectorAffineFunction{T},
-        CP.AllDifferent,
+        MOI.AllDifferent,
     )
 
     if T == Int
@@ -29,17 +29,17 @@
     else
         @assert false
     end
-    c = MOI.add_constraint(model, fct, CP.AllDifferent(dim))
+    c = MOI.add_constraint(model, fct, MOI.AllDifferent(dim))
 
     for i in 1:dim
         @test MOI.is_valid(model, x[i])
     end
     @test MOI.is_valid(model, c)
 
-    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, CP.AllDifferent}(-1)]
+    bridge = MOIBC.bridges(model)[MOI.ConstraintIndex{MOI.VectorOfVariables, MOI.AllDifferent}(-1)]
 
     @testset "Bridge properties" begin
-        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, CP.AllDifferent) == typeof(bridge)
+        @test MOIBC.concrete_bridge_type(typeof(bridge), MOI.VectorOfVariables, MOI.AllDifferent) == typeof(bridge)
         @test MOIB.added_constrained_variable_types(typeof(bridge)) == Tuple{Type}[]
         @test MOIB.added_constraint_types(typeof(bridge)) == [(MOI.ScalarAffineFunction{T}, CP.DifferentFrom{T})]
 
