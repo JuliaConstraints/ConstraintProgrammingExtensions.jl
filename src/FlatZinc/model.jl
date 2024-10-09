@@ -102,6 +102,8 @@ function MOI.get(model::Model, ::MOI.ObjectiveFunction{MOI.VariableIndex})
     return model.objective_function
 end
 
+MOI.supports(::Model, ::MOI.ObjectiveFunction{MOI.VariableIndex}) = true
+
 function MOI.set(
     model::Model,
     ::MOI.ObjectiveFunction{MOI.VariableIndex},
