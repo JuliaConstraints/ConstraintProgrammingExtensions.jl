@@ -8,7 +8,7 @@ All the constraints that are currently defined in [hakank's constraints_utils.jl
 * `decreasing_strict`: `Strictly(Decreasing)`
 * `all_different_except_c`: `AllDifferentExceptConstants`
 * `count_ctr`: `Count` (except for operators)
-* `count_ctr2`: `CountDistinct` (except for operators)
+* `count_ctr2`: `MOI.CountDistinct` (except for operators)
 * `global_cardinality_count`: `Count`
 * `either_eq`: `Disjunction`
 * `is_member_of`: `Domain` and `Membership`

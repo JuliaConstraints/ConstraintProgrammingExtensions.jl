@@ -253,31 +253,7 @@ end
 
 MOI.dimension(set::CountCompare) = 2 * set.dimension + 1
 
-"""
-    CountDistinct(dimension::Int)
-
-The first variable in the set is forced to be the number of distinct values in
-the rest of the expressions.
-
-This is a relaxed version of `MOI.AllDifferent`; it encodes an `MOI.AllDifferent`
-constraint when the first variable is the number of variables in the set.
-
-Also called `nvalues`.
-
-## Example
-
-    [x, y, z] in CountDistinct(3)
-    # x = 1 if y == z, x = 2 if y != z
-"""
-struct CountDistinct <: MOI.AbstractVectorSet
-    dimension::Int
-end
-
-MOI.dimension(set::CountDistinct) = set.dimension + 1
-
 # isbits types, nothing to copy
-function copy(
-    set::Union{CountCompare, CountDistinct},
-)
+function copy(set::CountCompare)
     return set
 end
