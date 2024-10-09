@@ -7,6 +7,10 @@
     @testset "Supported constraints" begin
         m = CP.FlatZinc.Model()
 
+        @test MOI.supports(
+            m,
+	    MOI.ObjectiveFunction{MOI.VariableIndex}(),
+        )
         @test MOI.supports_constraint(
             m,
             MOI.VariableIndex,
