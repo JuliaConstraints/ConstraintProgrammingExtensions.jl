@@ -1,8 +1,8 @@
 """
-Bridges `CP.SymmetricAllDifferent` to `CP.AllDifferent` and `CP.Inverse`.
+Bridges `CP.SymmetricAllDifferent` to `MOI.AllDifferent` and `CP.Inverse`.
 """
 struct SymmetricAllDifferent2AllDifferentInverseBridge{T} <: MOIBC.AbstractBridge
-    con_all_diff::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.AllDifferent}
+    con_all_diff::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.AllDifferent}
     con_inverse::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.Inverse}
 end
 
@@ -32,7 +32,7 @@ function MOIBC.bridge_constraint(
     con_all_diff = MOI.add_constraint(
         model,
         f,
-        CP.AllDifferent(dim)
+        MOI.AllDifferent(dim)
     )
 
     con_inverse = MOI.add_constraint(
@@ -58,7 +58,7 @@ end
 
 function MOIB.added_constraint_types(::Type{SymmetricAllDifferent2AllDifferentInverseBridge{T}}) where {T}
     return [
-        (MOI.VectorAffineFunction{T}, CP.AllDifferent),
+        (MOI.VectorAffineFunction{T}, MOI.AllDifferent),
         (MOI.VectorAffineFunction{T}, CP.Inverse),
     ]
 end
@@ -66,7 +66,7 @@ end
 function MOI.get(
     ::SymmetricAllDifferent2AllDifferentInverseBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.AllDifferent,
+        MOI.VectorAffineFunction{T}, MOI.AllDifferent,
     },
 ) where {T}
     return 1
@@ -84,7 +84,7 @@ end
 function MOI.get(
     b::SymmetricAllDifferent2AllDifferentInverseBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.AllDifferent,
+        MOI.VectorAffineFunction{T}, MOI.AllDifferent,
     },
 ) where {T}
     return [b.con_all_diff]

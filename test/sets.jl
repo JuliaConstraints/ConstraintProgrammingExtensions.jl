@@ -24,7 +24,7 @@
     # Just a dimension.
     @testset "$(S)" for S in [
         CP.AllEqual,
-        CP.AllDifferent,
+        MOI.AllDifferent,
         CP.SymmetricAllDifferent,
         CP.Membership,
         CP.ElementVariableArray,
@@ -54,7 +54,7 @@
 
         if S in [
             CP.AllEqual,
-            CP.AllDifferent,
+            MOI.AllDifferent,
             CP.SymmetricAllDifferent,
             CP.Membership,
             CP.Contiguity,

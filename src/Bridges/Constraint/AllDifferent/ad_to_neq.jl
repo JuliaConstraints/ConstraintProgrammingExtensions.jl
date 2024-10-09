@@ -1,5 +1,5 @@
 """
-Bridges `CP.AllDifferent` to a series of `CP.DifferentFrom`.
+Bridges `MOI.AllDifferent` to a series of `CP.DifferentFrom`.
 """
 struct AllDifferent2DifferentFromBridge{T} <: MOIBC.AbstractBridge
     # An upper-triangular matrix (i.e. nothing if i < j, constraint if i >= j).
@@ -16,7 +16,7 @@ function MOIBC.bridge_constraint(
     ::Type{AllDifferent2DifferentFromBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::CP.AllDifferent,
+    s::MOI.AllDifferent,
 ) where {T}
     return MOIBC.bridge_constraint(
         AllDifferent2DifferentFromBridge{T},
@@ -30,7 +30,7 @@ function MOIBC.bridge_constraint(
     ::Type{AllDifferent2DifferentFromBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::CP.AllDifferent,
+    s::MOI.AllDifferent,
 ) where {T}
     f_scalars = MOIU.scalarize(f)
     dim = MOI.output_dimension(f)
@@ -59,7 +59,7 @@ end
 function MOI.supports_constraint(
     ::Type{AllDifferent2DifferentFromBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
-    ::Type{CP.AllDifferent},
+    ::Type{MOI.AllDifferent},
 ) where {T}
     return true
 end

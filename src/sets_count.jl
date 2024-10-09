@@ -259,7 +259,7 @@ MOI.dimension(set::CountCompare) = 2 * set.dimension + 1
 The first variable in the set is forced to be the number of distinct values in
 the rest of the expressions.
 
-This is a relaxed version of `AllDifferent`; it encodes an `AllDifferent`
+This is a relaxed version of `MOI.AllDifferent`; it encodes an `MOI.AllDifferent`
 constraint when the first variable is the number of variables in the set.
 
 Also called `nvalues`.

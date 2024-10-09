@@ -9,7 +9,7 @@ MiniZinc has a similar goal to this project: a common modelling interface for ma
         * Multivalued: `CP.VectorDomain`
             * [`table`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/table.mzn): [one binary variable per possible combination](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/linear/fzn_table_int.mzn)
     * All different:
-        * Base: `CP.AllDifferent`
+        * Base: `MOI.AllDifferent`
             * [`all_different`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/all_different.mzn): mapped onto [a MILP-like model](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_all_different_int.mzn).
             * [`all_different_reif`](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/all_different.mzn): similar, [with an equivalence](https://github.com/MiniZinc/libminizinc/blob/master/share/minizinc/std/fzn_all_different_int_reif.mzn).
             * These constraints are available in two includes: `all_different.mzn` and `alldifferent.mzn`.

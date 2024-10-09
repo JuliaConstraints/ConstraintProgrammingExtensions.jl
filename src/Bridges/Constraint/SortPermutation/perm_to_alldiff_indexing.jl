@@ -1,9 +1,9 @@
 """
-Bridges `CP.SortPermutation` to `CP.AllDifferent` and 
+Bridges `CP.SortPermutation` to `MOI.AllDifferent` and 
 `CP.ElementVariableArray`.
 """
 struct SortPermutation2AllDifferentBridge{T} <: MOIBC.AbstractBridge
-    con_alldiff::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.AllDifferent}
+    con_alldiff::MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, MOI.AllDifferent}
     cons_value::Vector{MOI.ConstraintIndex{MOI.VectorAffineFunction{T}, CP.ElementVariableArray}}
     cons_sort::Vector{MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.GreaterThan{T}}}
 end
@@ -50,7 +50,7 @@ function MOIBC.bridge_constraint(
     con_alldiff = MOI.add_constraint(
         model, 
         MOIU.vectorize(indices),
-        CP.AllDifferent(dim)
+        MOI.AllDifferent(dim)
     )
 
     # Relate the three sets of variables by indexing.
@@ -86,7 +86,7 @@ end
 
 function MOIB.added_constraint_types(::Type{SortPermutation2AllDifferentBridge{T}}) where {T}
     return [
-        (MOI.VectorAffineFunction{T}, CP.AllDifferent),
+        (MOI.VectorAffineFunction{T}, MOI.AllDifferent),
         (MOI.ScalarAffineFunction{T}, CP.ElementVariableArray),
         (MOI.ScalarAffineFunction{T}, MOI.LessThan{T}),
     ]
@@ -95,7 +95,7 @@ end
 function MOI.get(
     ::SortPermutation2AllDifferentBridge{T},
     ::MOI.NumberOfConstraints{
-        MOI.VectorAffineFunction{T}, CP.AllDifferent,
+        MOI.VectorAffineFunction{T}, MOI.AllDifferent,
     },
 ) where {T}
     return 1
@@ -122,7 +122,7 @@ end
 function MOI.get(
     b::SortPermutation2AllDifferentBridge{T},
     ::MOI.ListOfConstraintIndices{
-        MOI.VectorAffineFunction{T}, CP.AllDifferent,
+        MOI.VectorAffineFunction{T}, MOI.AllDifferent,
     },
 ) where {T}
     return [b.con_alldiff]

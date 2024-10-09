@@ -2,7 +2,7 @@
 
 Numberjack has a very similar goal to this project: a common modelling interface for many underlying solvers. List of supported global constraints: https://github.com/eomahony/Numberjack/blob/master/doc/source/globalcons.rst. List of other constraints: https://github.com/eomahony/Numberjack/blob/master/doc/source/constraints.rst
 
-* `Numberjack.AllDiff`: `AllDifferent`
+* `Numberjack.AllDiff`: `MOI.AllDifferent`
 * `Numberjack.AllDiffExcept0`: `AllDifferentExceptConstants`
 * `Numberjack.Sum`: MOI (linear expressions
 * `Numberjack.Product`: MOI (quadratic expressions)

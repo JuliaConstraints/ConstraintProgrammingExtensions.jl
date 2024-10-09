@@ -6,12 +6,12 @@ function test_domain_singlevariable(
     @show MOI.supports_add_constrained_variable(model, MOI.Integer) # x1, x2
     @show MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
     @show MOI.supports_constraint(model, MOI.VariableIndex, CP.Domain{T}) # c1, c2
-    @show MOI.supports_constraint(model, MOI.VectorOfVariables, CP.AllDifferent) # c3
+    @show MOI.supports_constraint(model, MOI.VectorOfVariables, MOI.AllDifferent) # c3
     @show MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c4
 
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, CP.Domain{T}) # c1, c2
-    @MOIT.requires MOI.supports_constraint(model, MOI.VectorOfVariables, CP.AllDifferent) # c3
+    @MOIT.requires MOI.supports_constraint(model, MOI.VectorOfVariables, MOI.AllDifferent) # c3
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c4
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -20,7 +20,7 @@ function test_domain_singlevariable(
     c1 = MOI.add_constraint(model, x1, CP.Domain(Set([1, 2])))
     c2 = MOI.add_constraint(model, x2, CP.Domain(Set([1, 2])))
 
-    c3 = MOI.add_constraint(model, MOIU.vectorize([x1, x2]), CP.AllDifferent(2))
+    c3 = MOI.add_constraint(model, MOIU.vectorize([x1, x2]), MOI.AllDifferent(2))
     c4 = MOI.add_constraint(model, x1, MOI.EqualTo(1))
 
     @test MOI.is_valid(model, x1)
@@ -59,7 +59,7 @@ function test_domain_scalaraffinefunction(
 ) where {T <: Real}
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2
     @MOIT.requires MOI.supports_constraint(model, MOI.ScalarAffineFunction{T}, CP.Domain{T}) # c1, c2
-    @MOIT.requires MOI.supports_constraint(model, MOI.VectorAffineFunction{T}, CP.AllDifferent) # c3
+    @MOIT.requires MOI.supports_constraint(model, MOI.VectorAffineFunction{T}, MOI.AllDifferent) # c3
     @MOIT.requires MOI.supports_constraint(model, MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}) # c4
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -79,7 +79,7 @@ function test_domain_scalaraffinefunction(
     c3 = MOI.add_constraint(
         model,
         MOIU.vectorize(one(T) .* [x1, x2]),
-        CP.AllDifferent(2),
+        MOI.AllDifferent(2),
     )
     c4 = MOI.add_constraint(
         model,
