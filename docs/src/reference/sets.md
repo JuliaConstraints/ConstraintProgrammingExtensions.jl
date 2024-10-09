@@ -64,7 +64,6 @@ KnapsackValueType
 ```@docs
 Count
 CountCompare
-CountDistinct
 ```
 
 ### Global cardinality

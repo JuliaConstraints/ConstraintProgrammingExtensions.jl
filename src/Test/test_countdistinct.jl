@@ -4,7 +4,7 @@ function test_countdistinct_vectorofvariables(
 ) where {T <: Real}
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2, x3, x4
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.EqualTo{T}) # c1, c2, c3
-    @MOIT.requires MOI.supports_constraint(model, MOI.VectorOfVariables, CP.CountDistinct) # c4
+    @MOIT.requires MOI.supports_constraint(model, MOI.VectorOfVariables, MOI.CountDistinct) # c4
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -15,7 +15,7 @@ function test_countdistinct_vectorofvariables(
     c2 = MOI.add_constraint(model, x2, MOI.EqualTo(1))
     c3 = MOI.add_constraint(model, x3, MOI.EqualTo(2))
 
-    c4 = MOI.add_constraint(model, MOI.VectorOfVariables([x4, x1, x2, x3]), CP.CountDistinct(3))
+    c4 = MOI.add_constraint(model, MOI.VectorOfVariables([x4, x1, x2, x3]), MOI.CountDistinct(4))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)
@@ -57,7 +57,7 @@ function test_countdistinct_vectoraffinefunction(
 ) where {T <: Real}
     @MOIT.requires MOI.supports_constraint(model, MOI.VariableIndex, MOI.Integer) # x1, x2, x3, x4
     @MOIT.requires MOI.supports_constraint(model, MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}) # c1, c2, c3
-    @MOIT.requires MOI.supports_constraint(model, MOI.VectorAffineFunction{T}, CP.CountDistinct) # c4
+    @MOIT.requires MOI.supports_constraint(model, MOI.VectorAffineFunction{T}, MOI.CountDistinct) # c4
 
     x1, _ = MOI.add_constrained_variable(model, MOI.Integer())
     x2, _ = MOI.add_constrained_variable(model, MOI.Integer())
@@ -68,7 +68,7 @@ function test_countdistinct_vectoraffinefunction(
     c2 = MOI.add_constraint(model, one(T) * x2, MOI.EqualTo(1))
     c3 = MOI.add_constraint(model, one(T) * x3, MOI.EqualTo(2))
 
-    c4 = MOI.add_constraint(model, MOIU.vectorize(one(T) .* [x4, x1, x2, x3]), CP.CountDistinct(3))
+    c4 = MOI.add_constraint(model, MOIU.vectorize(one(T) .* [x4, x1, x2, x3]), MOI.CountDistinct(4))
 
     @test MOI.is_valid(model, x1)
     @test MOI.is_valid(model, x2)

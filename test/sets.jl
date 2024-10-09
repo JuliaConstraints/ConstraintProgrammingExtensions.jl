@@ -24,11 +24,9 @@
     # Just a dimension.
     @testset "$(S)" for S in [
         CP.AllEqual,
-        MOI.AllDifferent,
         CP.SymmetricAllDifferent,
         CP.Membership,
         CP.ElementVariableArray,
-        CP.CountDistinct,
         CP.Inverse,
         CP.Contiguity,
         CP.LexicographicallyLessThan,
@@ -54,7 +52,6 @@
 
         if S in [
             CP.AllEqual,
-            MOI.AllDifferent,
             CP.SymmetricAllDifferent,
             CP.Membership,
             CP.Contiguity,
@@ -64,7 +61,6 @@
             @test MOI.dimension(S(2)) == 2
             @test MOI.dimension(S(3)) == 3
         elseif S in [
-            CP.CountDistinct,
             CP.MinimumAmong,
             CP.MaximumAmong,
             CP.ArgumentMinimumAmong,
