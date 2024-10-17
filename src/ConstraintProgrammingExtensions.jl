@@ -26,6 +26,5 @@ include("Bridges/Bridges.jl")
 include("Test/Test.jl")
 
 include("FlatZinc/FlatZinc.jl")
-include("XCSP/XCSP.jl")
 
 end
