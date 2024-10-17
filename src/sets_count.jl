@@ -238,14 +238,14 @@ end
 
 ``\\{(z, x, y) \\in \\mathbb{N} \\times \\mathbb{R}^\\mathtt{dimension} \\times \\mathbb{R}^\\mathtt{dimension} : Z = |\\{i | x_i = y_i\\}|\\}``
 
-The first `dimension` variables are the first array that is compared to the 
-second one, indicated by the next `dimension` variables. The last variable
+The first `dimension` variables after `z` are the first array that is compared to the
+second one, indicated by the next `dimension` variables. The first variable
 is the number of values that are identical in both arrays.
 
 ## Example
 
     [v, w, x, y, z] in Count(2)
-    # w == sum([w, x] .== [y, z])
+    # v == sum([w, x] .== [y, z])
 """
 struct CountCompare <: MOI.AbstractVectorSet
     dimension::Int
