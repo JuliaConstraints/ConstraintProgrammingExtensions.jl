@@ -1,3 +1,0 @@
-module XCSP
-
-end
