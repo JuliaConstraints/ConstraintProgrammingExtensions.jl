@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.8.0
+-------------
+
+MOI now offers `CountDistinct` and `AllDifferent` (breaking change:
+use `MOI.CountDistinct` and `MOI.AllDifferent` instead of the ones in
+this package).
+
+
 Version 0.7.0
 -------------
 
