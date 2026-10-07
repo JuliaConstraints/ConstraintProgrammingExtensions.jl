@@ -100,12 +100,17 @@
         @test length(bridge.cons_compare_reif) == dim * length(values_set)
 
         for i in 1:dim
+            # Every excluded constant must occur, regardless of Set order.
+            excluded_constants = [MOI.get(model, MOI.ConstraintFunction(), bridge.cons_compare_reif[i, j]).constants[2]
+                                  for j in 1:length(values_set)]
+            @test Set(iszero(c) ? zero(T) : -c for c in excluded_constants) == values_set
             for j in 1:length(values_set)
                 @test MOI.is_valid(model, bridge.cons_compare_reif[i, j])
                 @test MOI.get(model, MOI.ConstraintSet(), bridge.cons_compare_reif[i, j]) == CP.Reification(MOI.EqualTo(zero(T)))
                 f = MOI.get(model, MOI.ConstraintFunction(), bridge.cons_compare_reif[i, j])
                 @test length(f.terms) == 2
-                @test f.constants == [zero(T), -T(j - 1)]
+                @test f.constants[1] == zero(T)
+                @test any(value -> value == -f.constants[2], values_set)
                 
                 t1 = f.terms[1]
                 @test t1.output_index == 1

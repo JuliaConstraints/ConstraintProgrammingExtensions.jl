@@ -326,9 +326,18 @@
         write(io, m)
         fzn = String(take!(io))
 
+        # The serialized set may use any iteration order; check its members
+        # before normalizing only that order for the complete output check.
+        domain_match = match(r"set of int: SET0 = \{([^}]*)\};", fzn)
+        @test domain_match !== nothing
+        if domain_match !== nothing
+            @test Set(parse.(Int, split(domain_match.captures[1], ','))) == Set([0, 1, 2])
+            fzn = replace(fzn, domain_match.match => "set of int: SET0 = {0, 1, 2};")
+        end
+
         @test fzn == """var int: x1 :: output_var;
             
-            set of int: SET0 = {0, 2, 1};
+            set of int: SET0 = {0, 1, 2};
             
             
             constraint set_in(x1, SET0);
