@@ -332,12 +332,12 @@ function write_constraint(
     index::MOI.ConstraintIndex,
     f::MOI.VectorAffineFunction{T},
     s::Union{
-        CP.Reification{MOI.EqualTo{U}},
-        CP.Reification{MOI.LessThan{U}},
-        CP.Reification{CP.Strictly{MOI.LessThan{U}, U}},
+        (CP.Reification{MOI.EqualTo{U}} where {U}),
+        (CP.Reification{MOI.LessThan{U}} where {U}),
+        (CP.Reification{CP.Strictly{MOI.LessThan{U}, U}} where {U}),
         CP.Reification{CP.DifferentFrom{T}},
     },
-) where {T, U}
+) where {T}
     # *_lin_eq_reif, *_lin_le_reif, *_lin_lt_reif, *_lin_ne_reif
     variables = _vaf_to_vars(f)
     write_constraint(

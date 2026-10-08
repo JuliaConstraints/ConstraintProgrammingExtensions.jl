@@ -49,8 +49,13 @@ tool = "snoopcompile"
 [aqua]
 baseline_ambiguities = 328
 candidate_ambiguities = 328
+compatibility_repairs = "Added LinearAlgebra 1 and Test 1 bounds; all compatibility checks pass."
+current_other_checks = "Aqua.test_all(...; ambiguities=false) passed."
+current_scope = "Default Aqua still fails on 328 pre-existing ambiguity pairs, mostly broad FlatZinc optimizer attribute forwarding versus MOI bridge methods. Every other default check passes after removing seven unbound type parameters without changing supported strict/reified set types."
 scope = "Default Aqua ambiguity check; pre-existing FlatZinc/MOI interactions."
 status = "baseline_failure_unchanged"
+unbound_type_parameters_after = 0
+unbound_type_parameters_before = 7
 version = "0.8.18"
 
 [[baseline]]
@@ -95,6 +100,94 @@ dimension = 3
 median_seconds = 0.000129311
 oracle = "passed"
 rows = 128
+
+[[builtin_diagnostics]]
+artifacts = []
+correctness = "passed"
+status = "complete"
+summary = ""
+tool = "latency"
+
+    [builtin_diagnostics.measurements]
+    first_case_seconds = 0.547344834
+    load_seconds = 0.733450838
+    warm_case_seconds = 0.00017218
+[[builtin_diagnostics]]
+artifacts = []
+correctness = "passed"
+status = "complete"
+summary = "3 operations: 0.0 ms in GC, 78240 allocated bytes in total. Diagnostic counters are process-wide."
+tool = "gc"
+
+    [builtin_diagnostics.measurements]
+    sample_count = 3
+
+        [builtin_diagnostics.measurements.allocated_bytes]
+        maximum = 26080
+        minimum = 26080
+
+        [builtin_diagnostics.measurements.gc_seconds]
+        maximum = 0.0
+        minimum = 0.0
+
+        [builtin_diagnostics.measurements.lock_conflicts]
+        maximum = 0
+        minimum = 0
+[[builtin_diagnostics]]
+artifacts = []
+correctness = "passed"
+status = "complete"
+summary = "3 operations: reachable state changed by 11422 to 11422 bytes. Growth may be intended output or a cache; it does not establish a leak."
+tool = "memory"
+
+    [builtin_diagnostics.measurements]
+    sample_count = 3
+
+        [builtin_diagnostics.measurements.state_after_bytes]
+        maximum = 23036
+        minimum = 23036
+
+        [builtin_diagnostics.measurements.state_and_result_bytes]
+        maximum = 25260
+        minimum = 25260
+
+        [builtin_diagnostics.measurements.state_before_bytes]
+        maximum = 11614
+        minimum = 11614
+[[builtin_diagnostics]]
+artifacts = []
+correctness = "passed"
+status = "complete"
+summary = "3 operations: 0 observed lock conflicts. Counts do not measure waiting duration."
+tool = "locks"
+
+    [builtin_diagnostics.measurements]
+    sample_count = 3
+
+        [builtin_diagnostics.measurements.allocated_bytes]
+        maximum = 26080
+        minimum = 26080
+
+        [builtin_diagnostics.measurements.gc_seconds]
+        maximum = 0.0
+        minimum = 0.0
+
+        [builtin_diagnostics.measurements.lock_conflicts]
+        maximum = 0
+        minimum = 0
+[[builtin_diagnostics]]
+correctness = "passed"
+status = "complete"
+summary = "Redacted heap snapshot captured after verification. Covers GC-managed objects in the whole worker; native and device memory are excluded."
+tool = "heap"
+
+    [[builtin_diagnostics.artifacts]]
+    bytes = 331769972
+    kind = "heap_snapshot"
+    redacted = true
+    sha256 = "94613982d1f9e3f075e7dc6497eca38ad99660db4afe584afd912eba94b36ad3"
+
+    [builtin_diagnostics.measurements]
 
 [[candidate]]
 allocations = 34
@@ -311,6 +404,12 @@ status = "complete"
     maximum = 76.0
     metric = "julia.alloc.count"
     minimum = 76.0
+
+[quality_repair_tests]
+assertions = 69464
+elapsed_seconds = 167.0
+scope = "Complete source suite after scoped type-parameter and compatibility-bound repairs."
+status = "passed"
 
 [source_sha256]
 "perf/scenarios.jl" = "0518cc5a201d57f20680282a9ca2aacbd9f0d065583911b5f9db957f249752f5"

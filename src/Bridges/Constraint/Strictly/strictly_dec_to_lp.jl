@@ -9,12 +9,8 @@ function MOIBC.bridge_constraint(
     ::Type{StrictlyDecreasing2LPBridge{T}},
     model,
     f::MOI.VectorOfVariables,
-    s::Union{
-        CP.Strictly{CP.Decreasing, T}, 
-        CP.Strictly{CP.Decreasing, S}, 
-        CP.Strictly{CP.Decreasing}
-    },
-) where {T, S}
+    s::CP.Strictly{CP.Decreasing},
+) where {T}
     return MOIBC.bridge_constraint(
         StrictlyDecreasing2LPBridge{T},
         model,
@@ -27,12 +23,8 @@ function MOIBC.bridge_constraint(
     ::Type{StrictlyDecreasing2LPBridge{T}},
     model,
     f::MOI.VectorAffineFunction{T},
-    s::Union{
-        CP.Strictly{CP.Decreasing, T}, 
-        CP.Strictly{CP.Decreasing, S}, 
-        CP.Strictly{CP.Decreasing}
-    },
-) where {T, S}
+    s::CP.Strictly{CP.Decreasing},
+) where {T}
     f_scalars = MOIU.scalarize(f)
     dim = MOI.output_dimension(f)
 
@@ -52,11 +44,10 @@ function MOI.supports_constraint(
     ::Type{StrictlyDecreasing2LPBridge{T}},
     ::Union{Type{MOI.VectorOfVariables}, Type{MOI.VectorAffineFunction{T}}},
     ::Union{
-        Type{CP.Strictly{CP.Decreasing, T}},
-        Type{CP.Strictly{CP.Decreasing, S}},
+        (Type{CP.Strictly{CP.Decreasing, S}} where {S}),
         Type{CP.Strictly{CP.Decreasing}},
     }
-) where {T, S}
+) where {T}
     return true
 end
 
