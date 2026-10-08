@@ -692,6 +692,19 @@
             @test MOI.dimension(CP.VariableWeightEulerianPath{T}(20, 1, 2)) == 20 + 20 + 1
         end
 
+        @testset "Walk weight/source constructor orders" begin
+            W = CP.Walk{CP.FIXED_WEIGHT_VERTEX, CP.FIXED_WEIGHT_EDGE, CP.PATH_WALK,
+                CP.HAMILTONIAN_WALK, CP.FIXED_SOURCE_VERTEX, CP.FIXED_DESTINATION_VERTEX, T}
+            vertex_weights = T[2, 4]
+            edge_weights = T[0 3; 5 0]
+            canonical = W(2, 1, 2, vertex_weights, edge_weights)
+            reordered = W(2, vertex_weights, edge_weights, 1, 2)
+            @test reordered == canonical
+            @test reordered.s == 1 && reordered.t == 2
+            @test reordered.vertex_weights === vertex_weights
+            @test reordered.edge_weights === edge_weights
+        end
+
         @testset "Variable-weight Eulerian path with variable source and destination" begin
             VWEPVSD = CP.Walk{CP.VARIABLE_WEIGHT_VERTEX, CP.UNWEIGHTED_EDGE, CP.PATH_WALK, CP.EULERIAN_WALK, CP.VARIABLE_SOURCE_VERTEX, CP.VARIABLE_DESTINATION_VERTEX, T}
             @test VWEPVSD(20) == VWEPVSD(20)

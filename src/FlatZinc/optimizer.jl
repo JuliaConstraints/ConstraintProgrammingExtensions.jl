@@ -162,8 +162,27 @@ end
 
 MOI.get(model::Optimizer, ::MOI.SolverName) = "FlatZincWriter"
 
-function MOI.supports(model::Optimizer, attr::MOI.AnyAttribute, x...)
-    return MOI.supports(model.inner, attr, x...)::Bool
+function MOI.supports(
+    model::Optimizer,
+    attr::Union{MOI.AbstractModelAttribute, MOI.AbstractOptimizerAttribute},
+)
+    return MOI.supports(model.inner, attr)::Bool
+end
+
+function MOI.supports(
+    model::Optimizer,
+    attr::MOI.AbstractVariableAttribute,
+    index_type::Type{MOI.VariableIndex},
+)
+    return MOI.supports(model.inner, attr, index_type)::Bool
+end
+
+function MOI.supports(
+    model::Optimizer,
+    attr::MOI.AbstractConstraintAttribute,
+    index_type::Type{MOI.ConstraintIndex{F, S}},
+) where {F, S}
+    return MOI.supports(model.inner, attr, index_type)::Bool
 end
 
 function MOI.supports_add_constrained_variable(
@@ -188,16 +207,55 @@ function MOI.supports_constraint(
     return MOI.supports_constraint(model.inner, f, s)::Bool
 end
 
-function MOI.get(model::Optimizer, attr::MOI.AnyAttribute, x...)
-    return MOI.get(model.inner, attr, x...)
+function MOI.get(
+    model::Optimizer,
+    attr::Union{MOI.AbstractModelAttribute, MOI.AbstractOptimizerAttribute},
+)
+    return MOI.get(model.inner, attr)
+end
+
+function MOI.get(model::Optimizer, attr::MOI.AbstractVariableAttribute, index::MOI.VariableIndex)
+    return MOI.get(model.inner, attr, index)
+end
+
+function MOI.get(model::Optimizer, attr::MOI.AbstractConstraintAttribute, index::MOI.ConstraintIndex)
+    return MOI.get(model.inner, attr, index)
+end
+
+function MOI.get(model::Optimizer, attr::MOI.AnyAttribute, indices::Vector)
+    return MOI.get(model.inner, attr, indices)
 end
 
 function MOI.get(model::Optimizer, ::Type{MOI.VariableIndex}, name::String)
     return MOI.get(model.inner, MOI.VariableIndex, name)
 end
 
-function MOI.set(model::Optimizer, attr::MOI.AnyAttribute, x...)
-    MOI.set(model.inner, attr, x...)
+function MOI.set(
+    model::Optimizer,
+    attr::Union{MOI.AbstractModelAttribute, MOI.AbstractOptimizerAttribute},
+    value,
+)
+    MOI.set(model.inner, attr, value)
+    return
+end
+
+function MOI.set(model::Optimizer, attr::MOI.AbstractVariableAttribute, index::MOI.VariableIndex, value)
+    MOI.set(model.inner, attr, index, value)
+    return
+end
+
+function MOI.set(model::Optimizer, attr::MOI.AbstractConstraintAttribute, index::MOI.ConstraintIndex, value)
+    MOI.set(model.inner, attr, index, value)
+    return
+end
+
+function MOI.set(
+    model::Optimizer,
+    attr::Union{MOI.AbstractVariableAttribute, MOI.AbstractConstraintAttribute},
+    indices::Vector,
+    values::Vector,
+)
+    MOI.set(model.inner, attr, indices, values)
     return
 end
 

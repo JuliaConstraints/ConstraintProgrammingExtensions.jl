@@ -50,3 +50,50 @@ function domain_bridge_case(parameters)
     end
     (; prepare, operation, verify)
 end
+
+"FlatZinc attribute access through the optimizer with independent input-name checks."
+function optimizer_attribute_case(parameters)
+    n = get(parameters, "variables", 64)
+    repetitions = get(parameters, "repetitions", 128)
+    vector_access = get(parameters, "vector_access", false)
+    n > 0 && repetitions > 0 || throw(ArgumentError("positive fixture sizes required"))
+    prepare = () -> begin
+        model = CP.FlatZinc.Optimizer()
+        variables = MOI.add_variables(model, n)
+        names = ["variable_$(i)" for i in 1:n]
+        for (variable, name) in zip(variables, names)
+            MOI.set(model, MOI.VariableName(), variable, name)
+        end
+        MOI.set(model, MOI.ObjectiveSense(), MOI.MIN_SENSE)
+        MOI.set(model, MOI.ObjectiveFunction{MOI.VariableIndex}(), first(variables))
+        (; model, variables, names)
+    end
+    operation = if vector_access
+        state -> begin
+            result = String[]
+            for _ in 1:repetitions
+                result = MOI.get(state.model, MOI.VariableName(), state.variables)
+            end
+            result
+        end
+    else
+        state -> begin
+            result = 0
+            for _ in 1:repetitions
+                for variable in state.variables
+                    result += ncodeunits(MOI.get(state.model, MOI.VariableName(), variable))
+                end
+                result += MOI.get(state.model, MOI.NumberOfVariables())
+            end
+            result
+        end
+    end
+    verify = if vector_access
+        (state, result) -> result == state.names && result !== state.names &&
+            all(MOI.get(state.model, MOI.VariableName(), variable) == name
+                for (variable, name) in zip(state.variables, state.names))
+    else
+        (state, result) -> result == repetitions * (sum(ncodeunits, state.names) + n)
+    end
+    (; prepare, operation, verify)
+end

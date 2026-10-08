@@ -2,7 +2,7 @@ baseline_commit = "8c74772"
 benchmarktools = "1.7.0"
 blas_threads = 1
 chairmarks = "1.3.1"
-changes = "Build each final affine function once with owned term arrays; avoid repeated growing reductions. Preserve coefficients, source order, constants, bridge handles and copied getter buffers."
+changes = "Build each final affine function once with owned term arrays; avoid repeated growing reductions. Preserve coefficients, source order, constants, bridge handles and copied getter buffers. Narrow FlatZinc attribute forwarding to valid MOI argument forms and retain the concrete default variable dictionary type. Resolve the previously uncallable fixed/open cardinality support intersection via the standard MOI function-type query; align the alternate Walk constructor's existing Real bound."
 cpu_affinity = [12, 14]
 gc_threads = 1
 julia = "1.13.1"
@@ -11,9 +11,9 @@ mathoptinterface = "1.54.0"
 native_solver_threads = 1
 perfchecker = "1.0.0"
 precompile_tasks = 1
-qualification = "Same domain sizes, affine inputs, primitive model type, 20 observations and independent projection oracle. Preparation and verification excluded from timed operations. Concurrent overnight tasks were active; timing is operational evidence, not controlled scaling. Source and regression checks passed; default Aqua remains baseline-failed."
-recorded_utc = "2026-10-08T20:03:12.083"
-remaining_hotspots = ["MOI model insertion/copying owns the remaining allocations.", "JET and AllocCheck report generic MOI dispatch and intentional affine/model allocations; analyze concrete optimizer adapters if these become a measured blocker."]
+qualification = "Fixed domain sizes, affine inputs, 20 timing observations and independent projection oracle; preparation and verification excluded. Typed FlatZinc attribute queries additionally qualified with original input-name checks, owned vector output checks, 20 timing observations and one operation for each profile collector. Concurrent tasks were active; timing is operational evidence. Default Aqua and source regressions pass."
+recorded_utc = "2026-10-08T21:22:09.117"
+remaining_hotspots = ["MOI model insertion and copying own the remaining domain-bridge allocations.", "Vector attribute queries intentionally allocate owned result arrays.", "Static allocation reports include potential exception/growth paths; measured scalar workload uses zero operation allocations.", "FlatZinc model constraint_info stores abstract function/set entries; qualify a concrete construction/query workload before narrowing those fields."]
 schema = "qualified-performance-increment/1"
 unavailable = ["Linux perf counters: perf_event_paranoid=4; no kernel policy changed."]
 
@@ -48,12 +48,12 @@ tool = "snoopcompile"
 
 [aqua]
 baseline_ambiguities = 328
-candidate_ambiguities = 328
+candidate_ambiguities = 0
 compatibility_repairs = "Added LinearAlgebra 1 and Test 1 bounds; all compatibility checks pass."
-current_other_checks = "Aqua.test_all(...; ambiguities=false) passed."
-current_scope = "Default Aqua still fails on 328 pre-existing ambiguity pairs, mostly broad FlatZinc optimizer attribute forwarding versus MOI bridge methods. Every other default check passes after removing seven unbound type parameters without changing supported strict/reified set types."
+current_other_checks = "Default Aqua.test_all passed every check."
+current_scope = "326 broad attribute-forwarding ambiguity pairs resolved with typed MOI argument forms. Walk's redundant unbounded outer parameter aligned with its Real-bounded set type. Previously ambiguous fixed/open cardinality trait intersection now uses MOI's standard function-type support query."
 scope = "Default Aqua ambiguity check; pre-existing FlatZinc/MOI interactions."
-status = "baseline_failure_unchanged"
+status = "passed"
 unbound_type_parameters_after = 0
 unbound_type_parameters_before = 7
 version = "0.8.18"
@@ -405,17 +405,2127 @@ status = "complete"
     metric = "julia.alloc.count"
     minimum = 76.0
 
+[flat_zinc_attributes]
+baseline_commit = "8c74772899742ebc007a717872c508420d2a423e"
+claim = "8192 scalar attribute lookups: baseline 131072 bytes/8192 allocations, candidate 0/0. Frozen vector lookup failed with MethodError ambiguity; candidate completed with owned outputs. Vector baseline has no numeric performance comparison."
+profile_semantics = "One profiled operation, independent byte/count totals from separate operation evaluations. CPU samples may be zero for short operations and do not imply zero runtime."
+scope = "64 variables, 128 repeated sweeps; variable names prepared before timing. Scalar native result is zero operation allocations; vector query intentionally owns 128 returned arrays and its initial empty result."
+
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "unavailable"
+    artifacts = []
+    correctness = "not_checked"
+    finding_count = 0
+    measurements = "unavailable"
+    quality = "passed"
+    representative_findings = []
+    scenario = "package"
+    status = "complete"
+    summary = ""
+    tool = "aqua"
+    tool_version = "0.8.18"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "operation specialized for prepared state type; synchronization excluded"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 0
+    measurements = "unavailable"
+    quality = "not_checked"
+    representative_findings = []
+    scenario = "flat_zinc_scalar_attributes"
+    status = "complete"
+    summary = ""
+    tool = "jet"
+    tool_version = "0.12.3"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "static operation specialization; tool exception-path defaults; not a universal allocation guarantee"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 0
+    measurements = "unavailable"
+    quality = "not_checked"
+    representative_findings = []
+    scenario = "flat_zinc_scalar_attributes"
+    status = "complete"
+    summary = ""
+    tool = "alloccheck"
+    tool_version = "0.2.6"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "first complete scenario lifecycle in diagnostic process"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 1
+    quality = "not_checked"
+    scenario = "flat_zinc_scalar_attributes"
+    status = "complete"
+    summary = ""
+    tool = "snoopcompile"
+    tool_version = "3.2.9"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [flat_zinc_attributes.analyzers.measurements]
+        inference_seconds = 1.537799835205078e-5
+
+        [[flat_zinc_attributes.analyzers.representative_findings]]
+        message = "InferenceTimingNode: 0.000014/0.000015 on Base.Compiler.Timings.ROOT() with 0 direct children"
+        rule_id = "compilation.inference"
+        severity = "warning"
+
+            [flat_zinc_attributes.analyzers.representative_findings.evidence]
+            inference_seconds = 1.537799835205078e-5
+
+            [flat_zinc_attributes.analyzers.representative_findings.location]
+            file = ""
+            line = 0
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "unavailable"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 0
+    quality = "not_checked"
+    representative_findings = []
+    scenario = "flat_zinc_scalar_attributes"
+    status = "complete"
+    summary = ""
+    tool = "latency"
+    tool_version = "unavailable"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [flat_zinc_attributes.analyzers.measurements]
+        first_case_seconds = 0.715424283
+        load_seconds = 0.733949916
+        warm_case_seconds = 4.3447e-5
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "warmed operation and synchronization; fresh state; preparation, verification and cleanup excluded"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 0
+    quality = "not_checked"
+    representative_findings = []
+    scenario = "flat_zinc_scalar_attributes"
+    status = "complete"
+    summary = "5 operations: 0.0 ms in GC, 0 allocated bytes in total. Diagnostic counters are process-wide."
+    tool = "gc"
+    tool_version = "unavailable"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 0
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 1.9791e-5
+        pause = 0
+        poolalloc = 0
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 0
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 1.9563e-5
+        pause = 0
+        poolalloc = 0
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 0
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 1.9526e-5
+        pause = 0
+        poolalloc = 0
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 0
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 1.9587e-5
+        pause = 0
+        poolalloc = 0
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 0
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 1.9617e-5
+        pause = 0
+        poolalloc = 0
+        realloc = 0
+        recompile_time = 0.0
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "unavailable"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 0
+    quality = "not_checked"
+    representative_findings = []
+    scenario = "flat_zinc_scalar_attributes"
+    status = "complete"
+    summary = "5 operations: reachable state changed by 0 to 0 bytes. Growth may be intended output or a cache; it does not establish a leak."
+    tool = "memory"
+    tool_version = "unavailable"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        state_after_bytes = 5987
+        state_and_result_bytes = 5995
+        state_before_bytes = 5987
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_after]
+            message = ""
+            peak_rss_bytes = 0x1bc9d000
+            pid = 161140
+            private_bytes = 0x101af000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1bc9d000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12cea2fcd715
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_before]
+            message = ""
+            peak_rss_bytes = 0x1bc88000
+            pid = 161140
+            private_bytes = 0x101ae000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1bc88000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12ce9d9f90a3
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        state_after_bytes = 5987
+        state_and_result_bytes = 5995
+        state_before_bytes = 5987
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_after]
+            message = ""
+            peak_rss_bytes = 0x1bc9e000
+            pid = 161140
+            private_bytes = 0x101b0000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1bc9e000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12cea756ee4d
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_before]
+            message = ""
+            peak_rss_bytes = 0x1bc9e000
+            pid = 161140
+            private_bytes = 0x101b0000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1bc9e000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12cea6ebdc27
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        state_after_bytes = 5987
+        state_and_result_bytes = 5995
+        state_before_bytes = 5987
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_after]
+            message = ""
+            peak_rss_bytes = 0x1bc9e000
+            pid = 161140
+            private_bytes = 0x101b0000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1bc9e000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12cea86969da
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_before]
+            message = ""
+            peak_rss_bytes = 0x1bc9e000
+            pid = 161140
+            private_bytes = 0x101b0000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1bc9e000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12cea7cc774b
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        state_after_bytes = 5987
+        state_and_result_bytes = 5995
+        state_before_bytes = 5987
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_after]
+            message = ""
+            peak_rss_bytes = 0x1bc9e000
+            pid = 161140
+            private_bytes = 0x101b0000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1bc9e000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12cea94b031f
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_before]
+            message = ""
+            peak_rss_bytes = 0x1bc9e000
+            pid = 161140
+            private_bytes = 0x101b0000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1bc9e000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12cea8df5602
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        state_after_bytes = 5987
+        state_and_result_bytes = 5995
+        state_before_bytes = 5987
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_after]
+            message = ""
+            peak_rss_bytes = 0x1bc9e000
+            pid = 161140
+            private_bytes = 0x101b0000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1bc9e000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12ceaa5d38ed
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_before]
+            message = ""
+            peak_rss_bytes = 0x1bc9e000
+            pid = 161140
+            private_bytes = 0x101b0000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1bc9e000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12cea9f0d824
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "unavailable"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 0
+    quality = "not_checked"
+    representative_findings = []
+    scenario = "flat_zinc_scalar_attributes"
+    status = "complete"
+    summary = "5 operations: 0 observed lock conflicts. Counts do not measure waiting duration."
+    tool = "locks"
+    tool_version = "unavailable"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 0
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.0929e-5
+        pause = 0
+        poolalloc = 0
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 0
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.0873e-5
+        pause = 0
+        poolalloc = 0
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 0
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.0312e-5
+        pause = 0
+        poolalloc = 0
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 0
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.212e-5
+        pause = 0
+        poolalloc = 0
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 0
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.038e-5
+        pause = 0
+        poolalloc = 0
+        realloc = 0
+        recompile_time = 0.0
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "operation specialized for prepared state type; synchronization excluded"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 0
+    measurements = "unavailable"
+    quality = "not_checked"
+    representative_findings = []
+    scenario = "flat_zinc_vector_attributes"
+    status = "complete"
+    summary = ""
+    tool = "jet"
+    tool_version = "0.12.3"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "static operation specialization; tool exception-path defaults; not a universal allocation guarantee"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 6
+    measurements = "unavailable"
+    quality = "not_checked"
+    scenario = "flat_zinc_vector_attributes"
+    status = "complete"
+    summary = ""
+    tool = "alloccheck"
+    tool_version = "0.2.6"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [[flat_zinc_attributes.analyzers.representative_findings]]
+        message = """Allocation of Vector{String} in ./boot.jl:649\n  | return $(Expr(:new, :self, :(memoryref(mem)), :((m,))))\n\nStacktrace:\n [1] Array\n   @ ./boot.jl:649 [inlined]\n [2] getindex\n   @ ./array.jl:436 [inlined]\n [3] (::Main.var\"##SharedCase#142\".var\"#optimizer_attribute_case##4#optimizer_attribute_case##5\"{Int64})(state::@NamedTuple{model::ConstraintProgrammingExtensions.FlatZinc.Optimizer, variables::Vector{MathOptInterface.VariableIndex}, names::Vector{String}})\n   @ Main.var\"##SharedCase#142\" ~/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl:73\n"""
+        rule_id = "allocation.potential"
+        severity = "warning"
+
+            [flat_zinc_attributes.analyzers.representative_findings.evidence]
+            analysis = "AllocCheck.check_allocs"
+            report_type = "AllocCheck.AllocationSite"
+
+            [flat_zinc_attributes.analyzers.representative_findings.location]
+            file = "./boot.jl"
+            line = 649
+        [[flat_zinc_attributes.analyzers.representative_findings]]
+        message = """Allocation of Vector{String} in ./boot.jl:649\n  | return $(Expr(:new, :self, :(memoryref(mem)), :((m,))))\n\nStacktrace:\n [1] Array\n   @ ./boot.jl:649 [inlined]\n [2] Array\n   @ ./boot.jl:673 [inlined]\n [3] get(model::ConstraintProgrammingExtensions.FlatZinc.Model, attr::MathOptInterface.VariableName, idxs::Vector{MathOptInterface.VariableIndex})\n   @ MathOptInterface ~/.julia/packages/MathOptInterface/lY2WB/src/attributes.jl:479\n [4] get\n   @ ~/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/src/FlatZinc/optimizer.jl:226 [inlined]\n [5] (::Main.var\"##SharedCase#142\".var\"#optimizer_attribute_case##4#optimizer_attribute_case##5\"{Int64})(state::@NamedTuple{model::ConstraintProgrammingExtensions.FlatZinc.Optimizer, variables::Vector{MathOptInterface.VariableIndex}, names::Vector{String}})\n   @ Main.var\"##SharedCase#142\" ~/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl:75\n"""
+        rule_id = "allocation.potential"
+        severity = "warning"
+
+            [flat_zinc_attributes.analyzers.representative_findings.evidence]
+            analysis = "AllocCheck.check_allocs"
+            report_type = "AllocCheck.AllocationSite"
+
+            [flat_zinc_attributes.analyzers.representative_findings.location]
+            file = "./boot.jl"
+            line = 649
+        [[flat_zinc_attributes.analyzers.representative_findings]]
+        message = """Allocation of Memory{String} in ./boot.jl:588\n  | (self::Type{GenericMemory{kind,T,addrspace}})(::UndefInitializer, m::Int) where {T,addrspace,kind} = memorynew(self, m)\n\nStacktrace:\n  [1] GenericMemory\n    @ ./boot.jl:588 [inlined]\n  [2] Array\n    @ ./boot.jl:648 [inlined]\n  [3] Array\n    @ ./boot.jl:661 [inlined]\n  [4] Array\n    @ ./boot.jl:671 [inlined]\n  [5] similar\n    @ ./abstractarray.jl:877 [inlined]\n  [6] similar\n    @ ./array.jl:409 [inlined]\n  [7] similar\n    @ ./abstractarray.jl:876 [inlined]\n  [8] similar\n    @ ./broadcast.jl:230 [inlined]\n  [9] similar\n    @ ./broadcast.jl:229 [inlined]\n [10] copy\n    @ ./broadcast.jl:924 [inlined]\n [11] materialize\n    @ ./broadcast.jl:899 [inlined]\n [12] get(model::ConstraintProgrammingExtensions.FlatZinc.Model, attr::MathOptInterface.VariableName, idxs::Vector{MathOptInterface.VariableIndex})\n    @ MathOptInterface ~/.julia/packages/MathOptInterface/lY2WB/src/attributes.jl:481\n [13] get\n    @ ~/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/src/FlatZinc/optimizer.jl:226 [inlined]\n [14] (::Main.var\"##SharedCase#142\".var\"#optimizer_attribute_case##4#optimizer_attribute_case##5\"{Int64})(state::@NamedTuple{model::ConstraintProgrammingExtensions.FlatZinc.Optimizer, variables::Vector{MathOptInterface.VariableIndex}, names::Vector{String}})\n    @ Main.var\"##SharedCase#142\" ~/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl:75\n"""
+        rule_id = "allocation.potential"
+        severity = "warning"
+
+            [flat_zinc_attributes.analyzers.representative_findings.evidence]
+            analysis = "AllocCheck.check_allocs"
+            report_type = "AllocCheck.AllocationSite"
+
+            [flat_zinc_attributes.analyzers.representative_findings.location]
+            file = "./boot.jl"
+            line = 588
+        [[flat_zinc_attributes.analyzers.representative_findings]]
+        message = """Allocation of Vector{String} in ./boot.jl:649\n  | return $(Expr(:new, :self, :(memoryref(mem)), :((m,))))\n\nStacktrace:\n  [1] Array\n    @ ./boot.jl:649 [inlined]\n  [2] Array\n    @ ./boot.jl:661 [inlined]\n  [3] Array\n    @ ./boot.jl:671 [inlined]\n  [4] similar\n    @ ./abstractarray.jl:877 [inlined]\n  [5] similar\n    @ ./array.jl:409 [inlined]\n  [6] similar\n    @ ./abstractarray.jl:876 [inlined]\n  [7] similar\n    @ ./broadcast.jl:230 [inlined]\n  [8] similar\n    @ ./broadcast.jl:229 [inlined]\n  [9] copy\n    @ ./broadcast.jl:924 [inlined]\n [10] materialize\n    @ ./broadcast.jl:899 [inlined]\n [11] get(model::ConstraintProgrammingExtensions.FlatZinc.Model, attr::MathOptInterface.VariableName, idxs::Vector{MathOptInterface.VariableIndex})\n    @ MathOptInterface ~/.julia/packages/MathOptInterface/lY2WB/src/attributes.jl:481\n [12] get\n    @ ~/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/src/FlatZinc/optimizer.jl:226 [inlined]\n [13] (::Main.var\"##SharedCase#142\".var\"#optimizer_attribute_case##4#optimizer_attribute_case##5\"{Int64})(state::@NamedTuple{model::ConstraintProgrammingExtensions.FlatZinc.Optimizer, variables::Vector{MathOptInterface.VariableIndex}, names::Vector{String}})\n    @ Main.var\"##SharedCase#142\" ~/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl:75\n"""
+        rule_id = "allocation.potential"
+        severity = "warning"
+
+            [flat_zinc_attributes.analyzers.representative_findings.evidence]
+            analysis = "AllocCheck.check_allocs"
+            report_type = "AllocCheck.AllocationSite"
+
+            [flat_zinc_attributes.analyzers.representative_findings.location]
+            file = "./boot.jl"
+            line = 649
+        [[flat_zinc_attributes.analyzers.representative_findings]]
+        message = """Allocation of Memory{MathOptInterface.VariableIndex} in ./boot.jl:588\n  | (self::Type{GenericMemory{kind,T,addrspace}})(::UndefInitializer, m::Int) where {T,addrspace,kind} = memorynew(self, m)\n\nStacktrace:\n   [1] GenericMemory\n     @ ./boot.jl:588 [inlined]\n   [2] copy\n     @ ./array.jl:384 [inlined]\n   [3] unaliascopy\n     @ ./abstractarray.jl:1567 [inlined]\n   [4] unalias\n     @ ./abstractarray.jl:1551 [inlined]\n   [5] broadcast_unalias\n     @ ./broadcast.jl:973 [inlined]\n   [6] preprocess\n     @ ./broadcast.jl:980 [inlined]\n   [7] preprocess_args\n     @ ./broadcast.jl:983 [inlined]\n ┌ [8] preprocess_args\n │   @ ./broadcast.jl:982 [inlined]\n ╰──── repeated 2 times\n  [10] preprocess\n     @ ./broadcast.jl:979 [inlined]\n  [11] copyto!\n     @ ./broadcast.jl:996 [inlined]\n  [12] copyto!\n     @ ./broadcast.jl:952 [inlined]\n  [13] copy\n     @ ./broadcast.jl:924 [inlined]\n  [14] materialize\n     @ ./broadcast.jl:899 [inlined]\n  [15] get(model::ConstraintProgrammingExtensions.FlatZinc.Model, attr::MathOptInterface.VariableName, idxs::Vector{MathOptInterface.VariableIndex})\n     @ MathOptInterface ~/.julia/packages/MathOptInterface/lY2WB/src/attributes.jl:481\n  [16] get\n     @ ~/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/src/FlatZinc/optimizer.jl:226 [inlined]\n  [17] (::Main.var\"##SharedCase#142\".var\"#optimizer_attribute_case##4#optimizer_attribute_case##5\"{Int64})(state::@NamedTuple{model::ConstraintProgrammingExtensions.FlatZinc.Optimizer, variables::Vector{MathOptInterface.VariableIndex}, names::Vector{String}})\n     @ Main.var\"##SharedCase#142\" ~/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl:75\n"""
+        rule_id = "allocation.potential"
+        severity = "warning"
+
+            [flat_zinc_attributes.analyzers.representative_findings.evidence]
+            analysis = "AllocCheck.check_allocs"
+            report_type = "AllocCheck.AllocationSite"
+
+            [flat_zinc_attributes.analyzers.representative_findings.location]
+            file = "./boot.jl"
+            line = 588
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "first complete scenario lifecycle in diagnostic process"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 1
+    quality = "not_checked"
+    scenario = "flat_zinc_vector_attributes"
+    status = "complete"
+    summary = ""
+    tool = "snoopcompile"
+    tool_version = "3.2.9"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [flat_zinc_attributes.analyzers.measurements]
+        inference_seconds = 1.537799835205078e-5
+
+        [[flat_zinc_attributes.analyzers.representative_findings]]
+        message = "InferenceTimingNode: 0.000014/0.000015 on Base.Compiler.Timings.ROOT() with 0 direct children"
+        rule_id = "compilation.inference"
+        severity = "warning"
+
+            [flat_zinc_attributes.analyzers.representative_findings.evidence]
+            inference_seconds = 1.537799835205078e-5
+
+            [flat_zinc_attributes.analyzers.representative_findings.location]
+            file = ""
+            line = 0
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "unavailable"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 0
+    quality = "not_checked"
+    representative_findings = []
+    scenario = "flat_zinc_vector_attributes"
+    status = "complete"
+    summary = ""
+    tool = "latency"
+    tool_version = "unavailable"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [flat_zinc_attributes.analyzers.measurements]
+        first_case_seconds = 0.804456381
+        load_seconds = 1.590321743
+        warm_case_seconds = 5.069e-5
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "warmed operation and synchronization; fresh state; preparation, verification and cleanup excluded"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 0
+    quality = "not_checked"
+    representative_findings = []
+    scenario = "flat_zinc_vector_attributes"
+    status = "complete"
+    summary = "5 operations: 0.0 ms in GC, 368800 allocated bytes in total. Diagnostic counters are process-wide."
+    tool = "gc"
+    tool_version = "unavailable"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 73760
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.6691e-5
+        pause = 0
+        poolalloc = 257
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 73760
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.5158e-5
+        pause = 0
+        poolalloc = 257
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 73760
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.6888e-5
+        pause = 0
+        poolalloc = 257
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 73760
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.7887e-5
+        pause = 0
+        poolalloc = 257
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 73760
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.3662e-5
+        pause = 0
+        poolalloc = 257
+        realloc = 0
+        recompile_time = 0.0
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "unavailable"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 0
+    quality = "not_checked"
+    representative_findings = []
+    scenario = "flat_zinc_vector_attributes"
+    status = "complete"
+    summary = "5 operations: reachable state changed by 0 to 0 bytes. Growth may be intended output or a cache; it does not establish a leak."
+    tool = "memory"
+    tool_version = "unavailable"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        state_after_bytes = 5987
+        state_and_result_bytes = 6547
+        state_before_bytes = 5987
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_after]
+            message = ""
+            peak_rss_bytes = 0x1ce23000
+            pid = 161353
+            private_bytes = 0x11399000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1ce23000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12d57fa72965
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_before]
+            message = ""
+            peak_rss_bytes = 0x1ce0d000
+            pid = 161353
+            private_bytes = 0x11397000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1ce0d000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12d57d259e4e
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        state_after_bytes = 5987
+        state_and_result_bytes = 6547
+        state_before_bytes = 5987
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_after]
+            message = ""
+            peak_rss_bytes = 0x1ce24000
+            pid = 161353
+            private_bytes = 0x1139a000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1ce24000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12d581b45c96
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_before]
+            message = ""
+            peak_rss_bytes = 0x1ce24000
+            pid = 161353
+            private_bytes = 0x1139a000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1ce24000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12d581727669
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        state_after_bytes = 5987
+        state_and_result_bytes = 6547
+        state_before_bytes = 5987
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_after]
+            message = ""
+            peak_rss_bytes = 0x1ce24000
+            pid = 161353
+            private_bytes = 0x1139a000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1ce24000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12d5823ef3e7
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_before]
+            message = ""
+            peak_rss_bytes = 0x1ce24000
+            pid = 161353
+            private_bytes = 0x1139a000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1ce24000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12d581ffd036
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        state_after_bytes = 5987
+        state_and_result_bytes = 6547
+        state_before_bytes = 5987
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_after]
+            message = ""
+            peak_rss_bytes = 0x1ce24000
+            pid = 161353
+            private_bytes = 0x1139a000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1ce24000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12d582c4059b
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_before]
+            message = ""
+            peak_rss_bytes = 0x1ce24000
+            pid = 161353
+            private_bytes = 0x1139a000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1ce24000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12d582888cb3
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        state_after_bytes = 5987
+        state_and_result_bytes = 6547
+        state_before_bytes = 5987
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_after]
+            message = ""
+            peak_rss_bytes = 0x1ce24000
+            pid = 161353
+            private_bytes = 0x1139a000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1ce24000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12d58347224a
+
+            [flat_zinc_attributes.analyzers.measurements.samples.process_before]
+            message = ""
+            peak_rss_bytes = 0x1ce24000
+            pid = 161353
+            private_bytes = 0x1139a000
+            provider = "linux-proc-status+smaps-rollup"
+            rss_bytes = 0x1ce24000
+            schema_version = "perfchecker-process-memory/1"
+            status = "observed"
+            timestamp_ns = 0x12d5830c1925
+    [[flat_zinc_attributes.analyzers]]
+    analysis_scope = "unavailable"
+    artifacts = []
+    correctness = "passed"
+    finding_count = 0
+    quality = "not_checked"
+    representative_findings = []
+    scenario = "flat_zinc_vector_attributes"
+    status = "complete"
+    summary = "5 operations: 0 observed lock conflicts. Counts do not measure waiting duration."
+    tool = "locks"
+    tool_version = "unavailable"
+
+        [flat_zinc_attributes.analyzers.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 73760
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.5694e-5
+        pause = 0
+        poolalloc = 257
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 73760
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.8293e-5
+        pause = 0
+        poolalloc = 257
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 73760
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.785e-5
+        pause = 0
+        poolalloc = 257
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 73760
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.8116e-5
+        pause = 0
+        poolalloc = 257
+        realloc = 0
+        recompile_time = 0.0
+        [[flat_zinc_attributes.analyzers.measurements.samples]]
+        allocated_bytes = 73760
+        bigalloc = 0
+        compile_time = 0.0
+        full_sweep = 0
+        gc_seconds = 0.0
+        lock_conflicts = 0
+        malloc = 0
+        operation_seconds = 2.337e-5
+        pause = 0
+        poolalloc = 257
+        realloc = 0
+        recompile_time = 0.0
+
+    [flat_zinc_attributes.baseline.scalar]
+    median_allocations = 8192.0
+    median_bytes = 131072.0
+    median_seconds = 0.0001548695
+    oracle = "passed"
+    status = "complete"
+
+    [flat_zinc_attributes.baseline.vector]
+    error_type = "MethodError"
+    message = """MethodError: get(::ConstraintProgrammingExtensions.FlatZinc.Optimizer, ::MathOptInterface.VariableName, ::Vector{MathOptInterface.VariableIndex}) is ambiguous.\n\nCandidates:\n  get(model::ConstraintProgrammingExtensions.FlatZinc.Optimizer, attr::Union{MathOptInterface.AbstractConstraintAttribute, MathOptInterface.AbstractModelAttribute, MathOptInterface.AbstractOptimizerAttribute, MathOptInterface.AbstractVariableAttribute}, x...)\n    @ ConstraintProgrammingExtensions.FlatZinc ~/.julia/dev/JuliaConstraintsHandoff/ConstraintProgrammingExtensions/src/FlatZinc/optimizer.jl:191\n  get(model::MathOptInterface.ModelLike, attr::Union{MathOptInterface.AbstractConstraintAttribute, MathOptInterface.AbstractModelAttribute, MathOptInterface.AbstractOptimizerAttribute, MathOptInterface.AbstractVariableAttribute}, idxs::Vector)\n    @ MathOptInterface ~/.julia/packages/MathOptInterface/lY2WB/src/attributes.jl:477\n\nPossible fix, define\n  get(::ConstraintProgrammingExtensions.FlatZinc.Optimizer, ::Union{MathOptInterface.AbstractConstraintAttribute, MathOptInterface.AbstractModelAttribute, MathOptInterface.AbstractOptimizerAttribute, MathOptInterface.AbstractVariableAttribute}, ::Vector)\n"""
+    status = "failed"
+
+    [[flat_zinc_attributes.collectors]]
+    collector = "benchmark"
+    environment_reference = "flat_zinc_attributes.environment_provenance"
+    median_allocs = 0.0
+    median_bytes = 0.0
+    median_time = 2.1432500000000002e-5
+    oracle = "passed"
+    sample_count = 20
+    scenario = "flat_zinc_scalar_attributes"
+    status = "complete"
+
+        [flat_zinc_attributes.collectors.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [flat_zinc_attributes.collectors.runtime]
+        language = "julia"
+        threads = 2
+        version = "1.13.1"
+    [[flat_zinc_attributes.collectors]]
+    collector = "chairmark"
+    environment_reference = "flat_zinc_attributes.environment_provenance"
+    median_allocs = 0.0
+    median_bytes = 0.0
+    median_time = 2.1308e-5
+    oracle = "passed"
+    sample_count = 20
+    scenario = "flat_zinc_scalar_attributes"
+    status = "complete"
+
+        [flat_zinc_attributes.collectors.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [flat_zinc_attributes.collectors.runtime]
+        language = "julia"
+        threads = 2
+        version = "1.13.1"
+    [[flat_zinc_attributes.collectors]]
+    collector = "benchmark"
+    environment_reference = "flat_zinc_attributes.environment_provenance"
+    median_allocs = 257.0
+    median_bytes = 73760.0
+    median_time = 2.3683499999999998e-5
+    oracle = "passed"
+    sample_count = 20
+    scenario = "flat_zinc_vector_attributes"
+    status = "complete"
+
+        [flat_zinc_attributes.collectors.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [flat_zinc_attributes.collectors.runtime]
+        language = "julia"
+        threads = 2
+        version = "1.13.1"
+    [[flat_zinc_attributes.collectors]]
+    collector = "chairmark"
+    environment_reference = "flat_zinc_attributes.environment_provenance"
+    median_allocs = 257.0
+    median_bytes = 73760.0
+    median_time = 2.4233000000000003e-5
+    oracle = "passed"
+    sample_count = 20
+    scenario = "flat_zinc_vector_attributes"
+    status = "complete"
+
+        [flat_zinc_attributes.collectors.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [flat_zinc_attributes.collectors.runtime]
+        language = "julia"
+        threads = 2
+        version = "1.13.1"
+    [[flat_zinc_attributes.collectors]]
+    collector = "profile"
+    environment_reference = "flat_zinc_attributes.environment_provenance"
+    oracle = "passed"
+    sample_count = 0
+    scenario = "flat_zinc_scalar_attributes"
+    status = "complete"
+
+        [flat_zinc_attributes.collectors.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [flat_zinc_attributes.collectors.runtime]
+        language = "julia"
+        threads = 2
+        version = "1.13.1"
+    [[flat_zinc_attributes.collectors]]
+    collector = "profile_alloc"
+    environment_reference = "flat_zinc_attributes.environment_provenance"
+    oracle = "passed"
+    sample_count = 0
+    scenario = "flat_zinc_scalar_attributes"
+    status = "complete"
+
+        [flat_zinc_attributes.collectors.allocation_profile]
+        samples = "unavailable"
+        status = "zero_allocations"
+        total_allocations = 0
+        total_bytes = 0
+        total_semantics = "bytes and allocation count from two separate operation evaluations; not inferred from samples"
+
+        [flat_zinc_attributes.collectors.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [flat_zinc_attributes.collectors.runtime]
+        language = "julia"
+        threads = 2
+        version = "1.13.1"
+    [[flat_zinc_attributes.collectors]]
+    collector = "profile"
+    environment_reference = "flat_zinc_attributes.environment_provenance"
+    oracle = "passed"
+    sample_count = 0
+    scenario = "flat_zinc_vector_attributes"
+    status = "complete"
+
+        [flat_zinc_attributes.collectors.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [flat_zinc_attributes.collectors.runtime]
+        language = "julia"
+        threads = 2
+        version = "1.13.1"
+    [[flat_zinc_attributes.collectors]]
+    collector = "profile_alloc"
+    environment_reference = "flat_zinc_attributes.environment_provenance"
+    oracle = "passed"
+    sample_count = 0
+    scenario = "flat_zinc_vector_attributes"
+    status = "complete"
+
+        [flat_zinc_attributes.collectors.allocation_profile]
+        samples = "unavailable"
+        status = "complete"
+        total_allocations = 257
+        total_bytes = 73760
+        total_semantics = "bytes and allocation count from two separate operation evaluations; not inferred from samples"
+
+        [flat_zinc_attributes.collectors.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
+        [flat_zinc_attributes.collectors.runtime]
+        language = "julia"
+        threads = 2
+        version = "1.13.1"
+
+    [flat_zinc_attributes.environment_provenance]
+    manifest_file = "Manifest.toml"
+    manifest_sha256 = "b54eba098843bf8670d44ee926d71982c78667fa6bb26ea81fec8e5109a24ad2"
+    path = "/tmp/qubo-perf-night-20261008.ueeYcD"
+    preferences_sha256 = "unavailable"
+    project_sha256 = "5d504c68de05b3aa7aec387ba35c86e36b4b6539a12067a0f66e59f78a22495f"
+
+        [[flat_zinc_attributes.environment_provenance.development_sources]]
+        package = "CBLS"
+        path = "/home/azzaare/.julia/dev/JuliaConstraintsHandoff/CBLS"
+
+            [flat_zinc_attributes.environment_provenance.development_sources.source]
+            complete = true
+            files = 31
+            scope = "Project.toml, LocalPreferences.toml, src/, ext/, deps/ and providers/; additional data must be declared as scenario fixtures"
+            sha256 = "c0ea8646cb7d8870f9a641a800cf1a9208bf443c5e2fca783806942a46234d82"
+        [[flat_zinc_attributes.environment_provenance.development_sources]]
+        package = "CompositionalNetworks"
+        path = "/home/azzaare/.julia/dev/JuliaConstraintsHandoff/CompositionalNetworks"
+
+            [flat_zinc_attributes.environment_provenance.development_sources.source]
+            complete = true
+            files = 31
+            scope = "Project.toml, LocalPreferences.toml, src/, ext/, deps/ and providers/; additional data must be declared as scenario fixtures"
+            sha256 = "a1bf26a26045cfe3a058a9f6b8a4c88ddf209dc332e6962a08ed781219bcbe42"
+        [[flat_zinc_attributes.environment_provenance.development_sources]]
+        package = "ConstraintCommons"
+        path = "/home/azzaare/.julia/dev/JuliaConstraintsHandoff/ConstraintCommons"
+
+            [flat_zinc_attributes.environment_provenance.development_sources.source]
+            complete = true
+            files = 10
+            scope = "Project.toml, LocalPreferences.toml, src/, ext/, deps/ and providers/; additional data must be declared as scenario fixtures"
+            sha256 = "defd368dac20054bed41335d422c12083e4ae16c2df4d45c279218f8f2f647a0"
+        [[flat_zinc_attributes.environment_provenance.development_sources]]
+        package = "ConstraintDomains"
+        path = "/home/azzaare/.julia/dev/JuliaConstraintsHandoff/ConstraintDomains"
+
+            [flat_zinc_attributes.environment_provenance.development_sources.source]
+            complete = true
+            files = 8
+            scope = "Project.toml, LocalPreferences.toml, src/, ext/, deps/ and providers/; additional data must be declared as scenario fixtures"
+            sha256 = "f1a3a201e762d67bc95895e2b41d894168ba1e9ff36ab8a3efcd1dde88805f7b"
+        [[flat_zinc_attributes.environment_provenance.development_sources]]
+        package = "ConstraintModels"
+        path = "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintModels"
+
+            [flat_zinc_attributes.environment_provenance.development_sources.source]
+            complete = true
+            files = 14
+            scope = "Project.toml, LocalPreferences.toml, src/, ext/, deps/ and providers/; additional data must be declared as scenario fixtures"
+            sha256 = "704c3377aa7455fe831a190d44c221a5e232f6bc7180805db327a6dddb211e33"
+        [[flat_zinc_attributes.environment_provenance.development_sources]]
+        package = "ConstraintProgrammingExtensions"
+        path = "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions"
+
+            [flat_zinc_attributes.environment_provenance.development_sources.source]
+            complete = true
+            files = 115
+            scope = "Project.toml, LocalPreferences.toml, src/, ext/, deps/ and providers/; additional data must be declared as scenario fixtures"
+            sha256 = "c2f7855a920073661f8bf3bfde94a613481cc9649f7f3628f5c737692f76e984"
+        [[flat_zinc_attributes.environment_provenance.development_sources]]
+        package = "Constraints"
+        path = "/home/azzaare/.julia/dev/JuliaConstraintsHandoff/Constraints"
+
+            [flat_zinc_attributes.environment_provenance.development_sources.source]
+            complete = true
+            files = 26
+            scope = "Project.toml, LocalPreferences.toml, src/, ext/, deps/ and providers/; additional data must be declared as scenario fixtures"
+            sha256 = "ecb78dc3b2713878ce95ad799aa6320da0da81d2d6fca51f5b86d6edbf1bda3e"
+        [[flat_zinc_attributes.environment_provenance.development_sources]]
+        package = "LocalSearchSolvers"
+        path = "/home/azzaare/.julia/dev/JuliaConstraintsHandoff/LocalSearchSolvers"
+
+            [flat_zinc_attributes.environment_provenance.development_sources.source]
+            complete = true
+            files = 49
+            scope = "Project.toml, LocalPreferences.toml, src/, ext/, deps/ and providers/; additional data must be declared as scenario fixtures"
+            sha256 = "cac1469f0ddb7d05501684b3e2c0b2201f51b9cfff87381420cfd93be6f50d8c"
+        [[flat_zinc_attributes.environment_provenance.development_sources]]
+        package = "MetaStrategist"
+        path = "/home/azzaare/.julia/dev/JuliaConstraintsHandoff/MetaStrategist"
+
+            [flat_zinc_attributes.environment_provenance.development_sources.source]
+            complete = true
+            files = 13
+            scope = "Project.toml, LocalPreferences.toml, src/, ext/, deps/ and providers/; additional data must be declared as scenario fixtures"
+            sha256 = "b89ae4374c11bb74f4cc2f22b000f6f000dde2ff125d75ad2bd8317c6514abed"
+        [[flat_zinc_attributes.environment_provenance.development_sources]]
+        package = "PatternFolds"
+        path = "/home/azzaare/.julia/dev/JuliaConstraintsHandoff/PatternFolds"
+
+            [flat_zinc_attributes.environment_provenance.development_sources.source]
+            complete = true
+            files = 6
+            scope = "Project.toml, LocalPreferences.toml, src/, ext/, deps/ and providers/; additional data must be declared as scenario fixtures"
+            sha256 = "3cec92baf52616611116e79fa2ffa944886c71c30b778d1a84512fd22033b92f"
+        [[flat_zinc_attributes.environment_provenance.development_sources]]
+        package = "QUBOConstraints"
+        path = "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/QUBOConstraints"
+
+            [flat_zinc_attributes.environment_provenance.development_sources.source]
+            complete = true
+            files = 32
+            scope = "Project.toml, LocalPreferences.toml, src/, ext/, deps/ and providers/; additional data must be declared as scenario fixtures"
+            sha256 = "e519215e1aa3458dfdf70bea67be12bf52a9de8c4727490b82d6af3feb2305ea"
+        [[flat_zinc_attributes.environment_provenance.development_sources]]
+        package = "XCSP3Bridges"
+        path = "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/XCSP3Bridges"
+
+            [flat_zinc_attributes.environment_provenance.development_sources.source]
+            complete = true
+            files = 6
+            scope = "Project.toml, LocalPreferences.toml, src/, ext/, deps/ and providers/; additional data must be declared as scenario fixtures"
+            sha256 = "51ce65656b997a1ca22fbfed73611a2c12158913b58a1e49509759ab2d1af5ea"
+
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
+        name = "AbstractTrees"
+        uuid = "1520ce14-60c1-5f80-bbc7-55ef81b5835c"
+        version = "0.4.5"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "9876e1e164b144ca45e9e3198d0b689cadfed9ff"
+        name = "AliasTables"
+        uuid = "66dad0bd-aa9a-41b7-9441-69ab47430ed8"
+        version = "1.1.3"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "609862a8c1e180e47b7f2ecad77bba4142a66a04"
+        name = "AllocCheck"
+        uuid = "9b6a8646-10ed-4001-bbdc-1d2f46dfbb1a"
+        version = "0.2.6"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "4096262296646ab75ff2316c47798f8c2a92f641"
+        name = "Aqua"
+        uuid = "4c88cf16-eb10-579e-8560-4a9242c79595"
+        version = "0.8.18"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "ArgTools"
+        uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
+        version = "1.1.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "404265cd8128a2515a81d5eae16de90fdef05101"
+        name = "ArrowTypes"
+        uuid = "31f734f8-188a-4ce0-8406-c8a06bd891cd"
+        version = "2.3.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Artifacts"
+        uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Base64"
+        uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "6876e30dc02dc69f0613cb6ece242144f2ca9e56"
+        name = "BenchmarkTools"
+        uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+        version = "1.7.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "1b96ea4a01afe0ea4090c5c8039690672dd13f2e"
+        name = "Bzip2_jll"
+        uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
+        version = "1.0.9+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "CBLS"
+        uuid = "a3809bfe-37bb-4d48-a667-bac4c6be8d90"
+        version = "0.2.3"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "389ad5c84de1ae7cf0e28e381131c98ea87d54fc"
+        name = "CEnum"
+        uuid = "fa961155-64e5-5f13-b03f-caf6b980ea82"
+        version = "0.5.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "CRC32c"
+        uuid = "8bf52ea8-c179-5cab-976a-9e18b702a9bc"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "9a49491e67e7a4d6f885c43d00bb101e6e5a434b"
+        name = "Chairmarks"
+        uuid = "0ca39b1e-fe0b-4e98-acfc-b1656634c4de"
+        version = "1.3.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "cfb7a2e89e245a9d5016b70323db412b3a7438d5"
+        name = "CodeTracking"
+        uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
+        version = "3.0.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "84990fa864b7f2b4901901ca12736e45ee79068c"
+        name = "CodecBzip2"
+        uuid = "523fee87-0ab8-5b00-afb7-3ecf72e48cfd"
+        version = "0.8.5"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "970758a3d591a2a5c2a907c53f2e2f8c1b1d3537"
+        name = "CodecZlib"
+        uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
+        version = "0.7.9"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "61761f58648aa7217445f24f841839b78c712232"
+        name = "ColorTypes"
+        uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
+        version = "0.12.3"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "291665b547f137df070e4dd83e432b5fee8cc4a0"
+        name = "Colors"
+        uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
+        version = "0.13.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "7c8fe02c7eb6fe22e89d3990123a2a931ca8fcfb"
+        name = "CommonMark"
+        uuid = "a80b9123-70ca-4bc0-993e-6e3bcb318db6"
+        version = "1.0.4"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "cda2cfaebb4be89c9084adaca7dd7333369715c5"
+        name = "CommonSubexpressions"
+        uuid = "bbf7d656-a473-5ed7-a52c-81e309532950"
+        version = "0.3.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "9d8a54ce4b17aa5bdce0ea5c34bc5e7c340d16ad"
+        name = "Compat"
+        uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
+        version = "4.18.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "382d79bfe72a406294faca39ef0c3cef6e6ce1f1"
+        name = "Compiler"
+        uuid = "807dbc54-b67e-4c79-8afb-eafe4df6f2e1"
+        version = "0.1.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "CompilerSupportLibraries_jll"
+        uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+        version = "1.5.5+2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "CompositionalNetworks"
+        uuid = "4b67e4b5-442d-4ef5-b760-3f5df3a57537"
+        version = "0.6.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "ConstraintCommons"
+        uuid = "e37357d9-0691-492f-a822-e5ea6a920954"
+        version = "0.3.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "ConstraintDomains"
+        uuid = "5800fd60-8556-4464-8d61-84ebf7a0bedb"
+        version = "0.4.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "ConstraintModels"
+        uuid = "841a6ec5-cac3-4c42-9a0a-4b21c9553698"
+        version = "0.3.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "ConstraintProgrammingExtensions"
+        uuid = "b65d079e-ed98-51d9-b0db-edee61a5c5f8"
+        version = "0.8.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Constraints"
+        uuid = "30f324ab-b02d-43f0-b619-e131c61659f7"
+        version = "0.5.11"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "54b76cbb40d9a0f5368c880725b2f141da77c94f"
+        name = "Crayons"
+        uuid = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
+        version = "4.2.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "abe83f3a2f1b857aac70ef8b269080af17764bbe"
+        name = "DataAPI"
+        uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
+        version = "1.16.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "5fab31e2e01e70ad66e3e24c968c264d1cf166d6"
+        name = "DataFrames"
+        uuid = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+        version = "1.8.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "b0bc6d2cad1fed8b7fd59a1551a991cb3d2809e6"
+        name = "DataStructures"
+        uuid = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+        version = "0.19.6"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
+        name = "DataValueInterfaces"
+        uuid = "e2d170a0-9d28-54be-80f0-106bbe20a464"
+        version = "1.0.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Dates"
+        uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "a55766a9c8f66cf19ffcdbdb1444e249bb4ace33"
+        name = "Dictionaries"
+        uuid = "85a47980-9c8c-11e8-2b9f-f7ca1fa99fb4"
+        version = "0.4.6"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "782dd5f4561f5d267313f23853baaaa4c52ea621"
+        name = "DiffResults"
+        uuid = "163ba53b-c6d8-5494-b064-1a9d43ac40c5"
+        version = "1.1.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "79a2aca180a85c690c58a020d47b426954b590f8"
+        name = "DiffRules"
+        uuid = "b552c78f-8df3-52c6-915a-8e097449b14b"
+        version = "1.16.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "c7e3a542b999843086e2f29dac96a618c105be1d"
+        name = "Distances"
+        uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
+        version = "0.10.12"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Distributed"
+        uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "7442a5dfe1ebb773c29cc2962a8980f47221d76c"
+        name = "DocStringExtensions"
+        uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
+        version = "0.9.5"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Downloads"
+        uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
+        version = "1.7.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "d2e49e7efd29719d6f28b891b0e0e159daa9d2b4"
+        name = "ExprTools"
+        uuid = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
+        version = "0.1.11"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "c13f0b150373771b0fdc1713c97860f8df12e6c2"
+        name = "ExproniconLite"
+        uuid = "55351af7-c7e9-48d6-89ff-24e801d99491"
+        version = "0.10.14"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "7ea1aa5869e2626ccae84480e4f37185bc6f41d3"
+        name = "EzXML"
+        uuid = "8f5d6c58-4d21-5cfd-889c-e3ad7ee6a615"
+        version = "1.2.3"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "6621fef488e496356c9c9625d0562c12a6070819"
+        name = "FileIO"
+        uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
+        version = "1.20.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "FileWatching"
+        uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "59af96b98217c6ef4ae0dfe065ac7c20831d1a84"
+        name = "FixedPointNumbers"
+        uuid = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
+        version = "0.8.6"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "1f955e6e2c9fe7f56a0fdd169453f7a65b3e69f5"
+        name = "FlameGraphs"
+        uuid = "08572546-2f56-4bcf-ba4e-bab62c3a3f89"
+        version = "1.2.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "3b0f72e2ffef1a139ac450725c9ecd01c0a3c050"
+        name = "ForwardDiff"
+        uuid = "f6369f11-7733-5829-9624-2563aa707210"
+        version = "1.4.6"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Future"
+        uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "5e54ec63c34bcc878558b173c411b8efe6b08344"
+        name = "GPUCompiler"
+        uuid = "61eb1bfa-7361-4325-ad38-22787b887f55"
+        version = "1.23.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "246c628cec062230b7d183aab88841fa94fcabe9"
+        name = "Glob"
+        uuid = "c27321d9-0574-5035-807b-f59d2c89b15c"
+        version = "1.5.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "096cba93cdc8dd80451b7fa1cabfe3f34572f998"
+        name = "HiGHS"
+        uuid = "87dc4568-4c63-4d18-b0c0-bb2238e4078b"
+        version = "1.26.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "d4e63f395d10590fcece8d35005dd7b9a4862635"
+        name = "HiGHS_jll"
+        uuid = "8fd58aa0-07eb-5a78-9b36-339c94fd15ea"
+        version = "1.15.1+3"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "9f4b499b37bcd0541d76c9e4385045a3d9d5c865"
+        name = "Highlights"
+        uuid = "eafb193a-b7ab-5a9e-9068-77385905fa72"
+        version = "0.6.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "ce1566720fd6b19ff3411404d4b977acd4814f9f"
+        name = "Indexing"
+        uuid = "313cdc1a-70c2-5d6a-ae34-0150d3930a38"
+        version = "1.1.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "012e604e1c7458645cb8b436f8fba789a51b257f"
+        name = "IndirectArrays"
+        uuid = "9b13fd28-a010-5f03-acff-a1bbcff69959"
+        version = "1.0.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "06b65886c7577a3784d616e29f1302c2e36e389d"
+        name = "InlineStrings"
+        uuid = "842dd82b-1e85-43dc-bf29-5d0ee9dffc48"
+        version = "1.4.6"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "InteractiveUtils"
+        uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "d6fe00b123e32ddd17231b35d69a6394e696fd5a"
+        name = "Intervals"
+        uuid = "d8418881-c3e1-53bb-8760-2df7ec849ed5"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "6da3c4316095de0f5ee2ebd875df8721e7e0bdbe"
+        name = "InvertedIndices"
+        uuid = "41ab1584-1d38-5bbf-9106-f11c6c58b48f"
+        version = "1.3.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "b2d91fe939cae05960e760110b328288867b5758"
+        name = "IrrationalConstants"
+        uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
+        version = "0.2.6"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
+        name = "IteratorInterfaceExtensions"
+        uuid = "82899510-4779-5014-852e-03e436cf321d"
+        version = "1.0.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "2c350a2325c19490c0e18ece0137366eafbc4733"
+        name = "JET"
+        uuid = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
+        version = "0.12.3"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "7204148362dafe5fe6a273f855b8ccbe4df8173e"
+        name = "JLLWrappers"
+        uuid = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
+        version = "1.8.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "4657a834b01ce00f2b94546095c4350617b9af2c"
+        name = "JSON"
+        uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+        version = "1.10.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "bed3712e45396e205ddcec9e56479f2ab6e6aebc"
+        name = "JuMP"
+        uuid = "4076af6c-e467-56ae-b986-b466b2749572"
+        version = "1.32.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "4a25454bfd37ad800d20017fe59243e41163fed9"
+        name = "JuliaFormatter"
+        uuid = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
+        version = "2.14.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "210525997a2434caa497655f86d151b1bcad0dce"
+        name = "JuliaInterpreter"
+        uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
+        version = "0.12.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "0d4b3dab95018bcf3925204475693d9f09dc45b8"
+        name = "JuliaSyntax"
+        uuid = "70703baa-626e-46a2-a12c-08ffd08c73b4"
+        version = "1.0.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "JuliaSyntaxHighlighting"
+        uuid = "ac6e5ff7-fb65-4e79-a425-ec3bc9c03011"
+        version = "1.12.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "3bcfa5cd59aecfc0680d8b5b8ea38237b009f112"
+        name = "LLVM"
+        uuid = "929cbde3-209d-540e-8aea-75f648917ca0"
+        version = "9.13.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "d77aea19c9a71059a021acd99b0a4343e9661d94"
+        name = "LLVMExtra_jll"
+        uuid = "dad2f222-ce93-54a1-a47d-0025e8a3acab"
+        version = "0.0.47+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "f88f3ccef05a6a72a0cf0ed417c8fd68530f4ab2"
+        name = "LaTeXStrings"
+        uuid = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+        version = "1.4.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "1370f8202dac30758f3c345f9909b97f53d87d3f"
+        name = "Lazy"
+        uuid = "50d2b5c4-7a5e-59d5-8109-a42b560f39c0"
+        version = "0.15.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "LazyArtifacts"
+        uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "d4816abce26971e3237b46a47b99991f306e4832"
+        name = "LeftChildRightSiblingTrees"
+        uuid = "1d6d02ad-be62-4b6b-8a6d-2f90e265016e"
+        version = "0.3.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "LibCURL"
+        uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
+        version = "1.0.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "LibCURL_jll"
+        uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
+        version = "8.18.0+1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "LibGit2"
+        uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "LibGit2_jll"
+        uuid = "e37daf67-58a4-590a-8e99-b0245dd2ffc5"
+        version = "1.9.1+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "LibSSH2_jll"
+        uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
+        version = "1.11.104+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "d4e20500d210247322901841d4eafc7a0c52642d"
+        name = "LibTracyClient_jll"
+        uuid = "ad6e5548-8b26-5c9f-8ef3-ef0ad883f3a5"
+        version = "0.13.1+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Libdl"
+        uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "be484f5c92fad0bd8acfef35fe017900b0b73809"
+        name = "Libiconv_jll"
+        uuid = "94ce4f54-9a6c-5748-9c1c-f9c7231a4531"
+        version = "1.18.0+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "LinearAlgebra"
+        uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+        version = "1.13.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "LocalSearchSolvers"
+        uuid = "2b10edaa-728d-4283-ac71-07e312d6ccf3"
+        version = "0.4.11"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "b85e2797b2409570e84c4de46238c0ed5f6476ae"
+        name = "LogExpFunctions"
+        uuid = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
+        version = "1.0.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Logging"
+        uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "497f602dc6d4d894e000ad6ee13b6dfd3c0be94a"
+        name = "LoweredCodeUtils"
+        uuid = "6f1432cf-f94c-5a45-995e-cdbf5db27b0b"
+        version = "3.10.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "1e0228a030642014fe5cfe68c2c0a818f9e3f522"
+        name = "MacroTools"
+        uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+        version = "0.5.16"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Markdown"
+        uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "3b3d69130d8ab8c39d5fa4d30e20a8e6428c9d37"
+        name = "MathOptIIS"
+        uuid = "8c4f8055-bd93-4160-a86b-a0c04941dbff"
+        version = "0.2.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "637aa0115265323850b125287833341a6f7b9b54"
+        name = "MathOptInterface"
+        uuid = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
+        version = "1.54.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "MetaStrategist"
+        uuid = "989f9ba8-86ac-4138-b458-047055bae907"
+        version = "0.1.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "ec4f7fbeab05d7747bdf98eb74d130a2a2ed298d"
+        name = "Missings"
+        uuid = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
+        version = "1.2.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "2c140d60d7cb82badf06d8783800d0bcd1a7daa2"
+        name = "Mocking"
+        uuid = "78c3b35d-d492-501b-9361-3d52fe80e533"
+        version = "0.8.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "MozillaCACerts_jll"
+        uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
+        version = "2026.8.13"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "7fc67976fca2c577ca96257061e4785463bb9fb8"
+        name = "MutableArithmetics"
+        uuid = "d8a4904e-b15c-11e9-3269-09a3773c0cb0"
+        version = "1.8.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "01d8466fb449436348999d7c6ad740f8f853a579"
+        name = "MyterialColors"
+        uuid = "1c23619d-4212-4747-83aa-717207fae70f"
+        version = "0.3.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "dbd2e8cd2c1c27f0b584f6661b4309609c5a685e"
+        name = "NaNMath"
+        uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
+        version = "1.1.4"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "NetworkOptions"
+        uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
+        version = "1.3.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "30870d0f2dc0b2dba76b10df1c58c7f018413e56"
+        name = "OpenBLAS32_jll"
+        uuid = "656ef2d0-ae68-5445-9ca0-591084a874a2"
+        version = "0.3.34+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "OpenBLAS_jll"
+        uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
+        version = "0.3.30+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "OpenLibm_jll"
+        uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
+        version = "0.8.7+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "OpenSSL_jll"
+        uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
+        version = "3.5.6+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "1346c9208249809840c91b26703912dff463d335"
+        name = "OpenSpecFun_jll"
+        uuid = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
+        version = "0.5.6+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "05f45c2e0de6259db764adbfd2f1dc6d3f8de13c"
+        name = "OrderedCollections"
+        uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
+        version = "2.0.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "PCRE2_jll"
+        uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
+        version = "10.46.0+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "0ed04c372da78ff5b98e35e3bd4f4ca9931299cc"
+        name = "Parameters"
+        uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
+        version = "0.13.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "663e8b48b789916221e0765393b289ca6c88f24e"
+        name = "Parsers"
+        uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
+        version = "3.0.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "PatternFolds"
+        uuid = "c18a7f1d-76ad-4ce4-950d-5419b888513b"
+        version = "0.2.7"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Pkg"
+        uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+        version = "1.13.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "36d8b4b899628fb92c2749eb488d884a926614d3"
+        name = "PooledArrays"
+        uuid = "2dfb63ee-cc39-5dd5-95bd-886bf059d720"
+        version = "1.4.3"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "edbeefc7a4889f528644251bdb5fc9ab5348bc2c"
+        name = "PrecompileTools"
+        uuid = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
+        version = "1.3.4"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "5005266de4bfe50e53ff44a5cb5c540b6e47a254"
+        name = "Preferences"
+        uuid = "21216c6a-2e73-6563-6e65-726566657250"
+        version = "1.6.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "99fd8f32ab6728ff205cddd24e2d9ea6cbb498d3"
+        name = "PrettyTables"
+        uuid = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
+        version = "3.5.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Printf"
+        uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Profile"
+        uuid = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "b437cdb0385ed38312d91d9c00c20f3798b30256"
+        name = "ProgressBars"
+        uuid = "49802e3a-d2f1-5c88-81d8-b72133a6f568"
+        version = "1.5.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "f0803bc1171e455a04124affa9c21bba5ac4db32"
+        name = "ProgressLogging"
+        uuid = "33c8b6b6-d38a-422a-b730-caa89a2f386c"
+        version = "0.1.6"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "fbb92c6c56b34e1a2c4c36058f68f332bec840e7"
+        name = "ProgressMeter"
+        uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "4fbbafbc6251b883f4d2705356f3641f3652a7fe"
+        name = "PtrArrays"
+        uuid = "43287f4e-b6f4-7ad1-bb20-aadabca52c3d"
+        version = "1.4.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "QUBOConstraints"
+        uuid = "110b7fcc-6942-4061-a625-86e03d1de7cf"
+        version = "0.2.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "REPL"
+        uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Random"
+        uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "0c0dcffc464cda2ff33fc8ffc1dd1bdd53cd98be"
+        name = "RecipesBase"
+        uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
+        version = "1.4.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
+        name = "Reexport"
+        uuid = "189a3867-3050-52da-a836-e630ba90ab69"
+        version = "1.2.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "62389eeff14780bfe55195b7204c0d8738436d64"
+        name = "Requires"
+        uuid = "ae029012-a4dd-5104-9daa-d747884805df"
+        version = "1.3.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "177e0fc0e89b18c567e90d04f841a8304b22f097"
+        name = "Revise"
+        uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
+        version = "3.17.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "SHA"
+        uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+        version = "1.0.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "9b81b8393e50b7d4e6d0a9f14e192294d3b7c109"
+        name = "Scratch"
+        uuid = "6c6a2e73-6563-6170-7368-637461726353"
+        version = "1.3.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "084c47c7c5ce5cfecefa0a98dff69eb3646b5a80"
+        name = "SentinelArrays"
+        uuid = "91c51154-3ec4-41a3-a24f-3f23e20d615c"
+        version = "1.4.10"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Serialization"
+        uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "1b2f1fd20ce67f9e7fbabd9cef407e6e284875f2"
+        name = "SnoopCompile"
+        uuid = "aa65fe97-06da-5843-b5b1-d5d13cad87d2"
+        version = "3.2.9"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "483a96a3655c93e27cd7baaa0a00fcdda1f3fdec"
+        name = "SnoopCompileCore"
+        uuid = "e2b509da-e806-4183-be48-004708413034"
+        version = "3.1.3"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Sockets"
+        uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "13cd91cc9be159e3f4d95b857fa2aa383b53772a"
+        name = "SortingAlgorithms"
+        uuid = "a2af1166-a08f-5f64-846c-94a0d3cef48c"
+        version = "1.2.3"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "SparseArrays"
+        uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+        version = "1.13.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "429071b23f4c9a13fb6582f807cc2ef454082408"
+        name = "SpecialFunctions"
+        uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
+        version = "2.9.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "6ab403037779dae8c514bad259f32a447262455a"
+        name = "StaticArraysCore"
+        uuid = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+        version = "1.4.4"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "e2b53ce13a53367e96601081e33d34746b571bad"
+        name = "Statistics"
+        uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+        version = "1.11.5"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "178ed29fd5b2a2cfc3bd31c13375ae925623ff36"
+        name = "StatsAPI"
+        uuid = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
+        version = "1.8.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "adb9da019510162e67a4493fc235c23203d8b09e"
+        name = "StatsBase"
+        uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+        version = "0.34.13"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "b765e46ba27ecf6b44faf70df40c57aa3a547dcb"
+        name = "StringEncodings"
+        uuid = "69024149-9ee7-55f6-a4c4-859efe599b68"
+        version = "0.3.7"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "9e3a02d73a8f0a9be04e677dbef758aab40f8bea"
+        name = "StringManipulation"
+        uuid = "892a3eda-7b42-436c-8928-eab12a02cf0e"
+        version = "0.6.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "b814d5005d6a529d740ffe06f8a86396f6501138"
+        name = "StructUtils"
+        uuid = "ec057cc2-7a8d-4b58-b3b3-92acb9f63b42"
+        version = "2.9.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "StyledStrings"
+        uuid = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "SuiteSparse_jll"
+        uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
+        version = "7.10.1+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "TOML"
+        uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+        version = "1.0.3"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "9ecd8b67004162f1651bcea9ee7cd0fdf87e6c26"
+        name = "TZJData"
+        uuid = "dc5dba14-91b3-4cab-a142-028a31da12f7"
+        version = "1.11.0+2026e"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "c06b2f539df1c6efa794486abfb6ed2022561a39"
+        name = "TableTraits"
+        uuid = "3783bdb8-4a98-5b6b-af9a-565f29a5fe9c"
+        version = "1.0.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "a94d9bdda1b7bed0046cea645639ab3f62196fac"
+        name = "Tables"
+        uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
+        version = "1.14.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Tar"
+        uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
+        version = "1.10.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "723986b94b7d64842046ef482a0e2e7b89bc3249"
+        name = "Term"
+        uuid = "22787eb5-b846-44ae-b979-8e399b8463ab"
+        version = "2.2.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Test"
+        uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "9edf3b25f95dd92da044289a5c13cbdcfa142a77"
+        name = "TestItemRunner"
+        uuid = "f8b46487-2199-4994-9208-9a1283c18c0a"
+        version = "1.3.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "a6dd904babc04670c784f81b67957a3545271610"
+        name = "TestItems"
+        uuid = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
+        version = "1.1.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "d422301b2a1e294e3e4214061e44f338cafe18a2"
+        name = "TimeZones"
+        uuid = "f269a46b-ccf7-5d73-abea-4c690281aa53"
+        version = "1.22.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "73e3ff50fd3990874c59fef0f35d10644a1487bc"
+        name = "Tracy"
+        uuid = "e689c965-62c8-4b79-b2c5-8359227902fd"
+        version = "0.1.6"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
+        name = "TranscodingStreams"
+        uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
+        version = "0.11.3"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "90930c3c438e1a60f9eb38e5a640e60c3238f5ce"
+        name = "TreeSitter"
+        uuid = "f42328cb-ece0-4cf2-995f-9e7abb27d006"
+        version = "0.2.3"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "UUIDs"
+        uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "387c1f73762231e86e0c9c5443ce3b4a0a9a0c2b"
+        name = "UnPack"
+        uuid = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
+        version = "1.0.2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Unicode"
+        uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+        version = "1.11.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "53915e50200959667e78a92a418594b428dffddf"
+        name = "UnicodeFun"
+        uuid = "1cfade01-22cf-5700-b092-accc4b62d6e1"
+        version = "0.4.1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "XCSP3Bridges"
+        uuid = "2c268c00-805a-4bbc-9664-dd5edd963493"
+        version = "0.1.0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "b826aedca5fce2e3c91904e338c279e5c1a2da74"
+        name = "XML2_jll"
+        uuid = "02c8fc9c-b97f-50b9-bbe4-9be30ff0a78a"
+        version = "2.15.4+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "9c685a6e94e255019e2bf9486318147cd42fe34a"
+        name = "YAML"
+        uuid = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
+        version = "0.4.17"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Zlib_jll"
+        uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
+        version = "1.3.1+2"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "Zstd_jll"
+        uuid = "3161d3a3-bdf6-5164-811a-617609db77b4"
+        version = "1.5.7+1"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "libblastrampoline_jll"
+        uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
+        version = "5.15.0+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "nghttp2_jll"
+        uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
+        version = "1.67.1+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        name = "p7zip_jll"
+        uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
+        version = "17.8.2+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "cd8c31cbd887c3260b79acfeb0dce1298deca1c9"
+        name = "tree_sitter_jll"
+        uuid = "695101d5-1b81-5434-9529-70430e482717"
+        version = "0.25.10+0"
+        [[flat_zinc_attributes.environment_provenance.resolved_packages]]
+        git-tree-sha1 = "940c5a89c367f566812c5816a4d14e935e91651f"
+        name = "tree_sitter_julia_jll"
+        uuid = "52be201e-a5e9-5cfe-8bf2-2dc4b062171c"
+        version = "0.25.0+0"
+
+    [[flat_zinc_attributes.heap]]
+    analysis_scope = "unavailable"
+    correctness = "passed"
+    finding_count = 0
+    measurements = "unavailable"
+    quality = "not_checked"
+    representative_findings = []
+    scenario = "flat_zinc_scalar_attributes"
+    status = "complete"
+    summary = "Redacted heap snapshot captured after verification. Covers GC-managed objects in the whole worker; native and device memory are excluded."
+    tool = "heap"
+    tool_version = "unavailable"
+
+        [[flat_zinc_attributes.heap.artifacts]]
+        bytes = 330821042
+        kind = "heap_snapshot"
+        path = "/tmp/qubo-perf-night-20261008.ueeYcD/cpe-final-attributes-heap/artifacts/7976ad5c-99e9-4132-bf63-a9ad3d54e35a/after-operation.heapsnapshot"
+        redacted = true
+        removed_after_metadata_capture = true
+        sha256 = "f8bb2645f58df938ab3a5369ca5a9a6cf9e3a1a3d10afcf9cf3ae98ac786b809"
+
+        [flat_zinc_attributes.heap.input_fingerprints]
+        "/home/azzaare/.julia/dev/JuliaConstraintsPerfNightQUBO/ConstraintProgrammingExtensions/perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
+
 [quality_repair_tests]
 assertions = 69464
 elapsed_seconds = 167.0
+qualified_phase = "preceding-4c3ac2af"
 scope = "Complete source suite after scoped type-parameter and compatibility-bound repairs."
 status = "passed"
 
+[source_hashes]
+"src/Bridges/Bridges.jl" = "b457ccdd701bc5b87f2a48cbd66f8ee40daff4e84f38b902f2fc60025be2794d"
+"src/Bridges/Constraint/AbsoluteValue/abs_to_milp.jl" = "f2c0299d4b3b745218d4120ddf3ddfb2bdce47ac17722ddea6d80f8dc9157e7b"
+"src/Bridges/Constraint/AllDifferent/ad_to_neq.jl" = "6f9c0a1beb5512f2a3a116a20efc140052402b1d3cbc841ff08c92d9ed81be2e"
+"src/Bridges/Constraint/AllDifferentExceptConstants/adec_to_disjunction.jl" = "17218f246ae9ca102ad36bf7cc6e8d69efb81d5b2e2e0bedafeafdd5b460570f"
+"src/Bridges/Constraint/AllDifferentExceptConstants/adec_to_reif.jl" = "4b78752044d7314df3b64fa6316eb3812802ab787119ede17bceefe476b70730"
+"src/Bridges/Constraint/AllEqual/alleq_to_eq.jl" = "cc51f9a9938a7130a009dab72b8a1cf4f4b1e1c2d2867ba5a1b4fae4be4bd5de"
+"src/Bridges/Constraint/ArgumentMaximumAmong/argmax_to_milp.jl" = "9f26f4fb6a7c716a6e18ed2271631bc338a336356e3aa660ed02a3e977e1e8eb"
+"src/Bridges/Constraint/ArgumentMinimumAmong/argmin_to_milp.jl" = "af90276cbf67cec85006ddb8003a7ee81598689107d996b6c3275d8fd380c78b"
+"src/Bridges/Constraint/BinPacking/bp_to_milp.jl" = "3c5ec9f802054bc8f1c04f967c49263de36f7ee0765fa87b5a55f0437caabc7a"
+"src/Bridges/Constraint/BinPacking/fixedcapa_to_bp.jl" = "3f6c25832607abcb2b6cfca01afce7700ff6135099402f43cac156f270660867"
+"src/Bridges/Constraint/BinPacking/fixedcapa_to_varcapa.jl" = "010a02922c19888880385d30e569aa028a8a2a4bde932012679724f28266149f"
+"src/Bridges/Constraint/BinPacking/varcapa_to_bp.jl" = "ecb3f20df9db67d9212fa630efa37a7c7e6eba72db272507d6d10d867b7ab6de"
+"src/Bridges/Constraint/Conjunction/conjunction_to_reif.jl" = "af55f6cbcc51ba6a24652025323bf51c1e9be5622d94fff0f1a00059931ad629"
+"src/Bridges/Constraint/Constraint.jl" = "a6893bc2e880f0a02a9b08990e8305a7d5ee9c1cde8f49fe540db9b6ed0aa601"
+"src/Bridges/Constraint/Count/count_to_reif.jl" = "c02ac6615e3de5fd66fd961e9a917fe0de0d7b52f9f9b0d08daab0eb397fec49"
+"src/Bridges/Constraint/CountCompare/countcmp_to_count.jl" = "6355bd38b03ca2466e1c6e4f217d7b73ffd1dd8f9bc10955f734d7bb0ed4c2f8"
+"src/Bridges/Constraint/Decreasing/dec_to_lp.jl" = "c6234798e78dd97328050126229ac0e0637aae75605d54f55de88b3be812eead"
+"src/Bridges/Constraint/DifferentFrom/neq_to_pseudolp.jl" = "a6378559d805c96e422c061f3b4dd481c3b1b9573d69de76a7be3019cb810037"
+"src/Bridges/Constraint/DifferentFrom_Indicator/neq_indicator_to_pseudolp.jl" = "384d9b41ea9b0d16695753f1c87c761d05a04e6a554e82739fcf705812095668"
+"src/Bridges/Constraint/DifferentFrom_Reify/reif_neq_to_indic.jl" = "6c74f6fd0c1b9f916b33957c4605b6aacf4c537110db3e946b903be9f36a8fd0"
+"src/Bridges/Constraint/DifferentFrom_Reify/reif_neq_to_milp.jl" = "692842c6d8a9152035822a9d9b57821fe0db6668ccddbb5bbdd2f350e7116546"
+"src/Bridges/Constraint/Disjunction/disjunction_to_reif.jl" = "ddf17801a25ef6fd9b6b482aa9e633b763373d72aeed84e2fcbd4afee60ef6dd"
+"src/Bridges/Constraint/Domain/domain_to_milp.jl" = "91dce09c914aab7e6fbaafa07055d7fdd86e12ea070f81e0463465f9fe280624"
+"src/Bridges/Constraint/DoublyLexicographicallyGreaterThan/dlgt_to_lgt.jl" = "b076b4e94fbfe36fbf198d3dd93283b27522c1f051ea4fbb8f18464f144b76e7"
+"src/Bridges/Constraint/DoublyLexicographicallyLessThan/dllt_to_llt.jl" = "8cf5919823bc89ce639288bd1a3c339697d171fe24e41194ebceb59e9c502f8e"
+"src/Bridges/Constraint/Element/element_to_milp.jl" = "ef6db99bba2dd990aaa2eb4980a38927aab5f1e4a3356fe8e6bd2d24184d1b20"
+"src/Bridges/Constraint/ElementVariableArray/elementva_to_milp.jl" = "69bdc65a66ae4c4c17405b25592db164ffadf3d7af5e23c4cc9dd993b07a21e1"
+"src/Bridges/Constraint/EqualTo_Reify/reif_eqto_to_indic.jl" = "ff80c8176eb0ec3d42040595d02b05759b3e16824a4b4f917b1cd921d9e333f4"
+"src/Bridges/Constraint/EqualTo_Reify/reif_eqto_to_milp.jl" = "f837e3be17a60344b1b8212a767590f88778a863c9c359fa1011502fea679786"
+"src/Bridges/Constraint/GlobalCardinality/cgc_to_gc.jl" = "91c1fb35ddd111c1eb3cbb13aa69bdf34cf1c78a1314d20eba15af4a46e84773"
+"src/Bridges/Constraint/GlobalCardinality/cgcv_to_gcv.jl" = "9377386ec13c8828b78efd0806a6fc9adb0753e4485dea42559c9cdc43137104"
+"src/Bridges/Constraint/GlobalCardinality/gc_to_count.jl" = "8bbb40b29ce24940b82ad5e7118b3f04325b12899bb154d6be11ea53014b7b9d"
+"src/Bridges/Constraint/GlobalCardinality/gc_to_gcv.jl" = "16bc5ca0405e0ded5642675bd2e78639333abb4b2c93e12250ba84f840ca5867"
+"src/Bridges/Constraint/GlobalCardinality/gcv_to_count.jl" = "639e4f12e57bae3ca70a33de775f02ab5df320c0af90a1148de81b926651d752"
+"src/Bridges/Constraint/GreaterThan_Reify/reif_gt_to_indic.jl" = "8b176b2f4ef9c338ca98c7ee4cbde871911c5513f9f268dc0904d6ca2669a2f7"
+"src/Bridges/Constraint/GreaterThan_Reify/reif_gt_to_milp.jl" = "8fb578e022f44dfbe33dc9fa708bc39ab09b3e1c1bd0c9983c83847ad23e5afc"
+"src/Bridges/Constraint/IfThenElse/ifthenelse_to_implication.jl" = "4a5921ac39e71383916d1e1a3a000739445ce93caf2d58da7e0216511d79fd1d"
+"src/Bridges/Constraint/IfThenElse/ifthenelse_to_reif.jl" = "7a0a9ab0259a3f7139c4e634785cb5288963382c15714a57324b7d07d89d6923"
+"src/Bridges/Constraint/Implication/implication_to_reif.jl" = "30bd53e58dafdcc1f6b753136052ca7536a2f3df5c9aeee3cdec3c5cb2170a26"
+"src/Bridges/Constraint/Increasing/inc_to_lp.jl" = "630bfd6506e1cdeca1f93cf09ce838edff282e4b70bdf24b8e600c4e9e108d55"
+"src/Bridges/Constraint/Inverse/inverse_to_reif.jl" = "99047bb411984f752525c61f302ec99f5ffa83f43b5551c0ed63afc5f217a944"
+"src/Bridges/Constraint/Knapsack/kp_to_milp.jl" = "163665ed2a708af18b48c1c6e8d3c9ac82a5a383aa604793dbb7b8f32d6d5c96"
+"src/Bridges/Constraint/Knapsack/kp_to_varcapa.jl" = "ccf7a74c154fc0b34d91f0a8f62383f4ad56661361eae8c941d28cc3964634e5"
+"src/Bridges/Constraint/Knapsack/varcapav_to_varcapa.jl" = "16944fee46f5d0f242a5b9e48b772d26dadc8232717a9b269f165a465d8b09ee"
+"src/Bridges/Constraint/Knapsack/vkp_to_kp.jl" = "36dde029255a6304f2b58fbc57b8ce66f6e38177cfb3da551bda12b2c15e2114"
+"src/Bridges/Constraint/LessThan_Reify/reif_lt_to_indic.jl" = "77f3933f2ad667949be50583378dce2098f398e04658afce027cf5795acc8248"
+"src/Bridges/Constraint/LessThan_Reify/reif_lt_to_milp.jl" = "9061bd0bd30cc189ca4b2c42e7dc3536a5c387a49296743a1e0826c030bd883d"
+"src/Bridges/Constraint/LexicographicallyGreaterThan/lgt_to_indic.jl" = "e055e944fe5469a503ac62dad6209dcc4155d6a02d6edc39f809a270abf34b05"
+"src/Bridges/Constraint/LexicographicallyLessThan/llt_to_indic.jl" = "d8463782a76c1c595a1eb8808773b9c2815f7408837f5cd50cc719258c3493e6"
+"src/Bridges/Constraint/MaximumAmong/max_to_milp.jl" = "e9d5d332593af3a5c84997a44ba633e6bc7001b616131b75575d10b84515c860"
+"src/Bridges/Constraint/MinimumAmong/min_to_milp.jl" = "15d4502b87772b261d81d03627263552016c1022c7eec672bf7e5db348d43999"
+"src/Bridges/Constraint/NonOverlappingOrthotopes/noov_to_disjunction_milp.jl" = "f663ad42b1fcdb3fc029e094a7d5ca7d171f3d90a6b315c08a9a70c565f084bb"
+"src/Bridges/Constraint/NonOverlappingOrthotopes/noov_to_noovcond.jl" = "69fd96251cda0637e91b05993b4a6d8a81d369ff32efd5545878ee41c5826861"
+"src/Bridges/Constraint/SlidingSum/ss_to_lp.jl" = "3b7dd52be5e5c3f978ad7e9dc4fb4d97d3c9f14f640331fda7593851dbae239a"
+"src/Bridges/Constraint/Sort/sort_to_milp.jl" = "0872f7b5edc5df5c6f8ec0e496e10a349713f65f24056fc8c2e730c905dec17f"
+"src/Bridges/Constraint/Sort/sort_to_perm.jl" = "941b67333824856627773271703de20cb169001b6f8e5a26a04b1859c2392ed3"
+"src/Bridges/Constraint/SortPermutation/perm_to_alldiff_indexing.jl" = "6d8c5dbe19cfe04c71fb44eeb78f4bca60462805ba3493d7d243622b4e2037cd"
+"src/Bridges/Constraint/SortPermutation/perm_to_milp.jl" = "9d2dd70da43b947ca28a08131c2889535efab9d6ef9ce4adc3ac5b8550055bd4"
+"src/Bridges/Constraint/Strictly/strictly_dec_to_lp.jl" = "1cb53f8611d2cf4f95d1442d7b540dcda0bdfeb9183e9cd71ae442d6d7d81975"
+"src/Bridges/Constraint/Strictly/strictly_dlgt_to_lgt.jl" = "04b179bc3184b9102bc987b3a08f951daea731504d5ed42ae32f426238e8e731"
+"src/Bridges/Constraint/Strictly/strictly_dllt_to_llt.jl" = "92fffc25c7d5e33389735615463c35bcf015345d28acc84ed6d2f70309aa1c4b"
+"src/Bridges/Constraint/Strictly/strictly_gt_to_strictly_lt.jl" = "20a5dfa22e003237d055a51b12c466da31f174562644f985714ec7bb2bfc8e5f"
+"src/Bridges/Constraint/Strictly/strictly_inc_to_lp.jl" = "532dcda641e4e87ebbeed9fccadc9c57e5af1415d6ef9abaab36236324d25fdd"
+"src/Bridges/Constraint/Strictly/strictly_lgt_to_indic.jl" = "6724d9a0ecde636f4feb785478dab632ed14e44578ad1909f5c41c3b523111b4"
+"src/Bridges/Constraint/Strictly/strictly_llt_to_indic.jl" = "6eb6aa60c017c4e9bc9f8b9977d14e7fa60044fe7b5c28f916b4a127b33e80ea"
+"src/Bridges/Constraint/Strictly/strictly_lt_to_strictly_gt.jl" = "e1a07c357204ae34ce9550fe9e77ab54f1984aaac6e2a92b89feb155f7238bd8"
+"src/Bridges/Constraint/Strictly/strictly_to_lp.jl" = "a719ce6a0bd6184f27c69807cb930827c026b2ea963ef658d17e72ed55a927bb"
+"src/Bridges/Constraint/SymmetricAllDifferent/salldiff_to_alldiff_inverse.jl" = "6ed345bc26e3e48efae75c9613e43121b66d7611321f8cd7cf97760d2fafceb0"
+"src/Bridges/Constraint/ValuePrecedence/vprec_to_reif.jl" = "eed18a8b810ce221997cbfeafb2ac6e1d9d56036f4d7fbd9c161c3fae0fb5093"
+"src/Bridges/Constraint/VectorDomain/vd_to_milp.jl" = "227931e07bb4c20a0384e3f64217132ab3b214fe8c53b21e6b3214995e036984"
+"src/Bridges/helpers.jl" = "1aa329cae2e518d76194570247bfa59679f5c567320c2c65c2197670edf92150"
+"src/ConstraintProgrammingExtensions.jl" = "edb1fc1b7fecb41423491e364a16872189d1220247b19ce29e142b169ee4eee9"
+"src/FlatZinc/FlatZinc.jl" = "d87491afef61303c520e7701e1120f90f9779d1f77440fcc0c4d4d615b81faa5"
+"src/FlatZinc/export.jl" = "9c1409498cc58ac0037885d80ecc8b40b42697634bd3d0d2a82a552ed2663e53"
+"src/FlatZinc/import.jl" = "517ced449d091d24cd259d2ba572becd4eb6d06161e785c9ad5dc2c652caa5dc"
+"src/FlatZinc/model.jl" = "1a06c114c4d048c296a27bdd4316ce44b5aa816c3e949936fc46618812729ab8"
+"src/FlatZinc/optimizer.jl" = "cbce7f4659f926b093d2020650063d3e98594a1ad8796ba816cd79080b359186"
+"src/Test/Test.jl" = "375458881ef8b33de5d45e1907b26a612a2001122d6f2def865453255d9f8b50"
+"src/Test/test_alldifferent.jl" = "aa29678b6072355d2e73814d5a7d545a61208f26666eebe6167c9d8829e391f2"
+"src/Test/test_antidomain.jl" = "8625127a549b6795d60f7d21d0c1268d21dabec5e3aea5d8f62b8aa5f44415dd"
+"src/Test/test_binpacking.jl" = "a98e9530ecee61ad4036a60ef6e1c4098a5daeb0c4fbd2c6b288033154bef9c0"
+"src/Test/test_count.jl" = "0e9ea5b33054cd15944cb0c197c227113b041313f3d12d3daf097b9001c415eb"
+"src/Test/test_countdistinct.jl" = "13804ea4d2626c77435aabd66a54d9f6a2f879b3388c167ad3d98034239e869f"
+"src/Test/test_differentfrom.jl" = "436d888b273ff3df862d5a27375b7780f15a8e5b68d8b3fe57a34a6d33812e31"
+"src/Test/test_domain.jl" = "90c474ffbcf388d431118f8f731c7a9762fbf114411eb5015b8bfe37a8251fa1"
+"src/Test/test_element.jl" = "9c81c38c911c670cc8a887a61ac608a7292789a43b297e64b3016b5cf24e3743"
+"src/Test/test_equivalence.jl" = "17dabc9d12c9274b0dd09a0b0fe15429d94bd778c8abd1114e6c10a7cd62c23c"
+"src/Test/test_equivalencenot.jl" = "32cface186b7989450d380c1a1eb101ca6adb73284aece7189f6f45b9e35db30"
+"src/Test/test_ifthenelse.jl" = "c0f0e8bb86c39a534b2827af1651c36f665dfe59b148e3522725d727aa824b8e"
+"src/Test/test_implication.jl" = "5e35cec5b8c63375b99a1ebb5ff30e98aae14114538fe9c259a76897ab1c694b"
+"src/Test/test_indicator.jl" = "538a03db6af4598d90a101d68510fdb11a1667369a3dc03f9446d97b1a5ec472"
+"src/Test/test_integration.jl" = "e465ed01b5f37b6ba9769ae7d4b46462581f82855725efa9b38f10f4baaf9c5c"
+"src/Test/test_inverse.jl" = "aa776442fd78b0b2b2b76de97ca40b36f731b131d8c94c97d17fc697752e3b2f"
+"src/Test/test_lexicographically.jl" = "167e1c043245413c0f7066f0a4d8dc78766c1fb09303d41bf8ad2f08ea379d38"
+"src/Test/test_minimumdistance.jl" = "6a98c65d1ae1b6d93ffc042676b519b7ae8295b56d09defe807fe9800f781206"
+"src/Test/test_reification.jl" = "8077e2f73eb69cee763decc843359a2a9c50bee2e27295cbd4ac54553de483a7"
+"src/Test/test_strictly.jl" = "9017761fad65858651bf766ad6194a70f1dbd637863fc3e6f53e23b6aae58b74"
+"src/Test/test_strictly_lexicographically.jl" = "35e50ad634d30f3ef26a366944579cca78a5e8bc820d2aa70a7109e29c1b58fe"
+"src/Test/test_truefalse.jl" = "e5d02c65601a48b8043097bd50f1df423a55b7f7865c502b2b23817deb9ed2d3"
+"src/moi_traits.jl" = "60f270f42555367e4dacb845fd3ca21a6520fdc0933a8af25df75191056283ff"
+"src/semantic.jl" = "1271b48079840ce43fb61762527863ee1b51e5d7444e7183e0cf29f2b8fdaaa6"
+"src/sets.jl" = "597a187ee8dd62040b109b6afa51e2ec903c9e84452af9a47ecefa6a1c315bd7"
+"src/sets_combinatorial.jl" = "15e792b0497d8e41859d93fa8336e4469634721be2527c6dc19600c37112fc52"
+"src/sets_combinatorial_binpacking.jl" = "b895078bb576d7d34f92ff47ed364c44c8d296ba58d741afe0fb08face51dece"
+"src/sets_combinatorial_knapsack.jl" = "d70c2aa93cd5bb6ff15474ec1a6c1123b84dde0e4bce8deeced05a934e1793ba"
+"src/sets_count.jl" = "23e302bca8e23adc81073527e318d78a7892b16ffbbfe7a4a789b60ab1e69471"
+"src/sets_functions.jl" = "ab75bb60a9c2b36c3a47bba2782a9c7d52756c7b01944c2dcdb69dbac6b3509b"
+"src/sets_graph.jl" = "6b596d3bb430f28dd81bc77602d4d787f94940eab9690072b8d23152719d0315"
+"src/sets_reification.jl" = "0b490b985f3e0fde50de2239f64c0ef3616a8ed6ab306de430a067afaefb4e3f"
+"src/sets_scheduling.jl" = "0e688ab51e628719344a4bbeb55351e78c422bbb5d4a1a0004978e62717cb317"
+"src/sets_sorting.jl" = "eaa56e66737fd7bccfd0ab457b5e1dd3099fbbf8fea2d27aeada9471195a1543"
+"src/sets_strictly.jl" = "e2d0ec7ca119dd97e53b8e93ff8fe5165286ed3a02a43b4cc9c2c383fc49e6a0"
+"src/sets_xcsp3.jl" = "68dae3082e317a64b347ec86c4d2be47dfc061ba3736d9539238667745c1c568"
+"src/sets_xcsp3_core.jl" = "a98956a2c13610dd5885120d18de473577a02a3ec396100339630d5d4a359005"
+
 [source_sha256]
-"perf/scenarios.jl" = "0518cc5a201d57f20680282a9ca2aacbd9f0d065583911b5f9db957f249752f5"
+"perf/scenarios.jl" = "72903756726a276b6d563c7722201dda126a36657cab7a9944b5a0c1ddb989ec"
 "src/Bridges/Constraint/Domain/domain_to_milp.jl" = "91dce09c914aab7e6fbaafa07055d7fdd86e12ea070f81e0463465f9fe280624"
 "src/Bridges/Constraint/VectorDomain/vd_to_milp.jl" = "227931e07bb4c20a0384e3f64217132ab3b214fe8c53b21e6b3214995e036984"
 
 [tests]
-full_suite_passed = 69464
+adapter_coverage = "Scalar and vector attributes; existing return/error behavior; owned vectors; missing/non-sequential indices; empty/reused model; alternate Walk constructor ordering and storage references; supported and unsupported cardinality function types."
+assertions = 69508
+full_suite_passed = 69508
+new_adapter_assertions = 44
 new_checks = "Exhaustive scalar/vector affine projection with duplicate source terms, nonzero constants and owned arrays."
+status = "passed"

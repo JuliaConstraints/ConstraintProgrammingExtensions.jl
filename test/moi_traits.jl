@@ -1,3 +1,28 @@
+struct _GlobalCardinalitySupportProbe <: MOI.AbstractOptimizer end
+
+function MOI.supports_constraint(
+    ::_GlobalCardinalitySupportProbe,
+    ::Type{MOI.VectorOfVariables},
+    ::Type{CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}},
+) where {T <: Real}
+    return true
+end
+
+@testset "Fixed/open cardinality support dispatch" begin
+    model = _GlobalCardinalitySupportProbe()
+    variables = MOI.VectorOfVariables(MOI.VariableIndex.([1, 2, 3]))
+    for T in (Int, Float64)
+        S = CP.GlobalCardinality{CP.FIXED_COUNTED_VALUES, CP.OPEN_COUNTED_VALUES, T}
+        @test MOI.supports_constraint(model, variables, S)
+        @test MOI.supports_constraint(model, variables, S,
+            Val(CP.FIXED_COUNTED_VALUES), Val(CP.OPEN_COUNTED_VALUES))
+        affine = convert(MOI.VectorAffineFunction{T}, variables)
+        @test !MOI.supports_constraint(model, affine, S)
+        @test !MOI.supports_constraint(model, affine, S,
+            Val(CP.FIXED_COUNTED_VALUES), Val(CP.OPEN_COUNTED_VALUES))
+    end
+end
+
 @testset "Traits" begin
     @testset "is_binary" begin
         model = MOI.Utilities.Model{Float64}()

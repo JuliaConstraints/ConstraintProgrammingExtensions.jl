@@ -24,3 +24,29 @@ repeatable = true
 [scenarios.parameters]
 dimension = 3
 rows = 128
+
+[[scenarios]]
+id = "flat_zinc_scalar_attributes"
+source = "scenarios.jl"
+factory = "optimizer_attribute_case"
+implementation = "typed-attribute-forwarding-v1"
+collectors = ["benchmark", "chairmark", "profile", "profile_alloc"]
+requirements = ["ConstraintProgrammingExtensions", "MathOptInterface"]
+repeatable = true
+[scenarios.parameters]
+variables = 64
+repetitions = 128
+vector_access = false
+
+[[scenarios]]
+id = "flat_zinc_vector_attributes"
+source = "scenarios.jl"
+factory = "optimizer_attribute_case"
+implementation = "typed-attribute-forwarding-v1"
+collectors = ["benchmark", "chairmark", "profile", "profile_alloc"]
+requirements = ["ConstraintProgrammingExtensions", "MathOptInterface"]
+repeatable = true
+[scenarios.parameters]
+variables = 64
+repetitions = 128
+vector_access = true

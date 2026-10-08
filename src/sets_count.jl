@@ -233,6 +233,18 @@ function MOI.supports_constraint(o::MOI.AbstractOptimizer, f::MOI.AbstractVector
     return MOI.supports_constraint(o, f, s, Val(CVCT))
 end
 
+# Both legacy trait shortcuts apply to the fixed/open variant. Their intersection
+# previously had no callable method; use MOI's function-type query at that point.
+function MOI.supports_constraint(
+    o::MOI.AbstractOptimizer,
+    f::MOI.AbstractVectorFunction,
+    s::Type{GlobalCardinality{FIXED_COUNTED_VALUES, OPEN_COUNTED_VALUES, T}},
+    ::Val{FIXED_COUNTED_VALUES},
+    ::Val{OPEN_COUNTED_VALUES},
+) where {T <: Real}
+    return MOI.supports_constraint(o, typeof(f), s)
+end
+
 """
     CountCompare(dimension::Int)
 

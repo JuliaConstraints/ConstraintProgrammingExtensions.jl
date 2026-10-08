@@ -18,10 +18,14 @@ mutable struct ConstraintInfo
     output_as_part_of_variable::Bool
 end
 
+# Preserve the concrete default key/index mappings in the stored dictionary
+# type, so attribute queries do not box a lookup through an abstract field.
+const _VariableInfoDictionary = typeof(CleverDicts.CleverDict{MOI.VariableIndex, VariableInfo}())
+
 mutable struct Model <: MOI.AbstractOptimizer
     # A mapping from the MOI.VariableIndex to the variable object.
     # VariableInfo also stores some additional fields like the type of variable.
-    variable_info::CleverDicts.CleverDict{MOI.VariableIndex, VariableInfo}
+    variable_info::_VariableInfoDictionary
 
     # A mapping from the MOI.ConstraintIndex to the variable object.
     # ConstraintInfo also stores some additional fields like the type of 
