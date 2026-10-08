@@ -110,3 +110,36 @@
         end
     end
 end
+
+@testset "VectorDomain affine projection and owned buffers: $T" for T in (Int, Float64)
+    model = MOIU.Model{T}()
+    x, y = MOI.add_variables(model, 2)
+    f = MOI.VectorAffineFunction([
+        MOI.VectorAffineTerm(1, MOI.ScalarAffineTerm(T(2), x)),
+        MOI.VectorAffineTerm(2, MOI.ScalarAffineTerm(T(-1), y)),
+        MOI.VectorAffineTerm(1, MOI.ScalarAffineTerm(T(1), x)),
+        MOI.VectorAffineTerm(2, MOI.ScalarAffineTerm(T(1), x))], T[3, -2])
+    original = copy(f)
+    domain = CP.VectorDomain(2, Set([T[-3, 0], T[0, -2], T[6, 1]]))
+    bridge = MOIBC.bridge_constraint(COIB.VectorDomain2MILPBridge{T}, model, f, domain)
+    @test f.terms == original.terms && f.constants == original.constants
+    equations = [MOI.get(model, MOI.ConstraintFunction(), c) for c in bridge.cons_values]
+    ordered = collect(domain.values)
+    values = zeros(T, MOI.get(model, MOI.NumberOfVariables()))
+    for a in -2:2, b in -2:2, selected in 1:length(ordered)
+        fill!(values, zero(T))
+        values[x.value], values[y.value] = T(a), T(b)
+        values[bridge.vars[selected].value] = one(T)
+        residuals = [MOIU.eval_variables(v -> values[v.value], g) for g in equations]
+        @test all(iszero, residuals) == (T[3a + 3, a - b - 2] == ordered[selected])
+    end
+    @test equations[1].terms !== equations[2].terms
+    other_terms = copy(equations[2].terms)
+    equations[1].terms[1] = MOI.ScalarAffineTerm(T(99), x)
+    @test f.terms == original.terms && f.constants == original.constants
+    @test equations[2].terms == other_terms
+    handles = MOI.get(bridge,
+        MOI.ListOfConstraintIndices{MOI.ScalarAffineFunction{T},MOI.EqualTo{T}}())
+    empty!(handles)
+    @test length(bridge.cons_values) == 2
+end

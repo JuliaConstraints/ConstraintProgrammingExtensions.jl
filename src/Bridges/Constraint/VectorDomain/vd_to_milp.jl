@@ -29,11 +29,11 @@ function MOIBC.bridge_constraint(
     f::MOI.VectorAffineFunction{T},
     s::CP.VectorDomain{T},
 ) where {T}
-    vars, vars_bin = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:length(s.values)])
+    vars, vars_bin = MOI.add_constrained_variables(model, fill(MOI.ZeroOne(), length(s.values)))
 
     con_choose_one = MOI.add_constraint(
         model,
-        sum(one(T) .* vars),
+        MOI.ScalarAffineFunction([MOI.ScalarAffineTerm(one(T), v) for v in vars], zero(T)),
         MOI.EqualTo(one(T))
     )
     
@@ -43,7 +43,7 @@ function MOIBC.bridge_constraint(
     cons_values = MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}[
         MOI.add_constraint(
             model,
-            f_scalars[i] - sum(one(T) * vars[j] * values[j][i] for j in 1:length(s.values)),
+            _domain_value_function(f_scalars[i], vars, (row[i] for row in values)),
             MOI.EqualTo(zero(T))
         )
         for i in 1:s.dimension

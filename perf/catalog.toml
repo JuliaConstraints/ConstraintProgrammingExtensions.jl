@@ -1,0 +1,26 @@
+schema_version = "perfchecker-scenario-catalog/1"
+root = ".."
+
+[[scenarios]]
+id = "scalar_domain_128"
+source = "scenarios.jl"
+factory = "domain_bridge_case"
+implementation = "owned-direct-affine-terms-v1"
+collectors = ["benchmark", "chairmark", "profile", "profile_alloc"]
+requirements = ["ConstraintProgrammingExtensions", "MathOptInterface"]
+repeatable = true
+[scenarios.parameters]
+dimension = 1
+rows = 128
+
+[[scenarios]]
+id = "vector_domain_128"
+source = "scenarios.jl"
+factory = "domain_bridge_case"
+implementation = "owned-direct-affine-terms-v1"
+collectors = ["benchmark", "chairmark", "profile", "profile_alloc"]
+requirements = ["ConstraintProgrammingExtensions", "MathOptInterface"]
+repeatable = true
+[scenarios.parameters]
+dimension = 3
+rows = 128

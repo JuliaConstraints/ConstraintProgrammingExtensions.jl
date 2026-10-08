@@ -109,3 +109,34 @@
         end
     end
 end
+
+@testset "Domain affine projection and owned buffers: $T" for T in (Int, Float64)
+    model = MOIU.Model{T}()
+    x, y = MOI.add_variables(model, 2)
+    f = MOI.ScalarAffineFunction([
+        MOI.ScalarAffineTerm(T(2), x), MOI.ScalarAffineTerm(T(-1), y),
+        MOI.ScalarAffineTerm(T(1), x)], T(3))
+    original = copy(f)
+    domain = CP.Domain(Set(T[-3, 0, 6]))
+    bridge = MOIBC.bridge_constraint(COIB.Domain2MILPBridge{T}, model, f, domain)
+    @test f.terms == original.terms && f.constant == original.constant
+    value_equation = MOI.get(model, MOI.ConstraintFunction(), bridge.con_value)
+    choose_equation = MOI.get(model, MOI.ConstraintFunction(), bridge.con_choose_one)
+    # Check the projection independently, including repeated source terms and a
+    # nonzero constant, for every binary selector and several source assignments.
+    ordered = collect(domain.values)
+    values = zeros(T, MOI.get(model, MOI.NumberOfVariables()))
+    for a in -2:2, b in -2:2, selected in 1:length(ordered)
+        fill!(values, zero(T))
+        values[x.value], values[y.value] = T(a), T(b)
+        values[bridge.vars[selected].value] = one(T)
+        evaluate(g) = MOIU.eval_variables(v -> values[v.value], g)
+        @test evaluate(choose_equation) == one(T)
+        @test iszero(evaluate(value_equation)) == (3a - b + 3 == ordered[selected])
+    end
+    returned = MOI.get(bridge, MOI.ListOfVariableIndices())
+    empty!(returned)
+    @test length(bridge.vars) == 3
+    value_equation.terms[1] = MOI.ScalarAffineTerm(T(99), x)
+    @test f.terms == original.terms && f.constant == original.constant
+end

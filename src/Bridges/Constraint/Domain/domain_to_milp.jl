@@ -9,6 +9,18 @@ struct Domain2MILPBridge{T} <: MOIBC.AbstractBridge
     con_value::MOI.ConstraintIndex{MOI.ScalarAffineFunction{T}, MOI.EqualTo{T}}
 end
 
+# Each returned function owns its terms. Repeated affine addition copies the
+# growing prefix for every domain value; construct the final terms once instead.
+function _domain_value_function(f::MOI.ScalarAffineFunction{T}, vars, values) where {T}
+    prefix = length(f.terms)
+    terms = Vector{MOI.ScalarAffineTerm{T}}(undef, prefix + length(vars))
+    copyto!(terms, 1, f.terms, 1, prefix)
+    for (j, value) in enumerate(values)
+        terms[prefix + j] = MOI.ScalarAffineTerm(-(one(T) * value), vars[j])
+    end
+    return MOI.ScalarAffineFunction(terms, f.constant)
+end
+
 function MOIBC.bridge_constraint(
     ::Type{Domain2MILPBridge{T}},
     model,
@@ -29,11 +41,11 @@ function MOIBC.bridge_constraint(
     f::MOI.ScalarAffineFunction{T},
     s::CP.Domain{T},
 ) where {T}
-    vars, vars_bin = MOI.add_constrained_variables(model, [MOI.ZeroOne() for _ in 1:length(s.values)])
+    vars, vars_bin = MOI.add_constrained_variables(model, fill(MOI.ZeroOne(), length(s.values)))
 
     con_choose_one = MOI.add_constraint(
         model,
-        sum(one(T) .* vars),
+        MOI.ScalarAffineFunction([MOI.ScalarAffineTerm(one(T), v) for v in vars], zero(T)),
         MOI.EqualTo(one(T))
     )
     
@@ -41,7 +53,7 @@ function MOIBC.bridge_constraint(
 
     con_value = MOI.add_constraint(
         model,
-        f - sum(one(T) * vars[i] * values[i] for i in 1:length(s.values)),
+        _domain_value_function(f, vars, values),
         MOI.EqualTo(zero(T))
     )
 

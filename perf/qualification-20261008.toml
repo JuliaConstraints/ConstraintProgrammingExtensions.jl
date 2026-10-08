@@ -1,0 +1,322 @@
+baseline_commit = "8c74772"
+benchmarktools = "1.7.0"
+blas_threads = 1
+chairmarks = "1.3.1"
+changes = "Build each final affine function once with owned term arrays; avoid repeated growing reductions. Preserve coefficients, source order, constants, bridge handles and copied getter buffers."
+cpu_affinity = [12, 14]
+gc_threads = 1
+julia = "1.13.1"
+julia_threads = 2
+mathoptinterface = "1.54.0"
+native_solver_threads = 1
+perfchecker = "1.0.0"
+precompile_tasks = 1
+qualification = "Same domain sizes, affine inputs, primitive model type, 20 observations and independent projection oracle. Preparation and verification excluded from timed operations. Concurrent overnight tasks were active; timing is operational evidence, not controlled scaling. Source and regression checks passed; default Aqua remains baseline-failed."
+recorded_utc = "2026-10-08T20:03:12.083"
+remaining_hotspots = ["MOI model insertion/copying owns the remaining allocations.", "JET and AllocCheck report generic MOI dispatch and intentional affine/model allocations; analyze concrete optimizer adapters if these become a measured blocker."]
+schema = "qualified-performance-increment/1"
+unavailable = ["Linux perf counters: perf_event_paranoid=4; no kernel policy changed."]
+
+[[analyzers]]
+correctness = "passed"
+findings = 31
+representative_findings = []
+status = "complete"
+target_source_findings = 0
+tool = "jet"
+
+    [analyzers.measurements]
+[[analyzers]]
+correctness = "passed"
+findings = 63
+representative_findings = []
+status = "complete"
+target_source_findings = 0
+tool = "alloccheck"
+
+    [analyzers.measurements]
+[[analyzers]]
+correctness = "passed"
+findings = 1
+representative_findings = []
+status = "complete"
+target_source_findings = 0
+tool = "snoopcompile"
+
+    [analyzers.measurements]
+    inference_seconds = 0.24464893341064453
+
+[aqua]
+baseline_ambiguities = 328
+candidate_ambiguities = 328
+scope = "Default Aqua ambiguity check; pre-existing FlatZinc/MOI interactions."
+status = "baseline_failure_unchanged"
+version = "0.8.18"
+
+[[baseline]]
+allocations = 140
+bytes = 8160
+dimension = 1
+median_seconds = 1.2280000000000001e-6
+oracle = "passed"
+rows = 8
+[[baseline]]
+allocations = 456
+bytes = 54944
+dimension = 1
+median_seconds = 5.0630000000000005e-6
+oracle = "passed"
+rows = 32
+[[baseline]]
+allocations = 1811
+bytes = 626536
+dimension = 1
+median_seconds = 5.2678000000000006e-5
+oracle = "passed"
+rows = 128
+[[baseline]]
+allocations = 329
+bytes = 20368
+dimension = 3
+median_seconds = 4.344e-6
+oracle = "passed"
+rows = 8
+[[baseline]]
+allocations = 1125
+bytes = 152416
+dimension = 3
+median_seconds = 1.2943000000000001e-5
+oracle = "passed"
+rows = 32
+[[baseline]]
+allocations = 4599
+bytes = 1823848
+dimension = 3
+median_seconds = 0.000129311
+oracle = "passed"
+rows = 128
+
+[[candidate]]
+allocations = 34
+bytes = 2192
+dimension = 1
+median_seconds = 3.85e-7
+oracle = "passed"
+rows = 8
+[[candidate]]
+allocations = 37
+bytes = 5040
+dimension = 1
+median_seconds = 7.71e-7
+oracle = "passed"
+rows = 32
+[[candidate]]
+allocations = 44
+bytes = 16320
+dimension = 1
+median_seconds = 3.0e-6
+oracle = "passed"
+rows = 128
+[[candidate]]
+allocations = 65
+bytes = 4704
+dimension = 3
+median_seconds = 8.22e-7
+oracle = "passed"
+rows = 8
+[[candidate]]
+allocations = 68
+bytes = 11088
+dimension = 3
+median_seconds = 1.526e-6
+oracle = "passed"
+rows = 32
+[[candidate]]
+allocations = 76
+bytes = 26032
+dimension = 3
+median_seconds = 4.296e-6
+oracle = "passed"
+rows = 128
+
+[[collectors]]
+collector = "benchmark"
+correctness = "passed"
+id = "scalar_domain_128"
+message = ""
+status = "complete"
+
+    [collectors.allocation_profile]
+
+    [[collectors.metrics]]
+    maximum = 7.405e-6
+    metric = "julia.wall.time"
+    minimum = 2.728e-6
+    [[collectors.metrics]]
+    maximum = 16320.0
+    metric = "julia.alloc.bytes"
+    minimum = 16320.0
+    [[collectors.metrics]]
+    maximum = 44.0
+    metric = "julia.alloc.count"
+    minimum = 44.0
+[[collectors]]
+collector = "chairmark"
+correctness = "passed"
+id = "scalar_domain_128"
+message = ""
+status = "complete"
+
+    [collectors.allocation_profile]
+
+    [[collectors.metrics]]
+    maximum = 5.003e-6
+    metric = "julia.wall.time"
+    minimum = 2.4450000000000003e-6
+    [[collectors.metrics]]
+    maximum = 16320.0
+    metric = "julia.alloc.bytes"
+    minimum = 16320.0
+    [[collectors.metrics]]
+    maximum = 44.0
+    metric = "julia.alloc.count"
+    minimum = 44.0
+[[collectors]]
+collector = "profile"
+correctness = "passed"
+cpu_samples = 0
+id = "scalar_domain_128"
+message = ""
+metrics = []
+status = "complete"
+
+    [collectors.allocation_profile]
+[[collectors]]
+allocation_samples = 225
+collector = "profile_alloc"
+correctness = "passed"
+id = "scalar_domain_128"
+message = ""
+status = "complete"
+
+    [collectors.allocation_profile]
+    bytes_measurement_evaluations = 1
+    count_measurement_evaluations = 1
+    message = "Allocation stacks were captured."
+    profile_evaluations = 5
+    retained_allocations = 225
+    retained_sampled_bytes = 78890
+    sample_rate = 1.0
+    sampled_allocations = 225
+    schema_version = "perfchecker-allocation-profile/1"
+    source_allocations = 225
+    status = "complete"
+    total_allocations = 44
+    total_bytes = 16320
+    total_measurement_evaluations = 2
+    total_semantics = "bytes and allocation count from two separate operation evaluations; not inferred from samples"
+    weight_semantics = "raw sampled bytes and events across all profile evaluations"
+
+    [[collectors.metrics]]
+    maximum = 16320.0
+    metric = "julia.alloc.bytes"
+    minimum = 16320.0
+    [[collectors.metrics]]
+    maximum = 44.0
+    metric = "julia.alloc.count"
+    minimum = 44.0
+[[collectors]]
+collector = "benchmark"
+correctness = "passed"
+id = "vector_domain_128"
+message = ""
+status = "complete"
+
+    [collectors.allocation_profile]
+
+    [[collectors.metrics]]
+    maximum = 1.0147e-5
+    metric = "julia.wall.time"
+    minimum = 4.641e-6
+    [[collectors.metrics]]
+    maximum = 26032.0
+    metric = "julia.alloc.bytes"
+    minimum = 26032.0
+    [[collectors.metrics]]
+    maximum = 76.0
+    metric = "julia.alloc.count"
+    minimum = 76.0
+[[collectors]]
+collector = "chairmark"
+correctness = "passed"
+id = "vector_domain_128"
+message = ""
+status = "complete"
+
+    [collectors.allocation_profile]
+
+    [[collectors.metrics]]
+    maximum = 7.654e-6
+    metric = "julia.wall.time"
+    minimum = 3.957e-6
+    [[collectors.metrics]]
+    maximum = 26032.0
+    metric = "julia.alloc.bytes"
+    minimum = 26032.0
+    [[collectors.metrics]]
+    maximum = 76.0
+    metric = "julia.alloc.count"
+    minimum = 76.0
+[[collectors]]
+collector = "profile"
+correctness = "passed"
+cpu_samples = 0
+id = "vector_domain_128"
+message = ""
+metrics = []
+status = "complete"
+
+    [collectors.allocation_profile]
+[[collectors]]
+allocation_samples = 385
+collector = "profile_alloc"
+correctness = "passed"
+id = "vector_domain_128"
+message = ""
+status = "complete"
+
+    [collectors.allocation_profile]
+    bytes_measurement_evaluations = 1
+    count_measurement_evaluations = 1
+    message = "Allocation stacks were captured."
+    profile_evaluations = 5
+    retained_allocations = 385
+    retained_sampled_bytes = 125730
+    sample_rate = 1.0
+    sampled_allocations = 385
+    schema_version = "perfchecker-allocation-profile/1"
+    source_allocations = 385
+    status = "complete"
+    total_allocations = 76
+    total_bytes = 26032
+    total_measurement_evaluations = 2
+    total_semantics = "bytes and allocation count from two separate operation evaluations; not inferred from samples"
+    weight_semantics = "raw sampled bytes and events across all profile evaluations"
+
+    [[collectors.metrics]]
+    maximum = 26032.0
+    metric = "julia.alloc.bytes"
+    minimum = 26032.0
+    [[collectors.metrics]]
+    maximum = 76.0
+    metric = "julia.alloc.count"
+    minimum = 76.0
+
+[source_sha256]
+"perf/scenarios.jl" = "0518cc5a201d57f20680282a9ca2aacbd9f0d065583911b5f9db957f249752f5"
+"src/Bridges/Constraint/Domain/domain_to_milp.jl" = "91dce09c914aab7e6fbaafa07055d7fdd86e12ea070f81e0463465f9fe280624"
+"src/Bridges/Constraint/VectorDomain/vd_to_milp.jl" = "227931e07bb4c20a0384e3f64217132ab3b214fe8c53b21e6b3214995e036984"
+
+[tests]
+full_suite_passed = 69464
+new_checks = "Exhaustive scalar/vector affine projection with duplicate source terms, nonzero constants and owned arrays."
