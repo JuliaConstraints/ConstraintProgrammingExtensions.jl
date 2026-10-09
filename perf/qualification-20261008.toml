@@ -58,6 +58,18 @@ unbound_type_parameters_after = 0
 unbound_type_parameters_before = 7
 version = "0.8.18"
 
+    [aqua.followup_audit]
+    decision = "No further source correction is needed. Keep default Aqua and all supported mathematical forms."
+    default_test_all = "Fresh Aqua.test_all(ConstraintProgrammingExtensions) passed all default checks on 2026-10-09 03:01 UTC; zero ambiguities and zero unbound type parameters."
+    qualified_commit = "7ab51085b7e17db00c21c496a8f70d47a3422c11"
+    recorded_utc = "2026-10-09T03:10:21.162"
+    residual_ambiguity_fix_commit = "7ab51085b7e17db00c21c496a8f70d47a3422c11"
+    residual_ambiguity_reasons = ["The alternate Walk constructor had an outer T without the Real bound already required by the Walk set definition. Matching that existing bound preserves constructor order and storage.", "The fixed/open GlobalCardinality trait shortcuts intersected without a callable method. The explicit intersection delegates to the standard MOI supports_constraint optimizer/function-type/set-type query, with supported and unsupported functions covered by regressions."]
+    source_hashes_verified = 114
+    standard_package_test = "Parent read-only V6 standard Pkg.test with allow_reresolve=false passed 69508 assertions at the same published commit; /tmp/hdr-full-package-tests-v6-20261009.toml."
+    unbound_fix_commit = "4c3ac2af6f1575dae7148ff6e253c6a4d974f92c"
+    unbound_reasons = ["Three StrictlyDecreasing methods and three StrictlyIncreasing methods unnecessarily bound an outer S in alternative union arms or support queries. The equivalent Strictly{Decreasing}/Strictly{Increasing} argument and locally scoped support-query parameter preserve accepted forms.", "One FlatZinc reification export union bound U outside arms that do not use it. Scope U independently inside the EqualTo, LessThan and Strictly LessThan arms; DifferentFrom retains the affine coefficient parameter T."]
+
 [[baseline]]
 allocations = 140
 bytes = 8160
